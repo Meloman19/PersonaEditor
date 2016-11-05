@@ -520,7 +520,6 @@ namespace PersonaFont
             }
         }
 
-
         public void Save2BMP(ref FileStream FONT)
         {
             int x = 0;
