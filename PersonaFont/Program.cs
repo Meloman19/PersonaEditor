@@ -511,7 +511,7 @@ namespace PersonaFont
             int abs = Count;
             for (int i = 1; i < Count; i++)
             {
-                if ((Count / i == Math.Round((double)Count / i)) & (Math.Abs((decimal)i - Count / i)) < abs)
+                if ((Count % i == 0) & (Math.Abs((decimal)i - Count / i)) < abs)
                 {
                     abs = (int)Math.Abs((decimal)(i - Count / i));
                     x = i;
