@@ -266,8 +266,28 @@ namespace PersonaFont
                 FONT_COMPRESS_FILE.Position = 0x4;
                 Add.Write4ByteFile(ref FONT_COMPRESS_FILE, ((int)FONT_COMPRESS_FILE.Length - (Add.TotalNumberOfGlyphs * 2 + 7)));
 
-
                 File.Delete(@"GLYPH POSITION NEW");
+
+                FONT_COMPRESS_FILE.Position = Add.GlyphCutTable_Pos;
+
+                using(FileStream Cut_Table = new FileStream(@"FONT0 CUT.TXT", FileMode.Open))
+                {
+                   using (StreamReader sr = new StreamReader(Cut_Table))
+                    {
+                        while (sr.EndOfStream == false)
+                        {
+                            string str = sr.ReadLine();
+                            while (str.Length != 0)
+                            {
+                                str = str.Remove(0, 1);
+                                FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str.Remove(2)));
+                                str = str.Remove(0, 3);
+                                FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str.Remove(2)));
+                                str = str.Remove(0, 3);
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {
