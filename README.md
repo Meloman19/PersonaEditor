@@ -6,9 +6,7 @@
 * "FONT0 CUT.TXT" - cut's table. One line has 16 pair of number (left cut, right cut). Both numbers mean count pixels from left edge.
 3. Editing bitmap and cut's table.
 
-!Attention!
-
-Don't change cut's table structure! Result "FONT0.BMP" must have origin size and color depth!
+**Attention! Don't change cut's table structure! Result "FONT0.BMP" must have origin size and color depth!**
 
 4. Place origin "FONT0.FNT" and changed "FONT0.BMP","FONT0 CUT.TXT" near "PersonaFont.exe"
 5. Run "PersonaFont.exe", enter "com" and you got:
