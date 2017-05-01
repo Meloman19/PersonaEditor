@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("PersonaFont")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Persona Font")]
+[assembly: AssemblyDescription("Persona 3/4 Font Decompressor/Compressor")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PersonaFont")]
+[assembly: AssemblyProduct("Persona Font")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
