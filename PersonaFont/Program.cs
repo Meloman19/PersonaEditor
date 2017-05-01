@@ -36,9 +36,15 @@ namespace PersonaFont
                         Console.ReadKey();
                         return false;
                     }
+                    if (File.Exists(@"FONT0 CUT.TXT") == false)
+                    {
+                        Console.WriteLine("Missing 'FONT0 CUT.TXT'");
+                        Console.ReadKey();
+                        return false;
+                    }
                     if (File.Exists(@"FONT0.bmp") == false)
                     {
-                        Console.WriteLine("Missing 'FONT0.BMP' file");
+                        Console.WriteLine("Missing 'FONT0.BMP'");
                         Console.ReadKey();
                         return false;
                     }
@@ -140,9 +146,7 @@ namespace PersonaFont
                 int DictPart = Add.FindDictPart(Add.Dictionary);
 
                 bool boolean = true;
-
                 FontDecRev.Position = 0;
-                boolean = true;
 
                 while (boolean)
                 {
@@ -179,7 +183,7 @@ namespace PersonaFont
                 FONT.Position = 0;
                 while (FONT.Position < Add.CompressedFontBlock_Pos)
                 {
-                    FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(FONT.ReadByte()));
+                    FONT_COMPRESS_FILE.WriteByte((byte)FONT.ReadByte());
                 }
 
                 int GlyphSize = 0;
@@ -204,11 +208,8 @@ namespace PersonaFont
                     GlyphSize++;
                 }
 
-
                 FONT_COMPRESS_FILE.Position = Add.DictionaryHeader_Pos + 8;
                 Add.Write2ByteFile(ref FONT_COMPRESS_FILE, GlyphSize);
-
-
 
                 FONT_COMPRESS_FILE.Position = Add.CompressedFontBlock_Pos;
                 int temp = 0;
@@ -253,18 +254,17 @@ namespace PersonaFont
                     FONT_COMPRESS_FILE.Position = Add.Dictionary_Pos + Add.Dictionary_Size;
                     for (int i = 0; i < Add.GlyphPositionTable_Size / 4; i++)
                     {
-                        string str = Convert.ToString(Convert.ToInt32(Reader.ReadLine()), 16);
-                        str = str.PadLeft(8, '0');
-                        string str1 = Convert.ToString(str[6]) + Convert.ToString(str[7]);
-                        string str2 = Convert.ToString(str[4]) + Convert.ToString(str[5]);
-                        string str3 = Convert.ToString(str[2]) + Convert.ToString(str[3]);
-                        string str4 = Convert.ToString(str[0]) + Convert.ToString(str[1]);
-                        FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str1, 16));
-                        FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str2, 16));
-                        FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str3, 16));
-                        FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str4, 16));
+                        Add.Write4ByteFile(ref FONT_COMPRESS_FILE, Convert.ToInt32(Reader.ReadLine()));
                     }
                 }
+
+                FONT_COMPRESS_FILE.Position = FONT_COMPRESS_FILE.Position - 4;
+                int temp2 = Add.Read4ByteFile(ref FONT_COMPRESS_FILE);
+                FONT_COMPRESS_FILE.Position = Add.DictionaryHeader_Pos + 12;
+                Add.Write4ByteFile(ref FONT_COMPRESS_FILE, temp2);
+
+                FONT_COMPRESS_FILE.Position = 0x4;
+                Add.Write4ByteFile(ref FONT_COMPRESS_FILE, ((int)FONT_COMPRESS_FILE.Length - (Add.TotalNumberOfGlyphs * 2 + 7)));
 
 
                 File.Delete(@"GLYPH POSITION NEW");
@@ -279,7 +279,7 @@ namespace PersonaFont
 
         static void Main(string[] args)
         {
-            string command = "decom";
+            string command = "";
 
             if (check_command(ref command) == true)
             {
@@ -292,7 +292,6 @@ namespace PersonaFont
             }
             else { return; }
         }
-
 
     }
 
@@ -348,6 +347,16 @@ namespace PersonaFont
             return BitConverter.ToUInt16(val, 0);
         }
 
+        public void Write2ByteFile(ref FileStream NewStream, int Byte2)
+        {
+            string str = Convert.ToString(Byte2, 16);
+            str = str.PadLeft(4, '0');
+            string str2 = Convert.ToString(str[0]) + Convert.ToString(str[1]);
+            str = Convert.ToString(str[2]) + Convert.ToString(str[3]);
+            NewStream.WriteByte(Convert.ToByte(str, 16));
+            NewStream.WriteByte(Convert.ToByte(str2, 16));
+        }
+
         public int Read4ByteFile(ref FileStream NewStream)
         {
             byte[] val = new byte[4];
@@ -356,6 +365,20 @@ namespace PersonaFont
             val[2] = (byte)NewStream.ReadByte();
             val[3] = (byte)NewStream.ReadByte();
             return (int)BitConverter.ToInt32(val, 0);
+        }
+
+        public void Write4ByteFile(ref FileStream NewStream, int Byte4)
+        {
+            string str = Convert.ToString(Byte4, 16);
+            str = str.PadLeft(8, '0');
+            string str1 = Convert.ToString(str[0]) + Convert.ToString(str[1]);
+            string str2 = Convert.ToString(str[2]) + Convert.ToString(str[3]);
+            string str3 = Convert.ToString(str[4]) + Convert.ToString(str[5]);
+            string str4 = Convert.ToString(str[6]) + Convert.ToString(str[7]);
+            NewStream.WriteByte(Convert.ToByte(str4, 16));
+            NewStream.WriteByte(Convert.ToByte(str3, 16));
+            NewStream.WriteByte(Convert.ToByte(str2, 16));
+            NewStream.WriteByte(Convert.ToByte(str1, 16));
         }
 
         public int[,] ReadDict(ref FileStream NewStream)
@@ -411,15 +434,7 @@ namespace PersonaFont
             return -1;
         }
 
-        public void Write2ByteFile(ref FileStream NewStream, int Byte2)
-        {
-            string str = Convert.ToString(Byte2, 16);
-            str = str.PadLeft(4, '0');
-            string str2 = Convert.ToString(str[0]) + Convert.ToString(str[1]);
-            str = Convert.ToString(str[2]) + Convert.ToString(str[3]);
-            NewStream.WriteByte(Convert.ToByte(str, 16));
-            NewStream.WriteByte(Convert.ToByte(str2, 16));
-        }
+
 
         private void BMPCopyPalette(ref Bitmap bmp, ref FileStream FONT)
         {
@@ -482,7 +497,11 @@ namespace PersonaFont
                     }
                 }
             }
-            return FontDec;
+
+            MemoryStream FontDec2 = new MemoryStream();
+            FontDec.Position = (x * y - TotalNumberOfGlyphs) * 512;
+            for (int i = 0; i < 512 * TotalNumberOfGlyphs; i++) { FontDec2.WriteByte((byte)FontDec.ReadByte()); }
+            return FontDec2;
         }
 
         public void Save2BMP(ref FileStream FONT)
