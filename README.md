@@ -1,4 +1,7 @@
 # Persona 3/4 Font Decompressor/Compressor
+
+[PersonaFont.exe](https://github.com/Meloman19/PersonaFont/releases)
+
 ## How it's work
 1. Place "FONT0.FNT" (or renamed "FONT1.FNT") file near "PersonaFont.exe"
 2. Run "PersonaFont.exe", enter "decom" and you got:
