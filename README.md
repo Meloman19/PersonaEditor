@@ -14,3 +14,6 @@
 4. Place source "FONT0.FNT" and changed "FONT0.BMP","FONT0 CUT.TXT" near "PersonaFont.exe"
 5. Run "PersonaFont.exe", enter "com" and you got:
 * "FONT0 NEW.FNT"
+
+# How encoded text
+![How encoded text](https://raw.githubusercontent.com/Meloman19/PersonaFont/master/how_encoded_text.jpg)
