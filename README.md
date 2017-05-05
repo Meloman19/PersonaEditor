@@ -7,6 +7,7 @@
 2. Run "PersonaFont.exe", enter "decom" and you got:
 * "FONT0.BMP" - indexed bitmap (Width = 16 glyph, Color depth = 4bpp).
 * "FONT0 CUT.TXT" - cut's table. One line has 16 pair of number (x, y).
+
 ![Cut's table](https://raw.githubusercontent.com/Meloman19/PersonaFont/master/cut_table.jpg)
 
 3. Edit bitmap and cut's table.
