@@ -8,11 +8,14 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Release TEMP|Any CPU = Release TEMP|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Release TEMP|Any CPU.ActiveCfg = Release TEMP|Any CPU
+		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Release TEMP|Any CPU.Build.0 = Release TEMP|Any CPU
 		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

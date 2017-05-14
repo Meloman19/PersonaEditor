@@ -9,9 +9,9 @@ namespace PersonaFont
 {
     class Program
     {
-        private static bool check_command(ref string command)
+        private static bool check_command(ref string command, ref string command2)
         {
-            while ((command != "decom") & (command != "com"))
+            while ((command != "decom") & (command != "com") & (command2 != "P34") & (command2 != "P5"))
             {
                 Console.Clear();
                 Console.WriteLine("---------------------------------------------------");
@@ -49,8 +49,12 @@ namespace PersonaFont
                         return false;
                     }
                 }
+                Console.WriteLine("---------------------------------------------------");
+                Console.WriteLine("---Persona 3/4 [P34], Persona 5 [P5], Exit [exit]--");
+                Console.WriteLine("---------------------------------------------------");
+                command2 = Console.ReadLine();
+                if (command2 == "exit") { return false; }
                 Console.WriteLine("");
-
             }
             return true;
         }
@@ -60,6 +64,7 @@ namespace PersonaFont
             try
             {
                 Addons Add = new Addons();
+                Add.NumberOfColor = 16;
                 FileStream FONT = new FileStream(@"FONT0.FNT", FileMode.Open, FileAccess.Read);
                 Add.GetReady(ref FONT);
 
@@ -131,9 +136,88 @@ namespace PersonaFont
             }
         }
 
+        private static void decom_P5()
+        {
+            try
+            {
+                Addons Add = new Addons();
+                Add.NumberOfColor = 256;
+                FileStream FONT = new FileStream(@"FONT0.FNT", FileMode.Open, FileAccess.Read);
+                Add.GetReady(ref FONT);
+
+                FONT.Position = Add.GlyphCutTable_Pos;
+                try
+                {
+                    FileStream CutTable = new FileStream(@"FONT0 CUT.TXT", FileMode.Create, FileAccess.ReadWrite);
+                    StreamWriter sw = new StreamWriter(CutTable);
+                    int k = 0;
+                    for (int i = 0; i < Add.TotalNumberOfGlyphs; i++)
+                    {
+                        k++;
+                        sw.Write('(');
+                        sw.Write(FONT.ReadByte().ToString("00"));
+                        sw.Write(',');
+                        sw.Write(FONT.ReadByte().ToString("00"));
+                        sw.Write(')');
+                        if (k >= 16)
+                        {
+                            k = 0;
+                            sw.WriteLine();
+                            sw.Flush();
+                        }
+                    }
+                    sw.Flush();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    Console.ReadKey();
+                    return;
+                }
+
+                FONT.Position = Add.CompressedFontBlock_Pos;
+                int temp = 0;
+                bool boolean = true;
+
+                do
+                {
+                    if (FONT.Position == FONT.Length)
+                    {
+                        boolean = false;
+                    }
+                    else
+                    {
+                        int s4 = Add.Read2ByteFile(ref FONT);
+                        for (int i = 0; i < 16; i++)
+                        {
+                            temp = Add.Dictionary[temp, s4 % 2];
+                            s4 = s4 >> 1;
+
+                            if (Add.Dictionary[temp, 0] == 0)
+                            {
+                                Add.FontDec.WriteByte((byte)(Add.Dictionary[temp, 1]));
+                                temp = 0;
+                            }
+                        }
+                    }
+                } while (boolean);
+
+                FONT.Position = Add.MainHeaderSize;
+                Add.Save2BMP(ref FONT);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Console.ReadKey();
+                return;
+            }
+        }
+
         private static void com()
         {
             Addons Add = new Addons();
+            Add.NumberOfColor = 16;
             FileStream FONT = new FileStream(@"FONT0.FNT", FileMode.Open, FileAccess.Read);
             Add.GetReady(ref FONT);
 
@@ -202,11 +286,11 @@ namespace PersonaFont
                     FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str, 2));
                     GlyphSize++;
                 } while (FONT_COMPRESS.Position != 0);
-                if (GlyphSize % 2 == 1)
-                {
-                    FONT_COMPRESS_FILE.WriteByte(0);
-                    GlyphSize++;
-                }
+                //if (GlyphSize % 2 == 1)
+                //{
+                FONT_COMPRESS_FILE.WriteByte(0);
+                GlyphSize++;
+                //}
 
                 FONT_COMPRESS_FILE.Position = Add.DictionaryHeader_Pos + 8;
                 Add.Write2ByteFile(ref FONT_COMPRESS_FILE, GlyphSize);
@@ -270,9 +354,175 @@ namespace PersonaFont
 
                 FONT_COMPRESS_FILE.Position = Add.GlyphCutTable_Pos;
 
-                using(FileStream Cut_Table = new FileStream(@"FONT0 CUT.TXT", FileMode.Open))
+                using (FileStream Cut_Table = new FileStream(@"FONT0 CUT.TXT", FileMode.Open))
                 {
-                   using (StreamReader sr = new StreamReader(Cut_Table))
+                    using (StreamReader sr = new StreamReader(Cut_Table))
+                    {
+                        while (sr.EndOfStream == false)
+                        {
+                            string str = sr.ReadLine();
+                            while (str.Length != 0)
+                            {
+                                str = str.Remove(0, 1);
+                                FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str.Remove(2)));
+                                str = str.Remove(0, 3);
+                                FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str.Remove(2)));
+                                str = str.Remove(0, 3);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Console.ReadKey();
+                return;
+            }
+        }
+
+        private static void com_P5()
+        {
+            Addons Add = new Addons();
+            Add.NumberOfColor = 256;
+            FileStream FONT = new FileStream(@"FONT0.FNT", FileMode.Open, FileAccess.Read);
+            Add.GetReady(ref FONT);
+
+            try
+            {
+                MemoryStream FontDecRev = Add.FontDecRev();
+                FileStream FONT_COMPRESS_FILE = new FileStream(@"FONT0 NEW.FNT", FileMode.Create);
+                MemoryStream FONT_COMPRESS = new MemoryStream();
+
+                int DictPart = Add.FindDictPart(Add.Dictionary);
+
+                bool boolean = true;
+                FontDecRev.Position = 0;
+
+                while (boolean)
+                {
+                    if (FontDecRev.Position == FontDecRev.Length) { boolean = false; }
+                    else
+                    {
+                        int s4 = FontDecRev.ReadByte();
+                        int i = 1;
+
+                        while (Add.Dictionary[i, 1] != s4)
+                        {
+                            i++;
+                            if (Add.Dictionary[i - 1, 1] == 0)
+                            {
+                                if ((s4 >> 4) > ((s4 << 4) >> 4))
+                                {
+                                    s4 = s4 - (1 << 4);
+                                }
+                                else
+                                {
+                                    s4 = s4 - 1;
+                                }
+                                i = 1;
+                            }
+                        }
+                        int v0 = i;
+                        while (v0 != 0)
+                        {
+                            v0 = Add.FindDictIndex(Add.Dictionary, v0, DictPart, ref FONT_COMPRESS);
+                        }
+                    }
+                }
+
+                FONT.Position = 0;
+                while (FONT.Position < Add.CompressedFontBlock_Pos)
+                {
+                    FONT_COMPRESS_FILE.WriteByte((byte)FONT.ReadByte());
+                }
+
+                int GlyphSize = 0;
+                do
+                {
+                    int i = 0;
+                    string str = "";
+                    while ((i < 8) & (FONT_COMPRESS.Position != 0))
+                    {
+                        FONT_COMPRESS.Position--;
+                        str = Convert.ToString(FONT_COMPRESS.ReadByte()) + str;
+                        FONT_COMPRESS.Position--;
+                        i++;
+                    }
+                    str = str.PadLeft(8, '0');
+                    FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str, 2));
+                    GlyphSize++;
+                } while (FONT_COMPRESS.Position != 0);
+
+                FONT_COMPRESS_FILE.WriteByte(0);
+                GlyphSize++;
+
+                FONT_COMPRESS_FILE.Position = Add.DictionaryHeader_Pos + 8;
+                Add.Write4ByteFile(ref FONT_COMPRESS_FILE, GlyphSize);
+
+                FONT_COMPRESS_FILE.Position = Add.CompressedFontBlock_Pos;
+                int temp = 0;
+                boolean = true;
+
+                using (StreamWriter Writer = new StreamWriter(File.Create(@"GLYPH POSITION NEW"), Encoding.Default))
+                {
+                    int a = 0;
+                    int b = 0;
+                    do
+                    {
+                        if (FONT_COMPRESS_FILE.Position == FONT_COMPRESS_FILE.Length)
+                        {
+                            boolean = false;
+                        }
+                        else
+                        {
+                            int s4 = Add.Read2ByteFile(ref FONT_COMPRESS_FILE);
+                            a++;
+                            for (int i = 0; i < 16; i++)
+                            {
+                                temp = Add.Dictionary[temp, s4 % 2];
+                                s4 = s4 >> 1;
+
+                                if (Add.Dictionary[temp, 0] == 0)
+                                {
+                                    if (b % 1024 == 0)
+                                    {
+                                        int t = (((a - 1) * 2) << 3) + i;
+                                        Writer.WriteLine(t);
+                                        Writer.Flush();
+                                    }
+                                    b++;
+                                    temp = 0;
+                                }
+                            }
+                        }
+                    } while (boolean);
+                }
+
+                using (StreamReader Reader = new StreamReader(File.OpenRead(@"GLYPH POSITION NEW")))
+                {
+                    FONT_COMPRESS_FILE.Position = Add.Dictionary_Pos + Add.Dictionary_Size;
+                    for (int i = 0; i < Add.GlyphPositionTable_Size / 4; i++)
+                    {
+                        Add.Write4ByteFile(ref FONT_COMPRESS_FILE, Convert.ToInt32(Reader.ReadLine()));
+                    }
+                }
+
+                FONT_COMPRESS_FILE.Position = FONT_COMPRESS_FILE.Position - 4;
+                int temp2 = Add.Read4ByteFile(ref FONT_COMPRESS_FILE);
+                FONT_COMPRESS_FILE.Position = Add.DictionaryHeader_Pos + 12;
+                Add.Write4ByteFile(ref FONT_COMPRESS_FILE, temp2);
+
+                FONT_COMPRESS_FILE.Position = 0x4;
+                Add.Write4ByteFile(ref FONT_COMPRESS_FILE, ((int)FONT_COMPRESS_FILE.Length - (Add.TotalNumberOfGlyphs * 3 + 9)));
+
+                File.Delete(@"GLYPH POSITION NEW");
+
+                FONT_COMPRESS_FILE.Position = Add.GlyphCutTable_Pos;
+
+                using (FileStream Cut_Table = new FileStream(@"FONT0 CUT.TXT", FileMode.Open))
+                {
+                    using (StreamReader sr = new StreamReader(Cut_Table))
                     {
                         while (sr.EndOfStream == false)
                         {
@@ -300,11 +550,31 @@ namespace PersonaFont
         static void Main(string[] args)
         {
             string command = "";
-
-            if (check_command(ref command) == true)
+            string command2 = "";
+            if (check_command(ref command, ref command2) == true)
             {
-                if (command == "decom") { decom(); }
-                else { com(); }
+                if (command == "decom")
+                {
+                    if (command2 == "P34")
+                    {
+                        decom();
+                    }
+                    else
+                    {
+                        decom_P5();
+                    }
+                }
+                else
+                {
+                    if (command2 == "P34")
+                    {
+                        com();
+                    }
+                    else
+                    {
+                        com_P5();
+                    }
+                }
 
                 Console.WriteLine("Success");
                 Console.ReadKey();
@@ -317,6 +587,7 @@ namespace PersonaFont
 
     class Addons
     {
+        public int NumberOfColor = 0;
         public int MainHeaderSize = 0;
         public int TotalNumberOfGlyphs = 0;
         public int GlyphCutTable_Pos = 0;
@@ -336,12 +607,18 @@ namespace PersonaFont
             MainHeaderSize = Read4ByteFile(ref FONT);
             FONT.Position = 0xE;
             TotalNumberOfGlyphs = Read2ByteFile(ref FONT);
-            GlyphCutTable_Pos = MainHeaderSize + 64 + 4;
+            GlyphCutTable_Pos = MainHeaderSize + NumberOfColor * 4 + 4;
             FONT.Position = GlyphCutTable_Pos - 4;
             GlyphCutTable_Size = Read4ByteFile(ref FONT);
 
-
-            DictionaryHeader_Pos = GlyphCutTable_Pos + GlyphCutTable_Size + TotalNumberOfGlyphs * 4 + 4;
+            if (NumberOfColor == 16)
+            {
+                DictionaryHeader_Pos = GlyphCutTable_Pos + GlyphCutTable_Size + TotalNumberOfGlyphs * 4 + 4;
+            }
+            else if (NumberOfColor == 256)
+            {
+                DictionaryHeader_Pos = GlyphCutTable_Pos + GlyphCutTable_Size + TotalNumberOfGlyphs * 5 + 6;
+            }
 
             FONT.Position = DictionaryHeader_Pos;
             DictionaryHeader_Size = Read4ByteFile(ref FONT);
@@ -473,62 +750,130 @@ namespace PersonaFont
 
         private byte[] Memory2BMP(ref MemoryStream FontDec, int x, int y)
         {
-            byte[] BMP = new byte[512 * x * y];
-            int BMPpos = -1;
-            for (int i = 0; i < 512 * x * y; i = i + 512 * x)
+            if (NumberOfColor == 16)
             {
-                for (int u = 0; u < 512; u = u + 16)
+                byte[] BMP = new byte[512 * x * y];
+                int BMPpos = -1;
+                for (int i = 0; i < 512 * x * y; i = i + 512 * x)
                 {
-                    for (int k = 0; k < 512 * x; k = k + 512)
+                    for (int u = 0; u < 512; u = u + 16)
                     {
-                        FontDec.Position = i + k + u;
-                        for (int t = 0; t < 16; t++)
+                        for (int k = 0; k < 512 * x; k = k + 512)
                         {
-                            BMPpos++;
-                            int a = (byte)FontDec.ReadByte();
-                            a = (a >> 4) + (a - (a >> 4 << 4) << 4);
-                            BMP[BMPpos] = (byte)a;
+                            FontDec.Position = i + k + u;
+                            for (int t = 0; t < 16; t++)
+                            {
+                                BMPpos++;
+                                int a = (byte)FontDec.ReadByte();
+                                a = (a >> 4) + (a - (a >> 4 << 4) << 4);
+                                BMP[BMPpos] = (byte)a;
+                            }
                         }
                     }
                 }
+
+                return BMP;
+            }
+            else
+            {
+                byte[] BMP = new byte[1024 * x * y];
+                int BMPpos = -1;
+                for (int i = 0; i < 1024 * x * y; i = i + 1024 * x)
+                {
+                    for (int u = 0; u < 1024; u = u + 32)
+                    {
+                        for (int k = 0; k < 1024 * x; k = k + 1024)
+                        {
+                            FontDec.Position = i + k + u;
+                            for (int t = 0; t < 32; t++)
+                            {
+                                BMPpos++;
+                                int a = (byte)FontDec.ReadByte();
+                                BMP[BMPpos] = (byte)a;
+                            }
+                        }
+                    }
+                }
+
+                return BMP;
             }
 
-            return BMP;
+
         }
 
         private MemoryStream BMP2Memory(byte[] data, int x, int y)
         {
-            MemoryStream FontDec = new MemoryStream();
-            int BMPpos = -1;
-            for (int i = 0; i < 512 * x * y; i = i + 512 * x)
+            if (NumberOfColor == 16)
             {
-                for (int u = 0; u < 512; u = u + 16)
+                MemoryStream FontDec = new MemoryStream();
+                int BMPpos = -1;
+                for (int i = 0; i < 512 * x * y; i = i + 512 * x)
                 {
-                    for (int k = 0; k < 512 * x; k = k + 512)
+                    for (int u = 0; u < 512; u = u + 16)
                     {
-                        FontDec.Position = i + k + u;
-                        for (int t = 0; t < 16; t++)
+                        for (int k = 0; k < 512 * x; k = k + 512)
                         {
-                            BMPpos++;
-                            int a = data[data.Length - 1 - BMPpos];
-                            a = (a >> 4) + (a - (a >> 4 << 4) << 4);
-                            FontDec.WriteByte((byte)a);
+                            FontDec.Position = i + k + u;
+                            for (int t = 0; t < 16; t++)
+                            {
+                                BMPpos++;
+                                int a = data[data.Length - 1 - BMPpos];
+                                a = (a >> 4) + (a - (a >> 4 << 4) << 4);
+                                FontDec.WriteByte((byte)a);
+                            }
                         }
                     }
                 }
+
+                MemoryStream FontDec2 = new MemoryStream();
+                FontDec.Position = (x * y - TotalNumberOfGlyphs) * 512;
+                for (int i = 0; i < 512 * TotalNumberOfGlyphs; i++) { FontDec2.WriteByte((byte)FontDec.ReadByte()); }
+                return FontDec2;
+            }
+            else
+            {
+                MemoryStream FontDec = new MemoryStream();
+                int BMPpos = -1;
+                for (int i = 0; i < 1024 * x * y; i = i + 1024 * x)
+                {
+                    for (int u = 0; u < 1024; u = u + 32)
+                    {
+                        for (int k = 0; k < 1024 * x; k = k + 1024)
+                        {
+                            FontDec.Position = i + k + u;
+                            for (int t = 0; t < 32; t++)
+                            {
+                                BMPpos++;
+                                int a = data[data.Length - 1 - BMPpos];
+                                //a = (a >> 4) + (a - (a >> 4 << 4) << 4);
+                                FontDec.WriteByte((byte)a);
+                            }
+                        }
+                    }
+                }
+
+                MemoryStream FontDec2 = new MemoryStream();
+                FontDec.Position = (x * y - TotalNumberOfGlyphs) * 1024;
+                for (int i = 0; i < 1024 * TotalNumberOfGlyphs; i++) { FontDec2.WriteByte((byte)FontDec.ReadByte()); }
+                return FontDec2;
             }
 
-            MemoryStream FontDec2 = new MemoryStream();
-            FontDec.Position = (x * y - TotalNumberOfGlyphs) * 512;
-            for (int i = 0; i < 512 * TotalNumberOfGlyphs; i++) { FontDec2.WriteByte((byte)FontDec.ReadByte()); }
-            return FontDec2;
         }
 
         public void Save2BMP(ref FileStream FONT)
         {
             int x = 16;
             int y = (int)Math.Ceiling((decimal)TotalNumberOfGlyphs / 16);
-            Bitmap FileBMP = new Bitmap(x * 32, y * 32, PixelFormat.Format4bppIndexed);
+            Bitmap FileBMP = new Bitmap(1, 1);
+            if (NumberOfColor == 16)
+            {
+                FileBMP = new Bitmap(x * 32, y * 32, PixelFormat.Format4bppIndexed);
+            }
+            else if (NumberOfColor == 256)
+            {
+                FileBMP = new Bitmap(x * 32, y * 32, PixelFormat.Format8bppIndexed);
+            }
+
             BMPCopyPalette(ref FileBMP, ref FONT);
 
             byte[] data = Memory2BMP(ref FontDec, x, y);
