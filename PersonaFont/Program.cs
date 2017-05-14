@@ -52,6 +52,7 @@ namespace PersonaFont
                 Console.WriteLine("---------------------------------------------------");
                 Console.WriteLine("---Persona 3/4 [P34], Persona 5 [P5], Exit [exit]--");
                 Console.WriteLine("---------------------------------------------------");
+                Console.Write("Command: ");
                 command2 = Console.ReadLine();
                 if (command2 == "exit") { return false; }
                 Console.WriteLine("");
