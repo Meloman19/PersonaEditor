@@ -198,7 +198,7 @@ namespace PersonaFont
 
 
                 FONT_COMPRESS_FILE.Position = Add.DictionaryHeader_Pos + 8;
-                FONT_COMPRESS_FILE.WriteUshort(GlyphSize);
+                FONT_COMPRESS_FILE.WriteInt(GlyphSize);
 
                 Add.WriteGlyphPosition(FONT_COMPRESS_FILE);
 
@@ -222,6 +222,5 @@ namespace PersonaFont
                 return;
             }
         }
-
     }
 }
