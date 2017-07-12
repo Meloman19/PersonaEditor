@@ -23,7 +23,7 @@ param2:
 
 **Attention! Don't change cut's table structure! Result "FONT0.BMP" must have origin size and color depth!**
 
-4. Place source "FONT0.FNT" and changed "FONT0.BMP","FONT0 CUT.TXT" near "PersonaFont.exe"
+4. Place source "FONT0.FNT" and changed "FONT0.BMP","FONT0 WIDTH TABLE.XML" near "PersonaFont.exe"
 5. Run "PersonaFont.exe", enter "com" and you got:
 * "FONT0 NEW.FNT"
 
