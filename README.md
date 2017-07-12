@@ -2,11 +2,20 @@
 
 [PersonaFont.exe](https://github.com/Meloman19/PersonaFont/releases)
 
+"PersonaFont.exe [param1] [param2:opt]"
+
+param1:
+"decom" - Decompress
+"com" - Compress
+
+param2:
+"-l" - Logging to "file PersonaFont.log"
+
 ## How it's work
 1. Place "FONT0.FNT" (or renamed "FONT1.FNT") file near "PersonaFont.exe"
 2. Run "PersonaFont.exe", enter "decom" and you got:
 * "FONT0.BMP" - indexed bitmap (Width = 16 glyph, Color depth = 4bpp).
-* "FONT0 CUT.TXT" - cut's table. One line has 16 pair of number (x, y).
+* "FONT0 WIDTH TABLE.XML" - width table.
 
 ![Cut's table](https://raw.githubusercontent.com/Meloman19/PersonaFont/master/cut_table.jpg)
 
