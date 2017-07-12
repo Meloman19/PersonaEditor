@@ -5,11 +5,11 @@
 "PersonaFont.exe [param1] [param2:opt]"
 
 param1:
-"decom" - Decompress
-"com" - Compress
+"decom" - Decompress;
+"com" - Compress.
 
 param2:
-"-l" - Logging to "file PersonaFont.log"
+"-l" - Logging to file "PersonaFont.log".
 
 ## How it's work
 1. Place "FONT0.FNT" (or renamed "FONT1.FNT") file near "PersonaFont.exe"
