@@ -28,6 +28,8 @@ namespace PersonaFont
                     LOG.WriteLine();
                 else
                     LOG.WriteLine(DateTime.Now + ": " + Line);
+
+                Console.WriteLine(DateTime.Now + ": " + Line);
             }
         }
     }
@@ -171,6 +173,8 @@ namespace PersonaFont
 
                 FONT.Position = Add.MainHeaderSize;
                 Add.Save2BMP(ref FONT);
+                Static.LOG.W("Complete");
+                Static.LOG.W("");
                 Console.WriteLine("Success");
             }
             catch (Exception e)
