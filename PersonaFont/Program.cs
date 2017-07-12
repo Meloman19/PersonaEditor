@@ -5,37 +5,86 @@ using System.Collections.Generic;
 
 namespace PersonaFont
 {
+    class Logging
+    {
+        public Logging(string FileName)
+        {
+            FileStream FS = new FileStream(FileName, FileMode.OpenOrCreate);
+            FS.Position = FS.Length;
+            LOG = new StreamWriter(FS);
+            LOG.AutoFlush = true;
+        }
+        public Logging()
+        {
+
+        }
+        StreamWriter LOG = new StreamWriter(new MemoryStream());
+
+        public void W(string Line)
+        {
+            if (LOG != null)
+            {
+                if (string.IsNullOrEmpty(Line))
+                    LOG.WriteLine();
+                else
+                    LOG.WriteLine(DateTime.Now + ": " + Line);
+            }
+        }
+    }
+
+    class Static
+    {
+        public static Logging LOG = new Logging();
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("---------------------------------------------------");
+            Console.WriteLine("-----Font decompressor/compressor by Meloman19-----");
+            Console.WriteLine("-------------------Persona 3/4/5-------------------");
+            Console.WriteLine("----------Based on RikuKH3's decompressor----------");
+            Console.WriteLine("---------------------------------------------------");
             string command = "";
-            if (check_command(ref command) == true)
+            if (args.Length == 0)
             {
-                if (command == "decom")
-                {
-                    decom();
-                }
-                else
-                {
-                    com();
-                }
-
-                Console.WriteLine("Success");
-                Console.ReadKey();
-                return;
+                check_command(ref command);
             }
-            else { return; }
+            else if (args.Length == 1)
+            {
+                command = args[0];
+            }
+            else if (args.Length == 2)
+            {
+                command = args[0];
+                if (args[1] == "-l")
+                {
+                    try
+                    {
+                        Static.LOG = new Logging("PersonaFont.log");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        Console.ReadLine();
+                    }
+                }
+            }
+
+            if (command == "decom")
+                decom();
+            else if (command == "com")
+                com();
+            else
+                Console.WriteLine("Unknown command");
         }
 
-        private static bool check_command(ref string command)
+        private static bool check_command(ref
+            string command)
         {
             while ((command != "decom") & (command != "com"))
             {
-                Console.Clear();
-                Console.WriteLine("---------------------------------------------------");
-                Console.WriteLine("-----Font decompressor/compressor by Meloman19-----");
-                Console.WriteLine("-------------------Persona 3/4/5-------------------");
                 Console.WriteLine("---------------------------------------------------");
                 Console.WriteLine("--Decompress [decom], Compress [com], Exit [exit]--");
                 Console.WriteLine("---------------------------------------------------");
@@ -50,6 +99,8 @@ namespace PersonaFont
             }
             if ((command == "decom") & (File.Exists(@"FONT0.FNT") == false))
             {
+                Static.LOG.W("ERROR: " + "Missing 'FONT0.FNT'");
+                Static.LOG.W("");
                 Console.WriteLine("Missing 'FONT0.FNT'");
                 Console.ReadKey();
                 return false;
@@ -58,20 +109,26 @@ namespace PersonaFont
             {
                 if (File.Exists(@"FONT0.FNT") == false)
                 {
+                    Static.LOG.W("ERROR: " + "Missing 'FONT0.FNT'");
+                    Static.LOG.W("");
                     Console.WriteLine("Missing 'FONT0.FNT'");
                     Console.ReadKey();
                     return false;
                 }
 
-                if (File.Exists(@"FONT0 CUT.TXT") == false)
+                if (File.Exists(@"FONT0 WIDTH TABLE.XML") == false)
                 {
-                    Console.WriteLine("Missing 'FONT0 CUT.TXT'");
+                    Static.LOG.W("ERROR: " + "Missing 'FONT0 WIDTH TABLE.XML'");
+                    Static.LOG.W("");
+                    Console.WriteLine("Missing 'FONT0 WIDTH TABLE.XML'");
                     Console.ReadKey();
                     return false;
                 }
 
                 if (File.Exists(@"FONT0.bmp") == false)
                 {
+                    Static.LOG.W("ERROR: " + "Missing 'FONT0.BMP'");
+                    Static.LOG.W("");
                     Console.WriteLine("Missing 'FONT0.BMP'");
                     Console.ReadKey();
                     return false;
@@ -110,14 +167,15 @@ namespace PersonaFont
                         }
                     }
                 }
+                Static.LOG.W("Get decompressed font");
 
                 FONT.Position = Add.MainHeaderSize;
                 Add.Save2BMP(ref FONT);
+                Console.WriteLine("Success");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                Console.ReadKey();
+                Static.LOG.W("ERROR: " + e.ToString());
                 return;
             }
         }
@@ -125,12 +183,14 @@ namespace PersonaFont
         private static void com()
         {
             FileStream FONT = new FileStream(@"FONT0.FNT", FileMode.Open, FileAccess.Read);
+            Static.LOG.W("Open FONT0.FNT");
             Font Add = new Font(FONT);
 
             try
             {
                 MemoryStream FontDecRev = Add.FontDecRev();
                 FileStream FONT_COMPRESS_FILE = new FileStream(@"FONT0 NEW.FNT", FileMode.Create);
+                Static.LOG.W("Create \"FONT0 NEW.FNT\"");
                 MemoryStream FONT_COMPRESS = new MemoryStream();
 
                 int DictPart = Add.FindDictPart(Add.Dictionary);
@@ -169,6 +229,7 @@ namespace PersonaFont
                         }
                     }
                 }
+                Static.LOG.W("Image packed");
 
                 FONT.Position = 0;
                 while (FONT.Position < Add.CompressedFontBlock_Pos)
@@ -210,15 +271,17 @@ namespace PersonaFont
                 FONT_COMPRESS_FILE.Position = 0x4;
                 FONT_COMPRESS_FILE.WriteInt(((int)FONT_COMPRESS_FILE.Length - (7 + Add.GlyphCutTable_Size + Add.UnknownSize)));
 
-                File.Delete(@"GLYPH POSITION NEW");
+                //   File.Delete(@"GLYPH POSITION NEW");
 
                 FONT_COMPRESS_FILE.Position = Add.GlyphCutTable_Pos;
                 FONT_COMPRESS_FILE.WriteMemoryStream(WidthTable.WriteToFont());
+                Static.LOG.W("Complete");
+                Static.LOG.W("");
+                Console.WriteLine("Success");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                Console.ReadKey();
+                Static.LOG.W("ERROR:" + e.ToString());
                 return;
             }
         }

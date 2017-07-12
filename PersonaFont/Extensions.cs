@@ -121,8 +121,6 @@ namespace PersonaFont
         }
     }
 
-
-
     public static class FileStreamExtension
     {
         public static MemoryStream ReadMemoryStream(this FileStream FileStream, int Size)

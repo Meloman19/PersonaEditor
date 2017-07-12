@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 
 namespace PersonaFont
 {
@@ -13,65 +14,91 @@ namespace PersonaFont
         {
             try
             {
-                FileStream CutTable = new FileStream(@"FONT0 CUT.TXT", FileMode.Create, FileAccess.ReadWrite);
-                StreamWriter SW = new StreamWriter(CutTable);
-                SW.AutoFlush = true;
+                List<List<byte>> WidthTable = new List<List<byte>>();
+                List<byte> WidthTableLine = new List<byte>();
 
                 int k = 0;
-
                 while (MemoryStream.Position < MemoryStream.Length)
                 {
                     k++;
-                    SW.Write('(');
-                    SW.Write(MemoryStream.ReadByte().ToString("00"));
-                    SW.Write(',');
-                    SW.Write(MemoryStream.ReadByte().ToString("00"));
-                    SW.Write(')');
+                    WidthTableLine.Add(Convert.ToByte(MemoryStream.ReadByte()));
+                    WidthTableLine.Add(Convert.ToByte(MemoryStream.ReadByte()));
+
                     if (k >= 16)
                     {
                         k = 0;
-                        SW.WriteLine();
+                        WidthTable.Add(WidthTableLine);
+                        WidthTableLine = new List<byte>();
                     }
                 }
+                if (k != 0)
+                {
+                    WidthTable.Add(WidthTableLine);
+                }
+
+                k = 1;
+                int index = 1;
+
+                XDocument xDoc = new XDocument();
+                XElement WT = new XElement("WidthTable");
+                xDoc.Add(WT);
+                foreach (var line in WidthTable)
+                {
+                    XElement Line = new XElement("Line_" + k);
+                    WT.Add(Line);
+                    k++;
+                    for (int i = 0; i < line.Count; i++)
+                    {
+                        XElement Glyph = new XElement("Glyph_" + index);
+                        Line.Add(Glyph);
+                        index++;
+                        Glyph.Add(new XElement("LeftCut", line[i]));
+                        Glyph.Add(new XElement("RightCut", line[i + 1]));
+                        i++;
+                    }
+                    index = 1;
+                }
+                xDoc.Save("FONT0 WIDTH TABLE.XML");
+                Static.LOG.W("Width Table was created.");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                Console.ReadKey();
+                Static.LOG.W("ERROR: " + e.ToString());
                 return;
             }
         }
 
         public static MemoryStream WriteToFont()
         {
+            int index = 0;
             MemoryStream MS = new MemoryStream();
-
-            using (FileStream Cut_Table = new FileStream(@"FONT0 CUT.TXT", FileMode.Open))
+            try
             {
-                using (StreamReader sr = new StreamReader(Cut_Table))
+                XDocument xDoc = XDocument.Load("FONT0 WIDTH TABLE.XML");
+                XElement WT = xDoc.Element("WidthTable");
+                foreach(var line in WT.Elements())
                 {
-                    while (sr.EndOfStream == false)
+                    foreach(var glyph in line.Elements())
                     {
-                        string str = sr.ReadLine();
-                        while (str.Length != 0)
-                        {
-                            str = str.Remove(0, 1);
-                            MS.WriteByte(Convert.ToByte(str.Remove(2)));
-                            str = str.Remove(0, 3);
-                            MS.WriteByte(Convert.ToByte(str.Remove(2)));
-                            str = str.Remove(0, 3);
-                        }
+                        MS.WriteByte(Convert.ToByte(glyph.Element("LeftCut").Value));
+                        MS.WriteByte(Convert.ToByte(glyph.Element("RightCut").Value));
+                        index++;
                     }
                 }
             }
+            catch (Exception e)
+            {
+                Static.LOG.W("ERROR: " + e.ToString());
+                return MS;
+            }
+
+            Static.LOG.W("Width Table was writed. Get " + index + " glyphs");
             return MS;
         }
     }
 
     class Font
     {
-
-
         private int _NumberOfColor = 0;
         private int NumberOfColor
         {
@@ -150,6 +177,8 @@ namespace PersonaFont
             {
                 Font.WriteInt(GlyphNewPosition[i]);
             }
+
+            Static.LOG.W("Writed new Glyph Position Table");
         }
 
         public Font(FileStream FONT)
@@ -190,6 +219,8 @@ namespace PersonaFont
             Dictionary = ReadDict(ref FONT);
 
             CompressedFontBlock_Pos = Dictionary_Pos + Dictionary_Size + GlyphPositionTable_Size;
+
+            Static.LOG.W("Get data from FONT0.FNT");
         }
 
         public int[,] ReadDict(ref FileStream NewStream)
@@ -293,6 +324,7 @@ namespace PersonaFont
 
         private MemoryStream BMP2Memory(byte[] data, int x, int y)
         {
+            MemoryStream FontDec2;
             if (NumberOfColor == 16)
             {
                 MemoryStream FontDec = new MemoryStream();
@@ -315,10 +347,11 @@ namespace PersonaFont
                     }
                 }
 
-                MemoryStream FontDec2 = new MemoryStream();
+                FontDec2 = new MemoryStream();
                 FontDec.Position = (x * y - TotalNumberOfGlyphs) * 512;
                 for (int i = 0; i < 512 * TotalNumberOfGlyphs; i++) { FontDec2.WriteByte((byte)FontDec.ReadByte()); }
-                return FontDec2;
+
+
             }
             else
             {
@@ -342,12 +375,13 @@ namespace PersonaFont
                     }
                 }
 
-                MemoryStream FontDec2 = new MemoryStream();
+                FontDec2 = new MemoryStream();
                 FontDec.Position = (x * y - TotalNumberOfGlyphs) * 1024;
                 for (int i = 0; i < 1024 * TotalNumberOfGlyphs; i++) { FontDec2.WriteByte((byte)FontDec.ReadByte()); }
-                return FontDec2;
             }
 
+            Static.LOG.W("Get data from BMP");
+            return FontDec2;
         }
 
         public void Save2BMP(ref FileStream FONT)
@@ -367,12 +401,13 @@ namespace PersonaFont
             BMPCopyPalette(ref FileBMP, ref FONT);
 
             byte[] data = Memory2BMP(ref FontDec, x, y);
-
+            Static.LOG.W("Get BMP data");
             BitmapData bmpData = FileBMP.LockBits(new Rectangle(0, 0, FileBMP.Width, FileBMP.Height), ImageLockMode.WriteOnly, FileBMP.PixelFormat);
             Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
             FileBMP.UnlockBits(bmpData);
 
             FileBMP.Save(@"FONT0.BMP", ImageFormat.Bmp);
+            Static.LOG.W("Created BMP");
         }
 
         public MemoryStream FontDecRev()
