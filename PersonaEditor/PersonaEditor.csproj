@@ -7,8 +7,8 @@
     <ProjectGuid>{77BD32F6-F52E-4A72-A919-B96255A4D23E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PersonaFont</RootNamespace>
-    <AssemblyName>PersonaFont</AssemblyName>
+    <RootNamespace>PersonaEditor</RootNamespace>
+    <AssemblyName>PersonaEditor</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
