@@ -5,19 +5,22 @@ VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonaEditor", "PersonaEditor\PersonaEditor.csproj", "{77BD32F6-F52E-4A72-A919-B96255A4D23E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonaEditorLib", "PersonaEditorLib\PersonaEditorLib.csproj", "{717EF6CB-2A9B-4565-88ED-3FD096DD2BBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Release TEMP|Any CPU = Release TEMP|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Release TEMP|Any CPU.ActiveCfg = Release TEMP|Any CPU
-		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Release TEMP|Any CPU.Build.0 = Release TEMP|Any CPU
 		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77BD32F6-F52E-4A72-A919-B96255A4D23E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{717EF6CB-2A9B-4565-88ED-3FD096DD2BBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{717EF6CB-2A9B-4565-88ED-3FD096DD2BBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{717EF6CB-2A9B-4565-88ED-3FD096DD2BBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{717EF6CB-2A9B-4565-88ED-3FD096DD2BBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

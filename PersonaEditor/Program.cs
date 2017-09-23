@@ -2,292 +2,195 @@
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
+using PersonaEditorLib.FileTypes;
+using PersonaEditorLib.Extension;
+using System.Linq;
+using System.Windows.Media.Imaging;
 
-namespace PersonaFont
+namespace PersonaEditor
 {
-    class Logging
+    public static class FNTWork
     {
-        public Logging(string FileName)
-        {
-            FileStream FS = new FileStream(FileName, FileMode.OpenOrCreate);
-            FS.Position = FS.Length;
-            LOG = new StreamWriter(FS);
-            LOG.AutoFlush = true;
-        }
-        public Logging()
-        {
-
-        }
-        StreamWriter LOG = new StreamWriter(new MemoryStream());
-
-        public void W(string Line)
-        {
-            if (LOG != null)
-            {
-                if (string.IsNullOrEmpty(Line))
-                    LOG.WriteLine();
-                else
-                    LOG.WriteLine(DateTime.Now + ": " + Line);
-
-                Console.WriteLine(DateTime.Now + ": " + Line);
-            }
-        }
-    }
-
-    class Static
-    {
-        public static Logging LOG = new Logging();
-    }
-
-    class Program
-    {
-        static void Main(string[] args)
+        public static bool Work(string[] args)
         {
             Console.WriteLine("---------------------------------------------------");
             Console.WriteLine("-----Font decompressor/compressor by Meloman19-----");
             Console.WriteLine("-------------------Persona 3/4/5-------------------");
             Console.WriteLine("----------Based on RikuKH3's decompressor----------");
             Console.WriteLine("---------------------------------------------------");
-            string command = "";
-            if (args.Length == 0)
+
+            if (args.Length > 0)
             {
-                check_command(ref command);
-            }
-            else if (args.Length == 1)
-            {
-                command = args[0];
-            }
-            else if (args.Length == 2)
-            {
-                command = args[0];
-                if (args[1] == "-l")
+                if (File.Exists(args[0]))
                 {
-                    try
+                    if (args.Length > 1)
                     {
-                        Static.LOG = new Logging("PersonaFont.log");
+                        if (args[1].ToLower() == "export")
+                            if (args.Length > 3)
+                                return Export(args[0], args[2], args[3]);
+                            else return Export(args[0]);
+                        else if (args[1].ToLower() == "import")
+                            if (args.Length > 4)
+                                return Import(args[0], args[2], args[3], args[4]);
+                            else return Import(args[0]);
+
+                        return false;
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.ToString());
-                        Console.ReadLine();
-                    }
-                }
-            }
-
-            if (command == "decom")
-                decom();
-            else if (command == "com")
-                com();
-            else
-                Console.WriteLine("Unknown command");
-        }
-
-        private static bool check_command(ref
-            string command)
-        {
-            while ((command != "decom") & (command != "com"))
-            {
-                Console.WriteLine("---------------------------------------------------");
-                Console.WriteLine("--Decompress [decom], Compress [com], Exit [exit]--");
-                Console.WriteLine("---------------------------------------------------");
-                Console.Write("Command: ");
-                command = Console.ReadLine();
-                Console.WriteLine("");
-            }
-
-            if (command == "exit")
-            {
-                return false;
-            }
-            if ((command == "decom") & (File.Exists(@"FONT0.FNT") == false))
-            {
-                Static.LOG.W("ERROR: " + "Missing 'FONT0.FNT'");
-                Static.LOG.W("");
-                Console.WriteLine("Missing 'FONT0.FNT'");
-                Console.ReadKey();
-                return false;
-            }
-            if (command == "com")
-            {
-                if (File.Exists(@"FONT0.FNT") == false)
-                {
-                    Static.LOG.W("ERROR: " + "Missing 'FONT0.FNT'");
-                    Static.LOG.W("");
-                    Console.WriteLine("Missing 'FONT0.FNT'");
-                    Console.ReadKey();
-                    return false;
-                }
-
-                if (File.Exists(@"FONT0 WIDTH TABLE.XML") == false)
-                {
-                    Static.LOG.W("ERROR: " + "Missing 'FONT0 WIDTH TABLE.XML'");
-                    Static.LOG.W("");
-                    Console.WriteLine("Missing 'FONT0 WIDTH TABLE.XML'");
-                    Console.ReadKey();
-                    return false;
-                }
-
-                if (File.Exists(@"FONT0.bmp") == false)
-                {
-                    Static.LOG.W("ERROR: " + "Missing 'FONT0.BMP'");
-                    Static.LOG.W("");
-                    Console.WriteLine("Missing 'FONT0.BMP'");
-                    Console.ReadKey();
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private static void decom()
-        {
-            try
-            {
-                FileStream FONT = new FileStream(@"FONT0.FNT", FileMode.Open, FileAccess.Read);
-                Font Add = new Font(FONT);
-
-                FONT.Position = Add.GlyphCutTable_Pos;
-                WidthTable.WriteToFile(FONT.ReadMemoryStream(Add.GlyphCutTable_Size));
-
-                FONT.Position = Add.CompressedFontBlock_Pos;
-
-                int temp = 0;
-                for (int k = 0; k < Add.CompressedFontBlock_Size; k += 2)
-                {
-                    int s4 = FONT.ReadUshort();
-                    for (int i = 0; i < 16; i++)
-                    {
-                        temp = Add.Dictionary[temp, s4 % 2];
-                        s4 = s4 >> 1;
-
-                        if (Add.Dictionary[temp, 0] == 0)
-                        {
-
-                            Add.FontDec.WriteByte((byte)(Add.Dictionary[temp, 1]));
-                            temp = 0;
-                        }
-                    }
-                }
-                Static.LOG.W("Get decompressed font");
-
-                FONT.Position = Add.MainHeaderSize;
-                Add.Save2BMP(ref FONT);
-                Static.LOG.W("Complete");
-                Static.LOG.W("");
-                Console.WriteLine("Success");
-            }
-            catch (Exception e)
-            {
-                Static.LOG.W("ERROR: " + e.ToString());
-                return;
-            }
-        }
-
-        private static void com()
-        {
-            FileStream FONT = new FileStream(@"FONT0.FNT", FileMode.Open, FileAccess.Read);
-            Static.LOG.W("Open FONT0.FNT");
-            Font Add = new Font(FONT);
-
-            try
-            {
-                MemoryStream FontDecRev = Add.FontDecRev();
-                FileStream FONT_COMPRESS_FILE = new FileStream(@"FONT0 NEW.FNT", FileMode.Create);
-                Static.LOG.W("Create \"FONT0 NEW.FNT\"");
-                MemoryStream FONT_COMPRESS = new MemoryStream();
-
-                int DictPart = Add.FindDictPart(Add.Dictionary);
-
-                bool boolean = true;
-                FontDecRev.Position = 0;
-
-                while (boolean)
-                {
-                    if (FontDecRev.Position == FontDecRev.Length) { boolean = false; }
                     else
                     {
-                        int s4 = FontDecRev.ReadByte();
-                        int i = 1;
-
-                        while (Add.Dictionary[i, 1] != s4)
-                        {
-                            i++;
-                            if (Add.Dictionary[i - 1, 1] == 0)
-                            {
-                                if ((s4 >> 4) > ((s4 << 4) >> 4))
-                                {
-                                    s4 = s4 - (1 << 4);
-                                }
-                                else
-                                {
-                                    s4 = s4 - 1;
-                                }
-                                i = 1;
-                            }
-                        }
-                        int v0 = i;
-                        while (v0 != 0)
-                        {
-                            v0 = Add.FindDictIndex(v0, DictPart, ref FONT_COMPRESS);
-                        }
+                        Console.WriteLine("Command not found.");
+                        return false;
                     }
                 }
-                Static.LOG.W("Image packed");
-
-                FONT.Position = 0;
-                while (FONT.Position < Add.CompressedFontBlock_Pos)
+                else
                 {
-                    FONT_COMPRESS_FILE.WriteByte((byte)FONT.ReadByte());
+                    Console.WriteLine("File " + args[0] + " not found.");
+                    return false;
                 }
+            }
+            else return false;
+        }
 
-                int GlyphSize = 0;
-                do
-                {
-                    int i = 0;
-                    string str = "";
-                    while ((i < 8) & (FONT_COMPRESS.Position != 0))
-                    {
-                        FONT_COMPRESS.Position--;
-                        str = Convert.ToString(FONT_COMPRESS.ReadByte()) + str;
-                        FONT_COMPRESS.Position--;
-                        i++;
-                    }
-                    str = str.PadLeft(8, '0');
-                    FONT_COMPRESS_FILE.WriteByte(Convert.ToByte(str, 2));
-                    GlyphSize++;
-                } while (FONT_COMPRESS.Position != 0);
+        public static bool Export(string fontname)
+        {
+            string fullpath = Path.GetFullPath(fontname);
 
-                FONT_COMPRESS_FILE.WriteByte(0);
-                GlyphSize++;
+            string imagename = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + ".BMP";
 
+            string wtname = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + ".XML";
 
-                FONT_COMPRESS_FILE.Position = Add.DictionaryHeader_Pos + 8;
-                FONT_COMPRESS_FILE.WriteInt(GlyphSize);
+            return Export(fontname, imagename, wtname);
+        }
 
-                Add.WriteGlyphPosition(FONT_COMPRESS_FILE);
-
-                FONT_COMPRESS_FILE.Position = FONT_COMPRESS_FILE.Position - 4;
-                int temp2 = FONT_COMPRESS_FILE.ReadInt();
-                FONT_COMPRESS_FILE.Position = Add.DictionaryHeader_Pos + 12;
-                FONT_COMPRESS_FILE.WriteInt(temp2);
-
-                FONT_COMPRESS_FILE.Position = 0x4;
-                FONT_COMPRESS_FILE.WriteInt(((int)FONT_COMPRESS_FILE.Length - (7 + Add.GlyphCutTable_Size + Add.UnknownSize)));
-
-                //   File.Delete(@"GLYPH POSITION NEW");
-
-                FONT_COMPRESS_FILE.Position = Add.GlyphCutTable_Pos;
-                FONT_COMPRESS_FILE.WriteMemoryStream(WidthTable.WriteToFont());
-                Static.LOG.W("Complete");
-                Static.LOG.W("");
-                Console.WriteLine("Success");
+        public static bool Export(string fontname, string imagename, string wtname)
+        {
+            try
+            {
+                Text.FNTwork FONT0 = new Text.FNTwork(fontname);
+                FONT0.WidthTable.WriteToFile(wtname);
+                BitmapSource BS = FONT0.GetFontImage();
+                Imaging.SaveBMP(BS, imagename);
+                return true;
             }
             catch (Exception e)
             {
-                Static.LOG.W("ERROR:" + e.ToString());
-                return;
+                Console.WriteLine(e.ToString());
+                return false;
             }
+        }
+
+        public static bool Import(string fontname)
+        {
+            string fullpath = Path.GetFullPath(fontname);
+
+            string imagename = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + ".BMP";
+
+            string wtname = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + ".XML";
+
+            string newfontname = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + "_NEW.FNT";
+
+            return Import(fontname, imagename, wtname, newfontname);
+        }
+
+        public static bool Import(string fontname, string imagename, string wtname, string newfontname)
+        {
+            try
+            {
+                Text.FNTwork FONT0 = new Text.FNTwork(fontname);
+                FONT0.WidthTable.ReadFromFile(wtname);
+                BitmapSource BS = Imaging.OpenImage(imagename);
+                FONT0.SetFontImage(BS);
+                FONT0.GetFont().SaveToFile(newfontname);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return false;
+            }
+        }
+    }
+
+    public static class PMDWork
+    {
+        public static bool Work(string[] args)
+        {
+            if (args.Length > 0)
+            {
+                if (File.Exists(args[0]))
+                {
+                    if (args.Length > 2)
+                    {
+                        if (args[1].ToLower() == "export")
+                            if (args[2].ToLower() == "msg")
+                                if (args.Length > 3)
+                                    return ExportMSG(args[0], args[3]);
+                                else return ExportMSG(args[0]);
+                            else return false;
+
+                        return false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Command not found.");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("File " + args[0] + " not found.");
+                    return false;
+                }
+            }
+            else return false;
+        }
+
+        public static bool ExportMSG(string pmdname)
+        {
+            string fullpath = Path.GetFullPath(pmdname);
+
+            string msgname = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + ".MSG";
+
+            return ExportMSG(pmdname, msgname);
+        }
+
+        public static bool ExportMSG(string pmdname, string msgname)
+        {
+            try
+            {
+                Text.PMDwork PM1 = new Text.PMDwork(pmdname);
+                PM1.GetMSG().SaveToFile(msgname);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return false;
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            bool complete = false;
+
+            if (args.Length > 0)
+            {
+                if (args[0].ToLower() == "fnt")
+                    complete = FNTWork.Work(args.Skip(1).ToArray());
+
+                else if (args[0].ToLower() == "pmd")
+                {
+                    complete = PMDWork.Work(args.Skip(1).ToArray());
+                }
+            }
+
+            if (complete) Console.WriteLine("Success");
+            else Console.WriteLine("Failure");
+
+            Console.ReadKey();
         }
     }
 }
