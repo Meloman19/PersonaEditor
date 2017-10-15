@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PersonaEditorLib</RootNamespace>
     <AssemblyName>PersonaEditorLib</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,6 +25,7 @@
     <DocumentationFile>
     </DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,9 +34,47 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release FULL|AnyCPU'">
+    <OutputPath>bin\Release FULL\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release FULL|x86'">
+    <OutputPath>bin\x86\Release FULL\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -45,8 +85,38 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extension.cs" />
+    <Compile Include="FileStructure\BF\BF.cs" />
+    <Compile Include="FileStructure\BF\BFElement.cs" />
+    <Compile Include="FileStructure\BF\BFHeader.cs" />
+    <Compile Include="FileStructure\BF\BFTable.cs" />
+    <Compile Include="FileStructure\FNT\FNT.cs" />
+    <Compile Include="FileStructure\FNT\FNTCompressed.cs" />
+    <Compile Include="FileStructure\FNT\FNTHeader.cs" />
+    <Compile Include="FileStructure\FNT\FNTPalette.cs" />
+    <Compile Include="FileStructure\FNT\FNTReserved.cs" />
+    <Compile Include="FileStructure\FNT\FNTUnknown.cs" />
+    <Compile Include="FileStructure\FNT\FNTWidthTable.cs" />
+    <Compile Include="FileStructure\PM1\PM1Element.cs" />
+    <Compile Include="FileStructure\PM1\PM1ElementBMD.cs" />
+    <Compile Include="FileStructure\PM1\PM1ElementEPL.cs" />
+    <Compile Include="FileStructure\PM1\PM1ElementEPLHead.cs" />
+    <Compile Include="FileStructure\PM1\PM1ElementFileNames.cs" />
+    <Compile Include="FileStructure\PM1\PM1ElementRMD.cs" />
+    <Compile Include="FileStructure\PM1\PM1ElementRMDHead.cs" />
+    <Compile Include="FileStructure\PM1\PM1Header.cs" />
+    <Compile Include="FileStructure\PM1\PM1Table.cs" />
+    <Compile Include="FileStructure\SPR\SPR.cs" />
+    <Compile Include="FileStructure\SPR\SPRHeader.cs" />
+    <Compile Include="FileStructure\SPR\SPRKeyList.cs" />
+    <Compile Include="FileStructure\SPR\SPRTextures.cs" />
+    <Compile Include="FileStructure\TMX\TMX.cs" />
+    <Compile Include="FileStructure\TMX\TMXHeader.cs" />
+    <Compile Include="FileStructure\TMX\TMXPalette.cs" />
     <Compile Include="FileTypes.cs" />
+    <Compile Include="FileStructure\PM1\PM1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

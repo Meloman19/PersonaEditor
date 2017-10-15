@@ -8,14 +8,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using PersonaEditorLib.FileStructure;
 using System.Text.RegularExpressions;
+using static PersonaEditorLib.FileTypes.Text;
+using System.ComponentModel;
 
 namespace PersonaEditorLib.Extension
 {
     public static class ListExtentsion
     {
-        public static MSG1.MyStringElement[] GetMyByteArray(this string String, CharList FontMap)
+        public static List<PTP.MSG.MSGstr.MSGstrElement> GetPTPMsgStrEl(this string String, CharList FontMap)
         {
-            List<MSG1.MyStringElement> MyByteArrayList = new List<MSG1.MyStringElement>();
+            List<PTP.MSG.MSGstr.MSGstrElement> MyByteArrayList = new List<PTP.MSG.MSGstr.MSGstrElement>();
 
             int Index = 0;
 
@@ -25,7 +27,7 @@ namespace PersonaEditorLib.Extension
             {
                 if (Regex.IsMatch(a, "\r\n|\r|\n"))
                 {
-                    MyByteArrayList.Add(new MSG1.MyStringElement(Index, MSG1.MyStringElement.arrayType.System, new byte[] { 0x0A }));
+                    MyByteArrayList.Add(new PTP.MSG.MSGstr.MSGstrElement("System", new byte[] { 0x0A }));
                     Index++;
                 }
                 else
@@ -36,7 +38,7 @@ namespace PersonaEditorLib.Extension
                     {
                         if (Regex.IsMatch(b, @"{.+}"))
                         {
-                            MyByteArrayList.Add(new MSG1.MyStringElement(Index, MSG1.MyStringElement.arrayType.System, b.Substring(1, b.Length - 2).GetSystemByte()));
+                            MyByteArrayList.Add(new PTP.MSG.MSGstr.MSGstrElement("System", b.Substring(1, b.Length - 2).GetSystemByte()));
                             Index++;
                         }
                         else
@@ -48,123 +50,152 @@ namespace PersonaEditorLib.Extension
                             {
                                 if (Regex.IsMatch(c, @"<.+>"))
                                 {
-                                    ListByte.AddChar(c.Substring(1, c.Length - 2), FontMap.List);
+                                    ListByte.AddChar(c.Substring(1, c.Length - 2), FontMap);
                                 }
                                 else
                                 {
-                                    
-                                    ListByte.AddRange(FontMap.GetEncodeBytes(c));
+
+                                    ListByte.AddRange(FontMap.Encode(c));
                                 }
                             }
 
-                            MyByteArrayList.Add(new MSG1.MyStringElement(Index, MSG1.MyStringElement.arrayType.Text, ListByte.ToArray()));
+                            MyByteArrayList.Add(new PTP.MSG.MSGstr.MSGstrElement("Text", ListByte.ToArray()));
                         }
                     }
                 }
             }
 
-            return MyByteArrayList.ToArray();
+            return MyByteArrayList;
         }
 
-        public static MSG1.MyStringElement[] parseString(this byte[] B)
+        public static List<PTP.MSG.MSGstr.MSGstrElement> GetPTPMsgStrEl(this ByteArray B)
         {
-            List<MSG1.MyStringElement> returned = new List<MSG1.MyStringElement>();
+            List<PTP.MSG.MSGstr.MSGstrElement> returned = new List<PTP.MSG.MSGstr.MSGstrElement>();
 
-            if (B != null)
+            string type = "Text";
+            List<byte> temp = new List<byte>();
+
+            for (int i = 0; i < B.Length; i++)
             {
-                MSG1.MyStringElement.arrayType type = MSG1.MyStringElement.arrayType.Text;
-                List<byte> temp = new List<byte>();
-
-                int Index = 0;
-
-                for (int i = 0; i < B.Length; i++)
+                if (0x20 <= B[i] & B[i] < 0x80)
                 {
-                    if (0x20 <= B[i] & B[i] < 0x80)
+                    temp.Add(B[i]);
+                }
+                else if (0x80 <= B[i] & B[i] < 0xF0)
+                {
+                    temp.Add(B[i]);
+                    i = i + 1;
+                    temp.Add(B[i]);
+                }
+                else
+                {
+                    if (0x00 <= B[i] & B[i] < 0x20)
                     {
+                        if (temp.Count != 0)
+                        {
+                            returned.Add(new PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                            temp.Clear();
+                        }
+
+                        type = "System";
                         temp.Add(B[i]);
-                    }
-                    else if (0x80 <= B[i] & B[i] < 0xF0)
-                    {
-                        temp.Add(B[i]);
-                        i = i + 1;
-                        temp.Add(B[i]);
+
+                        returned.Add(new PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                        type = "Text";
+                        temp.Clear();
                     }
                     else
                     {
-                        if (0x00 <= B[i] & B[i] < 0x20)
+                        if (temp.Count != 0)
                         {
-                            if (temp.Count != 0)
-                            {
-                                returned.Add(new MSG1.MyStringElement(Index, type, temp.ToArray()));
-                                Index++;
-                                temp.Clear();
-                            }
-
-                            type = MSG1.MyStringElement.arrayType.System;
-                            temp.Add(B[i]);
-
-                            returned.Add(new MSG1.MyStringElement(Index, type, temp.ToArray()));
-                            Index++;
-                            type = MSG1.MyStringElement.arrayType.Text;
+                            returned.Add(new PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                            type = "Text";
                             temp.Clear();
                         }
-                        else
+
+
+                        type = "System";
+                        temp.Add(B[i]);
+                        int count = (B[i] - 0xF0) * 2 - 1;
+                        for (int k = 0; k < count; k++)
                         {
-                            if (temp.Count != 0)
-                            {
-                                returned.Add(new MSG1.MyStringElement(Index, type, temp.ToArray()));
-                                Index++;
-                                type = MSG1.MyStringElement.arrayType.Text;
-                                temp.Clear();
-                            }
-
-
-                            type = MSG1.MyStringElement.arrayType.System;
+                            i++;
                             temp.Add(B[i]);
-                            int count = (B[i] - 0xF0) * 2 - 1;
-                            for (int k = 0; k < count; k++)
-                            {
-                                i++;
-                                temp.Add(B[i]);
-                            }
-
-                            returned.Add(new MSG1.MyStringElement(Index, type, temp.ToArray()));
-                            Index++;
-                            type = MSG1.MyStringElement.arrayType.Text;
-                            temp.Clear();
                         }
+
+                        returned.Add(new PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                        type = "Text";
+                        temp.Clear();
+                    }
+                }
+            }
+
+            if (temp.Count != 0)
+            {
+                returned.Add(new PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                temp.Clear();
+            }
+
+
+            return returned;
+        }
+
+        public static void ParseStrings(this IList<PTP.MSG.MSGstr> Strings, ByteArray SourceBytes)
+        {
+            Strings.Clear();
+
+            int Index = 0;
+            foreach (var Bytes in Util.SplitSourceBytes(SourceBytes))
+            {
+                PTP.MSG.MSGstr MSG = new PTP.MSG.MSGstr(Index, "");
+
+                List<PTP.MSG.MSGstr.MSGstrElement> temp = Bytes.GetPTPMsgStrEl();
+
+                int tempdown = 0;
+                int temptop = temp.Count;
+
+                for (int i = 0; i < temp.Count; i++)
+                {
+                    if (temp[i].Type == "System")
+                        MSG.Prefix.Add(temp[i]);
+                    else
+                    {
+                        tempdown = i;
+                        i = temp.Count;
                     }
                 }
 
-                if (temp.Count != 0)
+                for (int i = temp.Count - 1; i >= tempdown; i--)
                 {
-                    returned.Add(new MSG1.MyStringElement(Index, type, temp.ToArray()));
-                    temp.Clear();
+                    if (temp[i].Type == "System")
+                        MSG.Postfix.Add(temp[i]);
+                    else
+                    {
+                        temptop = i;
+                        i = 0;
+                    }
                 }
-            }
 
-            return returned.ToArray();
-        }
+                MSG.Postfix.Reverse();
 
-        public static void GetMyByteArray(this IList<MSG1.MyStringElement> MyByteArrayList, string String, CharList FontMap)
-        {
-            MyByteArrayList.Clear();
-            foreach (var a in String.GetMyByteArray(FontMap))
-            {
-                MyByteArrayList.Add(a);
+                for (int i = tempdown; i <= temptop; i++)
+                    MSG.OldString.Add(temp[i]);
+
+                Strings.Add(MSG);
+                Index++;
             }
         }
 
-        public static void AddChar(this List<byte> ByteList, char Char, IList<CharList.FnMpData> FontMap)
+        public static void AddChar(this IList<byte> ByteList, char Char, CharList FontMap)
         {
             ByteList.AddChar(Char.ToString(), FontMap);
         }
 
-        public static void AddChar(this List<byte> ByteList, string Char, IList<CharList.FnMpData> FontMap)
+        public static void AddChar(this IList<byte> ByteList, string Char, CharList FontMap)
         {
             if (Char != "")
             {
-                CharList.FnMpData fnmp = FontMap.FirstOrDefault(x => x.Char == Char);
+                CharList.FnMpData fnmp = FontMap.List.FirstOrDefault(x => x.Char == Char);
 
                 if (fnmp != null)
                 {
@@ -184,28 +215,17 @@ namespace PersonaEditorLib.Extension
             }
         }
 
-        public static byte[] getAllBytes(this MSG1.MyStringElement[] listMyByteArray)
-        {
-            List<byte> returned = new List<byte>();
-            foreach (var a in listMyByteArray)
-            {
-                returned.AddRange(a.Bytes);
-            }
-            return returned.ToArray();
-        }
-
-        public static string GetString(this MSG1.MyStringElement[] ByteCollection, CharList CharList, bool ClearText)
+        public static string GetString(this IList<PTP.MSG.MSGstr.MSGstrElement> ByteCollection, CharList CharList, bool ClearText)
         {
             string returned = "";
 
             foreach (var MSG in ByteCollection)
                 returned += MSG.GetText(CharList);
 
-
             return returned;
         }
 
-        public static string GetString(this MSG1.MyStringElement[] ByteCollection)
+        public static string GetString(this IList<PTP.MSG.MSGstr.MSGstrElement> ByteCollection)
         {
             string returned = "";
 
@@ -213,6 +233,14 @@ namespace PersonaEditorLib.Extension
                 returned += MSG.GetSystem();
 
             return returned;
+        }
+
+        public static ByteArray GetByteArray(this IList<PTP.MSG.MSGstr.MSGstrElement> ByteCollection)
+        {
+            List<byte> temp = new List<byte>();
+            foreach (var a in ByteCollection)
+                temp.AddRange(a.Array.ToArray());
+            return new ByteArray(temp.ToArray());
         }
     }
 
@@ -225,12 +253,12 @@ namespace PersonaEditorLib.Extension
             return new MemoryStream(buffer);
         }
 
-        public static void WriteMemoryStream(this FileStream FileStream, MemoryStream MemoryStream)
+        public static void WriteMemoryStream(this Stream Stream, MemoryStream MemoryStream)
         {
             MemoryStream.Position = 0;
             byte[] buffer = new byte[MemoryStream.Length];
             MemoryStream.Read(buffer, 0, (int)MemoryStream.Length);
-            FileStream.Write(buffer, 0, buffer.Length);
+            Stream.Write(buffer, 0, buffer.Length);
         }
 
         public static void SaveToFile(this Stream stream, string path)
@@ -245,19 +273,57 @@ namespace PersonaEditorLib.Extension
         }
     }
 
-    public static class Utilities
+    public static class Util
     {
-        public static void ReadShift(this List<IndexedByte> list)
+        public static BitmapPalette CreatePallete(Color color, PixelFormat pixelformat)
         {
-            list.Add(new IndexedByte { Index = 81, Shift = 2 });
-            list.Add(new IndexedByte { Index = 103, Shift = 2 });
-            list.Add(new IndexedByte { Index = 106, Shift = 2 });
-            list.Add(new IndexedByte { Index = 112, Shift = 2 });
-            list.Add(new IndexedByte { Index = 113, Shift = 2 });
-            list.Add(new IndexedByte { Index = 121, Shift = 2 });
+            int colorcount = 0;
+            byte step = 0;
+            if (pixelformat == PixelFormats.Indexed4)
+            {
+                colorcount = 16;
+                step = 0x10;
+            }
+            else if (pixelformat == PixelFormats.Indexed8)
+            {
+                colorcount = 256;
+                step = 1;
+            }
+
+
+            List<Color> ColorBMP = new List<Color>();
+            ColorBMP.Add(new Color { A = 0, R = 0, G = 0, B = 0 });
+            for (int i = 1; i < colorcount; i++)
+            {
+                ColorBMP.Add(new Color
+                {
+                    A = ByteTruncate(i * step),
+                    R = color.R,
+                    G = color.G,
+                    B = color.B
+                });
+            }
+            return new BitmapPalette(ColorBMP);
         }
 
-        public static bool CheckEntrance(this byte[] B, byte[] Bytes, int StartIndex)
+        public static byte ByteTruncate(int value)
+        {
+            if (value < 0) { return 0; }
+            else if (value > 255) { return 255; }
+            else { return (byte)value; }
+        }
+
+        public static void ReadShift(this Dictionary<int, byte> list)
+        {
+            list.Add(81, 2);
+            list.Add(103, 2);
+            list.Add(106, 2);
+            list.Add(112, 2);
+            list.Add(113, 2);
+            list.Add(121, 2);
+        }
+
+        public static bool CheckEntrance(this ByteArray B, byte[] Bytes, int StartIndex)
         {
             if (Bytes.Length != 0)
             {
@@ -272,11 +338,11 @@ namespace PersonaEditorLib.Extension
             else return true;
         }
 
-        public static List<byte[]> SplitSourceBytes(byte[] B)
+        public static List<ByteArray> SplitSourceBytes(this ByteArray B)
         {
-            List<byte[]> returned = new List<byte[]>();
+            List<ByteArray> returned = new List<ByteArray>();
 
-            byte[] LineSplit = B.Take((B[0] - 0xF0) * 2).ToArray();
+            byte[] LineSplit = B.ToArray().Take((B[0] - 0xF0) * 2).ToArray();
 
             List<byte> String = new List<byte>();
             for (int i = 0; i < B.Length; i++)
@@ -285,7 +351,7 @@ namespace PersonaEditorLib.Extension
                 {
                     if (String.Count != 0)
                     {
-                        returned.Add(String.ToArray());
+                        returned.Add(new ByteArray(String.ToArray()));
                         String.Clear();
                     }
                 }
@@ -295,12 +361,83 @@ namespace PersonaEditorLib.Extension
 
             if (String.Count != 0)
             {
-                returned.Add(String.ToArray());
+                returned.Add(new ByteArray(String.ToArray()));
                 String.Clear();
             }
 
             return returned;
         }
+
+        public static string GetNewPath(string source, string end)
+        {
+            string fullpath = Path.GetFullPath(source);
+            return Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + end;
+        }
+
+        public static bool ByteArrayCompareWithSimplest(byte[] BytesLeft, byte[] BytesRight)
+        {
+            if (BytesLeft.Length != BytesRight.Length)
+                return false;
+
+            var length = BytesLeft.Length;
+
+            for (int i = 0; i < length; i++)
+            {
+                if (BytesLeft[i] != BytesRight[i])
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool ByteArrayCompareWithSimplest(ByteArray BytesLeft, byte[] BytesRight)
+        {
+            if (BytesLeft.Length != BytesRight.Length)
+                return false;
+
+            var length = BytesLeft.Length;
+
+            for (int i = 0; i < length; i++)
+            {
+                if (BytesLeft[i] != BytesRight[i])
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static byte ReverseByte(byte toReverse)
+        {
+            int temp = (toReverse >> 4) + ((toReverse - (toReverse >> 4 << 4)) << 4);
+            return Convert.ToByte(temp);
+        }
+
+        public static void ReverseByteInList(IList<byte[]> list)
+        {
+            foreach (var a in list)
+            {
+                for (int i = 0; i < a.Length; i++)
+                {
+                    a[i] = ReverseByte(a[i]);
+                }
+            }
+        }
+
+        public static byte[] GetBytes(this string str, int size)
+        {
+            List<byte> returned = new List<byte>();
+            returned.AddRange(str.Select(x => Convert.ToByte(x)).ToArray());
+            for (int i = returned.Count; i < size; i++)
+                returned.Add(0);
+
+            return returned.ToArray();
+        }
+
+        public static byte[] GetBytes(this string str)
+        {
+            return str.GetBytes(str.Length);
+        }
+
     }
 
     public static class StreamExtension
@@ -374,6 +511,15 @@ namespace PersonaEditorLib.Extension
             else { return true; }
         }
 
+        public static void Write(this BinaryWriter writer, Stream stream)
+        {
+            long position = stream.Position;
+            stream.Position = 0;
+            byte[] buffer = new byte[stream.Length];
+            stream.Read(buffer, 0, buffer.Length);
+            writer.Write(buffer);
+            stream.Position = position;
+        }
     }
 
     public static class StringExtension
@@ -402,26 +548,24 @@ namespace PersonaEditorLib.Extension
         {
             string returned = String.Join(" ", Regex.Split(String, @"\\n"));
 
-            MSG1.MyStringElement[] temp = returned.GetMyByteArray(FontMap);
-
+            List<PTP.MSG.MSGstr.MSGstrElement> temp = returned.GetPTPMsgStrEl(FontMap);
             List<int> widthlist = new List<int>();
 
             foreach (var a in temp)
             {
-                if (a.Type == MSG1.MyStringElement.arrayType.Text)
-                    for (int i = 0; i < a.Bytes.Length; i++)
+                if (a.Type == "Text")
+                    for (int i = 0; i < a.Array.Length; i++)
                     {
                         CharList.FnMpData fnmp = null;
-                        if (a.Bytes[i] == 0x20)
+                        if (a.Array[i] == 0x20)
                         {
                             widthlist.Add(9);
                             continue;
                         }
-                        else if (0x20 < a.Bytes[i] & a.Bytes[i] < 0x80)
-                            fnmp = FontMap.List.FirstOrDefault(x => x.Index == a.Bytes[i]);
-                        else if (0x80 <= a.Bytes[i] & a.Bytes[i] < 0xF0)
+                        else if (0x20 < a.Array[i] & a.Array[i] < 0x80) fnmp = FontMap.List.FirstOrDefault(x => x.Index == a.Array[i]);
+                        else if (0x80 <= a.Array[i] & a.Array[i] < 0xF0)
                         {
-                            int newindex = (a.Bytes[i] - 0x81) * 0x80 + a.Bytes[i + 1] + 0x20;
+                            int newindex = (a.Array[i] - 0x81) * 0x80 + a.Array[i + 1] + 0x20;
                             i++;
                             fnmp = FontMap.List.FirstOrDefault(x => x.Index == newindex);
                         }
@@ -443,7 +587,7 @@ namespace PersonaEditorLib.Extension
                         else
                             widthlist.Add(0);
                     }
-                else if (a.Type == MSG1.MyStringElement.arrayType.System)
+                else if (a.Type == "System")
                     widthlist.AddRange(new int[a.GetSystem().Length]);
             }
 
@@ -540,6 +684,14 @@ namespace PersonaEditorLib.Extension
 
             BMPencoder.Frames.Add(BitmapFrame.Create(image));
             BMPencoder.Save(new FileStream(path, FileMode.Create));
+        }
+
+        public static void SavePNG(BitmapSource image, string path)
+        {
+            PngBitmapEncoder PNGencoder = new PngBitmapEncoder();
+
+            PNGencoder.Frames.Add(BitmapFrame.Create(image));
+            PNGencoder.Save(new FileStream(path, FileMode.Create));
         }
 
         public static BitmapSource OpenImage(string path)
