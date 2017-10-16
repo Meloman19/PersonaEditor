@@ -29,7 +29,6 @@ namespace PersonaEditorLib.FileStructure.BF
             foreach (var a in List)
             {
                 writer.Write(a);
-                writer.Write(new byte[Utilities.Alignment(a.Length, 0x10)]);
             }
         }
         public TypeMap Type { get { return _Type; } }

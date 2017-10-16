@@ -951,8 +951,8 @@ namespace PersonaEditorLib.FileTypes
 
             public PTPfactory(string filename, string oldfont, string newfont, string oldmap, string newmap)
             {
-                PTP = new FileStructure.PTP(new CharList(oldmap, new FileStructure.FNT.FNT(new FileStream(oldfont, FileMode.Open, FileAccess.Read), 0)),
-                   new CharList(newmap, new FileStructure.FNT.FNT(new FileStream(newfont, FileMode.Open, FileAccess.Read), 0)));
+                PTP = new FileStructure.PTP(new CharList(oldmap, new FileStructure.FNT.FNT(File.OpenRead(oldfont), 0)),
+                   new CharList(newmap, new FileStructure.FNT.FNT(File.OpenRead(newfont), 0)));
                 PTP.Open(XDocument.Load(filename));
             }
 
@@ -3996,8 +3996,9 @@ namespace PersonaEditorLib.FileStructure
             public int NewName { get; set; }
         }
 
-        public bool ImportTXT(string txtfile, string map, bool auto, int width)
+        public bool ImportTXT(string txtfile, string ptpfilename, string map, bool auto, int width)
         {
+            string name = Path.GetFileNameWithoutExtension(ptpfilename);
             int Width = (int)Math.Round((double)width / 0.9375);
             LineMap MAP = new LineMap(map);
 
@@ -4009,7 +4010,7 @@ namespace PersonaEditorLib.FileStructure
                     string line = SR.ReadLine();
                     string[] linespl = Regex.Split(line, "\t");
 
-                    if (Path.GetFileNameWithoutExtension(SourceFileName) == Path.GetFileNameWithoutExtension(linespl[MAP.FileName]))
+                    if (name == Path.GetFileNameWithoutExtension(linespl[MAP.FileName]))
                     {
                         string NewText = linespl[MAP.NewText];
                         if (auto)

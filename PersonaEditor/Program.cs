@@ -12,6 +12,36 @@ namespace PersonaEditor
 {
     public class ArgumentWork
     {
+        public class Parameters
+        {
+            public string NewFont { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_NEW.FNT");
+            public string OldFont { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_OLD.FNT");
+            public string NewMap { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_NEW.TXT");
+            public string OldMap { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_NEW.TXT");
+            public bool IsLittleEndian { get; private set; } = true;
+            public string map { get; private set; } = "";
+            public bool auto { get; private set; } = false;
+            public int width { get; private set; } = 0;
+
+            public Parameters(List<Argument.Parameter> ParList)
+            {
+                foreach (var a in ParList)
+                {
+                    if (a.Param == "nf") NewFont = a.Value;
+                    else if (a.Param == "of") OldFont = a.Value;
+                    else if (a.Param == "nm") NewMap = a.Value;
+                    else if (a.Param == "om") OldMap = a.Value;
+                    else if (a.Param == "be") IsLittleEndian = false;
+                    else if (a.Param == "map") map = a.Value;
+                    else if (a.Param == "auto")
+                    {
+                        auto = true;
+                        width = Convert.ToInt32(a.Value);
+                    }
+                }
+            }
+        }
+
         public class Argument
         {
             public class Parameter
@@ -39,7 +69,7 @@ namespace PersonaEditor
 
             public FileType SourceType { get; private set; }
             public string Value { get; private set; }
-            public List<Argument.Parameter> Parameters { get; set; }
+            public Parameters Parameters { get; private set; }
 
             public ArgumentSourceFile(Argument arg)
             {
@@ -51,7 +81,7 @@ namespace PersonaEditor
                 else SourceType = FileType.Empty;
 
                 Value = arg.Value;
-                Parameters = arg.Params;
+                Parameters = new Parameters(arg.Params);
             }
         }
 
@@ -75,7 +105,7 @@ namespace PersonaEditor
 
             public ActType Action { get; private set; }
             public string Value { get; private set; }
-            public List<Argument.Parameter> Parameters { get; set; }
+            public Parameters Parameters { get; private set; }
 
             public ArgumentAction(Argument arg)
             {
@@ -93,7 +123,7 @@ namespace PersonaEditor
                 else Action = ActType.Empty;
 
                 Value = arg.Value;
-                Parameters = arg.Params;
+                Parameters = new Parameters(arg.Params);
             }
         }
 
@@ -232,7 +262,9 @@ namespace PersonaEditor
 
                 foreach (var command in ActList)
                     if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportBMD) ExportBMD(PM1, SourceFile.Value, command.Value);
+                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportPTP) ExportPTP(PM1, SourceFile.Value, command.Value);
                     else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportBMD) ImportBMD(PM1, SourceFile.Value, command.Value);
+                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportPTP) ImportPTP(PM1, SourceFile.Value, command.Value, command.Parameters);
                     else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(PM1, SourceFile.Value, command.Value, command.Parameters);
 
                 return true;
@@ -251,6 +283,17 @@ namespace PersonaEditor
             PM1.GetBMD().SaveToFile(filename);
         }
 
+        public static void ExportPTP(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename)
+        {
+            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+
+            PersonaEditorLib.FileStructure.BMD BMD = new PersonaEditorLib.FileStructure.BMD();
+            BMD.Load(PM1.GetBMD(), Path.GetFileNameWithoutExtension(filename), true);
+            PersonaEditorLib.FileStructure.PTP PTP = new PersonaEditorLib.FileStructure.PTP(new PersonaEditorLib.CharList(), new PersonaEditorLib.CharList());
+            PTP.Open(BMD);
+            PTP.SaveProject().Save(filename);
+        }
+
         public static void ImportBMD(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename)
         {
             if (filename == "") filename = Util.GetNewPath(sourcefile, ".BMD");
@@ -264,18 +307,21 @@ namespace PersonaEditor
             }
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename, List<ArgumentWork.Argument.Parameter> ParList)
+        public static void ImportPTP(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        {
+            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+
+            Text.PTPfactory PTP = new Text.PTPfactory(filename, ParList.OldFont, ParList.NewFont, ParList.OldMap, ParList.NewMap);
+            PersonaEditorLib.FileStructure.BMD BMD = new PersonaEditorLib.FileStructure.BMD();
+            BMD.Load(PTP.PTP);
+            PM1.SetBMD(BMD.Get(ParList.IsLittleEndian));
+        }
+
+        public static void Save(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename, ArgumentWork.Parameters ParList)
         {
             if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).PM1");
 
-            bool IsLittleEndian = true;
-
-            foreach (var a in ParList)
-            {
-                if (a.Param == "be") IsLittleEndian = false;
-            }
-
-            PM1.Get(IsLittleEndian).SaveToFile(filename);
+            PM1.Get(ParList.IsLittleEndian).SaveToFile(filename);
         }
     }
 
@@ -288,12 +334,14 @@ namespace PersonaEditor
                 var SourceFile = argWRK.GetSourceFile();
                 var ActList = argWRK.GetActList();
 
-                PersonaEditorLib.FileStructure.BF.BF PM1 = new PersonaEditorLib.FileStructure.BF.BF(SourceFile.Value, true);
+                PersonaEditorLib.FileStructure.BF.BF BF = new PersonaEditorLib.FileStructure.BF.BF(SourceFile.Value, true);
 
                 foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportBMD) ExportBMD(PM1, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportBMD) ImportBMD(PM1, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(PM1, SourceFile.Value, command.Value, command.Parameters);
+                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportBMD) ExportBMD(BF, SourceFile.Value, command.Value);
+                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportPTP) ExportPTP(BF, SourceFile.Value, command.Value);
+                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportBMD) ImportBMD(BF, SourceFile.Value, command.Value);
+                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportPTP) ImportPTP(BF, SourceFile.Value, command.Value, command.Parameters);
+                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(BF, SourceFile.Value, command.Value, command.Parameters);
 
                 return true;
             }
@@ -311,31 +359,45 @@ namespace PersonaEditor
             BF.GetBMD().SaveToFile(filename);
         }
 
-        public static void ImportBMD(PersonaEditorLib.FileStructure.BF.BF PM1, string sourcefile, string filename)
+        public static void ExportPTP(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".BMD");
+            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+
+            PersonaEditorLib.FileStructure.BMD BMD = new PersonaEditorLib.FileStructure.BMD();
+            BMD.Load(BF.GetBMD(), Path.GetFileNameWithoutExtension(filename), true);
+            PersonaEditorLib.FileStructure.PTP PTP = new PersonaEditorLib.FileStructure.PTP(new PersonaEditorLib.CharList(), new PersonaEditorLib.CharList());
+            PTP.Open(BMD);
+            PTP.SaveProject().Save(filename);
+        }
+
+        public static void ImportBMD(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename)
+        {
+            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BMD");
 
             using (var FS = new FileStream(filename, FileMode.Open, FileAccess.Read))
             {
 
                 MemoryStream MS = new MemoryStream();
                 FS.CopyTo(MS);
-                PM1.SetBMD(MS);
+                BF.SetBMD(MS);
             }
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename, List<ArgumentWork.Argument.Parameter> ParList)
+        public static void ImportPTP(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        {
+            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+
+            Text.PTPfactory PTP = new Text.PTPfactory(filename, ParList.OldFont, ParList.NewFont, ParList.OldMap, ParList.NewMap);
+            PersonaEditorLib.FileStructure.BMD BMD = new PersonaEditorLib.FileStructure.BMD();
+            BMD.Load(PTP.PTP);
+            BF.SetBMD(BMD.Get(ParList.IsLittleEndian));
+        }
+
+        public static void Save(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename, ArgumentWork.Parameters ParList)
         {
             if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BF");
 
-            bool IsLittleEndian = true;
-
-            foreach (var a in ParList)
-            {
-                if (a.Param == "be") IsLittleEndian = false;
-            }
-
-            BF.Get(IsLittleEndian).SaveToFile(filename);
+            BF.Get(ParList.IsLittleEndian).SaveToFile(filename);
         }
     }
 
@@ -375,16 +437,11 @@ namespace PersonaEditor
             BMD.SavePTP(filename);
         }
 
-        public static void Save(Text.BMDfactory BMD, string sourcefile, string filename, List<ArgumentWork.Argument.Parameter> ParList)
+        public static void Save(Text.BMDfactory BMD, string sourcefile, string filename, ArgumentWork.Parameters ParList)
         {
             if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BMD");
 
-            bool IsLittleEndian = true;
-
-            foreach (var a in ParList)
-                if (a.Param == "be") IsLittleEndian = false;
-
-            BMD.Get(IsLittleEndian).SaveToFile(filename);
+            BMD.Get(ParList.IsLittleEndian).SaveToFile(filename);
         }
     }
 
@@ -397,20 +454,7 @@ namespace PersonaEditor
                 var SourceFile = argWRK.GetSourceFile();
                 var ActList = argWRK.GetActList();
 
-                string oldfont = "";
-                string newfont = "";
-                string oldmap = "";
-                string newmap = "";
-
-                foreach (var a in SourceFile.Parameters)
-                {
-                    if (a.Param == "nf") newfont = a.Value;
-                    else if (a.Param == "of") oldfont = a.Value;
-                    else if (a.Param == "nm") newmap = a.Value;
-                    else if (a.Param == "om") oldmap = a.Value;
-                }
-
-                Text.PTPfactory PTP = new Text.PTPfactory(SourceFile.Value, oldfont, newfont, oldmap, newmap);
+                Text.PTPfactory PTP = new Text.PTPfactory(SourceFile.Value, SourceFile.Parameters.OldFont, SourceFile.Parameters.NewFont, SourceFile.Parameters.OldMap, SourceFile.Parameters.NewMap);
 
                 foreach (var command in ActList)
                     if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportTXT) ExportTXT(PTP, SourceFile.Value, command.Value);
@@ -432,48 +476,24 @@ namespace PersonaEditor
 
         }
 
-        public static void ImportTXT(Text.PTPfactory PTP, string sourcefile, string filename, List<ArgumentWork.Argument.Parameter> ParList)
+        public static void ImportTXT(Text.PTPfactory PTP, string sourcefile, string filename, ArgumentWork.Parameters ParList)
         {
-            string map = "";
-            bool auto = false;
-            int width = 0;
-
-            foreach (var a in ParList)
-            {
-                if (a.Param == "map") map = a.Value;
-                else if (a.Param == "auto")
-                {
-                    auto = true;
-                    width = Convert.ToInt32(a.Value);
-                }
-            }
-
-            PTP.PTP.ImportTXT(filename, map, auto, width);
+            PTP.PTP.ImportTXT(filename, sourcefile, ParList.map, ParList.auto, ParList.width);
         }
 
-        public static void ExportBMD(Text.PTPfactory PTP, string sourcefile, string filename, List<ArgumentWork.Argument.Parameter> ParList)
+        public static void ExportBMD(Text.PTPfactory PTP, string sourcefile, string filename, ArgumentWork.Parameters ParList)
         {
-            if (filename == "")
-                Util.GetNewPath(sourcefile, "(NEW).BMD");
-
-            bool IsLittleEndian = true;
-
-            foreach (var a in ParList)
-                if (a.Param == "be") IsLittleEndian = false;
+            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BMD");
 
             PersonaEditorLib.FileStructure.BMD BMD = new PersonaEditorLib.FileStructure.BMD();
             BMD.Load(PTP.PTP);
-            BMD.Get(IsLittleEndian).SaveToFile(filename);
+            BMD.Get(ParList.IsLittleEndian).SaveToFile(filename);
         }
 
         public static void Save(Text.PTPfactory PTP, string sourcefile, string filename)
         {
-            if (filename == "")
-            {
-                string fullpath = Path.GetFullPath(sourcefile);
-                filename = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + "_NEW.PTP";
-            }
-
+            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+        
             PTP.Save(filename);
         }
     }

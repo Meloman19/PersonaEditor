@@ -32,59 +32,64 @@ namespace SPRAtlasEditor
         }
         #endregion INotifyPropertyChanged implementation
 
-        private int _X1;
-        private int _X2;
-        private int _Y1;
-        private int _Y2;
+        PersonaEditorLib.FileStructure.SPR.SPRKeyList.SPRKey KeyOut;
 
-        public string Name { get; set; }
+        public string Name
+        {
+            get { return KeyOut.mComment; }
+        }
         public int X1
         {
-            get { return _X1; }
+            get { return KeyOut.X1; }
             set
             {
-                if (value != _X1)
+                if (value != KeyOut.X1)
                 {
-                    _X1 = value;
+                    KeyOut.X1 = value;
                     Notify("X1");
                 }
             }
         }
         public int X2
         {
-            get { return _X2; }
+            get { return KeyOut.X2; }
             set
             {
-                if (value != _X2)
+                if (value != KeyOut.X2)
                 {
-                    _X2 = value;
+                    KeyOut.X2 = value;
                     Notify("X2");
                 }
             }
         }
         public int Y1
         {
-            get { return _Y1; }
+            get { return KeyOut.Y1; }
             set
             {
-                if (value != _Y1)
+                if (value != KeyOut.Y1)
                 {
-                    _Y1 = value;
+                    KeyOut.Y1 = value;
                     Notify("Y1");
                 }
             }
         }
         public int Y2
         {
-            get { return _Y2; }
+            get { return KeyOut.Y2; }
             set
             {
-                if (value != _X1)
+                if (value != KeyOut.Y2)
                 {
-                    _Y2 = value;
+                    KeyOut.Y2 = value;
                     Notify("Y2");
                 }
             }
+        }
+
+        public Key(PersonaEditorLib.FileStructure.SPR.SPRKeyList.SPRKey key)
+        {
+            KeyOut = key;
         }
     }
 
@@ -99,14 +104,7 @@ namespace SPRAtlasEditor
 
         public Visual(PersonaEditorLib.FileStructure.SPR.SPRKeyList.SPRKey Key)
         {
-            this.Key = new Key()
-            {
-                Name = Key.mComment,
-                X1 = Key.X1,
-                X2 = Key.X2,
-                Y1 = Key.Y1,
-                Y2 = Key.Y2
-            };
+            this.Key = new Key(Key);
             this.Key.PropertyChanged += Key_PropertyChanged;
 
             GD.Children.Add(Boarder);
@@ -209,7 +207,7 @@ namespace SPRAtlasEditor
             sfd.OverwritePrompt = true;
             sfd.InitialDirectory = Path.GetDirectoryName(OpenFile);
             sfd.FileName = Path.GetFileNameWithoutExtension(OpenFile);
-            
+
             if (sfd.ShowDialog() == true)
             {
                 Save(sfd.FileName);
@@ -246,26 +244,6 @@ namespace SPRAtlasEditor
 
         private void Save(string filename)
         {
-            foreach (var a in Images)
-            {
-                foreach(var b in a.VisualList)
-                {
-                    var temp = SPR.KeyList.List.Find(x => x.mComment == b.Key.Name);
-                    if (temp == null)
-                    {
-                        MessageBox.Show("Something happened :(");
-                    }
-                    else
-                    {
-                        temp.X1 = b.Key.X1;
-                        temp.Y1 = b.Key.Y1;
-                        temp.X2 = b.Key.X2;
-                        temp.Y2 = b.Key.Y2;
-                    }
-
-                }
-            }
-
             SPR.Get(true).SaveToFile(filename);
         }
 

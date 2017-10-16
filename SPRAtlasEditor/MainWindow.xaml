@@ -33,9 +33,9 @@
 
             <Grid Grid.Column="0" >
                 <Grid.RowDefinitions>
-                    <RowDefinition MinHeight="100" Height="auto"/>
+                    <RowDefinition MinHeight="100"/>
                     <RowDefinition Height="auto"/>
-                    <RowDefinition/>
+                    <RowDefinition MinHeight="50"/>
                 </Grid.RowDefinitions>
 
                 <ListView VerticalContentAlignment="Top"   ScrollViewer.CanContentScroll="False" ScrollViewer.VerticalScrollBarVisibility="Auto"

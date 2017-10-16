@@ -29,12 +29,13 @@ namespace PersonaText
         public static class Paths
         {
             public static string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            public static string Backgrounds = Path.Combine(CurrentFolderEXE, "background");
+            public static string DirBackgrounds = Path.Combine(CurrentFolderEXE, "background");
+            public static string DirFont = Path.Combine(CurrentFolderEXE, "font");
             public static string OpenFileName = "";
-            public static string FontOld = Path.Combine(Static.Paths.CurrentFolderEXE, "FONT_OLD.FNT");
-            public static string FontOldMap = Path.Combine(Static.Paths.CurrentFolderEXE, "FONT_OLD.TXT");
-            public static string FontNew = Path.Combine(Static.Paths.CurrentFolderEXE, "FONT_NEW.FNT");
-            public static string FontNewMap = Path.Combine(Static.Paths.CurrentFolderEXE, "FONT_NEW.TXT");
+            public static string FontOld = Path.Combine(DirFont, "FONT_OLD.FNT");
+            public static string FontOldMap = Path.Combine(DirFont, "FONT_OLD.TXT");
+            public static string FontNew = Path.Combine(DirFont, "FONT_NEW.FNT");
+            public static string FontNewMap = Path.Combine(DirFont, "FONT_NEW.TXT");
         }
 
         public static class FontMap
@@ -249,9 +250,9 @@ namespace PersonaText
             Height = SystemParameters.WorkArea.Height;
 
 
-            if (Directory.Exists((Static.Paths.Backgrounds)))
+            if (Directory.Exists((Static.Paths.DirBackgrounds)))
             {
-                DirectoryInfo DI = new DirectoryInfo(Static.Paths.Backgrounds);
+                DirectoryInfo DI = new DirectoryInfo(Static.Paths.DirBackgrounds);
                 foreach (var file in DI.GetFiles(@"*.png"))
                 {
                     ComboBoxItem cbi = new ComboBoxItem();
@@ -356,7 +357,7 @@ namespace PersonaText
             if (Current.Default.SelectedBackground == "Empty")
             { OV.BackImage.Update("Empty"); }
             else
-            { OV.BackImage.Update(Path.Combine(Static.Paths.Backgrounds, Current.Default.SelectedBackground)); }
+            { OV.BackImage.Update(Path.Combine(Static.Paths.DirBackgrounds, Current.Default.SelectedBackground)); }
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)

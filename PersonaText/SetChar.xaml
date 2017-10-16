@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PersonaText"
         mc:Ignorable="d"
-        Title="SetChar" Height="590.663" Width="552.885" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" Closed="Window_Closed">
+        Title="SetChar" Height="590.663" Width="552.885" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" Closing="Window_Closing">
     <Grid>
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <ItemsControl Name="wrap" ItemsSource="{Binding}">
