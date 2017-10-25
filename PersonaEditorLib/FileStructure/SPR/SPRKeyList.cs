@@ -125,33 +125,7 @@ namespace PersonaEditorLib.FileStructure.SPR
             for (int i = 0; i < count; i++)
                 List.Add(new SPRKey(reader.ReadBytes(0x80)));
         }
-
-        public void SaveToFile(string FileName)
-        {
-            FileStream FS = new FileStream(FileName, FileMode.Create, FileAccess.ReadWrite);
-            StreamWriter writer = new StreamWriter(FS);
-            writer.AutoFlush = true;
-
-            for (int i = 0; i < List.Count; i++)
-            {
-                writer.Write(List[i].mTextureIndex);
-                writer.Write("\t");
-                writer.Write(i);
-                writer.Write("\t");
-                writer.Write(List[i].X1);
-                writer.Write("\t");
-                writer.Write(List[i].Y1);
-                writer.Write("\t");
-                writer.Write(List[i].X2);
-                writer.Write("\t");
-                writer.Write(List[i].Y2);
-                writer.Write("\t");
-                writer.Write(List[i].mComment);
-                writer.WriteLine("");
-            }
-        }
-
-
+        
         public int Size
         {
             get

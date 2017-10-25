@@ -20,7 +20,7 @@ namespace PersonaEditorLib.FileStructure.PM1
 
         public int Size
         {
-            get { return BMD.Length + Utilities.Alignment(BMD.Length, 0x10); }
+            get { return BMD.Length + Utilities.Utilities.Alignment(BMD.Length, 0x10); }
         }
         public int Count
         {
@@ -37,7 +37,7 @@ namespace PersonaEditorLib.FileStructure.PM1
         public void Get(BinaryWriter writer)
         {
             writer.Write(BMD);
-            writer.Write(new byte[Utilities.Alignment(BMD.Length, 0x10)]);
+            writer.Write(new byte[Utilities.Utilities.Alignment(BMD.Length, 0x10)]);
         }
         public TypeMap Type
         {

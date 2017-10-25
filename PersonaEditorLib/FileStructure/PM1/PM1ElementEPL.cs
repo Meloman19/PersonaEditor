@@ -34,7 +34,7 @@ namespace PersonaEditorLib.FileStructure.PM1
             {
                 int returned = 0;
                 for (int i = 0; i < index; i++)
-                    returned += (int)List[i].Length + Utilities.Alignment(List[i].Length, 0x10);
+                    returned += (int)List[i].Length + Utilities.Utilities.Alignment(List[i].Length, 0x10);
                 return returned;
             }
         }
@@ -45,7 +45,7 @@ namespace PersonaEditorLib.FileStructure.PM1
             {
                 int returned = 0;
                 foreach (var a in List)
-                    returned += (int)a.Length + Utilities.Alignment(a.Length, 0x10);
+                    returned += (int)a.Length + Utilities.Utilities.Alignment(a.Length, 0x10);
                 return returned;
             }
         }
@@ -66,7 +66,7 @@ namespace PersonaEditorLib.FileStructure.PM1
             foreach (var a in List)
             {
                 writer.Write(a);
-                writer.Write(new byte[Utilities.Alignment(a.Length, 0x10)]);
+                writer.Write(new byte[Utilities.Utilities.Alignment(a.Length, 0x10)]);
             }
         }
         public TypeMap Type

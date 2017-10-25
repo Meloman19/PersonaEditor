@@ -21,6 +21,7 @@ using PersonaEditorLib.Extension;
 using Microsoft.Win32;
 using PersonaEditorLib;
 using PersonaEditorLib.FileTypes;
+using PersonaEditorLib.FileStructure.PTP;
 
 namespace PersonaText
 {
@@ -64,6 +65,7 @@ namespace PersonaText
         Color _ColorName;
         Point _TextStart;
         Point _NameStart;
+        int _LineSpacing;
 
         public Point TextStart
         {
@@ -122,8 +124,11 @@ namespace PersonaText
             get { return _ColorText; }
             set
             {
-                _ColorText = value;
-                Notify("ColorText");
+                if (_ColorText != value)
+                {
+                    _ColorText = value;
+                    Notify("ColorText");
+                }
             }
         }
         public Color ColorName
@@ -131,8 +136,23 @@ namespace PersonaText
             get { return _ColorName; }
             set
             {
-                _ColorName = value;
-                Notify("ColorName");
+                if (_ColorName != value)
+                {
+                    _ColorName = value;
+                    Notify("ColorName");
+                }
+            }
+        }
+        public int LineSpacing
+        {
+            get { return _LineSpacing; }
+            set
+            {
+                if (_LineSpacing != value)
+                {
+                    _LineSpacing = value;
+                    Notify("LineSpacing");
+                }
             }
         }
 
@@ -165,6 +185,7 @@ namespace PersonaText
             GlyphScale = Current.Default.EmptyGlyphScale;
             ColorName = Current.Default.EmptyNameColor;
             ColorText = Current.Default.EmptyTextColor;
+            LineSpacing = 0;
 
             Image = BitmapSource.Create(Width, Height, 96, 96, PixelFormats.Indexed1, new BitmapPalette(new List<Color> { Current.Default.EmptyBackgroundColor }), new byte[Width * Height], Width);
         }
@@ -184,6 +205,7 @@ namespace PersonaText
 
                 ColorName = (Color)ColorConverter.ConvertFromString(Background.Element("ColorName").Value);
                 ColorText = (Color)ColorConverter.ConvertFromString(Background.Element("ColorText").Value);
+                LineSpacing = Convert.ToInt32(Background.Element("LineSpacing").Value, culture);
             }
             catch (FormatException)
             {
@@ -275,14 +297,14 @@ namespace PersonaText
         {
             if (Path.GetExtension(Static.Paths.OpenFileName).ToUpper() == ".PTP")
             {
-                OV.PTP.Open(XDocument.Load(Static.Paths.OpenFileName, System.Xml.Linq.LoadOptions.PreserveWhitespace));
+                OV.PTP.Open(Static.Paths.OpenFileName);
             }
             else if (Path.GetExtension(Static.Paths.OpenFileName).ToUpper() == ".BMD")
             {
-                BMD BMD = new BMD();
-                BMD.Load(File.OpenRead(Static.Paths.OpenFileName), Static.Paths.OpenFileName, IsLittleEndian);
+                PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
+                BMD.Open(File.OpenRead(Static.Paths.OpenFileName), Static.Paths.OpenFileName, IsLittleEndian);
 
-                OV.PTP.Open(BMD);
+                OV.PTP.Open(BMD, false);
             }
         }
 
@@ -306,7 +328,7 @@ namespace PersonaText
             sfd.FileName = Path.GetFileNameWithoutExtension(Static.Paths.OpenFileName);
             if (sfd.ShowDialog() == true)
             {
-                OV.PTP.SaveProject().Save(sfd.FileName);
+                OV.PTP.SaveProject(sfd.FileName);
             }
         }
 
@@ -374,7 +396,7 @@ namespace PersonaText
         {
             try
             {
-                OV.PTP.msg[0].Strings[0].Prefix.Add(new PTP.MSG.MSGstr.MSGstrElement("Text", "41-68-2E-2E-2E-20-49-74"));
+
             }
             catch (Exception ex)
             {
@@ -826,9 +848,9 @@ namespace PersonaText
         private void BackgroundImageChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ColorText")
-                DrawingText.ImageSource = _ImageData.GetImageSource(Util.CreatePallete(BackImage.ColorText, _ImageData.PixelFormat));
+                DrawingText.ImageSource = _ImageData.GetImageSource(PersonaEditorLib.Utilities.Utilities.CreatePallete(BackImage.ColorText, _ImageData.PixelFormat));
             else if (e.PropertyName == "ColorName")
-                DrawingName.ImageSource = _DataName.GetImageSource(Util.CreatePallete(BackImage.ColorName, _DataName.PixelFormat));
+                DrawingName.ImageSource = _DataName.GetImageSource(PersonaEditorLib.Utilities.Utilities.CreatePallete(BackImage.ColorName, _DataName.PixelFormat));
             else if (e.PropertyName == "GlyphScale")
             {
                 UpdateTextSize();
@@ -838,14 +860,15 @@ namespace PersonaText
                 UpdateTextSize();
             else if (e.PropertyName == "NameStart")
                 UpdateNameSize();
-
+            else if (e.PropertyName == "LineSpacing")
+                CreateImageData();
         }
 
         ImageData CreateImageData(IList<PTP.MSG.MSGstr.MSGstrElement> array)
         {
             if (Current.Default.ViewVisualizer == true)
             {
-                return ImageData.DrawText(array, CharLST, Static.FontMap.Shift);
+                return ImageData.DrawText(array, CharLST, Static.FontMap.Shift, BackImage.LineSpacing);
                 //  AsyncTask at = new AsyncTask(() => DrawText(array, CharLST));
                 //  at.PropertyChanged += At_PropertyChanged;
             }
@@ -855,14 +878,14 @@ namespace PersonaText
         ImageData CreateImageData(string text)
         {
             if (Current.Default.ViewVisualizer == true)
-                return ImageData.DrawText(text.GetPTPMsgStrEl(CharLST), CharLST, Static.FontMap.Shift);
+                return ImageData.DrawText(text.GetPTPMsgStrEl(CharLST), CharLST, Static.FontMap.Shift, BackImage.LineSpacing);
             else return new ImageData();
         }
 
         ImageData CreateImageData(ByteArray Name)
         {
             if (Current.Default.ViewVisualizer == true)
-                return ImageData.DrawText(Name.GetPTPMsgStrEl(), CharLST, Static.FontMap.Shift);
+                return ImageData.DrawText(Name.GetPTPMsgStrEl(), CharLST, Static.FontMap.Shift, BackImage.LineSpacing);
             else return new ImageData();
         }
 
@@ -931,7 +954,7 @@ namespace PersonaText
             set
             {
                 _ImageData = value;
-                DrawingText.ImageSource = _ImageData.GetImageSource(Util.CreatePallete(BackImage.ColorText, _ImageData.PixelFormat));
+                DrawingText.ImageSource = _ImageData.GetImageSource(PersonaEditorLib.Utilities.Utilities.CreatePallete(BackImage.ColorText, _ImageData.PixelFormat));
                 UpdateTextSize();
             }
         }
@@ -941,7 +964,7 @@ namespace PersonaText
             set
             {
                 _DataName = value;
-                DrawingName.ImageSource = _DataName.GetImageSource(Util.CreatePallete(BackImage.ColorName, _DataName.PixelFormat));
+                DrawingName.ImageSource = _DataName.GetImageSource(PersonaEditorLib.Utilities.Utilities.CreatePallete(BackImage.ColorName, _DataName.PixelFormat));
                 UpdateNameSize();
             }
         }
@@ -963,20 +986,4 @@ namespace PersonaText
             DrawingName.Rect = new Rect(BackImage.NameStart, new Size(Width, Height));
         }
     }
-
-    //public class VisualText : IMultiValueConverter
-    //{
-    //    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        return null;
-    //        //// returned = new Visual(Static.FontMap.CharList, (BackgroundImage)values[0], Visual.Type.Text);
-    //        // returned.ElementArray_Changed(((string)values[1]).GetMyByteArrays(Static.FontMap.CharList));
-    //        // return returned.Text;
-    //    }
-
-    //    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 }

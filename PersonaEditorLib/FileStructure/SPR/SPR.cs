@@ -83,7 +83,7 @@ namespace PersonaEditorLib.FileStructure.SPR
                 writer.Write(a);
             }
             KeyList.Get(writer);
-            int temp = Utilities.Alignment(writer.BaseStream.Position, 16);
+            int temp = Utilities.Utilities.Alignment(writer.BaseStream.Position, 16);
             writer.Write(new byte[temp == 0 ? 16 : temp]);
             Textures.Get(writer);
 

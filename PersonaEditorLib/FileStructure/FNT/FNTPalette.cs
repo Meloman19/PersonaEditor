@@ -24,9 +24,9 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public BitmapPalette Pallete { get; set; }
 
-        public int Size()
+        public int Size
         {
-            return Pallete.Colors.Count * 4;
+            get { return Pallete.Colors.Count * 4; }
         }
 
         public void Get(BinaryWriter writer)

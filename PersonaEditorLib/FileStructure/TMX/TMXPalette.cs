@@ -26,11 +26,8 @@ namespace PersonaEditorLib.FileStructure.TMX
         PSMZ16S = 0x3A
     }
 
-
-
     public class TMXPalette
     {
-
         public static List<Color> TilePalette(List<Color> colorArray)
         {
             List<Color> returned = new List<Color>();
@@ -56,40 +53,37 @@ namespace PersonaEditorLib.FileStructure.TMX
             return returned;
         }
 
-        public static int GetIndexedColorCount(PS2PixelFormat fmt)
+        public static PixelFormat GetPixelFormat(PS2PixelFormat fmt)
         {
             switch (fmt)
             {
                 case PS2PixelFormat.PSMT8:
                 case PS2PixelFormat.PSMT8H:
-                    return 256;
+                    return PixelFormats.Indexed8;
                 case PS2PixelFormat.PSMT4:
                 case PS2PixelFormat.PSMT4HL:
                 case PS2PixelFormat.PSMT4HH:
-                    return 16;
+                    return PixelFormats.Indexed4;
+                case PS2PixelFormat.PSMTC24:
+                    return PixelFormats.Rgb24;
+                case PS2PixelFormat.PSMTC32:
+                    return PixelFormats.Pbgra32;
                 default:
-                    return 0;
+                    return PixelFormats.Default;
             }
         }
 
         public TMXPalette(BinaryReader reader, PS2PixelFormat format)
         {
-            List<Color> Colors = new List<Color>();
-            for (int i = 0; i < GetIndexedColorCount(format); i++)
-                Colors.Add(new Color()
-                {
-                    R = reader.ReadByte(),
-                    G = reader.ReadByte(),
-                    B = reader.ReadByte(),
-                    A = reader.ReadByte()
-                });
+            Format = GetPixelFormat(format);
 
-            if (GetIndexedColorCount(format) == 256)
-                Pallete = new BitmapPalette(TilePalette(Colors));
-            else
-                Pallete = new BitmapPalette(Colors);
+            if (Format == PixelFormats.Indexed8)
+                Pallete = new BitmapPalette(TilePalette(Utilities.Utilities.ReadPalette(reader, 256)));
+            else if (Format == PixelFormats.Indexed4)
+                Pallete = new BitmapPalette(Utilities.Utilities.ReadPalette(reader, 16));
         }
 
-        public BitmapPalette Pallete { get; set; }
+        public BitmapPalette Pallete { get; set; } = null;
+        public PixelFormat Format { get; set; }
     }
 }

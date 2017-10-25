@@ -26,6 +26,8 @@
     </DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -56,7 +58,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -89,9 +91,12 @@
     <Compile Include="FileStructure\BF\BFElement.cs" />
     <Compile Include="FileStructure\BF\BFHeader.cs" />
     <Compile Include="FileStructure\BF\BFTable.cs" />
+    <Compile Include="FileStructure\BIN\BIN.cs" />
+    <Compile Include="FileStructure\BMD\BMD.cs" />
     <Compile Include="FileStructure\FNT\FNT.cs" />
     <Compile Include="FileStructure\FNT\FNTCompressed.cs" />
     <Compile Include="FileStructure\FNT\FNTHeader.cs" />
+    <Compile Include="FileStructure\FNT\FNTLast.cs" />
     <Compile Include="FileStructure\FNT\FNTPalette.cs" />
     <Compile Include="FileStructure\FNT\FNTReserved.cs" />
     <Compile Include="FileStructure\FNT\FNTUnknown.cs" />
@@ -105,6 +110,8 @@
     <Compile Include="FileStructure\PM1\PM1ElementRMDHead.cs" />
     <Compile Include="FileStructure\PM1\PM1Header.cs" />
     <Compile Include="FileStructure\PM1\PM1Table.cs" />
+    <Compile Include="FileStructure\PTP\Extension.cs" />
+    <Compile Include="FileStructure\PTP\PTP.cs" />
     <Compile Include="FileStructure\SPR\SPR.cs" />
     <Compile Include="FileStructure\SPR\SPRHeader.cs" />
     <Compile Include="FileStructure\SPR\SPRKeyList.cs" />

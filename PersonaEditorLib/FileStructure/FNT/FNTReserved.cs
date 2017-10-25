@@ -13,9 +13,9 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public List<int> Reserved = new List<int>();
 
-        public int Size()
+        public int Size
         {
-            return Reserved.Count * 4;
+            get { return Reserved.Count * 4; }
         }
 
         public void Get(BinaryWriter writer)

@@ -19,6 +19,7 @@ namespace PersonaEditorLib.FileStructure.FNT
         public FNTUnknown Unknown { get; set; }
         public FNTReserved Reserved { get; set; }
         public FNTCompressed Compressed { get; private set; }
+        public FNTLast Last { get; private set; }
 
         public FNT(Stream stream, long position)
         {
@@ -26,11 +27,17 @@ namespace PersonaEditorLib.FileStructure.FNT
             BinaryReader reader = new BinaryReader(stream);
 
             Header = new FNTHeader(reader);
+            reader.BaseStream.Position = Header.HeaderSize;
             Palette = new FNTPalette(reader, Header.Glyphs.NumberOfColor);
             WidthTable = new FNTWidthTable(reader);
             Unknown = new FNTUnknown(reader);
             Reserved = new FNTReserved(reader, Header.Glyphs.Count);
             Compressed = new FNTCompressed(reader);
+            if (Header.LastPosition != 0)
+            {
+                reader.BaseStream.Position = Header.LastPosition;
+                Last = new FNTLast(reader, Header.Glyphs.Count);
+            }
         }
 
         public FNT(string path) : this(File.OpenRead(path), 0)
@@ -40,7 +47,7 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public int Size()
         {
-            return Header.HeaderSize + Palette.Size() + WidthTable.Size() + Unknown.Size() + Reserved.Size() + Compressed.Size();
+            return Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size();
         }
 
         private BitmapSource GetFontImage()
@@ -63,7 +70,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             int glyphindex = 0;
             foreach (var a in data)
             {
-                Line = ImageData.MergeLeftRight(Line, new ImageData(a, currentPF, Header.Glyphs.Size1, Header.Glyphs.Size2));
+                Line = ImageData.MergeLeftRight(Line, new ImageData(a, currentPF, Header.Glyphs.Size1, Header.Glyphs.Size2), 1);
                 glyphindex++;
                 if (glyphindex % 16 == 0)
                 {
@@ -114,7 +121,7 @@ namespace PersonaEditorLib.FileStructure.FNT
 
             XElement Line = null;
             int k = 0;
-            for (int i = 0; i < WidthTable.WidthTable.Count; i++)
+            for (int i = 0; i < WidthTable.Count; i++)
             {
                 if (i % 16 == 0)
                 {
@@ -124,8 +131,8 @@ namespace PersonaEditorLib.FileStructure.FNT
                 }
                 XElement Glyph = new XElement("Glyph_" + ((i % 16) + 1));
                 Line.Add(Glyph);
-                Glyph.Add(new XElement("LeftCut", WidthTable.WidthTable[i].Left));
-                Glyph.Add(new XElement("RightCut", WidthTable.WidthTable[i].Right));
+                Glyph.Add(new XElement("LeftCut", WidthTable[i]?.Left));
+                Glyph.Add(new XElement("RightCut", WidthTable[i]?.Right));
             }
 
             Logging.Write("PersonaEditorLib", "Width Table was created.");
@@ -144,7 +151,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                 {
                     int glyphindex = Convert.ToInt32(glyph.Name.LocalName.Split('_')[1]);
                     index = (lineindex - 1) * 16 + (glyphindex - 1);
-                    WidthTable.WidthTable[index] = new VerticalCut() { Left = Convert.ToByte(glyph.Element("LeftCut").Value), Right = Convert.ToByte(glyph.Element("RightCut").Value) };
+                    WidthTable[index] = new VerticalCut(Convert.ToByte(glyph.Element("LeftCut").Value), Convert.ToByte(glyph.Element("RightCut").Value));
                 }
             }
 
@@ -156,7 +163,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             MemoryStream returned = new MemoryStream();
             BinaryWriter writer = new BinaryWriter(returned);
 
-            Header.FileSize = 1 + Header.HeaderSize + Palette.Size() + Reserved.Size() + Compressed.Size();
+            Header.FileSize = 1 + Header.HeaderSize + Palette.Size + Reserved.Size + Compressed.Size();
 
             Header.Get(writer);
             Palette.Get(writer);
@@ -164,6 +171,8 @@ namespace PersonaEditorLib.FileStructure.FNT
             Unknown.Get(writer);
             Reserved.Get(writer);
             Compressed.Get(writer);
+            if (Last != null)
+                Last.Get(writer);
 
             returned.Position = 0;
             return returned;

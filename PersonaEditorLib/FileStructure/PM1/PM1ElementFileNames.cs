@@ -44,7 +44,7 @@ namespace PersonaEditorLib.FileStructure.PM1
             foreach (var a in List)
             {
                 writer.Write(Encoding.ASCII.GetBytes(a));
-                writer.Write(new byte[Utilities.Alignment(a.Length, 0x20)]);
+                writer.Write(new byte[Utilities.Utilities.Alignment(a.Length, 0x20)]);
             }
         }
         public TypeMap Type

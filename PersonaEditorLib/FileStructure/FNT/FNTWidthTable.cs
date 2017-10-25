@@ -11,14 +11,13 @@ namespace PersonaEditorLib.FileStructure.FNT
 
             for (int i = 0; i < Size / 2; i++)
             {
-                VerticalCut cut = new VerticalCut();
-                cut.Left = reader.ReadByte();
-                cut.Right = reader.ReadByte();
-                WidthTable.Add(cut);
+                byte Left = reader.ReadByte();
+                byte Right = reader.ReadByte();
+                WidthTable.Add(new VerticalCut(Left, Right));
             }
         }
 
-        public List<VerticalCut> WidthTable = new List<VerticalCut>();
+        List<VerticalCut> WidthTable = new List<VerticalCut>();
 
         public int Size()
         {
@@ -31,6 +30,26 @@ namespace PersonaEditorLib.FileStructure.FNT
             foreach (var glyph in WidthTable)
                 writer.Write(glyph.Get());
         }
-    }
 
+        public int Count
+        {
+            get { return WidthTable.Count; }
+        }
+
+        public VerticalCut? this[int i]
+        {
+            get
+            {
+                if (i < WidthTable.Count)
+                    return WidthTable[i];
+                else
+                    return null;
+            }
+            set
+            {
+                if (value != null)
+                    WidthTable[i] = value.Value;
+            }
+        }
+    }
 }

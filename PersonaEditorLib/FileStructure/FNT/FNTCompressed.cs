@@ -129,10 +129,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                     }
                 }
             }
-
-            Logging.Write("PersonaEditor", "Get decompressed font");
-
-
+            
             return returned;
         }
 

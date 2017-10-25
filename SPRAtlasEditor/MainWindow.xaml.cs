@@ -223,13 +223,13 @@ namespace SPRAtlasEditor
             BindingList<PersonaEditorLib.FileStructure.TMX.TMX> Textures = new BindingList<PersonaEditorLib.FileStructure.TMX.TMX>();
 
             foreach (var a in SPR.GetTextureList())
-                Textures.Add(new PersonaEditorLib.FileStructure.TMX.TMX(new MemoryStream(a), true));
+                Textures.Add(new PersonaEditorLib.FileStructure.TMX.TMX(new MemoryStream(a), 0, true));
 
             for (int i = 0; i < Textures.Count; i++)
             {
                 var img = Textures[i];
                 Names.Add(Encoding.ASCII.GetString(img.Header.UserComment.Where(x => x != 0).ToArray()));
-                var image = img.Data.GetBitmapSource(img.Palette.Pallete);
+                var image = img.Image;
 
                 var temp = new DrawingImage(new DrawingGroup());
 

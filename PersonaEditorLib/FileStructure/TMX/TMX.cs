@@ -12,46 +12,37 @@ namespace PersonaEditorLib.FileStructure.TMX
     public class TMX
     {
         public TMXHeader Header;
-        public TMXPalette Palette;
-        public byte[] DataB;
-        public FileTypes.ImageData Data;
+        TMXPalette Palette;
+        byte[] Data;
 
-        public TMX(Stream stream, bool IsLittleEndian)
+        public TMX(Stream stream, long position, bool IsLittleEndian)
         {
-            try
-            {
-                BinaryReader reader;
+            stream.Position = position;
 
-                if (IsLittleEndian)
-                    reader = new BinaryReader(stream);
-                else
-                    reader = new BinaryReaderBE(stream);
+            BinaryReader reader;
 
-                Header = new TMXHeader(reader);
-                Palette = new TMXPalette(reader, Header.PixelFormat);
+            if (IsLittleEndian)
+                reader = new BinaryReader(stream);
+            else
+                reader = new BinaryReaderBE(stream);
 
-                PixelFormat format;
-                if (TMXPalette.GetIndexedColorCount(Header.PixelFormat) == 256)
-                {
-                    format = PixelFormats.Indexed8;
-                    DataB = reader.ReadBytes(Header.Width * Header.Height);
+            Header = new TMXHeader(reader);
+            Palette = new TMXPalette(reader, Header.PixelFormat);
 
-                }
-                else
-                {
-                    format = PixelFormats.Indexed4;
-                    DataB = Utilities.DataReverse(reader.ReadBytes(Convert.ToInt32((double)Header.Width * Header.Height / 2)));
-                }
+            int Length = (Header.Width * Header.Height * Palette.Format.BitsPerPixel) / 8;
+            Data = reader.ReadBytes(Length);
+        }
 
-                Data = new FileTypes.ImageData(DataB, format, Header.Width, Header.Height);
+        public TMX(string path, bool IsLittleEndian) : this(File.OpenRead(path), 0, true) { }
 
+        private BitmapSource GetBitmapSource()
+        {
+            return BitmapSource.Create(Header.Width, Header.Height, 96, 96, Palette.Format, Palette.Pallete, Data, (Palette.Format.BitsPerPixel * Header.Width + 7) / 8);
+        }
 
-
-            }
-            catch (Exception e)
-            {
-                Logging.Write("L", e);
-            }
+        public BitmapSource Image
+        {
+            get { return GetBitmapSource(); }
         }
     }
 }

@@ -39,7 +39,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             UnknownH = reader.ReadBytes(6);
             Glyphs = new Glyph(reader);
             UnknownUShort = reader.ReadUInt16();
-            Last = reader.ReadBytes(8);
+            LastPosition = reader.ReadInt32();
         }
 
         public int HeaderSize { get; set; }
@@ -47,7 +47,7 @@ namespace PersonaEditorLib.FileStructure.FNT
         public byte[] UnknownH { get; set; }
         public Glyph Glyphs { get; set; }
         public ushort UnknownUShort { get; set; }
-        public byte[] Last { get; set; }
+        public int LastPosition { get; set; }
 
         public int Size()
         {
@@ -61,7 +61,8 @@ namespace PersonaEditorLib.FileStructure.FNT
             writer.Write(UnknownH);
             Glyphs.Get(writer);
             writer.Write(UnknownUShort);
-            writer.Write(Last);
+            writer.Write(LastPosition);
+            writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, HeaderSize)]);
         }
     }
 }

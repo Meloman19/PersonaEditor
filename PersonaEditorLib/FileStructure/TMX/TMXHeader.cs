@@ -33,6 +33,10 @@ namespace PersonaEditorLib.FileStructure.TMX
             Tag = reader.ReadBytes(8);
 
             PaletteCount = reader.ReadByte();
+            if (PaletteCount > 1)
+            {
+
+            }
             PaletteFormat = reader.ReadByte();
             Width = reader.ReadUInt16();
             Height = reader.ReadUInt16();
