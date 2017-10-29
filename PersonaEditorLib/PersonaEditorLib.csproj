@@ -93,6 +93,7 @@
     <Compile Include="FileStructure\BF\BFTable.cs" />
     <Compile Include="FileStructure\BIN\BIN.cs" />
     <Compile Include="FileStructure\BMD\BMD.cs" />
+    <Compile Include="FileStructure\BVP\BVP.cs" />
     <Compile Include="FileStructure\FNT\FNT.cs" />
     <Compile Include="FileStructure\FNT\FNTCompressed.cs" />
     <Compile Include="FileStructure\FNT\FNTHeader.cs" />
@@ -116,6 +117,8 @@
     <Compile Include="FileStructure\SPR\SPRHeader.cs" />
     <Compile Include="FileStructure\SPR\SPRKeyList.cs" />
     <Compile Include="FileStructure\SPR\SPRTextures.cs" />
+    <Compile Include="FileStructure\StringList.cs" />
+    <Compile Include="FileStructure\TBL\TBL.cs" />
     <Compile Include="FileStructure\TMX\TMX.cs" />
     <Compile Include="FileStructure\TMX\TMXHeader.cs" />
     <Compile Include="FileStructure\TMX\TMXPalette.cs" />

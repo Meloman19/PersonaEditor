@@ -59,7 +59,7 @@
                 <Border.Background>
                     <SolidColorBrush Color="{Binding BackgroundColor}"/>
                 </Border.Background>
-                <Image Name="MainImage" Stretch="Uniform"/>
+                <Image Name="MainImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant"/>
             </Border>
 
         </Grid>

@@ -277,8 +277,7 @@ namespace PersonaText
                 DirectoryInfo DI = new DirectoryInfo(Static.Paths.DirBackgrounds);
                 foreach (var file in DI.GetFiles(@"*.png"))
                 {
-                    ComboBoxItem cbi = new ComboBoxItem();
-                    cbi.Content = file.Name;
+                    ComboBoxItem cbi = new ComboBoxItem { Content = file.Name };
                     ElementSelectBackground.Items.Add(cbi);
                 }
             }
@@ -310,8 +309,11 @@ namespace PersonaText
 
         private void OpenPTP_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Persona Text Project (*.PTP)|*.PTP";
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Filter = "Persona Text Project (*.PTP)|*.PTP"
+            };
+
             if (ofd.ShowDialog() == true)
             {
                 Static.Paths.OpenFileName = ofd.FileName;
@@ -321,11 +323,14 @@ namespace PersonaText
 
         private void SavePTP_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Persona Text Project (*.PTP)|*.PTP";
-            sfd.OverwritePrompt = true;
-            sfd.InitialDirectory = Path.GetDirectoryName(Static.Paths.OpenFileName);
-            sfd.FileName = Path.GetFileNameWithoutExtension(Static.Paths.OpenFileName);
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                Filter = "Persona Text Project (*.PTP)|*.PTP",
+                OverwritePrompt = true,
+                InitialDirectory = Path.GetDirectoryName(Static.Paths.OpenFileName),
+                FileName = Path.GetFileNameWithoutExtension(Static.Paths.OpenFileName)
+            };
+
             if (sfd.ShowDialog() == true)
             {
                 OV.PTP.SaveProject(sfd.FileName);
@@ -334,8 +339,11 @@ namespace PersonaText
 
         private void ImportBMD_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "BMD files|*.BMD";
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Filter = "BMD files|*.BMD"
+            };
+
             if (ofd.ShowDialog() == true)
             {
                 Static.Paths.OpenFileName = ofd.FileName;
@@ -400,14 +408,17 @@ namespace PersonaText
             }
             catch (Exception ex)
             {
-
+                Logging.Write("D", ex);
             }
         }
 
         void SetBind(DependencyObject depO, DependencyProperty depP, object obj, string propName)
         {
-            Binding bind = new Binding(propName);
-            bind.Source = obj;
+            Binding bind = new Binding(propName)
+            {
+                Source = obj
+            };
+
             BindingOperations.SetBinding(depO, depP, bind);
         }
 
@@ -450,9 +461,12 @@ namespace PersonaText
 
         private void OpenFont_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog OFD = new OpenFileDialog();
-            OFD.Filter = "Persona Font (*.FNT) | *.FNT";
-            OFD.Multiselect = false;
+            OpenFileDialog OFD = new OpenFileDialog
+            {
+                Filter = "Persona Font (*.FNT) | *.FNT",
+                Multiselect = false
+            };
+
             if (OFD.ShowDialog() == true)
             {
                 CharList current = (sender as MenuItem).DataContext as CharList;

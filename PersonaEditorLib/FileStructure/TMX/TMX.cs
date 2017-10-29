@@ -30,7 +30,7 @@ namespace PersonaEditorLib.FileStructure.TMX
             Palette = new TMXPalette(reader, Header.PixelFormat);
 
             int Length = (Header.Width * Header.Height * Palette.Format.BitsPerPixel) / 8;
-            Data = reader.ReadBytes(Length);
+            Data = Palette.Format == PixelFormats.Indexed4 ? Utilities.Utilities.DataReverse(reader.ReadBytes(Length)) : reader.ReadBytes(Length);
         }
 
         public TMX(string path, bool IsLittleEndian) : this(File.OpenRead(path), 0, true) { }

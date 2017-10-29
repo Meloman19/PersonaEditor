@@ -310,18 +310,12 @@ namespace PersonaEditorLib
             public VerticalCut Cut { get; set; }
         }
 
-        private void Init()
-        {
-        }
+        public CharList() { }
 
-        public CharList()
-        {
-            Init();
-        }
+        public CharList(string FontMap, string Font) : this(FontMap, new FileStructure.FNT.FNT(Font)) { }
 
         public CharList(string FontMap, FileStructure.FNT.FNT FNT)
         {
-            Init();
             OpenFont(FNT);
             OpenFontMap(FontMap);
         }
@@ -476,30 +470,18 @@ namespace PersonaEditorLib
 
         public string GetChar(int index)
         {
-            string returned = "";
-
-            CharList.FnMpData fnmp = List.FirstOrDefault(x => x.Index == index);
+            FnMpData fnmp = List.FirstOrDefault(x => x.Index == index);
             if (fnmp == null)
-            {
-                returned += "<NCHAR>";
-            }
+                return "<NCHAR>";
             else
             {
                 if (fnmp.Char.Length == 0)
-                {
-                    returned += "<CHAR>";
-                }
+                    return "<CHAR>";
                 else if (fnmp.Char.Length == 1)
-                {
-                    returned += fnmp.Char;
-                }
+                    return fnmp.Char;
                 else
-                {
-                    returned += "<" + fnmp.Char + ">";
-                }
+                    return "<" + fnmp.Char + ">";
             }
-
-            return returned;
         }
 
         public byte[] Encode(string String)
@@ -509,6 +491,23 @@ namespace PersonaEditorLib
                 LB.AddRange(GetByte(C));
 
             return LB.ToArray();
+        }
+
+        public string Decode(byte[] bytes)
+        {
+            string returned = "";
+
+            for (int i = 0; i < bytes.Length; i++)
+                if (0x20 <= bytes[i] & bytes[i] < 0x80)
+                    returned += GetChar(bytes[i]);
+                else if (0x80 <= bytes[i] & bytes[i] < 0xF0)
+                {
+                    int link = (bytes[i] - 0x81) * 0x80 + bytes[i + 1] + 0x20;
+                    i++;
+                    returned += GetChar(link);
+                }
+
+            return returned;
         }
 
         public List<FnMpData> List { get; set; } = new List<FnMpData>();

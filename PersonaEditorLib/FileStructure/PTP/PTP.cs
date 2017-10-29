@@ -401,7 +401,7 @@ namespace PersonaEditorLib.FileStructure.PTP
 
             public bool CanGetName
             {
-                get { return dic[Type.FileName] >= 0 & dic[Type.OldName] >= 0 & dic[Type.NewName] >= 0; }
+                get { return dic[Type.OldName] >= 0 & dic[Type.NewName] >= 0; }
             }
         }
 
@@ -444,7 +444,7 @@ namespace PersonaEditorLib.FileStructure.PTP
             return true;
         }
 
-        public void ImportTXT(string txtfile, string map, bool auto, int width)
+        public void ImportTXT(string txtfile, string map, bool auto, int width, bool skip)
         {
             int Width = (int)Math.Round((double)width / 0.9375);
             LineMap MAP = new LineMap(map);
@@ -457,35 +457,52 @@ namespace PersonaEditorLib.FileStructure.PTP
                     {
                         string[] linespl = Regex.Split(SR.ReadLine(), "\t");
 
-                        if (OpenFileName.Equals(linespl[MAP[LineMap.Type.FileName]], StringComparison.OrdinalIgnoreCase))
+                        if (MAP.CanGetText)
                         {
-                            string NewText = linespl[MAP[LineMap.Type.NewText]];
-                            if (auto)
-                                NewText = NewText.SplitByWidth(NewCharList, Width);
-                            else
-                                NewText = NewText.Replace("\\n", "\n");
+                            if (OpenFileName.Equals(linespl[MAP[LineMap.Type.FileName]], StringComparison.OrdinalIgnoreCase))
+                            {
+                                string NewText = linespl[MAP[LineMap.Type.NewText]];
 
-                            if (MAP[LineMap.Type.MSGindex] >= 0)
-                                ImportText(Convert.ToInt32(linespl[MAP[LineMap.Type.MSGindex]]), Convert.ToInt32(linespl[MAP[LineMap.Type.StringIndex]]), NewText);
-                            else
-                                ImportText(linespl[MAP[LineMap.Type.MSGname]], Convert.ToInt32(linespl[MAP[LineMap.Type.StringIndex]]), NewText);
+                                if (!(NewText == "" & skip))
+                                {
+                                    if (auto)
+                                        NewText = NewText.SplitByWidth(NewCharList, Width);
+                                    else
+                                        NewText = NewText.Replace("\\n", "\n");
+
+                                    if (MAP[LineMap.Type.MSGindex] >= 0)
+                                    {
+                                        ImportText(Convert.ToInt32(linespl[MAP[LineMap.Type.MSGindex]]), Convert.ToInt32(linespl[MAP[LineMap.Type.StringIndex]]), NewText);
+                                        if (MAP.CanGetName)
+                                            ImportNameByMSG(Convert.ToInt32(linespl[MAP[LineMap.Type.MSGindex]]), linespl[MAP[LineMap.Type.NewName]]);
+                                    }
+                                    else
+                                    {
+                                        ImportText(linespl[MAP[LineMap.Type.MSGname]], Convert.ToInt32(linespl[MAP[LineMap.Type.StringIndex]]), NewText);
+                                        if (MAP.CanGetName)
+                                            ImportNameByMSG(linespl[MAP[LineMap.Type.MSGname]], linespl[MAP[LineMap.Type.NewName]]);
+                                    }
+                                }
+                            }
                         }
+                        else if (MAP.CanGetName)
+                            ImportNameByName(linespl[MAP[LineMap.Type.OldName]], linespl[MAP[LineMap.Type.NewName]]);
                     }
                 }
             }
         }
 
-        public bool ImportText(string MSGName, int StringIndex, string Text)
+        private void ImportText(string MSGName, int StringIndex, string Text)
         {
-            return ImportText(msg.FirstOrDefault(x => x.Name == MSGName), StringIndex, Text);
+            ImportText(msg.FirstOrDefault(x => x.Name == MSGName), StringIndex, Text);
         }
 
-        public bool ImportText(int MSGIndex, int StringIndex, string Text)
+        private void ImportText(int MSGIndex, int StringIndex, string Text)
         {
-            return ImportText(msg.FirstOrDefault(x => x.Index == MSGIndex), StringIndex, Text);
+            ImportText(msg.FirstOrDefault(x => x.Index == MSGIndex), StringIndex, Text);
         }
 
-        private bool ImportText(MSG MSG, int StringIndex, string Text)
+        private void ImportText(MSG MSG, int StringIndex, string Text)
         {
             if (MSG != null)
             {
@@ -493,29 +510,33 @@ namespace PersonaEditorLib.FileStructure.PTP
                 if (temp != null)
                 {
                     temp.NewString = Text;
-                    return true;
                 }
-                return false;
             }
-            return false;
         }
 
-        public bool ImportText(string MSGName, int StringIndex, string Text, string NewName)
+        private void ImportNameByMSG(int MSGIndex, string NewName)
         {
-            if (ImportText(MSGName, StringIndex, Text))
-            {
-                var temp = msg.FirstOrDefault(x => x.Name == MSGName);
-                if (temp != null)
-                {
-                    var temp2 = names.FirstOrDefault(x => x.Index == temp.CharacterIndex);
-                    if (temp2 != null)
-                    {
-                        temp2.NewName = NewName;
-                    }
-                }
-                return true;
-            }
-            else return false;
+            MSG MSG = msg.FirstOrDefault(x => x.Index == MSGIndex);
+            if (MSG != null)
+                ImportName(names.FirstOrDefault(x => x.Index == MSG.CharacterIndex), NewName);
+        }
+
+        private void ImportNameByMSG(string MSGName, string NewName)
+        {
+            MSG MSG = msg.FirstOrDefault(x => x.Name == MSGName);
+            if (MSG != null)
+                ImportName(names.FirstOrDefault(x => x.Index == MSG.CharacterIndex), NewName);
+        }
+
+        private void ImportNameByName(string OldName, string NewName)
+        {
+            ImportName(names.FirstOrDefault(x => x.OldName.GetPTPMsgStrEl().GetString(OldCharList, true) == OldName), NewName);
+        }
+
+        private void ImportName(Names Name, string NewName)
+        {
+            if (Name != null)
+                Name.NewName = NewName;
         }
 
         public void SaveProject(string path)

@@ -171,8 +171,13 @@ namespace PersonaEditorLib.FileStructure.PTP
                             i = 0;
                         }
                     }
+                    
+                    var temparray = MSG.Postfix.Reverse().ToList();
 
-                    MSG.Postfix.Reverse();
+                    MSG.Postfix.Clear();
+                    foreach (var a in temparray)
+                        MSG.Postfix.Add(a);
+
 
                     for (int i = tempdown; i <= temptop; i++)
                         MSG.OldString.Add(temp[i]);

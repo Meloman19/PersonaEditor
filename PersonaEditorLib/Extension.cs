@@ -276,64 +276,6 @@ namespace PersonaEditorLib.Extension
         }
     }
 
-    public static class StringExtension
-    {
-        public static string BytesToString(byte[] bytes, CharList Font)
-        {
-            string returned = "";
-
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                if (0x20 <= bytes[i] & bytes[i] < 0x80)
-                {
-                    CharList.FnMpData fnmp = Font.List.FirstOrDefault(x => x.Index == bytes[i]);
-
-                    if (fnmp == null)
-                    {
-                        returned = returned + "<NCHAR>";
-                    }
-                    else
-                    {
-                        if (fnmp.Char != "")
-                        {
-                            returned = returned + fnmp.Char;
-                        }
-                        else
-                        {
-                            returned = returned + "<CHAR>";
-                        }
-                    }
-                }
-                else if (0x80 <= bytes[i] & bytes[i] < 0xF0)
-                {
-                    int link = (bytes[i] - 0x81) * 0x80 + bytes[i + 1] + 0x20;
-
-                    i++;
-
-                    CharList.FnMpData fnmp = Font.List.FirstOrDefault(x => x.Index == link);
-
-                    if (fnmp == null)
-                    {
-                        returned = returned + "<NCHAR>";
-                    }
-                    else
-                    {
-                        if (fnmp.Char != "")
-                        {
-                            returned = returned + fnmp.Char;
-                        }
-                        else
-                        {
-                            returned = returned + "<CHAR>";
-                        }
-                    }
-                }
-            }
-
-            return returned;
-        }
-    }
-
     public static class Imaging
     {
         public static void SaveBMP(BitmapSource image, string path)
