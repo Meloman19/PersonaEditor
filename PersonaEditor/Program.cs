@@ -12,201 +12,12 @@ using System.Text.RegularExpressions;
 
 namespace PersonaEditor
 {
-    public class ArgumentWork
+    public class FNTConsole : IConsoleWork
     {
-        public class Parameters
-        {
-            public string NewFont { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_NEW.FNT");
-            public string OldFont { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_OLD.FNT");
-            public string NewMap { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_NEW.TXT");
-            public string OldMap { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_OLD.TXT");
-            public bool IsLittleEndian { get; private set; } = true;
-            public string Map { get; private set; } = "";
-            public bool Auto { get; private set; } = false;
-            public int Width { get; private set; } = 0;
-            public bool RemoveSplit { get; private set; } = false;
-            public bool CopyOld2New { get; private set; } = false;
-            public int Length { get; private set; } = 0;
-            public bool Old { get; private set; } = true;
-            public bool SkipEmpty { get; private set; } = false;
+        PersonaEditorLib.FileStructure.FNT.FNT FNT;
+        string source = "";
 
-            public Parameters(List<Argument.Parameter> ParList)
-            {
-                foreach (var a in ParList)
-                {
-                    if (a.Param == "nf") NewFont = a.Value;
-                    else if (a.Param == "of") OldFont = a.Value;
-                    else if (a.Param == "nm") NewMap = a.Value;
-                    else if (a.Param == "om") OldMap = a.Value;
-                    else if (a.Param == "be") IsLittleEndian = false;
-                    else if (a.Param == "map") Map = a.Value;
-                    else if (a.Param == "auto")
-                    {
-                        Auto = true;
-                        Width = Convert.ToInt32(a.Value);
-                    }
-                    else if (a.Param == "rmvspl") RemoveSplit = true;
-                    else if (a.Param == "co2n") CopyOld2New = true;
-                    else if (a.Param == "len") Length = Convert.ToInt32(a.Value);
-                    else if (a.Param == "new") Old = false;
-                    else if (a.Param == "skipempty") SkipEmpty = true;
-                }
-            }
-        }
-
-        public class Argument
-        {
-            public class Parameter
-            {
-                public string Param { get; set; }
-                public string Value { get; set; }
-            }
-
-            public string Command { get; set; } = "";
-            public string Value { get; set; } = "";
-            public List<Parameter> Params { get; set; } = new List<Parameter>();
-        }
-
-        public struct ArgumentSourceFile
-        {
-            public enum FileType
-            {
-                Empty,
-                FNT,
-                PM1,
-                BF,
-                BMD,
-                PTP,
-                TMX,
-                BIN,
-                BVP,
-                TBL,
-                TEXT
-            }
-
-            public FileType SourceType { get; private set; }
-            public string Value { get; private set; }
-            public Parameters Parameters { get; private set; }
-
-            public ArgumentSourceFile(Argument arg)
-            {
-                if (arg.Command == "fnt") SourceType = FileType.FNT;
-                else if (arg.Command == "pm1") SourceType = FileType.PM1;
-                else if (arg.Command == "bf") SourceType = FileType.BF;
-                else if (arg.Command == "bmd") SourceType = FileType.BMD;
-                else if (arg.Command == "ptp") SourceType = FileType.PTP;
-                else if (arg.Command == "tmx") SourceType = FileType.TMX;
-                else if (arg.Command == "bin") SourceType = FileType.BIN;
-                else if (arg.Command == "bvp") SourceType = FileType.BVP;
-                else if (arg.Command == "tbl") SourceType = FileType.TBL;
-                else if (arg.Command == "text") SourceType = FileType.TEXT;
-                else SourceType = FileType.Empty;
-
-                Value = arg.Value;
-                Parameters = new Parameters(arg.Params);
-            }
-        }
-
-        public struct ArgumentAction
-        {
-            public enum ActType
-            {
-                Empty = 0,
-                ExportImg = 10,
-                ExportWT = 11,
-                ExportBMD = 12,
-                ExportPTP = 13,
-                ExportTXT = 14,
-                ExportAll = 99,
-                ImportImg = 100,
-                ImportWT = 101,
-                ImportBMD = 102,
-                ImportPTP = 103,
-                ImportTXT = 104,
-                ImportAll = 199,
-                Save = 200
-            }
-
-            public ActType Action { get; private set; }
-            public string Value { get; private set; }
-            public Parameters Parameters { get; private set; }
-
-            public ArgumentAction(Argument arg)
-            {
-                if (arg.Command == "expimg") Action = ActType.ExportImg;
-                else if (arg.Command == "expwt") Action = ActType.ExportWT;
-                else if (arg.Command == "expbmd") Action = ActType.ExportBMD;
-                else if (arg.Command == "expptp") Action = ActType.ExportPTP;
-                else if (arg.Command == "exptxt") Action = ActType.ExportTXT;
-                else if (arg.Command == "expall") Action = ActType.ExportAll;
-                else if (arg.Command == "impimg") Action = ActType.ImportImg;
-                else if (arg.Command == "impwt") Action = ActType.ImportWT;
-                else if (arg.Command == "impbmd") Action = ActType.ImportBMD;
-                else if (arg.Command == "impptp") Action = ActType.ImportPTP;
-                else if (arg.Command == "imptxt") Action = ActType.ImportTXT;
-                else if (arg.Command == "impall") Action = ActType.ImportAll;
-                else if (arg.Command == "save") Action = ActType.Save;
-                else Action = ActType.Empty;
-
-                Value = arg.Value;
-                Parameters = new Parameters(arg.Params);
-            }
-        }
-
-        List<Argument> args = new List<Argument>();
-
-        public ArgumentWork(string[] args)
-        {
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i][0] == '-')
-                    this.args.Add(new Argument() { Command = args[i].Substring(1).ToLower() });
-                else if (args[i][0] == '/')
-                {
-                    if (this.args.Count > 0)
-                    {
-                        Argument a = this.args.Last();
-                        a.Params.Add(new Argument.Parameter() { Param = args[i].Substring(1).ToLower() });
-                    }
-                }
-                else
-                {
-                    if (this.args.Count > 0)
-                    {
-                        Argument a = this.args.Last();
-                        if (a.Params.Count > 0)
-                        {
-                            Argument.Parameter b = a.Params.Last();
-                            b.Value = args[i];
-                        }
-                        else
-                            a.Value = args[i];
-                    }
-                }
-            }
-        }
-
-        public ArgumentSourceFile GetSourceFile()
-        {
-            if (args.Count > 0) return new ArgumentSourceFile(args[0]);
-            else return new ArgumentSourceFile();
-        }
-
-        public List<ArgumentAction> GetActList()
-        {
-            List<ArgumentAction> returned = new List<ArgumentAction>();
-
-            if (args.Count > 1)
-                for (int i = 1; i < args.Count; i++)
-                    returned.Add(new ArgumentAction(args[i]));
-
-            return returned;
-        }
-    }
-
-    public static class FNTWork
-    {
-        public static bool Work(ArgumentWork argWRK)
+        public FNTConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
             Console.WriteLine("---------------------------------------------------");
             Console.WriteLine("-----Font decompressor/compressor by Meloman19-----");
@@ -214,156 +25,168 @@ namespace PersonaEditor
             Console.WriteLine("----------Based on RikuKH3's decompressor----------");
             Console.WriteLine("---------------------------------------------------");
 
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.FNT.FNT FNT = new PersonaEditorLib.FileStructure.FNT.FNT(SourceFile.Value);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportImg) ExportImg(FNT, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportWT) ExportWT(FNT, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(FNT, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportImg) ImportImg(FNT, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportWT) ImportWT(FNT, SourceFile.Value, command.Value);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            FNT = new PersonaEditorLib.FileStructure.FNT.FNT(source);
         }
 
-        public static void ExportImg(PersonaEditorLib.FileStructure.FNT.FNT FNT, string fontname, string filename)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            if (filename == "") filename = Util.GetNewPath(fontname, ".BMP");
-
-            Imaging.SaveBMP(FNT.Image, filename);
+            if (com == CommandSubType.Image)
+                ExportImg(dest);
+            else if (com == CommandSubType.Table)
+                ExportWT(dest);
         }
 
-        public static void ExportWT(PersonaEditorLib.FileStructure.FNT.FNT FNT, string fontname, string filename)
-        {
-            if (filename == "") filename = Util.GetNewPath(fontname, ".XML");
+        #region ExportMethods
 
-            FNT.Table.Save(filename);
+        private void ExportImg(string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, ".BMP");
+
+            Imaging.SaveBMP(FNT.Image, dest);
         }
 
-        public static void ImportImg(PersonaEditorLib.FileStructure.FNT.FNT FNT, string fontname, string filename)
+        private void ExportWT(string dest)
         {
-            if (filename == "") filename = Util.GetNewPath(fontname, ".BMP");
+            if (dest == "") dest = Util.GetNewPath(source, ".XML");
 
-            FNT.Image = Imaging.OpenImage(filename);
+            FNT.Table.Save(dest);
         }
 
-        public static void ImportWT(PersonaEditorLib.FileStructure.FNT.FNT FNT, string fontname, string filename)
-        {
-            if (filename == "") filename = Util.GetNewPath(fontname, ".XML");
+        #endregion ExportMethods
 
-            FNT.Table = XDocument.Load(filename);
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string src)
+        {
+            if (com == CommandSubType.Image)
+                ImportImg(src);
+            if (com == CommandSubType.Table)
+                ImportWT(src);
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.FNT.FNT FNT, string fontname, string filename)
+        #region ImportMethods
+
+        private void ImportImg(string src)
         {
-            if (filename == "") filename = Util.GetNewPath(fontname, "(NEW).FNT");
+            if (src == "") src = Util.GetNewPath(source, ".BMP");
 
-            FNT.This.SaveToFile(filename);
-        }
-    }
-
-    public static class TMXWork
-    {
-        public static bool Work(ArgumentWork argWRK)
-        {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.TMX.TMX FNT = new PersonaEditorLib.FileStructure.TMX.TMX(SourceFile.Value, true);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportImg) ExportImg(FNT, SourceFile.Value, command.Value);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            FNT.Image = Imaging.OpenImage(src);
         }
 
-        public static void ExportImg(PersonaEditorLib.FileStructure.TMX.TMX TMX, string fontname, string filename)
+        private void ImportWT(string src)
         {
-            if (filename == "") filename = Util.GetNewPath(fontname, ".PNG");
+            if (src == "") src = Util.GetNewPath(source, ".XML");
 
-            Imaging.SavePNG(TMX.Image, filename);
+            FNT.Table = XDocument.Load(src);
+        }
+
+        #endregion ImportMethods
+
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).FNT");
+
+            File.WriteAllBytes(dest, FNT.This);
         }
     }
 
-    public static class PM1Work
+    public class TMXConsole : IConsoleWork
     {
-        public static bool Work(ArgumentWork argWRK)
+        PersonaEditorLib.FileStructure.TMX.TMX TMX;
+        string source = "";
+
+        public TMXConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.PM1.PM1 PM1 = new PersonaEditorLib.FileStructure.PM1.PM1(SourceFile.Value, true);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportBMD) ExportBMD(PM1, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportPTP) ExportPTP(PM1, SourceFile.Value, command.Value, command.Parameters);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportBMD) ImportBMD(PM1, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportPTP) ImportPTP(PM1, SourceFile.Value, command.Value, command.Parameters);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(PM1, SourceFile.Value, command.Value, command.Parameters);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            TMX = new PersonaEditorLib.FileStructure.TMX.TMX(filepath, parameters.IsLittleEndian);
         }
 
-        public static void ExportBMD(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".BMD");
-
-            PM1.GetBMD().SaveToFile(filename);
+            if (com == CommandSubType.Image)
+                ExportImg(dest);
         }
 
-        public static void ExportPTP(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        #region ExportMethods
+
+        private void ExportImg(string dest)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+            if (dest == "") dest = Util.GetNewPath(source, ".PNG");
+
+            Imaging.SaveBMP(TMX.Image, dest);
+        }
+
+        #endregion ExportMethods
+
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string source)
+        {
+        }
+
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+        }
+    }
+
+    public class PM1Console : IConsoleWork
+    {
+        PersonaEditorLib.FileStructure.PM1.PM1 PM1;
+        string source = "";
+
+        public PM1Console(string filepath, ArgumentsWork.Parameters parameters)
+        {
+            source = Path.GetFullPath(filepath);
+            PM1 = new PersonaEditorLib.FileStructure.PM1.PM1(source, parameters.IsLittleEndian);
+        }
+
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (com == CommandSubType.BMD)
+                ExportBMD(dest);
+            else if (com == CommandSubType.PTP)
+                ExportPTP(dest, parameters);
+        }
+
+        #region ExportMethods
+
+        private void ExportBMD(string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, ".BMD");
+
+            File.WriteAllBytes(dest, PM1.GetBMD());
+        }
+
+        private void ExportPTP(string dest, ArgumentsWork.Parameters ParList)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, ".PTP");
 
             PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
-            BMD.Open(PM1.GetBMD(), Path.GetFileNameWithoutExtension(filename), true);
+            BMD.Open(PM1.GetBMD(), Path.GetFileNameWithoutExtension(dest), true);
             PersonaEditorLib.FileStructure.PTP.PTP PTP = new PersonaEditorLib.FileStructure.PTP.PTP(ParList.OldFont, ParList.OldMap, ParList.NewFont, ParList.NewMap);
             PTP.Open(BMD, ParList.CopyOld2New);
-            PTP.SaveProject(filename);
+            PTP.SaveProject(dest);
         }
 
-        public static void ImportBMD(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename)
-        {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BMD");
+        #endregion ExportMethods
 
-            using (var FS = new FileStream(filename, FileMode.Open, FileAccess.Read))
-            {
-                MemoryStream MS = new MemoryStream();
-                FS.CopyTo(MS);
-                PM1.SetBMD(MS);
-            }
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string src)
+        {
+            if (com == CommandSubType.BMD)
+                ImportBMD(src);
+            else if (com == CommandSubType.PTP)
+                ImportPTP(src, parameters);
         }
 
-        public static void ImportPTP(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        #region ImportMethods
+
+        private void ImportBMD(string src)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+            if (src == "") src = Util.GetNewPath(source, "(NEW).BMD");
+
+            PM1.SetBMD(File.ReadAllBytes(src));
+        }
+
+        private void ImportPTP(string src, ArgumentsWork.Parameters ParList)
+        {
+            if (src == "") src = Util.GetNewPath(source, ".PTP");
 
             PersonaEditorLib.FileStructure.PTP.PTP PTP = new PersonaEditorLib.FileStructure.PTP.PTP(ParList.OldFont, ParList.OldMap, ParList.NewFont, ParList.NewMap);
             PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
@@ -371,75 +194,77 @@ namespace PersonaEditor
             PM1.SetBMD(BMD.Get(ParList.IsLittleEndian));
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.PM1.PM1 PM1, string sourcefile, string filename, ArgumentWork.Parameters ParList)
-        {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).PM1");
+        #endregion ImportMethods
 
-            PM1.Get(ParList.IsLittleEndian).SaveToFile(filename);
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).PM1");
+
+            File.WriteAllBytes(dest, PM1.Get(parameters.IsLittleEndian));
         }
     }
 
-    public static class BFWork
+    public class BFConsole : IConsoleWork
     {
-        public static bool Work(ArgumentWork argWRK)
+        PersonaEditorLib.FileStructure.BF.BF BF;
+        string source = "";
+
+        public BFConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.BF.BF BF = new PersonaEditorLib.FileStructure.BF.BF(SourceFile.Value, true);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportBMD) ExportBMD(BF, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportPTP) ExportPTP(BF, SourceFile.Value, command.Value, command.Parameters);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportBMD) ImportBMD(BF, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportPTP) ImportPTP(BF, SourceFile.Value, command.Value, command.Parameters);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(BF, SourceFile.Value, command.Value, command.Parameters);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            BF = new PersonaEditorLib.FileStructure.BF.BF(source, parameters.IsLittleEndian);
         }
 
-        public static void ExportBMD(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".BMD");
-
-            BF.GetBMD().SaveToFile(filename);
+            if (com == CommandSubType.BMD)
+                ExportBMD(dest);
+            else if (com == CommandSubType.PTP)
+                ExportPTP(dest, parameters);
         }
 
-        public static void ExportPTP(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        #region ExportMethods
+
+        private void ExportBMD(string dest)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+            if (dest == "") dest = Util.GetNewPath(source, ".BMD");
+
+            File.WriteAllBytes(dest, BF.GetBMD());
+        }
+
+        private void ExportPTP(string dest, ArgumentsWork.Parameters ParList)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, ".PTP");
 
             PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
-            BMD.Open(BF.GetBMD(), Path.GetFileNameWithoutExtension(filename), true);
+            BMD.Open(BF.GetBMD(), Path.GetFileNameWithoutExtension(dest), true);
             PersonaEditorLib.FileStructure.PTP.PTP PTP = new PersonaEditorLib.FileStructure.PTP.PTP(ParList.OldFont, ParList.OldMap, ParList.NewFont, ParList.NewMap);
             PTP.Open(BMD, ParList.CopyOld2New);
-            PTP.SaveProject(filename);
+            PTP.SaveProject(dest);
         }
 
-        public static void ImportBMD(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename)
+        #endregion ExportMethods
+
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string src)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BMD");
-
-            using (var FS = new FileStream(filename, FileMode.Open, FileAccess.Read))
-            {
-
-                MemoryStream MS = new MemoryStream();
-                FS.CopyTo(MS);
-                BF.SetBMD(MS);
-            }
+            if (com == CommandSubType.BMD)
+                ImportBMD(src);
+            else if (com == CommandSubType.PTP)
+                ImportPTP(src, parameters);
         }
 
-        public static void ImportPTP(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        #region ImportMethods
+
+        private void ImportBMD(string src)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+            if (src == "") src = Util.GetNewPath(source, "(NEW).BMD");
+
+            BF.SetBMD(File.ReadAllBytes(src));
+        }
+
+        private void ImportPTP(string src, ArgumentsWork.Parameters ParList)
+        {
+            if (src == "") src = Util.GetNewPath(source, ".PTP");
 
             PersonaEditorLib.FileStructure.PTP.PTP PTP = new PersonaEditorLib.FileStructure.PTP.PTP(ParList.OldFont, ParList.OldMap, ParList.NewFont, ParList.NewMap);
             PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
@@ -447,152 +272,163 @@ namespace PersonaEditor
             BF.SetBMD(BMD.Get(ParList.IsLittleEndian));
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.BF.BF BF, string sourcefile, string filename, ArgumentWork.Parameters ParList)
-        {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BF");
+        #endregion ImportMethods
 
-            BF.Get(ParList.IsLittleEndian).SaveToFile(filename);
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).PM1");
+
+            File.WriteAllBytes(dest, BF.Get(parameters.IsLittleEndian));
         }
     }
 
-    public static class BMDWork
+    public class BMDConsole : IConsoleWork
     {
-        public static bool Work(ArgumentWork argWRK)
+        PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
+        string source = "";
+
+        public BMDConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
-                BMD.Open(File.OpenRead(SourceFile.Value), SourceFile.Value, true);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportPTP) ExportPTP(BMD, SourceFile.Value, command.Value, command.Parameters);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(BMD, SourceFile.Value, command.Value, command.Parameters);
-
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                PersonaEditorLib.Logging.Write("BMDWork.log", e);
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            BMD.Open(File.OpenRead(source), source, parameters.IsLittleEndian);
         }
 
-        public static void ExportPTP(PersonaEditorLib.FileStructure.BMD.BMD BMDfile, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+            if (com == CommandSubType.PTP)
+                ExportPTP(dest, parameters);
+        }
+
+        #region ExportMethods
+
+        private void ExportPTP(string dest, ArgumentsWork.Parameters ParList)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, ".PTP");
 
             PersonaEditorLib.FileStructure.PTP.PTP PTP = new PersonaEditorLib.FileStructure.PTP.PTP(ParList.OldFont, ParList.OldMap, ParList.NewFont, ParList.NewMap);
-            PTP.Open(BMDfile, ParList.CopyOld2New);
-            PTP.SaveProject(filename);
+            PTP.Open(BMD, ParList.CopyOld2New);
+            PTP.SaveProject(dest);
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.BMD.BMD BMD, string sourcefile, string filename, ArgumentWork.Parameters ParList)
-        {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BMD");
+        #endregion ExportMethods
 
-            BMD.Get(ParList.IsLittleEndian).SaveToFile(filename);
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string source)
+        {
+        }
+
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).BMD");
+
+            File.WriteAllBytes(dest, BMD.Get(parameters.IsLittleEndian));
         }
     }
 
-    public static class PTPWork
+    public class PTPConsole : IConsoleWork
     {
-        public static bool Work(ArgumentWork argWRK)
+        PersonaEditorLib.FileStructure.PTP.PTP PTP;
+        string source = "";
+
+        public PTPConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.PTP.PTP PTP = new PersonaEditorLib.FileStructure.PTP.PTP(SourceFile.Parameters.OldFont, SourceFile.Parameters.OldMap, SourceFile.Parameters.NewFont, SourceFile.Parameters.NewMap);
-
-                PTP.Open(SourceFile.Value);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportTXT) ExportTXT(PTP, SourceFile.Value, command.Value, command.Parameters);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportTXT) ImportTXT(PTP, SourceFile.Value, command.Value, command.Parameters);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportBMD) ExportBMD(PTP, SourceFile.Value, command.Value, command.Parameters);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(PTP, SourceFile.Value, command.Value);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            PTP = new PersonaEditorLib.FileStructure.PTP.PTP(parameters.OldFont, parameters.OldMap, parameters.NewFont, parameters.NewMap);
+            PTP.Open(source);
         }
 
-        public static void ExportTXT(PersonaEditorLib.FileStructure.PTP.PTP PTP, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            PTP.ExportTXT(filename, ParList.Map, ParList.RemoveSplit);
+            if (com == CommandSubType.TXT)
+                ExportTXT(dest, parameters);
+            else if (com == CommandSubType.BMD)
+                ExportBMD(dest, parameters);
         }
 
-        public static void ImportTXT(PersonaEditorLib.FileStructure.PTP.PTP PTP, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        #region ExportMethods
+
+        private void ExportTXT(string dest, ArgumentsWork.Parameters ParList)
         {
-            PTP.ImportTXT(filename, ParList.Map, ParList.Auto, ParList.Width, ParList.SkipEmpty);
+            PTP.ExportTXT(dest, ParList.Map, ParList.RemoveSplit);
         }
 
-        public static void ExportBMD(PersonaEditorLib.FileStructure.PTP.PTP PTP, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        private void ExportBMD(string dest, ArgumentsWork.Parameters ParList)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BMD");
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).BMD");
 
             PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
             BMD.Open(PTP);
-            BMD.Get(ParList.IsLittleEndian).SaveToFile(filename);
+            File.WriteAllBytes(dest, BMD.Get(ParList.IsLittleEndian));
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.PTP.PTP PTP, string sourcefile, string filename)
-        {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".PTP");
+        #endregion ExportMethods
 
-            PTP.SaveProject(filename);
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string src)
+        {
+            if (com == CommandSubType.TXT)
+                ImportTXT(src, parameters);
+        }
+
+        #region ImportMethods
+
+        private void ImportTXT(string src, ArgumentsWork.Parameters ParList)
+        {
+            PTP.ImportTXT(src, ParList.Map, ParList.Auto, ParList.Width, ParList.SkipEmpty);
+        }
+
+        #endregion ImportMethods
+
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, ".PTP");
+
+            PTP.SaveProject(dest);
         }
     }
 
-    public static class BINWork
+    public class BINConsole : IConsoleWork
     {
-        public static bool Work(ArgumentWork argWRK)
+        PersonaEditorLib.FileStructure.BIN.BIN BIN;
+        string source = "";
+
+        public BINConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.BIN.BIN BIN = new PersonaEditorLib.FileStructure.BIN.BIN(SourceFile.Value, true);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportAll) ExportAll(BIN, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportAll) ImportAll(BIN, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(BIN, SourceFile.Value, command.Value, command.Parameters);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            BIN = new PersonaEditorLib.FileStructure.BIN.BIN(source, parameters.IsLittleEndian);
         }
 
-        public static void ExportAll(PersonaEditorLib.FileStructure.BIN.BIN BIN, string sourcefile, string filename)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            List<string> filelist = BIN.GetFileList.Select(x => Path.Combine(Path.GetDirectoryName(Path.GetFullPath(sourcefile)), Path.GetFileName(sourcefile) + "+" + x.Replace('/', '+'))).ToList();
+            if (com == CommandSubType.ALL)
+                ExportAll(dest, parameters);
+        }
+
+        #region ExportMethods
+
+        private void ExportAll(string dest, ArgumentsWork.Parameters ParList)
+        {
+            List<string> filelist = BIN.GetFileList.Select(x => Path.Combine(Path.GetDirectoryName(Path.GetFullPath(source)), Path.GetFileName(source) + "+" + x.Replace('/', '+'))).ToList();
 
             for (int i = 0; i < filelist.Count; i++)
                 using (BinaryWriter writer = new BinaryWriter(File.Create(filelist[i])))
                     writer.Write(BIN[i]);
         }
 
-        public static void ImportAll(PersonaEditorLib.FileStructure.BIN.BIN BIN, string sourcefile, string filename)
+        #endregion ExportMethods
+
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string src)
         {
-            List<string> filelist = BIN.GetFileList.Select(x => Path.Combine(Path.GetDirectoryName(sourcefile), Path.GetFileName(sourcefile) + "+" + x.Replace('/', '+')))
+            if (com == CommandSubType.ALL)
+                ImportAll(src, parameters);
+        }
+
+        #region ImportMethods
+
+        private void ImportAll(string src, ArgumentsWork.Parameters ParList)
+        {
+            List<string> filelist = BIN.GetFileList.Select(x => Path.Combine(Path.GetDirectoryName(source), Path.GetFileName(source) + "+" + x.Replace('/', '+')))
                 .Select(x => Path.Combine(Path.GetDirectoryName(x), Path.GetFileNameWithoutExtension(x) + "(NEW)" + Path.GetExtension(x))).ToList();
 
-            List<FileInfo> Files = new List<FileInfo>(new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(sourcefile))).GetFiles());
+            List<FileInfo> Files = new List<FileInfo>(new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(source))).GetFiles());
 
             for (int i = 0; i < filelist.Count; i++)
             {
@@ -603,56 +439,62 @@ namespace PersonaEditor
             }
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.BIN.BIN BIN, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        #endregion ImportMethods
+
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
         {
-            if (filename == "")
+            if (dest == "")
             {
-                string fullpath = Path.GetFullPath(sourcefile);
-                filename = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + "(NEW)" + Path.GetExtension(fullpath);
+                string fullpath = Path.GetFullPath(source);
+                dest = Path.GetDirectoryName(fullpath) + "\\" + Path.GetFileNameWithoutExtension(fullpath) + "(NEW)" + Path.GetExtension(fullpath);
             }
 
-            BIN.Get().SaveToFile(filename);
+            File.WriteAllBytes(dest, BIN.Get(parameters.IsLittleEndian));
         }
     }
 
-    public static class BVPWork
+    public class BVPConsole : IConsoleWork
     {
-        public static bool Work(ArgumentWork argWRK)
+        PersonaEditorLib.FileStructure.BVP.BVP BVP;
+        string source = "";
+
+        public BVPConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.BVP.BVP BVP = new PersonaEditorLib.FileStructure.BVP.BVP(SourceFile.Value, true);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportAll) ExportAll(BVP, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportAll) ImportAll(BVP, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(BVP, SourceFile.Value, command.Value, command.Parameters);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            BVP = new PersonaEditorLib.FileStructure.BVP.BVP(source, parameters.IsLittleEndian);
         }
 
-        public static void ExportAll(PersonaEditorLib.FileStructure.BVP.BVP BVP, string sourcefile, string filename)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            string temp = Path.GetDirectoryName(Path.GetFullPath(sourcefile));
-            string temp2 = Path.GetFileNameWithoutExtension(sourcefile);
+            if (com == CommandSubType.ALL)
+                ExportAll(parameters);
+        }
+
+        #region ExportMethods
+
+        private void ExportAll(ArgumentsWork.Parameters ParList)
+        {
+            string temp = Path.GetDirectoryName(source);
+            string temp2 = Path.GetFileNameWithoutExtension(source);
 
             for (int i = 0; i < BVP.Count; i++)
                 File.WriteAllBytes(Path.Combine(temp, temp2 + "(" + i.ToString().PadLeft(3, '0') + ").BMD"), BVP[i]);
         }
 
-        public static void ImportAll(PersonaEditorLib.FileStructure.BVP.BVP BVP, string sourcefile, string filename)
+        #endregion ExportMethods
+
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string src)
         {
-            string temp = Path.GetDirectoryName(Path.GetFullPath(sourcefile));
-            string temp2 = Path.GetFileNameWithoutExtension(sourcefile);
+            if (com == CommandSubType.ALL)
+                ImportAll(parameters);
+        }
+
+        #region ImportMethods
+
+        private void ImportAll(ArgumentsWork.Parameters ParList)
+        {
+            string temp = Path.GetDirectoryName(Path.GetFullPath(source));
+            string temp2 = Path.GetFileNameWithoutExtension(source);
 
             for (int i = 0; i < BVP.Count; i++)
             {
@@ -662,52 +504,58 @@ namespace PersonaEditor
             }
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.BVP.BVP BVP, string sourcefile, string filename, ArgumentWork.Parameters ParList)
-        {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).BVP");
+        #endregion ImportMethods
 
-            File.WriteAllBytes(filename, BVP.Get(ParList.IsLittleEndian));
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).BVP");
+
+            File.WriteAllBytes(dest, BVP.Get(parameters.IsLittleEndian));
         }
     }
 
-    public static class TBLWork
+    public class TBLConsole : IConsoleWork
     {
-        public static bool Work(ArgumentWork argWRK)
+        PersonaEditorLib.FileStructure.TBL.TBL TBL;
+        string source = "";
+
+        public TBLConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                PersonaEditorLib.FileStructure.TBL.TBL TBL = new PersonaEditorLib.FileStructure.TBL.TBL(SourceFile.Value, true);
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportAll) ExportAll(TBL, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportAll) ImportAll(TBL, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(TBL, SourceFile.Value, command.Value, command.Parameters);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            TBL = new PersonaEditorLib.FileStructure.TBL.TBL(source, parameters.IsLittleEndian);
         }
 
-        public static void ExportAll(PersonaEditorLib.FileStructure.TBL.TBL TBL, string sourcefile, string filename)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            string temp = Path.GetDirectoryName(Path.GetFullPath(sourcefile));
-            string temp2 = Path.GetFileName(sourcefile);
+            if (com == CommandSubType.ALL)
+                ExportAll(parameters);
+        }
+
+        #region ExportMethods
+
+        private void ExportAll(ArgumentsWork.Parameters ParList)
+        {
+            string temp = Path.GetDirectoryName(Path.GetFullPath(source));
+            string temp2 = Path.GetFileName(source);
 
             for (int i = 0; i < TBL.Count; i++)
                 File.WriteAllBytes(Path.Combine(temp, temp2 + "(" + i.ToString().PadLeft(2, '0') + ").DAT"), TBL[i]);
         }
 
-        public static void ImportAll(PersonaEditorLib.FileStructure.TBL.TBL TBL, string sourcefile, string filename)
+        #endregion ExportMethods
+
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string src)
         {
-            string temp = Path.GetDirectoryName(Path.GetFullPath(sourcefile));
-            string temp2 = Path.GetFileName(sourcefile);
+            if (com == CommandSubType.ALL)
+                ImportAll(parameters);
+        }
+
+        #region ImportMethods
+
+        private void ImportAll(ArgumentsWork.Parameters ParList)
+        {
+            string temp = Path.GetDirectoryName(Path.GetFullPath(source));
+            string temp2 = Path.GetFileName(source);
 
             for (int i = 0; i < TBL.Count; i++)
             {
@@ -717,60 +565,66 @@ namespace PersonaEditor
             }
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.TBL.TBL TBL, string sourcefile, string filename, ArgumentWork.Parameters ParList)
-        {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).TBL");
+        #endregion ImportMethods
 
-            File.WriteAllBytes(filename, TBL.Get(ParList.IsLittleEndian));
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).TBL");
+
+            File.WriteAllBytes(dest, TBL.Get(parameters.IsLittleEndian));
         }
     }
 
-    public static class TEXTWork
+    public class TEXTConsole : IConsoleWork
     {
-        public static bool Work(ArgumentWork argWRK)
+        PersonaEditorLib.FileStructure.StringList StringList;
+        string source = "";
+
+        public TEXTConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
-            try
-            {
-                var SourceFile = argWRK.GetSourceFile();
-                var ActList = argWRK.GetActList();
-
-                if (SourceFile.Parameters.Length <= 0) return false;
-
-                PersonaEditorLib.FileStructure.StringList StringList = new PersonaEditorLib.FileStructure.StringList(SourceFile.Value, SourceFile.Parameters.Length,
-                    SourceFile.Parameters.Old ? new CharList(SourceFile.Parameters.OldMap, SourceFile.Parameters.OldFont) : new CharList(SourceFile.Parameters.NewMap, SourceFile.Parameters.NewFont));
-
-                foreach (var command in ActList)
-                    if (command.Action == ArgumentWork.ArgumentAction.ActType.ExportTXT) ExportTXT(StringList, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.ImportTXT) ImportTXT(StringList, SourceFile.Value, command.Value);
-                    else if (command.Action == ArgumentWork.ArgumentAction.ActType.Save) Save(StringList, SourceFile.Value, command.Value, command.Parameters);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return false;
-            }
+            source = Path.GetFullPath(filepath);
+            StringList = new PersonaEditorLib.FileStructure.StringList(source, parameters.Length,
+                     parameters.Old ? new CharList(parameters.OldMap, parameters.OldFont) : new CharList(parameters.NewMap, parameters.NewFont));
         }
 
-        public static void ExportTXT(PersonaEditorLib.FileStructure.StringList StringList, string sourcefile, string filename)
+        public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, ".TXT");
+            if (com == CommandSubType.TXT)
+                ExportTXT(dest, parameters);
+        }
+
+        #region ExportMethods
+
+        private void ExportTXT(string dest, ArgumentsWork.Parameters ParList)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, ".TXT");
 
             for (int i = 0; i < StringList.Count; i++)
-                File.AppendAllText(filename, StringList[i] + "\r\n");
+                File.AppendAllText(dest, StringList[i].Item1 + "\t" + StringList[i].Item2 + "\r\n");
         }
 
-        public static void ImportTXT(PersonaEditorLib.FileStructure.StringList StringList, string sourcefile, string filename)
+        #endregion ExportMethods
+
+        public void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string src)
         {
-            StringList.Import(filename);
+            if (com == CommandSubType.TXT)
+                ImportTXT(src, parameters);
         }
 
-        public static void Save(PersonaEditorLib.FileStructure.StringList StringList, string sourcefile, string filename, ArgumentWork.Parameters ParList)
+        #region ImportMethods
+
+        private void ImportTXT(string src, ArgumentsWork.Parameters ParList)
         {
-            if (filename == "") filename = Util.GetNewPath(sourcefile, "(NEW).DAT");
-            
-            File.WriteAllBytes(filename, StringList.Get(ParList.Length, ParList.Old ? new CharList(ParList.OldMap, ParList.OldFont) : new CharList(ParList.NewMap, ParList.NewFont)));
+            StringList.Import(src);
+        }
+
+        #endregion ImportMethods
+
+        public void Save(ArgumentsWork.Parameters parameters, string dest)
+        {
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).DAT");
+
+            File.WriteAllBytes(dest, StringList.Get(parameters.Old ? new CharList(parameters.OldMap, parameters.OldFont) : new CharList(parameters.NewMap, parameters.NewFont)));
         }
     }
 
@@ -778,53 +632,56 @@ namespace PersonaEditor
     {
         static void Main(string[] args)
         {
-            bool complete = false;
+            bool complete = Do(args);
 
-            ArgumentWork argWRK = new ArgumentWork(args);
-            var arg = argWRK.GetSourceFile();
-
-            switch (arg.SourceType)
-            {
-                case (ArgumentWork.ArgumentSourceFile.FileType.FNT):
-                    complete = FNTWork.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.PM1):
-                    complete = PM1Work.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.BMD):
-                    complete = BMDWork.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.PTP):
-                    complete = PTPWork.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.BF):
-                    complete = BFWork.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.TMX):
-                    complete = TMXWork.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.BIN):
-                    complete = BINWork.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.BVP):
-                    complete = BVPWork.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.TBL):
-                    complete = TBLWork.Work(argWRK);
-                    break;
-                case (ArgumentWork.ArgumentSourceFile.FileType.TEXT):
-                    complete = TEXTWork.Work(argWRK);
-                    break;
-                default:
-                    break;
-            }
-
-            if (complete) Console.WriteLine(arg.Value + " - Success");
-            else Console.WriteLine("Failure");
+            if (complete)
+                Console.WriteLine(args[1] + " - Success");
+            else
+                Console.WriteLine("Failure");
 
 #if DEBUG
             Console.ReadKey();
 #endif
+        }
+
+        static bool Do(string[] args)
+        {
+            IConsoleWork work;
+
+            ArgumentsWork argwrk = new ArgumentsWork(args);
+
+            if (argwrk.FileType == "-FNT")
+                work = new FNTConsole(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-TMX")
+                work = new TMXConsole(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-PM1")
+                work = new PM1Console(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-BF")
+                work = new BFConsole(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-BMD")
+                work = new BMDConsole(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-PTP")
+                work = new PTPConsole(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-BIN")
+                work = new BINConsole(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-BVP")
+                work = new BVPConsole(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-TBL")
+                work = new TBLConsole(argwrk.FileSource, argwrk.Param);
+            else if (argwrk.FileType == "-TEXT")
+                work = new TEXTConsole(argwrk.FileSource, argwrk.Param);
+            else
+                return false;
+
+            foreach (var command in argwrk.ArgumentList)
+                if (command.Command == CommandType.Export)
+                    work.Export(command.Type, command.Parameters, command.Value);
+                else if (command.Command == CommandType.Import)
+                    work.Import(command.Type, command.Parameters, command.Value);
+                else if (command.Command == CommandType.Save)
+                    work.Save(command.Parameters, command.Value);
+
+            return true;
         }
     }
 }

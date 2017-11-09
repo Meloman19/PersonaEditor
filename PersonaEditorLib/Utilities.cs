@@ -63,6 +63,15 @@ namespace PersonaEditorLib.Utilities
 
     }
 
+    public static class String
+    {
+        public static byte[] SplitString (string str, char del)
+        {
+            string[] temp = str.Split(del);
+            return Enumerable.Range(0, temp.Length).Select(x => Convert.ToByte(temp[x], 16)).ToArray();
+        }
+    }
+
     public static class Utilities
     {
         public static int Alignment(int Size, int Align)

@@ -2,11 +2,11 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PersonaText" GeneratedClassName="Current">
   <Profiles />
   <Settings>
-    <Setting Name="ViewVisualizer" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="ViewVisualizer" Type="System.Windows.Visibility" Scope="User">
+      <Value Profile="(Default)">Visible</Value>
     </Setting>
-    <Setting Name="ViewPrefixPostfix" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="ViewPrefixPostfix" Type="System.Windows.Visibility" Scope="User">
+      <Value Profile="(Default)">Visible</Value>
     </Setting>
     <Setting Name="SelectedBackground" Type="System.String" Scope="User">
       <Value Profile="(Default)">Empty</Value>

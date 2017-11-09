@@ -62,7 +62,7 @@ namespace PersonaEditorLib.FileStructure.BMD
             name.Clear();
             msg.Clear();
             foreach (var a in PTP.names)
-                name.Add(new Names(a.Index, a.NewName.GetPTPMsgStrEl(CharList).GetByteArray().ToArray()));
+                name.Add(new Names(a.Index, a.NewName.GetTextBaseList(CharList).GetByteArray().ToArray()));
 
             foreach (var a in PTP.msg)
             {
@@ -77,12 +77,12 @@ namespace PersonaEditorLib.FileStructure.BMD
                     foreach (var c in b.Prefix)
                         Msg.AddRange(c.Array.ToArray());
 
-                    Msg.AddRange(b.NewString.GetPTPMsgStrEl(CharList).GetByteArray().ToArray());
+                    Msg.AddRange(b.NewString.GetTextBaseList(CharList).GetByteArray().ToArray());
 
                     foreach (var c in b.Postfix)
                         Msg.AddRange(c.Array.ToArray());
                 }
-                ByteArray MsgBytes = new ByteArray(Msg.ToArray());
+                byte[] MsgBytes = Msg.ToArray();
 
                 msg.Add(new MSGs(Index, Name, Type, CharacterIndex, MsgBytes.ToArray()));
             }
@@ -90,12 +90,20 @@ namespace PersonaEditorLib.FileStructure.BMD
             return true;
         }
 
-        public MemoryStream Get(bool IsLittleEndian)
+        public bool Open(byte[] array, string filepath, bool IsLittleEndian)
         {
-            MemoryStream returned = new MemoryStream();
-            BinaryWriter writer = Utilities.IO.OpenWriteFile(returned, IsLittleEndian);
-            
-            GetNewBMD.Get(msg, name, writer);
+            return Open(new MemoryStream(array), filepath, IsLittleEndian);
+        }
+
+        public byte[] Get(bool IsLittleEndian)
+        {
+            byte[] returned = new byte[0];
+            using (MemoryStream MS = new MemoryStream())
+            {
+                BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
+                GetNewBMD.Get(msg, name, writer);
+                returned = MS.ToArray();
+            }
             return returned;
         }
 
@@ -221,14 +229,14 @@ namespace PersonaEditorLib.FileStructure.BMD
                 Type = type;
                 Name = name;
                 CharacterIndex = characterIndex;
-                MsgBytes = new ByteArray(msgBytes);
+                MsgBytes = msgBytes;
             }
 
             public int Index { get; set; }
             public MsgType Type { get; set; }
             public string Name { get; set; }
             public int CharacterIndex { get; set; }
-            public ByteArray MsgBytes { get; set; }
+            public byte[] MsgBytes { get; set; }
         }
 
         public CharList CharList { get; private set; }

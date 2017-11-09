@@ -14,7 +14,7 @@ namespace PersonaEditorLib.Extension
 {
     public static class ListExtentsion
     {
-        public static string GetString(this IList<FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement> ByteCollection, CharList CharList, bool LineSplit)
+        public static string GetString(this IList<FileStructure.PTP.TextBaseElement> ByteCollection, CharList CharList, bool LineSplit)
         {
             string returned = "";
 
@@ -24,7 +24,7 @@ namespace PersonaEditorLib.Extension
             return returned;
         }
 
-        public static string GetString(this IList<FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement> ByteCollection)
+        public static string GetString(this IList<FileStructure.PTP.TextBaseElement> ByteCollection)
         {
             string returned = "";
 
@@ -34,41 +34,19 @@ namespace PersonaEditorLib.Extension
             return returned;
         }
 
-        public static ByteArray GetByteArray(this IList<FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement> ByteCollection)
+        public static byte[] GetByteArray(this IList<FileStructure.PTP.TextBaseElement> ByteCollection)
         {
             List<byte> temp = new List<byte>();
             foreach (var a in ByteCollection)
                 temp.AddRange(a.Array.ToArray());
-            return new ByteArray(temp.ToArray());
-        }
-    }
-
-    public static class FileStreamExtension
-    {
-        public static MemoryStream ReadMemoryStream(this FileStream FileStream, int Size)
-        {
-            byte[] buffer = new byte[Size];
-            FileStream.Read(buffer, 0, Size);
-            return new MemoryStream(buffer);
+            return temp.ToArray();
         }
 
-        public static void WriteMemoryStream(this Stream Stream, MemoryStream MemoryStream)
+        public static T[] SubArray<T>(this T[] data, int index, int length)
         {
-            MemoryStream.Position = 0;
-            byte[] buffer = new byte[MemoryStream.Length];
-            MemoryStream.Read(buffer, 0, (int)MemoryStream.Length);
-            Stream.Write(buffer, 0, buffer.Length);
-        }
-
-        public static void SaveToFile(this Stream stream, string path)
-        {
-            using (FileStream FS = new FileStream(path, FileMode.Create))
-            {
-                long temp = stream.Position;
-                stream.Position = 0;
-                stream.CopyTo(FS);
-                stream.Position = temp;
-            }
+            T[] result = new T[length];
+            Array.Copy(data, index, result, 0, length);
+            return result;
         }
     }
 
@@ -84,7 +62,7 @@ namespace PersonaEditorLib.Extension
             list.Add(121, 2);
         }
 
-        public static bool CheckEntrance(this ByteArray B, byte[] Bytes, int StartIndex)
+        public static bool CheckEntrance(this byte[] B, byte[] Bytes, int StartIndex)
         {
             if (Bytes.Length != 0)
             {
@@ -99,36 +77,6 @@ namespace PersonaEditorLib.Extension
             else return true;
         }
 
-        public static List<ByteArray> SplitSourceBytes(this ByteArray B)
-        {
-            List<ByteArray> returned = new List<ByteArray>();
-
-            byte[] LineSplit = B.ToArray().Take((B[0] - 0xF0) * 2).ToArray();
-
-            List<byte> String = new List<byte>();
-            for (int i = 0; i < B.Length; i++)
-            {
-                if (B.CheckEntrance(LineSplit, i))
-                {
-                    if (String.Count != 0)
-                    {
-                        returned.Add(new ByteArray(String.ToArray()));
-                        String.Clear();
-                    }
-                }
-
-                String.Add(B[i]);
-            }
-
-            if (String.Count != 0)
-            {
-                returned.Add(new ByteArray(String.ToArray()));
-                String.Clear();
-            }
-
-            return returned;
-        }
-
         public static string GetNewPath(string source, string end)
         {
             string fullpath = Path.GetFullPath(source);
@@ -136,22 +84,6 @@ namespace PersonaEditorLib.Extension
         }
 
         public static bool ByteArrayCompareWithSimplest(byte[] BytesLeft, byte[] BytesRight)
-        {
-            if (BytesLeft.Length != BytesRight.Length)
-                return false;
-
-            var length = BytesLeft.Length;
-
-            for (int i = 0; i < length; i++)
-            {
-                if (BytesLeft[i] != BytesRight[i])
-                    return false;
-            }
-
-            return true;
-        }
-
-        public static bool ByteArrayCompareWithSimplest(ByteArray BytesLeft, byte[] BytesRight)
         {
             if (BytesLeft.Length != BytesRight.Length)
                 return false;
@@ -280,7 +212,7 @@ namespace PersonaEditorLib.Extension
     {
         public static void SaveBMP(BitmapSource image, string path)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
 
             using (FileStream FS = new FileStream(path, FileMode.Create))
             {
@@ -293,7 +225,7 @@ namespace PersonaEditorLib.Extension
 
         public static void SavePNG(BitmapSource image, string path)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
             using (FileStream FS = new FileStream(path, FileMode.Create))
             {
                 PngBitmapEncoder PNGencoder = new PngBitmapEncoder();

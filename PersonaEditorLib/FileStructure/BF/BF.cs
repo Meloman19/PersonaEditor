@@ -53,41 +53,42 @@ namespace PersonaEditorLib.FileStructure.BF
                     List.Add(new BFElement(reader, element));
         }
 
-        public MemoryStream GetBMD()
+        public byte[] GetBMD()
         {
             var temp = List.Find(x => x.Type == TypeMap.BMD);
-            return temp == null ? new MemoryStream() : temp.Count == 0 ? new MemoryStream() : new MemoryStream((temp as BFElement).List[0]);
+            return temp == null ? new byte[0] : temp.Count == 0 ? new byte[0] : (temp as BFElement).List[0].ToArray();
         }
 
-        public void SetBMD(MemoryStream bmd)
+        public void SetBMD(byte[] bmd)
         {
             var temp = List.Find(x => x.Type == TypeMap.BMD) as BFElement;
             if (temp != null)
             {
                 temp.List.Clear();
-                temp.List.Add(bmd.ToArray());
+                temp.List.Add(bmd);
             }
         }
 
-        public MemoryStream Get(bool IsLittleEndian)
+        public byte[] Get(bool IsLittleEndian)
         {
-            MemoryStream returned = new MemoryStream();
-            BinaryWriter writer;
+            byte[] returned = new byte[0];
 
-            if (IsLittleEndian)
-                writer = new BinaryWriter(returned);
-            else
-                writer = new BinaryWriterBE(returned);
+            using (MemoryStream MS = new MemoryStream())
+            {
+                BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
 
-            Table.Update(List);
+                Table.Update(List);
 
-            Header.FileSize = Header.Size + Table.Size;
-            List.ForEach(x => Header.FileSize += x.Size);
+                Header.FileSize = Header.Size + Table.Size;
+                List.ForEach(x => Header.FileSize += x.Size);
 
-            Header.Get(writer);
-            Table.Get(writer);
+                Header.Get(writer);
+                Table.Get(writer);
 
-            List.OrderBy(x => x.Type).ToList().ForEach(x => x.Get(writer));
+                List.OrderBy(x => x.Type).ToList().ForEach(x => x.Get(writer));
+
+                returned = MS.ToArray();
+            }
 
             return returned;
         }

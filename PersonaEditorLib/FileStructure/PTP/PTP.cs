@@ -11,6 +11,53 @@ using System.Text.RegularExpressions;
 
 namespace PersonaEditorLib.FileStructure.PTP
 {
+    public delegate void MsgElementListChanged(IList<TextBaseElement> array);
+
+    public interface ListMsg
+    {
+        event MsgElementListChanged Old;
+        event MsgElementListChanged New;
+    }
+
+    public struct TextBaseElement
+    {
+        public TextBaseElement(string type, byte[] array)
+        {
+            Type = type;
+            Array = array;
+        }
+
+        public string GetText(CharList CharList)
+        {
+            if (Type == "System")
+                if (Array[0] == 0x0A)
+                    return "\n";
+                else
+                    return GetSystem();
+            else
+                return CharList.Decode(Array);
+        }
+
+        public string GetSystem()
+        {
+            string returned = "";
+
+            if (Array.Length > 0)
+            {
+                returned += "{" + Convert.ToString(Array[0], 16).PadLeft(2, '0').ToUpper();
+                for (int i = 1; i < Array.Length; i++)
+                    returned += " " + Convert.ToString(Array[i], 16).PadLeft(2, '0').ToUpper();
+
+                returned += "}";
+            }
+
+            return returned;
+        }
+
+        public string Type { get; set; }
+        public byte[] Array { get; set; }
+    }
+
     public class PTP
     {
         public PTP(string OldFont, string OldMap, string NewFont, string NewMap)
@@ -30,36 +77,40 @@ namespace PersonaEditorLib.FileStructure.PTP
 
         public string OpenFileName = "";
 
-        public class Names
+        public class Names : ListMsg
         {
-            public event ByteArrayChangedEventHandler OldNameChanged;
-            public event StringChangedEventHandler NewNameChanged;
+            public event MsgElementListChanged Old;
+            public event MsgElementListChanged New;
 
-            public Names(int Index, string OldName, string NewName)
+            CharList NewChar;
+
+            public Names(int Index, string OldName, string NewName, CharList New)
             {
+                NewChar = New;
                 this.Index = Index;
                 this.NewName = NewName;
-                this.OldName = new ByteArray(OldName.Split('-'));
+                this.OldName = Utilities.String.SplitString(OldName, '-');
             }
 
-            public Names(int Index, byte[] OldName, string NewName)
+            public Names(int Index, byte[] OldName, string NewName, CharList New)
             {
+                NewChar = New;
                 this.Index = Index;
                 this.NewName = NewName;
-                this.OldName = new ByteArray(OldName);
+                this.OldName = OldName;
             }
 
-            private ByteArray _OldName;
+            private byte[] _OldName;
             private string _NewName;
 
             public int Index { get; set; }
-            public ByteArray OldName
+            public byte[] OldName
             {
                 get { return _OldName; }
                 set
                 {
                     _OldName = value;
-                    OldNameChanged?.Invoke(_OldName);
+                    Old?.Invoke(_OldName.GetTextBaseList());
                 }
             }
             public string NewName
@@ -68,92 +119,32 @@ namespace PersonaEditorLib.FileStructure.PTP
                 set
                 {
                     _NewName = value;
-                    NewNameChanged?.Invoke(_NewName);
+                    New?.Invoke(_NewName.GetTextBaseList(NewChar));
                 }
             }
         }
 
         public class MSG
         {
-            public class MSGstr : INotifyPropertyChanged
+            public class MSGstr : INotifyPropertyChanged, ListMsg
             {
-                public event StringChangedEventHandler NewStringChanged;
+                public event MsgElementListChanged Old;
+                public event MsgElementListChanged New;
 
-                public struct MSGstrElement
+                CharList NewChar;
+
+                public MSGstr(int index, string newstring, CharList New)
                 {
-                    public MSGstrElement(string type, string[] array)
-                    {
-                        Type = type;
-                        Array = new ByteArray(array);
-                    }
-
-                    public MSGstrElement(string type, byte[] array)
-                    {
-                        Type = type;
-                        Array = new ByteArray(array);
-                    }
-
-                    public string GetText(CharList CharList)
-                    {
-                        if (Type == "System")
-                            if (Array[0] == 0x0A)
-                                return "\n";
-                            else
-                                return GetSystem();
-                        else
-                        {
-                            string returned = "";
-                            for (int i = 0; i < Array.Length; i++)
-                            {
-                                if (0x20 <= Array[i] & Array[i] < 0x80)
-                                {
-                                    returned += CharList.GetChar(Array[i]);
-                                }
-                                else if (0x80 <= Array[i] & Array[i] < 0xF0)
-                                {
-                                    int newindex = (Array[i] - 0x81) * 0x80 + Array[i + 1] + 0x20;
-
-                                    i++;
-                                    returned += CharList.GetChar(newindex);
-                                }
-                                else
-                                {
-                                    throw new Exception("GetText error");
-                                }
-                            }
-                            return returned;
-                        }
-                    }
-
-                    public string GetSystem()
-                    {
-                        string returned = "";
-
-                        if (Array.Length > 0)
-                        {
-                            returned += "{" + Convert.ToString(Array[0], 16).PadLeft(2, '0').ToUpper();
-                            for (int i = 1; i < Array.Length; i++)
-                                returned += " " + Convert.ToString(Array[i], 16).PadLeft(2, '0').ToUpper();
-
-                            returned += "}";
-                        }
-
-                        return returned;
-                    }
-
-                    public string Type { get; set; }
-                    public ByteArray Array { get; set; }
-                }
-
-                public MSGstr(int index, string newstring)
-                {
+                    NewChar = New;
                     Index = index;
                     NewString = newstring;
                     OldString.ListChanged += OldString_ListChanged;
+
                 }
 
                 private void OldString_ListChanged(object sender, ListChangedEventArgs e)
                 {
+                    Old?.Invoke(OldString);
                     Notify("OldString");
                 }
 
@@ -173,9 +164,9 @@ namespace PersonaEditorLib.FileStructure.PTP
 
                 public int Index { get; set; }
                 public int CharacterIndex { get; set; }
-                public BindingList<MSGstrElement> Prefix { get; set; } = new BindingList<MSGstrElement>();
-                public BindingList<MSGstrElement> OldString { get; set; } = new BindingList<MSGstrElement>();
-                public BindingList<MSGstrElement> Postfix { get; set; } = new BindingList<MSGstrElement>();
+                public BindingList<TextBaseElement> Prefix { get; set; } = new BindingList<TextBaseElement>();
+                public BindingList<TextBaseElement> OldString { get; set; } = new BindingList<TextBaseElement>();
+                public BindingList<TextBaseElement> Postfix { get; set; } = new BindingList<TextBaseElement>();
                 public string NewString
                 {
                     get { return _NewString; }
@@ -184,7 +175,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                         if (_NewString != value)
                         {
                             _NewString = value;
-                            NewStringChanged?.Invoke(_NewString);
+                            New?.Invoke(_NewString.GetTextBaseList(NewChar));
                             Notify("NewString");
                         }
                     }
@@ -197,10 +188,10 @@ namespace PersonaEditorLib.FileStructure.PTP
                 Type = type;
                 Name = name;
                 CharacterIndex = charindex;
-                MsgBytes = new ByteArray(array.Split('-'));
+                MsgBytes = Utilities.String.SplitString(array, '-');
             }
 
-            public MSG(int index, string type, string name, int charindex, ByteArray array)
+            public MSG(int index, string type, string name, int charindex, byte[] array)
             {
                 Index = index;
                 Type = type;
@@ -213,7 +204,7 @@ namespace PersonaEditorLib.FileStructure.PTP
             public string Type { get; set; }
             public string Name { get; set; }
             public int CharacterIndex { get; set; }
-            public ByteArray MsgBytes { get; set; }
+            public byte[] MsgBytes { get; set; }
 
             public BindingList<MSGstr> Strings { get; set; } = new BindingList<MSGstr>();
         }
@@ -238,7 +229,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                     string OldNameSource = NAME.Element("OldNameSource").Value;
                     string NewName = NAME.Element("NewName").Value;
 
-                    names.Add(new Names(Index, OldNameSource, NewName));
+                    names.Add(new Names(Index, OldNameSource, NewName, NewCharList));
                 }
 
                 foreach (var Message in MSG1Doc.Element("MSG").Elements())
@@ -258,7 +249,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                         int StringIndex = Convert.ToInt32(Strings.Attribute("Index").Value);
                         string NewString = Strings.Element("NewString").Value;
 
-                        MSG.MSGstr temp2 = new MSG.MSGstr(StringIndex, NewString) { CharacterIndex = CharacterNameIndex };
+                        MSG.MSGstr temp2 = new MSG.MSGstr(StringIndex, NewString, NewCharList) { CharacterIndex = CharacterNameIndex };
                         temp.Strings.Add(temp2);
 
                         foreach (var Prefix in Strings.Elements("PrefixBytes"))
@@ -267,7 +258,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                             string PrefixType = Prefix.Attribute("Type").Value;
                             string PrefixBytes = Prefix.Value;
 
-                            temp2.Prefix.Add(new MSG.MSGstr.MSGstrElement(PrefixType, PrefixBytes.Split('-')));
+                            temp2.Prefix.Add(new TextBaseElement(PrefixType, Utilities.String.SplitString(PrefixBytes, '-')));
                         }
 
                         foreach (var Old in Strings.Elements("OldStringBytes"))
@@ -276,7 +267,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                             string OldType = Old.Attribute("Type").Value;
                             string OldBytes = Old.Value;
 
-                            temp2.OldString.Add(new MSG.MSGstr.MSGstrElement(OldType, OldBytes.Split('-')));
+                            temp2.OldString.Add(new TextBaseElement(OldType, Utilities.String.SplitString(OldBytes, '-')));
                         }
 
                         foreach (var Postfix in Strings.Elements("PostfixBytes"))
@@ -285,7 +276,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                             string PostfixType = Postfix.Attribute("Type").Value;
                             string PostfixBytes = Postfix.Value;
 
-                            temp2.Postfix.Add(new MSG.MSGstr.MSGstrElement(PostfixType, PostfixBytes.Split('-')));
+                            temp2.Postfix.Add(new TextBaseElement(PostfixType, Utilities.String.SplitString(PostfixBytes, '-')));
                         }
                     }
                 }
@@ -316,7 +307,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                     byte[] OldNameSource = NAME.NameBytes;
                     string NewName = "";
 
-                    names.Add(new Names(Index, OldNameSource, NewName));
+                    names.Add(new Names(Index, OldNameSource, NewName, NewCharList));
                 }
 
                 foreach (var Message in BMD.msg)
@@ -325,9 +316,9 @@ namespace PersonaEditorLib.FileStructure.PTP
                     string Type = Message.Type.ToString();
                     string Name = Message.Name;
                     int CharacterNameIndex = Message.CharacterIndex;
-                    ByteArray SourceBytes_str = Message.MsgBytes;
+                    byte[] SourceBytes_str = Message.MsgBytes;
                     MSG temp = new MSG(Index, Type, Name, CharacterNameIndex, SourceBytes_str) { CharacterIndex = CharacterNameIndex };
-                    temp.Strings.ParseStrings(SourceBytes_str);
+                    temp.Strings.ParseStrings(SourceBytes_str, NewCharList);
                     msg.Add(temp);
                 }
 
@@ -350,7 +341,7 @@ namespace PersonaEditorLib.FileStructure.PTP
         public void CopyOld2New()
         {
             foreach (var Name in names)
-                Name.NewName = Name.OldName.GetPTPMsgStrEl().GetString(OldCharList, false);
+                Name.NewName = Name.OldName.GetTextBaseList().GetString(OldCharList, false);
 
             foreach (var Msg in msg)
                 foreach (var Str in Msg.Strings)
@@ -427,7 +418,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                         else if (type == LineMap.Type.OldName)
                         {
                             var name = names.FirstOrDefault(x => x.Index == a.CharacterIndex);
-                            returned += name == null ? " \t" : name.OldName.GetPTPMsgStrEl().GetString(OldCharList, false).Replace("\n", " ") + "\t";
+                            returned += name == null ? " \t" : name.OldName.GetTextBaseList().GetString(OldCharList, false).Replace("\n", " ") + "\t";
                         }
                         else if (type == LineMap.Type.NewName)
                         {
@@ -530,7 +521,7 @@ namespace PersonaEditorLib.FileStructure.PTP
 
         private void ImportNameByName(string OldName, string NewName)
         {
-            ImportName(names.FirstOrDefault(x => x.OldName.GetPTPMsgStrEl().GetString(OldCharList, true) == OldName), NewName);
+            ImportName(names.FirstOrDefault(x => x.OldName.GetTextBaseList().GetString(OldCharList, true) == OldName), NewName);
         }
 
         private void ImportName(Names Name, string NewName)
@@ -553,7 +544,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                 {
                     XElement Name = new XElement("Name");
                     Name.Add(new XAttribute("Index", NAME.Index));
-                    Name.Add(new XElement("OldNameSource", NAME.OldName));
+                    Name.Add(new XElement("OldNameSource", BitConverter.ToString(NAME.OldName)));
                     Name.Add(new XElement("NewName", NAME.NewName));
                     CharName.Add(Name);
                 }
@@ -568,7 +559,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                     Msg.Add(new XElement("Type", MSG.Type));
                     Msg.Add(new XElement("Name", MSG.Name));
                     Msg.Add(new XElement("CharacterNameIndex", MSG.CharacterIndex));
-                    Msg.Add(new XElement("SourceBytes", MSG.MsgBytes));
+                    Msg.Add(new XElement("SourceBytes", BitConverter.ToString(MSG.MsgBytes)));
 
                     XElement Strings = new XElement("MessageStrings");
                     Msg.Add(Strings);
@@ -580,7 +571,7 @@ namespace PersonaEditorLib.FileStructure.PTP
 
                         for (int i = 0; i < STR.Prefix.Count; i++)
                         {
-                            XElement PrefixBytes = new XElement("PrefixBytes", STR.Prefix[i].Array);
+                            XElement PrefixBytes = new XElement("PrefixBytes", BitConverter.ToString(STR.Prefix[i].Array));
                             PrefixBytes.Add(new XAttribute("Index", i));
                             PrefixBytes.Add(new XAttribute("Type", STR.Prefix[i].Type));
                             String.Add(PrefixBytes);
@@ -588,7 +579,7 @@ namespace PersonaEditorLib.FileStructure.PTP
 
                         for (int i = 0; i < STR.OldString.Count; i++)
                         {
-                            XElement OldStringBytes = new XElement("OldStringBytes", STR.OldString[i].Array);
+                            XElement OldStringBytes = new XElement("OldStringBytes", BitConverter.ToString(STR.OldString[i].Array));
                             OldStringBytes.Add(new XAttribute("Index", i));
                             OldStringBytes.Add(new XAttribute("Type", STR.OldString[i].Type));
                             String.Add(OldStringBytes);
@@ -598,7 +589,7 @@ namespace PersonaEditorLib.FileStructure.PTP
 
                         for (int i = 0; i < STR.Postfix.Count; i++)
                         {
-                            XElement PostfixBytes = new XElement("PostfixBytes", STR.Postfix[i].Array);
+                            XElement PostfixBytes = new XElement("PostfixBytes", BitConverter.ToString(STR.Postfix[i].Array));
                             PostfixBytes.Add(new XAttribute("Index", i));
                             PostfixBytes.Add(new XAttribute("Type", STR.Postfix[i].Type));
                             String.Add(PostfixBytes);

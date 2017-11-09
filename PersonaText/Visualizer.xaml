@@ -1,0 +1,36 @@
+﻿<Window x:Class="PersonaText.Visualizer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PersonaText"
+        mc:Ignorable="d"
+        Title="Visualizer" Height="324.116" Width="508.36">
+    <Grid>
+        <Grid.Background>
+            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+        </Grid.Background>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <ComboBox Width="120" Name="SelectBackground" ItemsSource="{Binding}" SelectionChanged="SelectBackground_SelectionChanged"/>
+            <ComboBox Width="60" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
+                <ComboBoxItem>Old</ComboBoxItem>
+                <ComboBoxItem>New</ComboBoxItem>
+            </ComboBox>
+        </Menu>
+
+        <Image Grid.Row="1" Name="VisualText" Source="{Binding}"/>
+
+        <TextBox Grid.Row="2" Margin="4" Width="200" HorizontalAlignment="Left"  MaxLines="1" TextChanged="Name_TextChanged"/>
+        <TextBox Grid.Row="3" Margin="15,4,4,4" Name="TextBoxText" AcceptsReturn="True" TextChanged="Text_TextChanged"/>
+        <TextBox Grid.Row="4" Margin="15,4,4,4" Name="HEX" TextWrapping="Wrap" IsReadOnly="True"/>
+    </Grid>
+</Window>

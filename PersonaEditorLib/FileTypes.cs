@@ -16,52 +16,6 @@ using PersonaEditorLib.FileStructure.PTP;
 
 namespace PersonaEditorLib
 {
-    public struct ByteArray
-    {
-        byte[] Array { get; set; }
-
-        public ByteArray(byte[] array)
-        {
-            if (array == null)
-                Array = new byte[0];
-            else
-            {
-                Array = new byte[array.Length];
-                for (int i = 0; i < array.Length; i++)
-                    Array[i] = array[i];
-            }
-        }
-
-        public ByteArray(string[] array)
-        {
-            Array = Enumerable.Range(0, array.Length).Select(x => Convert.ToByte(array[x], 16)).ToArray();
-        }
-
-        public byte[] ToArray()
-        {
-            byte[] returned = new byte[Array.Length];
-            for (int i = 0; i < Array.Length; i++)
-                returned[i] = Array[i];
-            return returned;
-        }
-
-        public override string ToString()
-        {
-            return BitConverter.ToString(Array);
-        }
-
-        public int Length
-        {
-            get { return Array.Length; }
-        }
-
-        public byte this[int i]
-        {
-            get { return Array[i]; }
-            set { Array[i] = value; }
-        }
-    }
-
     public static class Logging
     {
         public static void Write(string name, string text)
@@ -221,8 +175,6 @@ namespace PersonaEditorLib
             base.Write(newvalue);
         }
     }
-
-    public delegate void ValueChangedEventHandler();
 
     public struct VerticalCut
     {
@@ -484,13 +436,31 @@ namespace PersonaEditorLib
             }
         }
 
-        public byte[] Encode(string String)
+        public enum EncodeOptions
         {
-            List<byte> LB = new List<byte>();
-            foreach (var C in String)
-                LB.AddRange(GetByte(C));
+            OneChar,
+            Bracket
+        }
 
-            return LB.ToArray();
+        public byte[] Encode(string String, EncodeOptions options)
+        {
+            List<byte> returned = new List<byte>();
+
+            if (options == EncodeOptions.OneChar)
+            {
+                foreach (var C in String)
+                    returned.AddRange(GetByte(C));
+            }
+            else if (options == EncodeOptions.Bracket)
+            {
+                foreach (var C in Regex.Split(String, @"(<[^>]+>)"))
+                    if (Regex.IsMatch(C, @"<.+>"))
+                        returned.AddRange(GetByte(C.Substring(1, C.Length - 2)));
+                    else
+                        returned.AddRange(Encode(C, EncodeOptions.OneChar));
+            }
+
+            return returned.ToArray();
         }
 
         public string Decode(byte[] bytes)
@@ -692,7 +662,7 @@ namespace PersonaEditorLib.FileTypes
 
         }
 
-        public static ImageData DrawText(IList<PersonaEditorLib.FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement> text, CharList CharList, Dictionary<int, byte> Shift, int LineSpacing)
+        public static ImageData DrawText(IList<TextBaseElement> text, CharList CharList, Dictionary<int, byte> Shift, int LineSpacing)
         {
             if (text != null)
             {
@@ -956,6 +926,6 @@ namespace PersonaEditorLib.FileTypes
 namespace PersonaEditorLib.FileStructure
 {
     public delegate void StringChangedEventHandler(string text);
-    public delegate void ByteArrayChangedEventHandler(ByteArray array);
+    public delegate void ByteArrayChangedEventHandler(byte[] array);
 
 }

@@ -23,6 +23,17 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public FNT(Stream stream, long position)
         {
+            Read(stream, 0);
+        }
+
+        public FNT(string path)
+        {
+            using (FileStream FS = File.OpenRead(path))
+                Read(FS, 0);
+        }
+
+        private void Read(Stream stream, long position)
+        {
             stream.Position = position;
             BinaryReader reader = new BinaryReader(stream);
 
@@ -38,11 +49,6 @@ namespace PersonaEditorLib.FileStructure.FNT
                 reader.BaseStream.Position = Header.LastPosition;
                 Last = new FNTLast(reader, Header.Glyphs.Count);
             }
-        }
-
-        public FNT(string path) : this(File.OpenRead(path), 0)
-        {
-
         }
 
         public int Size()
@@ -158,23 +164,28 @@ namespace PersonaEditorLib.FileStructure.FNT
             Logging.Write("PersonaEditorLib", "Width Table was writed. Get " + index + " glyphs");
         }
 
-        private MemoryStream Get()
+        private byte[] Get()
         {
-            MemoryStream returned = new MemoryStream();
-            BinaryWriter writer = new BinaryWriter(returned);
+            byte[] returned;
 
-            Header.FileSize = 1 + Header.HeaderSize + Palette.Size + Reserved.Size + Compressed.Size();
+            using (MemoryStream MS = new MemoryStream())
+            {
+                BinaryWriter writer = new BinaryWriter(MS);
 
-            Header.Get(writer);
-            Palette.Get(writer);
-            WidthTable.Get(writer);
-            Unknown.Get(writer);
-            Reserved.Get(writer);
-            Compressed.Get(writer);
-            if (Last != null)
-                Last.Get(writer);
+                Header.FileSize = 1 + Header.HeaderSize + Palette.Size + Reserved.Size + Compressed.Size();
 
-            returned.Position = 0;
+                Header.Get(writer);
+                Palette.Get(writer);
+                WidthTable.Get(writer);
+                Unknown.Get(writer);
+                Reserved.Get(writer);
+                Compressed.Get(writer);
+                if (Last != null)
+                    Last.Get(writer);
+
+                returned = MS.ToArray();
+            }
+
             return returned;
         }
 
@@ -188,7 +199,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             get { return GetWidthTable(); }
             set { SetWidthTable(value); }
         }
-        public MemoryStream This
+        public byte[] This
         {
             get { return Get(); }
         }

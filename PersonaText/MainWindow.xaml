@@ -28,25 +28,22 @@
                 <MenuItem Header="Open Project" Name="mm_openproject" Click="OpenPTP_Click" ></MenuItem>
                 <MenuItem Header="Save Project" Name="mm_saveproject" Click="SavePTP_Click" ></MenuItem>
                 <Separator></Separator>
-                <MenuItem Header="Import BMD" Click="ImportBMD_Click"></MenuItem>
+                <MenuItem Header="Import BMD" Click="ImportBMD_Click"/>
+                <MenuItem Header="Export BMD" Click="ExportBMD_Click"/>
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Visualizer" Name="ViewVisualizer" IsCheckable="True" Initialized="ViewVisualizer_Initialized" Checked="ViewVisualizer_Checked"  Unchecked="ViewVisualizer_Unchecked"/>
                 <MenuItem Header="Prefix/Postfix" Name="ViewPrefixPostfix" IsCheckable="True" Initialized="ViewPrefixPostfix_Initialized" Checked="ViewPrefixPostfix_Checked"  Unchecked="ViewPrefixPostfix_Unchecked"/>
-                <ComboBox Width="120" Name="ElementSelectBackground" SelectionChanged="SelectBack_SelectionChanged">
-                    <ComboBoxItem Content="Empty"></ComboBoxItem>
-                </ComboBox>
+                <ComboBox Width="120" Name="ElementSelectBackground" SelectionChanged="SelectBack_SelectionChanged" ItemsSource="{Binding}"/>
                 <Separator/>
-                <MenuItem Header="Settings" Click="MenuItem_Click">
+                <MenuItem Header="Text Visualizer" Click="ToolVis_Click" />
+                <Separator/>
+                <MenuItem Header="Settings" Click="Setting_Click">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource Setting}" RenderOptions.BitmapScalingMode="HighQuality"></Image>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            <!--<MenuItem Header="Tools">
-                <MenuItem Header="Extract text from..." Name="mm_tools_export" Click="mm_tools_export_Click"/>
-                <MenuItem Header="Text Visualizer" Name="mm_tools_visual" Click="mm_tools_visual_Click"/>
-            </MenuItem>-->
             <MenuItem Header="Font">
                 <MenuItem Header="Old">
                     <MenuItem Header="Open" Name="OpenOldFont" Click="OpenFont_Click"/>
@@ -147,8 +144,8 @@
                                                         </TextBox>
                                                         <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                        <Image Grid.Column="0" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="OldVisualizer_Loaded"/>
-                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="NewVisualizer_Loaded"/>
+                                                        <Image Grid.Column="0" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="OldVisualizer_Loaded" Visibility="{Binding ElementName=ScrollViewer, Path=ViewVisualizer}"/>
+                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="NewVisualizer_Loaded" Visibility="{Binding ElementName=ScrollViewer, Path=ViewVisualizer}"/>
                                                     </Grid>
 
                                                     <TextBlock TextWrapping="Wrap"  Grid.Row="2" Text="{Binding Postfix, Converter={StaticResource MSGListToSystem}}" HorizontalAlignment="Center"/>

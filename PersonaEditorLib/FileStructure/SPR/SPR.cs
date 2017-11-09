@@ -61,31 +61,37 @@ namespace PersonaEditorLib.FileStructure.SPR
             return Textures.List;
         }
 
-        public MemoryStream Get(bool IsLittleEndian)
+        public byte[] Get(bool IsLittleEndian)
         {
-            MemoryStream returned = new MemoryStream();
-            BinaryWriter writer;
+            byte[] returned;
 
-            if (IsLittleEndian)
-                writer = new BinaryWriter(returned);
-            else
-                writer = new BinaryWriterBE(returned);
+            using (MemoryStream MS = new MemoryStream())
+            {
+                BinaryWriter writer;
 
-            Header.Get(writer);
-            foreach (var a in TextureOffsetList)
-            {
-                writer.Write((int)0);
-                writer.Write(a);
+                if (IsLittleEndian)
+                    writer = new BinaryWriter(MS);
+                else
+                    writer = new BinaryWriterBE(MS);
+
+                Header.Get(writer);
+                foreach (var a in TextureOffsetList)
+                {
+                    writer.Write((int)0);
+                    writer.Write(a);
+                }
+                foreach (var a in KeyOffsetList)
+                {
+                    writer.Write((int)0);
+                    writer.Write(a);
+                }
+                KeyList.Get(writer);
+                int temp = Utilities.Utilities.Alignment(writer.BaseStream.Position, 16);
+                writer.Write(new byte[temp == 0 ? 16 : temp]);
+                Textures.Get(writer);
+
+                returned = MS.ToArray();
             }
-            foreach (var a in KeyOffsetList)
-            {
-                writer.Write((int)0);
-                writer.Write(a);
-            }
-            KeyList.Get(writer);
-            int temp = Utilities.Utilities.Alignment(writer.BaseStream.Position, 16);
-            writer.Write(new byte[temp == 0 ? 16 : temp]);
-            Textures.Get(writer);
 
             return returned;
         }

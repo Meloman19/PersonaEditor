@@ -114,6 +114,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\Background.cs" />
+    <Compile Include="Classes\ObservableVariable.cs" />
+    <Compile Include="Classes\Visual.cs" />
     <Compile Include="Current.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -121,6 +124,12 @@
     </Compile>
     <Compile Include="SetChar.xaml.cs">
       <DependentUpon>SetChar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SetSettings.xaml.cs">
+      <DependentUpon>SetSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Visualizer.xaml.cs">
+      <DependentUpon>Visualizer.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -130,12 +139,19 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\Settings.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="SetChar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SetSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Visualizer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

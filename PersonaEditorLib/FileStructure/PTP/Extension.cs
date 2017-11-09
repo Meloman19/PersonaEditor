@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PersonaEditorLib.Extension;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,62 +10,26 @@ namespace PersonaEditorLib.FileStructure.PTP
 {
     public static class Extension
     {
-        public static List<PTP.MSG.MSGstr.MSGstrElement> GetPTPMsgStrEl(this string String, CharList FontMap)
+        public static List<TextBaseElement> GetTextBaseList(this string String, CharList FontMap)
         {
-            List<PTP.MSG.MSGstr.MSGstrElement> MyByteArrayList = new List<PTP.MSG.MSGstr.MSGstrElement>();
+            List<TextBaseElement> MyByteArrayList = new List<TextBaseElement>();
 
-            int Index = 0;
-
-            string[] split = Regex.Split(String, "(\r\n|\r|\n)");
-
-            foreach (var a in split)
-            {
+            foreach (var a in Regex.Split(String, "(\r\n|\r|\n)"))
                 if (Regex.IsMatch(a, "\r\n|\r|\n"))
-                {
-                    MyByteArrayList.Add(new FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement("System", new byte[] { 0x0A }));
-                    Index++;
-                }
+                    MyByteArrayList.Add(new TextBaseElement("System", new byte[] { 0x0A }));
                 else
-                {
-                    string[] splitstr = Regex.Split(a, @"({[^}]+})");
-
-                    foreach (var b in splitstr)
-                    {
+                    foreach (var b in Regex.Split(a, @"({[^}]+})"))
                         if (Regex.IsMatch(b, @"{.+}"))
-                        {
-                            MyByteArrayList.Add(new PTP.MSG.MSGstr.MSGstrElement("System", b.Substring(1, b.Length - 2).Split(' ')));
-                            Index++;
-                        }
+                            MyByteArrayList.Add(new TextBaseElement("System", Utilities.String.SplitString(b.Substring(1, b.Length - 2), ' ')));
                         else
-                        {
-                            string[] splitsubstr = Regex.Split(b, @"(<[^>]+>)");
-                            List<byte> ListByte = new List<byte>();
-
-                            foreach (var c in splitsubstr)
-                            {
-                                if (Regex.IsMatch(c, @"<.+>"))
-                                {
-                                    ListByte.AddRange(FontMap.GetByte(c.Substring(1, c.Length - 2)));
-                                }
-                                else
-                                {
-
-                                    ListByte.AddRange(FontMap.Encode(c));
-                                }
-                            }
-
-                            MyByteArrayList.Add(new FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement("Text", ListByte.ToArray()));
-                        }
-                    }
-                }
-            }
+                            MyByteArrayList.Add(new TextBaseElement("Text", FontMap.Encode(b, CharList.EncodeOptions.Bracket)));
 
             return MyByteArrayList;
         }
 
-        public static List<PTP.MSG.MSGstr.MSGstrElement> GetPTPMsgStrEl(this ByteArray array)
+        public static List<TextBaseElement> GetTextBaseList(this byte[] array)
         {
-            List<PTP.MSG.MSGstr.MSGstrElement> returned = new List<PTP.MSG.MSGstr.MSGstrElement>();
+            List<TextBaseElement> returned = new List<TextBaseElement>();
 
             string type = "Text";
             List<byte> temp = new List<byte>();
@@ -87,14 +52,14 @@ namespace PersonaEditorLib.FileStructure.PTP
                     {
                         if (temp.Count != 0)
                         {
-                            returned.Add(new FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                            returned.Add(new TextBaseElement(type, temp.ToArray()));
                             temp.Clear();
                         }
 
                         type = "System";
                         temp.Add(array[i]);
 
-                        returned.Add(new FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                        returned.Add(new TextBaseElement(type, temp.ToArray()));
                         type = "Text";
                         temp.Clear();
                     }
@@ -102,7 +67,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                     {
                         if (temp.Count != 0)
                         {
-                            returned.Add(new FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                            returned.Add(new TextBaseElement(type, temp.ToArray()));
                             type = "Text";
                             temp.Clear();
                         }
@@ -117,7 +82,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                             temp.Add(array[i]);
                         }
 
-                        returned.Add(new FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                        returned.Add(new TextBaseElement(type, temp.ToArray()));
                         type = "Text";
                         temp.Clear();
                     }
@@ -126,7 +91,7 @@ namespace PersonaEditorLib.FileStructure.PTP
 
             if (temp.Count != 0)
             {
-                returned.Add(new FileStructure.PTP.PTP.MSG.MSGstr.MSGstrElement(type, temp.ToArray()));
+                returned.Add(new TextBaseElement(type, temp.ToArray()));
                 temp.Clear();
             }
 
@@ -134,16 +99,16 @@ namespace PersonaEditorLib.FileStructure.PTP
             return returned;
         }
 
-        public static void ParseStrings(this IList<PTP.MSG.MSGstr> Strings, ByteArray SourceBytes)
+        public static void ParseStrings(this IList<PTP.MSG.MSGstr> Strings, byte[] SourceBytes, CharList New)
         {
             Strings.Clear();
 
             int Index = 0;
-            foreach (var Bytes in PersonaEditorLib.Extension.Util.SplitSourceBytes(SourceBytes))
+            foreach (var Bytes in SplitSourceBytes(SourceBytes))
             {
-                PTP.MSG.MSGstr MSG = new PTP.MSG.MSGstr(Index, "");
+                PTP.MSG.MSGstr MSG = new PTP.MSG.MSGstr(Index, "", New);
 
-                List<PTP.MSG.MSGstr.MSGstrElement> temp = Bytes.GetPTPMsgStrEl();
+                List<TextBaseElement> temp = Bytes.GetTextBaseList();
 
                 int tempdown = 0;
                 int temptop = temp.Count;
@@ -171,7 +136,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                             i = 0;
                         }
                     }
-                    
+
                     var temparray = MSG.Postfix.Reverse().ToList();
 
                     MSG.Postfix.Clear();
@@ -192,7 +157,7 @@ namespace PersonaEditorLib.FileStructure.PTP
         {
             string returned = String.Join(" ", Regex.Split(String, @"\\n"));
 
-            List<PTP.MSG.MSGstr.MSGstrElement> temp = returned.GetPTPMsgStrEl(FontMap);
+            List<TextBaseElement> temp = returned.GetTextBaseList(FontMap);
             List<int> widthlist = new List<int>();
 
             foreach (var a in temp)
@@ -264,5 +229,34 @@ namespace PersonaEditorLib.FileStructure.PTP
             return returned;
         }
 
+        public static List<byte[]> SplitSourceBytes(this byte[] B)
+        {
+            List<byte[]> returned = new List<byte[]>();
+
+            byte[] LineSplit = B.ToArray().Take((B[0] - 0xF0) * 2).ToArray();
+
+            List<byte> String = new List<byte>();
+            for (int i = 0; i < B.Length; i++)
+            {
+                if (B.CheckEntrance(LineSplit, i))
+                {
+                    if (String.Count != 0)
+                    {
+                        returned.Add(String.ToArray());
+                        String.Clear();
+                    }
+                }
+
+                String.Add(B[i]);
+            }
+
+            if (String.Count != 0)
+            {
+                returned.Add(String.ToArray());
+                String.Clear();
+            }
+
+            return returned;
+        }
     }
 }

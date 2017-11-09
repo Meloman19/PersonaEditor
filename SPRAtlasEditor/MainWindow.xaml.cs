@@ -244,7 +244,7 @@ namespace SPRAtlasEditor
 
         private void Save(string filename)
         {
-            SPR.Get(true).SaveToFile(filename);
+            File.WriteAllBytes(filename, SPR.Get(true));
         }
 
         private void ListNames_SelectionChanged(object sender, SelectionChangedEventArgs e)

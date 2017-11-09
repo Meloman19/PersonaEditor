@@ -12,7 +12,7 @@ namespace PersonaText {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
     internal sealed partial class Current : global::System.Configuration.ApplicationSettingsBase {
         
         private static Current defaultInstance = ((Current)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Current())));
@@ -25,10 +25,10 @@ namespace PersonaText {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool ViewVisualizer {
+        [global::System.Configuration.DefaultSettingValueAttribute("Visible")]
+        public global::System.Windows.Visibility ViewVisualizer {
             get {
-                return ((bool)(this["ViewVisualizer"]));
+                return ((global::System.Windows.Visibility)(this["ViewVisualizer"]));
             }
             set {
                 this["ViewVisualizer"] = value;
@@ -37,10 +37,10 @@ namespace PersonaText {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool ViewPrefixPostfix {
+        [global::System.Configuration.DefaultSettingValueAttribute("Visible")]
+        public global::System.Windows.Visibility ViewPrefixPostfix {
             get {
-                return ((bool)(this["ViewPrefixPostfix"]));
+                return ((global::System.Windows.Visibility)(this["ViewPrefixPostfix"]));
             }
             set {
                 this["ViewPrefixPostfix"] = value;
