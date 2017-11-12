@@ -10,13 +10,13 @@ namespace PersonaEditorLib.FileStructure.TMX
     public class TMXHeader
     {
         int ID;
-        int FileSize;
+        public int FileSize { get; set; }
         byte[] Tag;
         byte PaletteCount;
         byte PaletteFormat;
-        public ushort Width;
-        public ushort Height;
-        public PS2PixelFormat PixelFormat;
+        public ushort Width { get; private set; }
+        public ushort Height { get; private set; }
+        public PS2PixelFormat PixelFormat { get; private set; }
         byte MinMap;
         ushort mipKL;
         byte Reserved;
@@ -24,7 +24,7 @@ namespace PersonaEditorLib.FileStructure.TMX
         byte mWrapModes;
         int UserTextureId;
         int UserClutId;
-        public byte[] UserComment;
+        public byte[] UserComment { get; private set; }
 
         public TMXHeader(BinaryReader reader)
         {
@@ -49,6 +49,31 @@ namespace PersonaEditorLib.FileStructure.TMX
 
             UserClutId = reader.ReadInt32();
             UserComment = reader.ReadBytes(28);
+        }
+
+        public int Size
+        {
+            get { return 64; }
+        }
+
+        public void Get(BinaryWriter writer)
+        {
+            writer.Write(ID);
+            writer.Write(FileSize);
+            writer.Write(Tag);
+            writer.Write(PaletteCount);
+            writer.Write(PaletteFormat);
+            writer.Write(Width);
+            writer.Write(Height);
+            writer.Write((byte)PixelFormat);
+            writer.Write(MinMap);
+            writer.Write(mipKL);
+            writer.Write(Reserved);
+            writer.Write(mWrapModes);
+            writer.Write(UserTextureId);
+
+            writer.Write(UserClutId);
+            writer.Write(UserComment);
         }
     }
 }

@@ -30,10 +30,7 @@ namespace PersonaText
 
         Visual Old;
         Visual New;
-
-        PersonaEditorLib.FileStructure.PTP.PTP.MSG.MSGstr VisText;
-        PersonaEditorLib.FileStructure.PTP.PTP.Names VisName;
-
+        
         string state = "Old";
 
         public Visualizer(ObservableVariable OV)
@@ -44,16 +41,11 @@ namespace PersonaText
             SelectBackground.DataContext = backgrounds.BackgroundList;
             SelectBackground.SelectedIndex = 0;
 
-            Old = new Visual(OV.OldCharList, backgrounds.CurrentBackground, Visual.Type.Text, Visual.Old.Old);
-            New = new Visual(OV.NewCharList, backgrounds.CurrentBackground, Visual.Type.Text, Visual.Old.New);
-
-            VisText = new PersonaEditorLib.FileStructure.PTP.PTP.MSG.MSGstr(0, "", OV.NewCharList);
-            VisName = new PersonaEditorLib.FileStructure.PTP.PTP.Names(0, new byte[0], "", OV.NewCharList);
-
-            Old.SetName(VisName);
-            Old.SetText(VisText);
-            New.SetName(VisName);
-            New.SetText(VisText);
+            Old = new Visual(OV.OldCharList, backgrounds.CurrentBackground);
+            New = new Visual(OV.NewCharList, backgrounds.CurrentBackground);
+            
+            backgrounds.BackgroundChanged += Old.Background_Update;
+            backgrounds.BackgroundChanged += New.Background_Update;
 
             backgrounds.CurrentBackground.PropertyChanged += CurrentBackground_PropertyChanged;
             InitAfter();
@@ -100,19 +92,16 @@ namespace PersonaText
         private void Name_TextChanged(object sender, TextChangedEventArgs e)
         {
             string text = (sender as TextBox).Text;
-
-            VisName.NewName = text;
-            VisName.OldName = OV.OldCharList.Encode(text, PersonaEditorLib.CharList.EncodeOptions.Bracket);
+            Old.Name_Update(text.GetTextBaseList(OV.OldCharList));
+            New.Name_Update(text.GetTextBaseList(OV.NewCharList));
         }
 
         private void Text_TextChanged(object sender, TextChangedEventArgs e)
         {
             string text = (sender as TextBox).Text;
             Text2HEX();
-            VisText.NewString = text;
-            VisText.OldString.Clear();
-            foreach (var a in text.GetTextBaseList(OV.OldCharList))
-                VisText.OldString.Add(a);
+            Old.Text_Update(text.GetTextBaseList(OV.OldCharList));
+            New.Text_Update(text.GetTextBaseList(OV.NewCharList));
         }
 
         private void Text2HEX()
@@ -122,7 +111,7 @@ namespace PersonaText
                 {
                     string text = TextBoxText.Text;
                     var temp = text.GetTextBaseList(OV.OldCharList).GetByteArray();
-                    HEX.Text = BitConverter.ToString(temp).Replace('-',' ');
+                    HEX.Text = BitConverter.ToString(temp).Replace('-', ' ');
                 }
                 else
                 {

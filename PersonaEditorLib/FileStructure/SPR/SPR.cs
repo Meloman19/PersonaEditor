@@ -56,9 +56,9 @@ namespace PersonaEditorLib.FileStructure.SPR
         {
         }
 
-        public List<byte[]> GetTextureList()
+        public List<TMX.TMX> GetTextureList()
         {
-            return Textures.List;
+            return Textures.list;
         }
 
         public byte[] Get(bool IsLittleEndian)
@@ -86,14 +86,38 @@ namespace PersonaEditorLib.FileStructure.SPR
                     writer.Write(a);
                 }
                 KeyList.Get(writer);
+
                 int temp = Utilities.Utilities.Alignment(writer.BaseStream.Position, 16);
                 writer.Write(new byte[temp == 0 ? 16 : temp]);
+
+                UpdateOffsets(TextureOffsetList, (int)writer.BaseStream.Position, Textures.list);
+
                 Textures.Get(writer);
+
+                writer.BaseStream.Position = Header.Size;
+                foreach (var a in TextureOffsetList)
+                {
+                    writer.Write((int)0);
+                    writer.Write(a);
+                }
 
                 returned = MS.ToArray();
             }
 
             return returned;
+        }
+
+        private void UpdateOffsets(List<int> list, int start, List<TMX.TMX> textures)
+        {
+            list[0] = start;
+
+            for (int i = 1; i < textures.Count; i++)
+            {
+                start += textures[i - 1].Size;
+                int temp = Utilities.Utilities.Alignment(start, 16);
+                start += temp == 0 ? 16 : temp;
+                list[i] = start;
+            }
         }
     }
 }

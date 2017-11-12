@@ -47,7 +47,8 @@ namespace PersonaText
 
     public partial class MainWindow : Window
     {
-        ObservableVariable OV = new ObservableVariable();
+        Visualizer visualizer;
+        public ObservableVariable OV = new ObservableVariable();
 
         public MainWindow()
         {
@@ -93,7 +94,7 @@ namespace PersonaText
 
         private void Open()
         {
-            Open(true);
+            Open(Current.Default.IsLittleEndian);
         }
 
         private void Open(bool IsLittleEndian)
@@ -171,43 +172,13 @@ namespace PersonaText
             {
                 PersonaEditorLib.FileStructure.BMD.BMD BMD = new PersonaEditorLib.FileStructure.BMD.BMD();
                 BMD.Open(OV.PTP);
-                File.WriteAllBytes(sfd.FileName, BMD.Get(true));
+                File.WriteAllBytes(sfd.FileName, BMD.Get(Current.Default.IsLittleEndian));
             }
         }
 
         #endregion File
 
         #region View
-
-        private void ViewVisualizer_Checked(object sender, RoutedEventArgs e)
-        {
-            Current.Default.ViewVisualizer = Visibility.Visible;
-        }
-
-        private void ViewVisualizer_Unchecked(object sender, RoutedEventArgs e)
-        {
-            Current.Default.ViewVisualizer = Visibility.Collapsed;
-        }
-
-        private void ViewVisualizer_Initialized(object sender, EventArgs e)
-        {
-            ViewVisualizer.IsChecked = Current.Default.ViewVisualizer == Visibility.Visible ? true : false;
-        }
-
-        private void ViewPrefixPostfix_Checked(object sender, RoutedEventArgs e)
-        {
-            Current.Default.ViewPrefixPostfix = Visibility.Visible;
-        }
-
-        private void ViewPrefixPostfix_Unchecked(object sender, RoutedEventArgs e)
-        {
-            Current.Default.ViewPrefixPostfix = Visibility.Collapsed;
-        }
-
-        private void ViewPrefixPostfix_Initialized(object sender, EventArgs e)
-        {
-            ViewPrefixPostfix.IsChecked = Current.Default.ViewPrefixPostfix == Visibility.Visible ? true : false;
-        }
 
         private void SelectBack_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -216,19 +187,27 @@ namespace PersonaText
                 Current.Default.SelectedBackground = OV.BackImage.BackgroundList[index];
         }
 
+        private void ToolVis_Click(object sender, RoutedEventArgs e)
+        {
+            visualizer = new Visualizer(OV);
+            visualizer.Show();
+            visualizer.Closed += Visualizer_Closed;
+        }
+
+        private void Visualizer_Closed(object sender, EventArgs e)
+        {
+            visualizer = null;
+        }
+
         private void Setting_Click(object sender, RoutedEventArgs e)
         {
             SetSettings setSettings = new SetSettings();
+            setSettings.Owner = this;
             setSettings.Show();
         }
 
         #endregion View
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            Current.Default.Save();
-        }
-
+        
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
             try
@@ -255,10 +234,18 @@ namespace PersonaText
         {
             Image img = sender as Image;
             PTP.MSG.MSGstr MSG = img.DataContext as PTP.MSG.MSGstr;
-            Visual visual = new Visual(OV.OldCharList, OV.BackImage.CurrentBackground, Visual.Type.Text, Visual.Old.Old);
-            visual.SetText(MSG);
-            visual.SetName(OV.PTP.names.FirstOrDefault(x => x.Index == MSG.CharacterIndex));
-            img.Unloaded += visual.Image_Unloaded;
+            Visual visual = new Visual(OV.OldCharList, OV.BackImage.CurrentBackground);
+            MSG.Old += visual.Text_Update;
+            visual.Text_Update(MSG.OldString);
+
+            var Name = OV.PTP.names.FirstOrDefault(x => x.Index == MSG.CharacterIndex);
+            if (Name != null)
+            {
+                Name.Old += visual.Name_Update;
+                visual.Name_Update(Name.OldName.GetTextBaseList());
+            }
+
+            OV.BackImage.BackgroundChanged += visual.Background_Update;
 
             ((img.Source as DrawingImage).Drawing as DrawingGroup).Children.Add(visual.DrawingText);
             ((img.Source as DrawingImage).Drawing as DrawingGroup).Children.Add(visual.DrawingName);
@@ -268,10 +255,18 @@ namespace PersonaText
         {
             Image img = sender as Image;
             PTP.MSG.MSGstr MSG = img.DataContext as PTP.MSG.MSGstr;
-            Visual visual = new Visual(OV.NewCharList, OV.BackImage.CurrentBackground, Visual.Type.Text, Visual.Old.New);
-            visual.SetText(MSG);
-            visual.SetName(OV.PTP.names.FirstOrDefault(x => x.Index == MSG.CharacterIndex));
-            img.Unloaded += visual.Image_Unloaded;
+            Visual visual = new Visual(OV.NewCharList, OV.BackImage.CurrentBackground);
+            MSG.New += visual.Text_Update;
+            visual.Text_Update(MSG.NewString.GetTextBaseList(OV.NewCharList));
+
+            var Name = OV.PTP.names.FirstOrDefault(x => x.Index == MSG.CharacterIndex);
+            if (Name != null)
+            {
+                Name.New += visual.Name_Update;
+                visual.Name_Update(Name.NewName.GetTextBaseList(OV.NewCharList));
+            }
+
+            OV.BackImage.BackgroundChanged += visual.Background_Update;
 
             ((img.Source as DrawingImage).Drawing as DrawingGroup).Children.Add(visual.DrawingText);
             ((img.Source as DrawingImage).Drawing as DrawingGroup).Children.Add(visual.DrawingName);
@@ -322,10 +317,11 @@ namespace PersonaText
             SetChar.ShowDialog();
         }
 
-        private void ToolVis_Click(object sender, RoutedEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
-            Visualizer visualizer = new Visualizer(OV);
-            visualizer.ShowDialog();
+            if (visualizer != null)
+                visualizer.Close();
+            Current.Default.Save();
         }
     }
 

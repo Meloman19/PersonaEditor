@@ -50,6 +50,7 @@ namespace PersonaEditor
             public int Length { get; private set; } = 0;
             public bool Old { get; private set; } = true;
             public bool SkipEmpty { get; private set; } = false;
+            public Encoding Encode { get; private set; } = Encoding.UTF8;
 
             public void Update(List<string[]> ParList)
             {
@@ -71,6 +72,13 @@ namespace PersonaEditor
                     else if (a[0] == "len") Length = Convert.ToInt32(a[1]);
                     else if (a[0] == "new") Old = false;
                     else if (a[0] == "skipempty") SkipEmpty = true;
+                    else if (a[0] == "enc")
+                    {
+                        if (a[1] == "UTF-7")
+                            Encode = Encoding.UTF7;
+                        if (a[1] == "UTF-16")
+                            Encode = Encoding.Unicode;
+                    }
                 }
             }
 

@@ -1,0 +1,140 @@
+﻿<UserControl x:Class="PersonaText.SettingsWindow.DefaultBackground"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PersonaText.SettingsWindow"
+             mc:Ignorable="d" 
+             x:Name="ColorPickerToolUC"
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Header="Text">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="X Position" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Name="TB_Xpos" Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=TextXpos}"/>
+                <TextBlock Text="Y Position" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Name="TB_Ypos" Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=TextYpos}"/>
+
+                <Grid Grid.Row="1" Grid.ColumnSpan="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBox Name="TB_Color" Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=TextColor}"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Click="TextColor_Pick"/>
+                </Grid>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Header="Name">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="X Position" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Name="Name_Xpos" Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=NameXpos}"/>
+                <TextBlock Text="Y Position" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Name="Name_Ypos" Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=NameYpos}"/>
+
+                <Grid Grid.Row="1" Grid.ColumnSpan="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBox Name="Name_Color" Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=NameColor}"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Click="NameColor_Pick"/>
+                </Grid>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" Header="Background">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Width" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Name="Background_Width" Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=BackgroundWidth}"/>
+                <TextBlock Text="Height" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Name="Background_Height" Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=BackgroundHeight}"/>
+
+
+                <Grid Grid.Row="1" Grid.ColumnSpan="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBox Name="Background_Color" Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=BackgroundColor}"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Click="BackgroundColor_Pick"/>
+                </Grid>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="3" Header="Other">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Glyph Scale" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Name="TB_GlyphScale" Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=GlyphScale}"/>
+                <TextBlock Text="Line Spacing" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Name="TB_LineSpacing" Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding ElementName=ColorPickerToolUC, Path=LineSpacing}"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+
+</UserControl>

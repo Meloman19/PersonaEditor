@@ -25,30 +25,6 @@ namespace PersonaText {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Visible")]
-        public global::System.Windows.Visibility ViewVisualizer {
-            get {
-                return ((global::System.Windows.Visibility)(this["ViewVisualizer"]));
-            }
-            set {
-                this["ViewVisualizer"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Visible")]
-        public global::System.Windows.Visibility ViewPrefixPostfix {
-            get {
-                return ((global::System.Windows.Visibility)(this["ViewPrefixPostfix"]));
-            }
-            set {
-                this["ViewPrefixPostfix"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
         public string SelectedBackground {
             get {
@@ -200,6 +176,18 @@ namespace PersonaText {
             }
             set {
                 this["IsLittleEndian"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int EmptyLineSpacing {
+            get {
+                return ((int)(this["EmptyLineSpacing"]));
+            }
+            set {
+                this["EmptyLineSpacing"] = value;
             }
         }
     }

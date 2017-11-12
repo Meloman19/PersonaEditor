@@ -37,7 +37,7 @@ namespace PersonaEditorLib.FileStructure.SPR
 
         public int Size
         {
-            get { return 0x40; }
+            get { return 0x20; }
         }
 
         public void Get(BinaryWriter writer)

@@ -11,7 +11,7 @@ namespace PersonaEditorLib.FileStructure.TMX
 {
     public class TMX
     {
-        public TMXHeader Header;
+        TMXHeader Header;
         TMXPalette Palette;
         byte[] Data;
 
@@ -30,19 +30,51 @@ namespace PersonaEditorLib.FileStructure.TMX
             Palette = new TMXPalette(reader, Header.PixelFormat);
 
             int Length = (Header.Width * Header.Height * Palette.Format.BitsPerPixel) / 8;
-            Data = Palette.Format == PixelFormats.Indexed4 ? Utilities.Utilities.DataReverse(reader.ReadBytes(Length)) : reader.ReadBytes(Length);
+            Data = reader.ReadBytes(Length);
         }
 
         public TMX(string path, bool IsLittleEndian) : this(File.OpenRead(path), 0, true) { }
 
         private BitmapSource GetBitmapSource()
         {
-            return BitmapSource.Create(Header.Width, Header.Height, 96, 96, Palette.Format, Palette.Pallete, Data, (Palette.Format.BitsPerPixel * Header.Width + 7) / 8);
+            byte[] data = Palette.Format == PixelFormats.Indexed4 ? Utilities.Utilities.DataReverse(Data) : Data;
+            return BitmapSource.Create(Header.Width, Header.Height, 96, 96, Palette.Format, Palette.Pallete, data, (Palette.Format.BitsPerPixel * Header.Width + 7) / 8);
         }
 
         public BitmapSource Image
         {
             get { return GetBitmapSource(); }
+        }
+
+        public string TMXname
+        {
+            get { return Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()); }
+        }
+
+        public int Size
+        {
+            get
+            {
+                return Header.Size + Palette.Size + Data.Length;
+            }
+        }
+
+        public byte[] Get(bool IsLittleEndian)
+        {
+            byte[] returned = new byte[0];
+
+            using (MemoryStream MS = new MemoryStream())
+            {
+                BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
+
+                Header.Get(writer);
+                Palette.Get(writer);
+                writer.Write(Data);
+
+                returned = MS.ToArray();
+            }
+
+            return returned;
         }
     }
 }

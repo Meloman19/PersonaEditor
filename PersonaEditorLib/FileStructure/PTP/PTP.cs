@@ -394,6 +394,11 @@ namespace PersonaEditorLib.FileStructure.PTP
             {
                 get { return dic[Type.OldName] >= 0 & dic[Type.NewName] >= 0; }
             }
+
+            public bool CanGetNameMSG
+            {
+                get { return dic[Type.FileName] >= 0 & (dic[Type.MSGindex] >= 0 | dic[Type.MSGname] >= 0) & dic[Type.NewName] >= 0; }
+            }
         }
 
         public bool ExportTXT(string output, string map, bool removesplit)
@@ -435,14 +440,14 @@ namespace PersonaEditorLib.FileStructure.PTP
             return true;
         }
 
-        public void ImportTXT(string txtfile, string map, bool auto, int width, bool skip)
+        public void ImportTXT(string txtfile, string map, bool auto, int width, bool skip, Encoding encoding)
         {
             int Width = (int)Math.Round((double)width / 0.9375);
             LineMap MAP = new LineMap(map);
 
             if (MAP.CanGetText | MAP.CanGetName)
             {
-                using (StreamReader SR = new StreamReader(File.OpenRead(txtfile)))
+                using (StreamReader SR = new StreamReader(File.OpenRead(txtfile), encoding))
                 {
                     while (SR.EndOfStream == false)
                     {
@@ -464,13 +469,13 @@ namespace PersonaEditorLib.FileStructure.PTP
                                     if (MAP[LineMap.Type.MSGindex] >= 0)
                                     {
                                         ImportText(Convert.ToInt32(linespl[MAP[LineMap.Type.MSGindex]]), Convert.ToInt32(linespl[MAP[LineMap.Type.StringIndex]]), NewText);
-                                        if (MAP.CanGetName)
+                                        if (MAP.CanGetNameMSG)
                                             ImportNameByMSG(Convert.ToInt32(linespl[MAP[LineMap.Type.MSGindex]]), linespl[MAP[LineMap.Type.NewName]]);
                                     }
                                     else
                                     {
                                         ImportText(linespl[MAP[LineMap.Type.MSGname]], Convert.ToInt32(linespl[MAP[LineMap.Type.StringIndex]]), NewText);
-                                        if (MAP.CanGetName)
+                                        if (MAP.CanGetNameMSG)
                                             ImportNameByMSG(linespl[MAP[LineMap.Type.MSGname]], linespl[MAP[LineMap.Type.NewName]]);
                                     }
                                 }

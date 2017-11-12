@@ -123,6 +123,7 @@ namespace PersonaEditor
 
         public void Save(ArgumentsWork.Parameters parameters, string dest)
         {
+            File.WriteAllBytes(dest, TMX.Get(parameters.IsLittleEndian));
         }
     }
 
@@ -372,7 +373,7 @@ namespace PersonaEditor
 
         private void ImportTXT(string src, ArgumentsWork.Parameters ParList)
         {
-            PTP.ImportTXT(src, ParList.Map, ParList.Auto, ParList.Width, ParList.SkipEmpty);
+            PTP.ImportTXT(src, ParList.Map, ParList.Auto, ParList.Width, ParList.SkipEmpty, ParList.Encode);
         }
 
         #endregion ImportMethods
@@ -646,42 +647,50 @@ namespace PersonaEditor
 
         static bool Do(string[] args)
         {
-            IConsoleWork work;
+            try
+            {
+                IConsoleWork work;
 
-            ArgumentsWork argwrk = new ArgumentsWork(args);
+                ArgumentsWork argwrk = new ArgumentsWork(args);
 
-            if (argwrk.FileType == "-FNT")
-                work = new FNTConsole(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-TMX")
-                work = new TMXConsole(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-PM1")
-                work = new PM1Console(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-BF")
-                work = new BFConsole(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-BMD")
-                work = new BMDConsole(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-PTP")
-                work = new PTPConsole(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-BIN")
-                work = new BINConsole(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-BVP")
-                work = new BVPConsole(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-TBL")
-                work = new TBLConsole(argwrk.FileSource, argwrk.Param);
-            else if (argwrk.FileType == "-TEXT")
-                work = new TEXTConsole(argwrk.FileSource, argwrk.Param);
-            else
+                if (argwrk.FileType == "-FNT")
+                    work = new FNTConsole(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-TMX")
+                    work = new TMXConsole(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-PM1")
+                    work = new PM1Console(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-BF")
+                    work = new BFConsole(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-BMD")
+                    work = new BMDConsole(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-PTP")
+                    work = new PTPConsole(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-BIN")
+                    work = new BINConsole(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-BVP")
+                    work = new BVPConsole(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-TBL")
+                    work = new TBLConsole(argwrk.FileSource, argwrk.Param);
+                else if (argwrk.FileType == "-TEXT")
+                    work = new TEXTConsole(argwrk.FileSource, argwrk.Param);
+                else
+                    return false;
+
+                foreach (var command in argwrk.ArgumentList)
+                    if (command.Command == CommandType.Export)
+                        work.Export(command.Type, command.Parameters, command.Value);
+                    else if (command.Command == CommandType.Import)
+                        work.Import(command.Type, command.Parameters, command.Value);
+                    else if (command.Command == CommandType.Save)
+                        work.Save(command.Parameters, command.Value);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logging.Write("D", ex);
                 return false;
-
-            foreach (var command in argwrk.ArgumentList)
-                if (command.Command == CommandType.Export)
-                    work.Export(command.Type, command.Parameters, command.Value);
-                else if (command.Command == CommandType.Import)
-                    work.Import(command.Type, command.Parameters, command.Value);
-                else if (command.Command == CommandType.Save)
-                    work.Save(command.Parameters, command.Value);
-
-            return true;
+            }
         }
     }
 }

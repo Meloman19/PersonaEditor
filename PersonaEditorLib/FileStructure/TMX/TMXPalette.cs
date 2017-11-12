@@ -28,7 +28,7 @@ namespace PersonaEditorLib.FileStructure.TMX
 
     public class TMXPalette
     {
-        public static List<Color> TilePalette(List<Color> colorArray)
+        public static List<Color> TilePalette(IList<Color> colorArray)
         {
             List<Color> returned = new List<Color>();
 
@@ -85,5 +85,31 @@ namespace PersonaEditorLib.FileStructure.TMX
 
         public BitmapPalette Pallete { get; set; } = null;
         public PixelFormat Format { get; set; }
+
+        public int Size
+        {
+            get
+            {
+                if (Pallete == null)
+                    return 0;
+                else
+                    return Pallete.Colors.Count * 4;
+            }
+        }
+
+        public void Get(BinaryWriter writer)
+        {
+            if (Pallete != null)
+            {
+                List<Color> colors = Format == PixelFormats.Indexed8 ? TilePalette(Pallete.Colors) : Pallete.Colors.ToList();
+                foreach (var color in colors)
+                {
+                    writer.Write(color.R);
+                    writer.Write(color.G);
+                    writer.Write(color.B);
+                    writer.Write(color.A);
+                }
+            }
+        }
     }
 }

@@ -8,20 +8,14 @@ using PersonaEditorLib.Extension;
 
 namespace PersonaEditorLib.FileStructure.SPR
 {
-    class SPRTextures :ISPR
+    class SPRTextures : ISPR
     {
-        public List<byte[]> List = new List<byte[]>();
-        
+        public List<TMX.TMX> list = new List<TMX.TMX>();
+
         public SPRTextures(BinaryReader reader, List<int> offset)
         {
-            var temp = offset.Select(x => x).ToList();
-            temp.Add((int)reader.BaseStream.Length);
-
-            for (int i = 1; i < temp.Count; i++)
-            {
-                reader.BaseStream.Position = temp[i - 1];
-                List.Add(reader.ReadBytes(temp[i] - temp[i - 1]));
-            }
+            foreach (var off in offset)
+                list.Add(new TMX.TMX(reader.BaseStream, off, true));
         }
 
         public int Size
@@ -29,16 +23,27 @@ namespace PersonaEditorLib.FileStructure.SPR
             get
             {
                 int returned = 0;
-                foreach (var a in List) returned += a.Length;
+
+                returned += list[0].Size;
+                for(int i = 1; i<list.Count;i++)
+                {
+                    int temp = Utilities.Utilities.Alignment(returned, 16);
+                    returned += temp == 0 ? 16 : temp;
+                    returned += list[i].Size;
+                }
+
                 return returned;
             }
         }
 
         public void Get(BinaryWriter writer)
         {
-            foreach(var a in List)
+            writer.Write(list[0].Get(true));
+            for (int i = 1; i < list.Count; i++)
             {
-                writer.Write(a);
+                int temp = Utilities.Utilities.Alignment(writer.BaseStream.Length, 16);
+                writer.Write(new byte[temp == 0 ? 16 : temp]) ;
+                writer.Write(list[i].Get(true));
             }
         }
     }

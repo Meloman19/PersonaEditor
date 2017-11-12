@@ -2,12 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PersonaText" GeneratedClassName="Current">
   <Profiles />
   <Settings>
-    <Setting Name="ViewVisualizer" Type="System.Windows.Visibility" Scope="User">
-      <Value Profile="(Default)">Visible</Value>
-    </Setting>
-    <Setting Name="ViewPrefixPostfix" Type="System.Windows.Visibility" Scope="User">
-      <Value Profile="(Default)">Visible</Value>
-    </Setting>
     <Setting Name="SelectedBackground" Type="System.String" Scope="User">
       <Value Profile="(Default)">Empty</Value>
     </Setting>
@@ -46,6 +40,9 @@
     </Setting>
     <Setting Name="IsLittleEndian" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="EmptyLineSpacing" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

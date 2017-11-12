@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PersonaText"
         mc:Ignorable="d"
-        Title="Persona Text Editor" Height="350" Width="525" WindowStartupLocation="CenterScreen" Icon="Resources/PersonaText.ico" Closed="Window_Closed">
+        Title="Persona Text Editor" Height="350" Width="525" WindowStartupLocation="CenterScreen" Icon="Resources/PersonaText.ico" Closing="Window_Closing">
 
     <Window.Resources>
         <BitmapImage x:Key="Setting" UriSource="/Resources/settings-work-tool.png"/>
@@ -25,17 +25,14 @@
 
         <Menu Grid.Row="0" Background="#FFF0F0F0">
             <MenuItem Header="File">
-                <MenuItem Header="Open Project" Name="mm_openproject" Click="OpenPTP_Click" ></MenuItem>
-                <MenuItem Header="Save Project" Name="mm_saveproject" Click="SavePTP_Click" ></MenuItem>
-                <Separator></Separator>
+                <MenuItem Header="Open Project" Name="mm_openproject" Click="OpenPTP_Click" />
+                <MenuItem Header="Save Project" Name="mm_saveproject" Click="SavePTP_Click" />
+                <Separator/>
                 <MenuItem Header="Import BMD" Click="ImportBMD_Click"/>
                 <MenuItem Header="Export BMD" Click="ExportBMD_Click"/>
             </MenuItem>
             <MenuItem Header="View">
-                <MenuItem Header="Visualizer" Name="ViewVisualizer" IsCheckable="True" Initialized="ViewVisualizer_Initialized" Checked="ViewVisualizer_Checked"  Unchecked="ViewVisualizer_Unchecked"/>
-                <MenuItem Header="Prefix/Postfix" Name="ViewPrefixPostfix" IsCheckable="True" Initialized="ViewPrefixPostfix_Initialized" Checked="ViewPrefixPostfix_Checked"  Unchecked="ViewPrefixPostfix_Unchecked"/>
                 <ComboBox Width="120" Name="ElementSelectBackground" SelectionChanged="SelectBack_SelectionChanged" ItemsSource="{Binding}"/>
-                <Separator/>
                 <MenuItem Header="Text Visualizer" Click="ToolVis_Click" />
                 <Separator/>
                 <MenuItem Header="Settings" Click="Setting_Click">
@@ -121,8 +118,7 @@
                                                         <RowDefinition Height="Auto"></RowDefinition>
                                                     </Grid.RowDefinitions>
 
-                                                    <TextBlock TextWrapping="Wrap" Grid.Row="0" Text="{Binding Prefix, Converter={StaticResource MSGListToSystem}}" HorizontalAlignment="Center"
-                                                               Visibility="{Binding Source={x:Static local:Current.Default}, Path=ViewPrefixPostfix}"/>
+                                                    <TextBlock TextWrapping="Wrap" Grid.Row="0" Text="{Binding Prefix, Converter={StaticResource MSGListToSystem}}" HorizontalAlignment="Center" />
 
                                                     <Grid Grid.Row="1" Margin="5">
                                                         <Grid.ColumnDefinitions>
@@ -144,8 +140,8 @@
                                                         </TextBox>
                                                         <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                        <Image Grid.Column="0" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="OldVisualizer_Loaded" Visibility="{Binding ElementName=ScrollViewer, Path=ViewVisualizer}"/>
-                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="NewVisualizer_Loaded" Visibility="{Binding ElementName=ScrollViewer, Path=ViewVisualizer}"/>
+                                                        <Image Grid.Column="0" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="OldVisualizer_Loaded"/>
+                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="NewVisualizer_Loaded"/>
                                                     </Grid>
 
                                                     <TextBlock TextWrapping="Wrap"  Grid.Row="2" Text="{Binding Postfix, Converter={StaticResource MSGListToSystem}}" HorizontalAlignment="Center"/>

@@ -125,7 +125,13 @@
     <Compile Include="SetChar.xaml.cs">
       <DependentUpon>SetChar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SetSettings.xaml.cs">
+    <Compile Include="SettingsWindow\DefaultBackground.xaml.cs">
+      <DependentUpon>DefaultBackground.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsWindow\Main.xaml.cs">
+      <DependentUpon>Main.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsWindow\SetSettings.xaml.cs">
       <DependentUpon>SetSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Visualizer.xaml.cs">
@@ -147,7 +153,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SetSettings.xaml">
+    <Page Include="SettingsWindow\DefaultBackground.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SettingsWindow\Main.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SettingsWindow\SetSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

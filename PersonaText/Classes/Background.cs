@@ -137,7 +137,7 @@ namespace PersonaText
             GlyphScale = Current.Default.EmptyGlyphScale;
             ColorName = Current.Default.EmptyNameColor;
             ColorText = Current.Default.EmptyTextColor;
-            LineSpacing = 0;
+            LineSpacing = Current.Default.EmptyLineSpacing ;
 
             Image = BitmapSource.Create(Width, Height, 96, 96, PixelFormats.Indexed1, new BitmapPalette(new List<Color> { Current.Default.EmptyBackgroundColor }), new byte[Width * Height], Width);
         }
@@ -145,6 +145,10 @@ namespace PersonaText
 
     public class Backgrounds // : INotifyPropertyChanged
     {
+        public delegate void BackgroundImageChanged(BackgroundImage background);
+
+        public event BackgroundImageChanged BackgroundChanged;
+
         public BackgroundImage CurrentBackground { get; } = new BackgroundImage();
 
         public List<string> BackgroundList { get; } = new List<string>();
@@ -278,9 +282,17 @@ namespace PersonaText
             }
         }
 
+        private int CurrentIndex = 0;
+
         public bool SetBackground(int index)
         {
+            CurrentIndex = index;
             return Update(BackgroundList[index]);
+        }
+
+        public bool CurrentUpdate()
+        {
+            return Update(BackgroundList[CurrentIndex]);
         }
 
         bool Update(string FileName)
@@ -288,6 +300,7 @@ namespace PersonaText
             if (Equals(FileName, "Default"))
             {
                 CurrentBackground.SetDefault();
+                BackgroundChanged?.Invoke(CurrentBackground);
                 return true;
             }
             else
@@ -297,6 +310,7 @@ namespace PersonaText
                     CurrentBackground.Image = new BitmapImage(new Uri(Path.Combine(Static.Paths.DirBackgrounds, FileName)));
                     string xml = Path.Combine(Static.Paths.DirBackgrounds, Path.GetFileNameWithoutExtension(FileName) + ".xml");
                     ParseDescription(xml);
+                    BackgroundChanged?.Invoke(CurrentBackground);
                     return true;
                 }
                 catch (FormatException)

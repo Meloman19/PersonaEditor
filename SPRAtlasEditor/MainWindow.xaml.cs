@@ -220,15 +220,12 @@ namespace SPRAtlasEditor
             Images.Clear();
             SPR = new PersonaEditorLib.FileStructure.SPR.SPR(filename, true);
 
-            BindingList<PersonaEditorLib.FileStructure.TMX.TMX> Textures = new BindingList<PersonaEditorLib.FileStructure.TMX.TMX>();
+            List<PersonaEditorLib.FileStructure.TMX.TMX> list = SPR.GetTextureList();
 
-            foreach (var a in SPR.GetTextureList())
-                Textures.Add(new PersonaEditorLib.FileStructure.TMX.TMX(new MemoryStream(a), 0, true));
-
-            for (int i = 0; i < Textures.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                var img = Textures[i];
-                Names.Add(Encoding.ASCII.GetString(img.Header.UserComment.Where(x => x != 0).ToArray()));
+                var img = list[i];
+                Names.Add(img.TMXname);
                 var image = img.Image;
 
                 var temp = new DrawingImage(new DrawingGroup());
@@ -256,23 +253,23 @@ namespace SPRAtlasEditor
 
         private void SetBackground_Click(object sender, RoutedEventArgs e)
         {
-            Color color;
-            ColorPickerWPF.ColorPickerWindow.ShowDialog(out color, ColorPickerWPF.Code.ColorPickerDialogOptions.SimpleView);
-            Current.Default.BackgroundColor = color;
+            PersonaEditorLib.ColorPicker.ColorPickerTool colorPickerTool = new PersonaEditorLib.ColorPicker.ColorPickerTool(Current.Default.BackgroundColor);
+            if (colorPickerTool.ShowDialog() == true)
+                Current.Default.BackgroundColor = colorPickerTool.Color;
         }
 
         private void SetLine_Click(object sender, RoutedEventArgs e)
         {
-            Color color;
-            ColorPickerWPF.ColorPickerWindow.ShowDialog(out color, ColorPickerWPF.Code.ColorPickerDialogOptions.SimpleView);
-            Current.Default.LineColor = color;
+            PersonaEditorLib.ColorPicker.ColorPickerTool colorPickerTool = new PersonaEditorLib.ColorPicker.ColorPickerTool(Current.Default.LineColor);
+            if (colorPickerTool.ShowDialog() == true)
+                Current.Default.LineColor = colorPickerTool.Color;
         }
 
         private void SelectColor_Click(object sender, RoutedEventArgs e)
         {
-            Color color;
-            ColorPickerWPF.ColorPickerWindow.ShowDialog(out color, ColorPickerWPF.Code.ColorPickerDialogOptions.SimpleView);
-            Current.Default.SelectColor = color;
+            PersonaEditorLib.ColorPicker.ColorPickerTool colorPickerTool = new PersonaEditorLib.ColorPicker.ColorPickerTool(Current.Default.SelectColor);
+            if (colorPickerTool.ShowDialog() == true)
+                Current.Default.SelectColor = colorPickerTool.Color;
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
