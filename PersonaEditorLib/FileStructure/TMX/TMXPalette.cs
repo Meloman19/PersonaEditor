@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PersonaEditorLib.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace PersonaEditorLib.FileStructure.TMX
         PSMZ16S = 0x3A
     }
 
-    public class TMXPalette
+    class TMXPalette
     {
         public static List<Color> TilePalette(IList<Color> colorArray)
         {
@@ -96,7 +97,7 @@ namespace PersonaEditorLib.FileStructure.TMX
                     return Pallete.Colors.Count * 4;
             }
         }
-
+        
         public void Get(BinaryWriter writer)
         {
             if (Pallete != null)

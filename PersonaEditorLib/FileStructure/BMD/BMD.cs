@@ -1,5 +1,6 @@
 ﻿using PersonaEditorLib.Extension;
 using PersonaEditorLib.FileStructure.PTP;
+using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,8 +10,18 @@ using System.Threading.Tasks;
 
 namespace PersonaEditorLib.FileStructure.BMD
 {
-    public class BMD
+    public class BMD //: IPersonaFile, IFile
     {
+        public BMD()
+        {
+
+        }
+
+        public BMD(byte[] data, bool IsLittleEndian)
+        {
+            var d = Open(data, IsLittleEndian);
+        }
+
         public bool Open(string filepath, bool IsLittleEndian)
         {
             try
@@ -42,7 +53,7 @@ namespace PersonaEditorLib.FileStructure.BMD
 
                 ParseMSG1(reader);
 
-                OpenFileName = Path.GetFileNameWithoutExtension(Path.GetFullPath(filepath)) + ".BMD";
+                OpenFileName = filepath == "" ? "" : Path.GetFileNameWithoutExtension(Path.GetFullPath(filepath)) + ".BMD";
                 return true;
             }
             catch (Exception e)
@@ -53,6 +64,11 @@ namespace PersonaEditorLib.FileStructure.BMD
                 Logging.Write("PTPfactory", e.ToString());
                 return false;
             }
+        }
+
+        public bool Open(byte[] data, bool IsLittleEndian)
+        {
+            return Open(data, "", IsLittleEndian);
         }
 
         public bool Open(PTP.PTP PTP)
@@ -92,19 +108,8 @@ namespace PersonaEditorLib.FileStructure.BMD
 
         public bool Open(byte[] array, string filepath, bool IsLittleEndian)
         {
-            return Open(new MemoryStream(array), filepath, IsLittleEndian);
-        }
-
-        public byte[] Get(bool IsLittleEndian)
-        {
-            byte[] returned = new byte[0];
-            using (MemoryStream MS = new MemoryStream())
-            {
-                BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
-                GetNewBMD.Get(msg, name, writer);
-                returned = MS.ToArray();
-            }
-            return returned;
+            using (MemoryStream MS = new MemoryStream(array))
+                return Open(new MemoryStream(array), filepath, IsLittleEndian);
         }
 
         private void ParseMSG1(BinaryReader BR)
@@ -490,5 +495,92 @@ namespace PersonaEditorLib.FileStructure.BMD
                 sum += reloc;
             }
         }
+
+        #region IPersonaFile
+
+        public FileType Type => FileType.BMD;
+
+        public List<TreeItem> GetTreeItemsList()
+        {
+            return new List<TreeItem>();
+        }
+
+        public void SetTreeItemsList(List<Tuple<string, byte[]>> list)
+        {
+        }
+
+        public List<ContextMenuItems> ContextMenuList
+        {
+            get
+            {
+                List<ContextMenuItems> returned = new List<ContextMenuItems>();
+
+                returned.Add(ContextMenuItems.Export);
+                returned.Add(ContextMenuItems.Import);
+
+                return returned;
+            }
+        }
+
+        public Dictionary<string, object> GetProperties
+        {
+            get
+            {
+                Dictionary<string, object> returned = new Dictionary<string, object>();
+
+                returned.Add("Names Count", name.Count);
+                returned.Add("MSG Count", msg.Count);
+                returned.Add("Type", Type);
+
+                return returned;
+            }
+        }
+
+        #endregion IPersonaFile
+
+        #region IFile
+
+        public int Size
+        {
+            get
+            {
+                int returned = 0;
+
+
+
+                return returned;
+            }
+        }
+
+        public string Name => throw new NotImplementedException();
+
+        public byte[] Get(bool IsLittleEndian)
+        {
+            byte[] returned = new byte[0];
+            using (MemoryStream MS = new MemoryStream())
+            {
+                BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
+                Get(writer);
+                returned = MS.ToArray();
+            }
+            return returned;
+        }
+
+        public void Get(BinaryWriter writer)
+        {
+            GetNewBMD.Get(msg, name, writer);
+        }
+
+        public List<object> GetSubFiles()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Replace(object a)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion IFile
     }
 }

@@ -1,9 +1,12 @@
-﻿using System;
+﻿using PersonaEditorLib.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -65,7 +68,7 @@ namespace PersonaEditorLib.Utilities
 
     public static class String
     {
-        public static byte[] SplitString (string str, char del)
+        public static byte[] SplitString(string str, char del)
         {
             string[] temp = str.Split(del);
             return Enumerable.Range(0, temp.Length).Select(x => Convert.ToByte(temp[x], 16)).ToArray();
@@ -167,6 +170,64 @@ namespace PersonaEditorLib.Utilities
             if (value < 0) { return 0; }
             else if (value > 255) { return 255; }
             else { return (byte)value; }
+        }
+    }
+
+    public static class PersonaFile
+    {
+        public static object OpenFile(string name, byte[] data, FileType type, bool IsLittleEndian)
+        {
+            try
+            {
+                if (type == FileType.BIN)
+                    return new FileStructure.BIN.BIN(name, data);
+                else if (type == FileType.SPR)
+                    return new FileStructure.SPR.SPR(name, data, IsLittleEndian);
+                else if (type == FileType.TMX)
+                    return new FileStructure.TMX.TMX(name, data, IsLittleEndian);
+                //else if (type == FileType.BF)
+                //    return new FileStructure.BF.BF(data, IsLittleEndian);
+                //else if (type == FileType.BMD)
+                //    return new FileStructure.BMD.BMD(data, IsLittleEndian);
+                else if (type == FileType.PTP)
+                    return new FileStructure.PTP.PTP(name, data);
+                else
+                    return new FileStructure.HEX(name, data);
+            }
+            catch
+            {
+                return null;
+            }
+
+        }
+
+        public static FileType GetFileType(string name)
+        {
+            string ext = Path.GetExtension(name);
+            if (ext.ToLower() == ".bin")
+                return FileType.BIN;
+            else if (ext.ToLower() == ".spr")
+                return FileType.SPR;
+            else if (ext.ToLower() == ".tmx")
+                return FileType.TMX;
+            //else if (ext.ToLower() == ".bf")
+            //    return FileType.BF;
+            //else if (ext.ToLower() == ".bmd")
+            //    return FileType.BMD;
+            else if (ext.ToLower() == ".ptp")
+                return FileType.PTP;
+            else
+                return FileType.HEX;
+        }
+    }
+
+    public static class WPF
+    {
+        public static void SetBind(DependencyObject target, DependencyProperty targetProp, object obj, string propName)
+        {
+            Binding bind = new Binding(propName) { Source = obj };
+
+            BindingOperations.SetBinding(target, targetProp, bind);
         }
     }
 }

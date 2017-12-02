@@ -487,6 +487,20 @@ namespace PersonaEditorLib
         public PixelFormat PixelFormat { get; set; }
 
         public string Tag { get; set; } = "";
+
+        public void CopyTo(CharList charList)
+        {
+            charList.List.Clear();
+            foreach (var a in List)
+                charList.List.Add(a);
+
+            charList.Palette = Palette;
+            charList.Height = Height;
+            charList.Width = Width;
+            charList.PixelFormat = PixelFormat;
+            charList.Tag = Tag;
+            charList.Update();
+        }
     }
 }
 

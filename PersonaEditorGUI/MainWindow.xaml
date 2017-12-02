@@ -1,0 +1,38 @@
+﻿<Window x:Class="PersonaEditorGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PersonaEditorGUI"
+        xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
+        xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        Left="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosX, Mode=TwoWay}"
+        Top="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosY, Mode=TwoWay}"
+        WindowState="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWState, Mode=TwoWay}"
+        Height="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWHeight, Mode=TwoWay}"
+        Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWWidth, Mode=TwoWay}"
+        Closing="Window_Closing">
+
+    <Window.Resources>
+        <controls:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="Open" Click="OpenFile_Click"/>
+            </MenuItem>
+            <MenuItem Header="Test" Click="MenuItem_Click"/>
+            <MenuItem Header="About" Click="About_Click"/>
+        </Menu>
+
+        <controls:MultiFileEdit Grid.Row="1" x:Name="MainControl"/>
+    </Grid>
+</Window>

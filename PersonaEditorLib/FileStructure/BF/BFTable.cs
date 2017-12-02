@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PersonaEditorLib.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,11 @@ namespace PersonaEditorLib.FileStructure.BF
 {
     class BFTable
     {
+        public static List<Tuple<FileType, int>> MAP = new List<Tuple<FileType, int>>()
+        {
+            new Tuple<FileType, int>(FileType.BMD, 0x3)
+        };
+
         public class Element
         {
             public int Index { get; set; } = -1;
@@ -58,11 +64,11 @@ namespace PersonaEditorLib.FileStructure.BF
             }
         }
 
-        public void Update(List<IBFElement> List)
+        public void Update(List<BFElement> List)
         {
             if (Table.Count > 0)
             {
-                var temp = List.Find(x => x.Type == (TypeMap)Table[0].Index);
+                var temp = List.Find(x => x.Index == Table[0].Index);
                 if (temp != null)
                 {
                     Table[0].Size = temp.TableSize;
@@ -73,7 +79,7 @@ namespace PersonaEditorLib.FileStructure.BF
             {
                 Table[i].Position = Table[i - 1].Position + Table[i - 1].Size * Table[i - 1].Count;
 
-                var temp = List.Find(x => x.Type == (TypeMap)Table[i].Index);
+                var temp = List.Find(x => x.Index == Table[i].Index);
                 if (temp != null)
                 {
                     Table[i].Size = temp.TableSize;

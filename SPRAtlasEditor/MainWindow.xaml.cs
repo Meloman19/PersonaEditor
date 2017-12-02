@@ -32,7 +32,7 @@ namespace SPRAtlasEditor
         }
         #endregion INotifyPropertyChanged implementation
 
-        PersonaEditorLib.FileStructure.SPR.SPRKeyList.SPRKey KeyOut;
+        PersonaEditorLib.FileStructure.SPR.SPRKey KeyOut;
 
         public string Name
         {
@@ -87,7 +87,7 @@ namespace SPRAtlasEditor
             }
         }
 
-        public Key(PersonaEditorLib.FileStructure.SPR.SPRKeyList.SPRKey key)
+        public Key(PersonaEditorLib.FileStructure.SPR.SPRKey key)
         {
             KeyOut = key;
         }
@@ -102,7 +102,7 @@ namespace SPRAtlasEditor
 
         public Key Key { get; private set; }
 
-        public Visual(PersonaEditorLib.FileStructure.SPR.SPRKeyList.SPRKey Key)
+        public Visual(PersonaEditorLib.FileStructure.SPR.SPRKey Key)
         {
             this.Key = new Key(Key);
             this.Key.PropertyChanged += Key_PropertyChanged;
@@ -158,7 +158,7 @@ namespace SPRAtlasEditor
         public DrawingImage DI { get; private set; }
         public List<Visual> VisualList { get; private set; } = new List<Visual>();
 
-        public DRAW(List<PersonaEditorLib.FileStructure.SPR.SPRKeyList.SPRKey> KeyList, DrawingImage DI)
+        public DRAW(List<PersonaEditorLib.FileStructure.SPR.SPRKey> KeyList, DrawingImage DI)
         {
             this.DI = DI;
 
@@ -220,11 +220,11 @@ namespace SPRAtlasEditor
             Images.Clear();
             SPR = new PersonaEditorLib.FileStructure.SPR.SPR(filename, true);
 
-            List<PersonaEditorLib.FileStructure.TMX.TMX> list = SPR.GetTextureList();
+            List<object> list = SPR.TextureList;
 
             for (int i = 0; i < list.Count; i++)
             {
-                var img = list[i];
+                var img = list[i] as PersonaEditorLib.FileStructure.TMX.TMX;
                 Names.Add(img.TMXname);
                 var image = img.Image;
 
@@ -236,7 +236,6 @@ namespace SPRAtlasEditor
 
                 Images.Add(new DRAW(SPR.KeyList.List.Where(x => x.mTextureIndex == i).ToList(), temp));
             }
-
         }
 
         private void Save(string filename)

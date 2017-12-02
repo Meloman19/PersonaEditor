@@ -82,12 +82,14 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BindingObject.cs" />
     <Compile Include="ColorPicker\ColorPickerTool.xaml.cs">
       <DependentUpon>ColorPickerTool.xaml</DependentUpon>
     </Compile>
@@ -103,6 +105,7 @@
     <Compile Include="ColorPicker\Controls\NumericIncDec.xaml.cs">
       <DependentUpon>NumericIncDec.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EventWrapper.cs" />
     <Compile Include="Extension.cs" />
     <Compile Include="FileStructure\BF\BF.cs" />
     <Compile Include="FileStructure\BF\BFElement.cs" />
@@ -119,6 +122,7 @@
     <Compile Include="FileStructure\FNT\FNTReserved.cs" />
     <Compile Include="FileStructure\FNT\FNTUnknown.cs" />
     <Compile Include="FileStructure\FNT\FNTWidthTable.cs" />
+    <Compile Include="FileStructure\HEX.cs" />
     <Compile Include="FileStructure\PM1\PM1Element.cs" />
     <Compile Include="FileStructure\PM1\PM1ElementBMD.cs" />
     <Compile Include="FileStructure\PM1\PM1ElementEPL.cs" />
@@ -133,7 +137,6 @@
     <Compile Include="FileStructure\SPR\SPR.cs" />
     <Compile Include="FileStructure\SPR\SPRHeader.cs" />
     <Compile Include="FileStructure\SPR\SPRKeyList.cs" />
-    <Compile Include="FileStructure\SPR\SPRTextures.cs" />
     <Compile Include="FileStructure\StringList.cs" />
     <Compile Include="FileStructure\TBL\TBL.cs" />
     <Compile Include="FileStructure\TMX\TMX.cs" />
@@ -141,6 +144,11 @@
     <Compile Include="FileStructure\TMX\TMXPalette.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="FileStructure\PM1\PM1.cs" />
+    <Compile Include="Interfaces\IImage.cs" />
+    <Compile Include="Interfaces\IFile.cs" />
+    <Compile Include="Interfaces\IPersonaFile.cs" />
+    <Compile Include="Interfaces\IPersonaFileElement.cs" />
+    <Compile Include="Interfaces\IPreview.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>

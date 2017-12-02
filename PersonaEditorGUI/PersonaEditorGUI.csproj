@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8115435E-B5D3-489C-B066-145BCFA1F933}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>PersonaEditorGUI</RootNamespace>
+    <AssemblyName>PersonaEditorGUI</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFHexaEditor.1.2.9\lib\net45\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WPFHexaEditor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WPFHexaEditor.1.2.9\lib\net45\WPFHexaEditor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\Controls\RelativePanel.cs" />
+    <Compile Include="Controls\ClosableTabItem.xaml.cs">
+      <DependentUpon>ClosableTabItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Editors\BMDEditor.xaml.cs">
+      <DependentUpon>BMDEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Editors\HEXEditor.xaml.cs">
+      <DependentUpon>HEXEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Editors\PTPEditorVM.cs" />
+    <Compile Include="Controls\Editors\SPREditor.xaml.cs">
+      <DependentUpon>SPREditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Editors\SPREditorVM.cs" />
+    <Compile Include="Controls\MultiFileEdit.xaml.cs">
+      <DependentUpon>MultiFileEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Editors\PTPEditor.xaml.cs">
+      <DependentUpon>PTPEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MultiFileEditVM.cs" />
+    <Compile Include="Controls\SingleFileEdit.xaml.cs">
+      <DependentUpon>SingleFileEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SingleFileEditVM.cs" />
+    <Compile Include="Controls\TreeViewPE.xaml.cs">
+      <DependentUpon>TreeViewPE.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Files\UserTreeViewItem.cs" />
+    <Compile Include="Classes\Media\Visual\Background.cs" />
+    <Compile Include="Settings\BackgroundDefault.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>BackgroundDefault.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\SPREditor.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>SPREditor.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\WindowSetting.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>WindowSetting.settings</DependentUpon>
+    </Compile>
+    <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ClosableTabItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Editors\BMDEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Editors\HEXEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Editors\SPREditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MainDockPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MultiFileEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Editors\PTPEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\SingleFileEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TreeViewPE.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\MainDockPanel.xaml.cs">
+      <DependentUpon>MainDockPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Settings\BackgroundDefault.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>BackgroundDefault.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Settings\SPREditor.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>SPREditor.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Settings\WindowSetting.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>WindowSetting.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj">
+      <Project>{717ef6cb-2a9b-4565-88ed-3fd096dd2bbe}</Project>
+      <Name>PersonaEditorLib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\Background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controls\Primitive\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

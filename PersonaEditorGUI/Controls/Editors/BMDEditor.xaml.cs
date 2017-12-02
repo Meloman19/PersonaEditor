@@ -10,16 +10,17 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SPRAtlasEditor
+namespace PersonaEditorGUI.Controls.Editors
 {
     /// <summary>
-    /// Логика взаимодействия для SettingWindow.xaml
+    /// Логика взаимодействия для BMDEditor.xaml
     /// </summary>
-    public partial class SettingWindow : Window
+    public partial class BMDEditor : UserControl
     {
-        public SettingWindow()
+        public BMDEditor()
         {
             InitializeComponent();
         }

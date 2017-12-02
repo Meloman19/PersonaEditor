@@ -24,7 +24,7 @@
             <MenuItem Header="Set Select Color" Click="SelectColor_Click"/>
         </Menu>
 
-        <Grid Grid.Row="1"  Background="#FFF0F0F0">
+        <Grid Grid.Row="1" Background="#FFF0F0F0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="200" Width="auto"/>
                 <ColumnDefinition Width="auto"/>
@@ -55,13 +55,13 @@
             </Grid>
 
             <GridSplitter Grid.Column="1" Width="6" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+
             <Border BorderThickness="2" Name="Board" Grid.Column="2" BorderBrush="Black"  HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Background>
                     <SolidColorBrush Color="{Binding BackgroundColor}"/>
                 </Border.Background>
                 <Image Name="MainImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant"/>
             </Border>
-
         </Grid>
     </Grid>
 </Window>

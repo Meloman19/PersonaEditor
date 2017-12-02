@@ -1,19 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using PersonaEditorLib.Interfaces;
+using System;
 
 namespace PersonaEditorLib.FileStructure.BF
 {
-    class BFElement : IBFElement
+    class BFElement
     {
         public List<byte[]> List = new List<byte[]>();
 
         private int _Size;
-        private TypeMap _Type;
+        private FileType _Type = FileType.HEX;
+        public int Index { get; set; }
 
         public BFElement(BinaryReader reader, BFTable.Element element)
         {
             _Size = element.Size;
-            _Type = (TypeMap)element.Index;
+            Index = element.Index;
+            if (BFTable.MAP.Find(x => x.Item2 == element.Index) is Tuple<FileType, int> a)
+                _Type = a.Item1;
+
             reader.BaseStream.Position = element.Position;
             for (int i = 0; i < element.Count; i++)
                 List.Add(reader.ReadBytes(element.Size));
@@ -31,6 +37,6 @@ namespace PersonaEditorLib.FileStructure.BF
                 writer.Write(a);
             }
         }
-        public TypeMap Type { get { return _Type; } }
+        public FileType Type { get { return _Type; } }
     }
 }

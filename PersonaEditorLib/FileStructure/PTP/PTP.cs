@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using PersonaEditorLib.Extension;
 using System.Text.RegularExpressions;
+using PersonaEditorLib.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace PersonaEditorLib.FileStructure.PTP
 {
@@ -58,22 +60,31 @@ namespace PersonaEditorLib.FileStructure.PTP
         public byte[] Array { get; set; }
     }
 
-    public class PTP
+    public class PTP : IPersonaFile, IFile
     {
+        private string _Name = "";
+
         public PTP(string OldFont, string OldMap, string NewFont, string NewMap)
         {
-            OldCharList = new CharList(OldMap, new FNT.FNT(File.OpenRead(OldFont), 0));
-            NewCharList = new CharList(NewMap, new FNT.FNT(File.OpenRead(NewFont), 0));
+            new CharList(OldMap, new FNT.FNT(File.OpenRead(OldFont), 0)).CopyTo(OldCharList);
+            new CharList(NewMap, new FNT.FNT(File.OpenRead(NewFont), 0)).CopyTo(NewCharList);
         }
 
         public PTP(CharList OldCharList, CharList NewCharList)
         {
-            this.OldCharList = OldCharList;
-            this.NewCharList = NewCharList;
+            OldCharList.CopyTo(this.OldCharList);
+            NewCharList.CopyTo(this.NewCharList);
         }
 
-        public CharList OldCharList { get; set; }
-        public CharList NewCharList { get; set; }
+        public PTP(string Name, byte[] data)
+        {
+            _Name = Name;
+            using (MemoryStream MS = new MemoryStream(data))
+                Open(MS);
+        }
+
+        public CharList OldCharList { get; } = new CharList();
+        public CharList NewCharList { get; } = new CharList();
 
         public string OpenFileName = "";
 
@@ -209,8 +220,8 @@ namespace PersonaEditorLib.FileStructure.PTP
             public BindingList<MSGstr> Strings { get; set; } = new BindingList<MSGstr>();
         }
 
-        public BindingList<Names> names { get; set; } = new BindingList<Names>();
-        public BindingList<MSG> msg { get; set; } = new BindingList<MSG>();
+        public ObservableCollection<Names> names { get; set; } = new ObservableCollection<Names>();
+        public ObservableCollection<MSG> msg { get; set; } = new ObservableCollection<MSG>();
 
         public bool Open(string path)
         {
@@ -282,6 +293,88 @@ namespace PersonaEditorLib.FileStructure.PTP
                 }
 
                 OpenFileName = Path.GetFileName(Path.GetFullPath(path));
+                return true;
+            }
+            catch (Exception e)
+            {
+                names.Clear();
+                msg.Clear();
+                OpenFileName = "";
+                Logging.Write("PTPfactory", e.ToString());
+                return false;
+            }
+        }
+
+        public bool Open(Stream stream)
+        {
+            try
+            {
+                names.Clear();
+                msg.Clear();
+
+                XDocument xDoc = XDocument.Load(stream, LoadOptions.PreserveWhitespace);
+
+                XElement MSG1Doc = xDoc.Element("MSG1");
+
+                foreach (var NAME in MSG1Doc.Element("CharacterNames").Elements())
+                {
+                    int Index = Convert.ToInt32(NAME.Attribute("Index").Value);
+                    string OldNameSource = NAME.Element("OldNameSource").Value;
+                    string NewName = NAME.Element("NewName").Value;
+
+                    names.Add(new Names(Index, OldNameSource, NewName, NewCharList));
+                }
+
+                foreach (var Message in MSG1Doc.Element("MSG").Elements())
+                {
+                    int Index = Convert.ToInt32(Message.Attribute("Index").Value);
+                    string Type = Message.Element("Type").Value;
+                    string Name = Message.Element("Name").Value;
+                    int CharacterNameIndex = Convert.ToInt32(Message.Element("CharacterNameIndex").Value);
+
+                    string SourceBytes_str = Message.Element("SourceBytes").Value;
+
+                    MSG temp = new MSG(Index, Type, Name, CharacterNameIndex, SourceBytes_str);
+                    msg.Add(temp);
+
+                    foreach (var Strings in Message.Element("MessageStrings").Elements())
+                    {
+                        int StringIndex = Convert.ToInt32(Strings.Attribute("Index").Value);
+                        string NewString = Strings.Element("NewString").Value;
+
+                        MSG.MSGstr temp2 = new MSG.MSGstr(StringIndex, NewString, NewCharList) { CharacterIndex = CharacterNameIndex };
+                        temp.Strings.Add(temp2);
+
+                        foreach (var Prefix in Strings.Elements("PrefixBytes"))
+                        {
+                            int PrefixIndex = Convert.ToInt32(Prefix.Attribute("Index").Value);
+                            string PrefixType = Prefix.Attribute("Type").Value;
+                            string PrefixBytes = Prefix.Value;
+
+                            temp2.Prefix.Add(new TextBaseElement(PrefixType, Utilities.String.SplitString(PrefixBytes, '-')));
+                        }
+
+                        foreach (var Old in Strings.Elements("OldStringBytes"))
+                        {
+                            int OldIndex = Convert.ToInt32(Old.Attribute("Index").Value);
+                            string OldType = Old.Attribute("Type").Value;
+                            string OldBytes = Old.Value;
+
+                            temp2.OldString.Add(new TextBaseElement(OldType, Utilities.String.SplitString(OldBytes, '-')));
+                        }
+
+                        foreach (var Postfix in Strings.Elements("PostfixBytes"))
+                        {
+                            int PostfixIndex = Convert.ToInt32(Postfix.Attribute("Index").Value);
+                            string PostfixType = Postfix.Attribute("Type").Value;
+                            string PostfixBytes = Postfix.Value;
+
+                            temp2.Postfix.Add(new TextBaseElement(PostfixType, Utilities.String.SplitString(PostfixBytes, '-')));
+                        }
+                    }
+                }
+
+                //OpenFileName = Path.GetFileName(Path.GetFullPath(path));
                 return true;
             }
             catch (Exception e)
@@ -605,11 +698,145 @@ namespace PersonaEditorLib.FileStructure.PTP
                 }
 
                 xDoc.Save(path);
+
             }
             catch (Exception e)
             {
                 Logging.Write("PTPfactory", e.ToString());
             }
         }
+
+        #region IPersonaFile
+
+        public FileType Type => FileType.PTP;
+
+        public List<object> GetSubFiles()
+        {
+            return new List<object>();
+        }
+
+        public bool Replace(object a)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ContextMenuItems> ContextMenuList
+        {
+            get
+            {
+                List<ContextMenuItems> returned = new List<ContextMenuItems>();
+
+                returned.Add(ContextMenuItems.Export);
+                returned.Add(ContextMenuItems.Import);
+
+                return returned;
+            }
+        }
+
+        public Dictionary<string, object> GetProperties
+        {
+            get
+            {
+                Dictionary<string, object> returned = new Dictionary<string, object>();
+
+                returned.Add("Type", Type);
+
+                return returned;
+            }
+        }
+
+        public string Name => _Name;
+
+        #endregion IPersonaFile
+
+        #region IFile
+
+        public bool IsLittleEndian { get; set; } = true;
+
+        public int Size => Get(true).Length;
+
+        public byte[] Get(bool temp)
+        {
+            try
+            {
+                XDocument xDoc = new XDocument();
+                XElement Document = new XElement("MSG1");
+                xDoc.Add(Document);
+                XElement CharName = new XElement("CharacterNames");
+                Document.Add(CharName);
+
+                foreach (var NAME in names)
+                {
+                    XElement Name = new XElement("Name");
+                    Name.Add(new XAttribute("Index", NAME.Index));
+                    Name.Add(new XElement("OldNameSource", BitConverter.ToString(NAME.OldName)));
+                    Name.Add(new XElement("NewName", NAME.NewName));
+                    CharName.Add(Name);
+                }
+
+                XElement MES = new XElement("MSG");
+                Document.Add(MES);
+
+                foreach (var MSG in msg)
+                {
+                    XElement Msg = new XElement("Message");
+                    Msg.Add(new XAttribute("Index", MSG.Index));
+                    Msg.Add(new XElement("Type", MSG.Type));
+                    Msg.Add(new XElement("Name", MSG.Name));
+                    Msg.Add(new XElement("CharacterNameIndex", MSG.CharacterIndex));
+                    Msg.Add(new XElement("SourceBytes", BitConverter.ToString(MSG.MsgBytes)));
+
+                    XElement Strings = new XElement("MessageStrings");
+                    Msg.Add(Strings);
+                    foreach (var STR in MSG.Strings)
+                    {
+                        XElement String = new XElement("String");
+                        String.Add(new XAttribute("Index", STR.Index));
+                        Strings.Add(String);
+
+                        for (int i = 0; i < STR.Prefix.Count; i++)
+                        {
+                            XElement PrefixBytes = new XElement("PrefixBytes", BitConverter.ToString(STR.Prefix[i].Array));
+                            PrefixBytes.Add(new XAttribute("Index", i));
+                            PrefixBytes.Add(new XAttribute("Type", STR.Prefix[i].Type));
+                            String.Add(PrefixBytes);
+                        }
+
+                        for (int i = 0; i < STR.OldString.Count; i++)
+                        {
+                            XElement OldStringBytes = new XElement("OldStringBytes", BitConverter.ToString(STR.OldString[i].Array));
+                            OldStringBytes.Add(new XAttribute("Index", i));
+                            OldStringBytes.Add(new XAttribute("Type", STR.OldString[i].Type));
+                            String.Add(OldStringBytes);
+                        }
+
+                        String.Add(new XElement("NewString", STR.NewString));
+
+                        for (int i = 0; i < STR.Postfix.Count; i++)
+                        {
+                            XElement PostfixBytes = new XElement("PostfixBytes", BitConverter.ToString(STR.Postfix[i].Array));
+                            PostfixBytes.Add(new XAttribute("Index", i));
+                            PostfixBytes.Add(new XAttribute("Type", STR.Postfix[i].Type));
+                            String.Add(PostfixBytes);
+                        }
+                    }
+
+                    MES.Add(Msg);
+                }
+
+                using (MemoryStream MS = new MemoryStream())
+                {
+                    xDoc.Save(MS);
+                    return MS.ToArray();
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.Write("PTPfactory", e.ToString());
+                return new byte[0];
+            }
+        }
+
+        #endregion IFile
     }
 }

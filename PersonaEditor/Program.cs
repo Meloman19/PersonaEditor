@@ -277,7 +277,7 @@ namespace PersonaEditor
 
         public void Save(ArgumentsWork.Parameters parameters, string dest)
         {
-            if (dest == "") dest = Util.GetNewPath(source, "(NEW).PM1");
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW).BF");
 
             File.WriteAllBytes(dest, BF.Get(parameters.IsLittleEndian));
         }
@@ -394,7 +394,7 @@ namespace PersonaEditor
         public BINConsole(string filepath, ArgumentsWork.Parameters parameters)
         {
             source = Path.GetFullPath(filepath);
-            BIN = new PersonaEditorLib.FileStructure.BIN.BIN(source, parameters.IsLittleEndian);
+            BIN = new PersonaEditorLib.FileStructure.BIN.BIN(source);
         }
 
         public void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest)
@@ -411,7 +411,7 @@ namespace PersonaEditor
 
             for (int i = 0; i < filelist.Count; i++)
                 using (BinaryWriter writer = new BinaryWriter(File.Create(filelist[i])))
-                    writer.Write(BIN[i]);
+                    writer.Write(BIN[i].ToString());
         }
 
         #endregion ExportMethods
@@ -623,7 +623,7 @@ namespace PersonaEditor
 
         public void Save(ArgumentsWork.Parameters parameters, string dest)
         {
-            if (dest == "") dest = Util.GetNewPath(source, "(NEW).DAT");
+            if (dest == "") dest = Util.GetNewPath(source, "(NEW)" + Path.GetExtension(source));
 
             File.WriteAllBytes(dest, StringList.Get(parameters.Old ? new CharList(parameters.OldMap, parameters.OldFont) : new CharList(parameters.NewMap, parameters.NewFont)));
         }

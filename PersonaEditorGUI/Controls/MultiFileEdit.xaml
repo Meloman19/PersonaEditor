@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="PersonaEditorGUI.Controls.MultiFileEdit"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PersonaEditorGUI"
+             xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
+             xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <controls:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="FirstCol" Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWLeftWidth, Mode=TwoWay}"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <controls:TreeViewPE x:Name="LeftCC" Grid.Column="0" DataContext="{Binding}" SelectedItemData="LeftCC_SelectedItemData" SelectedItemDataOpen="LeftCC_SelectedItemDataOpen"/>
+
+            <GridSplitter ResizeBehavior="PreviousAndCurrent" ShowsPreview="True" Grid.Column="1" Width="4"/>
+        </Grid>
+
+        <controls:SingleFileEdit Grid.Column="1" x:Name="SingleFile" x:FieldModifier="private"/>
+
+        <Grid Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWRightWidth, Mode=TwoWay}"/>
+            </Grid.ColumnDefinitions>
+
+            <GridSplitter ShowsPreview="True" ResizeDirection="Columns" ResizeBehavior="CurrentAndNext"  Grid.Column="0" Width="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+            <Grid Name="RightCC" Grid.Column="1" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Expander Grid.Row="0" HorizontalAlignment="Stretch" IsExpanded="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPropertyExpanded, Mode=TwoWay}">
+                    <Expander.Header>
+                        <TextBlock Text="Properties" Grid.Column="1" VerticalAlignment="Center"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock Text="No available properties"  Visibility="{Binding Converter={StaticResource NullVisibilityConverter},ConverterParameter='ItemsSource', ElementName=PropertyCC, Path=ItemsSource}"/>
+                        <DataGrid Name="PropertyCC" Visibility="{Binding Converter={StaticResource NullVisibilityConverter},ConverterParameter='ItemsSourceReverse', ElementName=PropertyCC, Path=ItemsSource}" IsReadOnly="True" AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Property name" Binding="{Binding Path=Key}"/>
+                                <DataGridTextColumn Header="Property value" Binding="{Binding Path=Value}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Expander>
+
+                <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Visibility="{Binding Converter={StaticResource NullVisibilityConverter}, ElementName=PreviewCC, Path=Content}">
+                    <ContentControl Name="PreviewCC"/>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

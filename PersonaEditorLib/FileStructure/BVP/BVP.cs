@@ -20,7 +20,7 @@ namespace PersonaEditorLib.FileStructure.BVP
             List<int[]> Entry = new List<int[]>();
             int[] temp = reader.ReadInt32Array(3);
 
-            while (temp[0] != 0)
+            while (temp[1] != 0)
             {
                 Entry.Add(temp);
                 temp = reader.ReadInt32Array(3);
