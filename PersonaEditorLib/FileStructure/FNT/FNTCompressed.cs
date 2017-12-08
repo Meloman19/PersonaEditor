@@ -96,10 +96,10 @@ namespace PersonaEditorLib.FileStructure.FNT
             CompressedData = reader.ReadBytes(Header.CompressedBlockSize);
         }
 
-        private CompressedHeader Header { get; set; }
-        private CompressedDictionary Dictionary { get; set; }
-        private CompressedGlyphTable GlyphTable { get; set; }
-        private byte[] CompressedData { get; set; }
+        public CompressedHeader Header { get; set; }
+        public CompressedDictionary Dictionary { get; set; }
+        public CompressedGlyphTable GlyphTable { get; set; }
+        public byte[] CompressedData { get; set; }
 
         public List<byte[]> GetDecompressedData()
         {

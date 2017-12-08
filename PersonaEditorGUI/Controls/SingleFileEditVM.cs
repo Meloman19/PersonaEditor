@@ -14,8 +14,8 @@ namespace PersonaEditorGUI.Controls
         Editors.SPREditor SPREditor { get; } = new Editors.SPREditor();
         Editors.PTPEditor PTPEditor { get; } = new Editors.PTPEditor();
         Editors.HEXEditor HEXEditor { get; } = new Editors.HEXEditor();
-
-        WpfHexaEditor.HexEditor hexEditor { get; } = new WpfHexaEditor.HexEditor();
+        Editors.BMDEditor BMDEditor { get; } = new Editors.BMDEditor();
+        Editors.FNTEditor FNTEditor { get; } = new Editors.FNTEditor();
 
         private object _SingleFileEditContent = null;
         public object SingleFileEditContent
@@ -57,11 +57,20 @@ namespace PersonaEditorGUI.Controls
                     PTPEditor.DataContext = new Editors.PTPEditorVM(data as PersonaEditorLib.FileStructure.PTP.PTP);
                     SingleFileEditContent = PTPEditor;
                 }
-                else
+                else if (pf.Type == FileType.BMD)
                 {
-                    HEXEditor.DataContext = (data as IFile).Get(true);
+                    BMDEditor.DataContext = new Editors.BMDEditorVM(data as PersonaEditorLib.FileStructure.BMD.BMD);
+                    SingleFileEditContent = BMDEditor;
+                }
+                else if (pf.Type == FileType.FNT)
+                {
+                    FNTEditor.DataContext = new Editors.FNTEditorVM(data as PersonaEditorLib.FileStructure.FNT.FNT);
+                    SingleFileEditContent = FNTEditor;
+                }
+                else if (pf.Type == FileType.HEX)
+                {
+                    HEXEditor.DataContext = new Editors.HEXEditorVM(data as PersonaEditorLib.FileStructure.HEX);
                     SingleFileEditContent = HEXEditor;
-
                 }
             }
         }
@@ -71,7 +80,9 @@ namespace PersonaEditorGUI.Controls
             SingleFileEditContent = null;
             SPREditor.DataContext = null;
             HEXEditor.DataContext = null;
-            //  hexEditor.Stream = null;
+            BMDEditor.DataContext = null;
+            PTPEditor.DataContext = null;
+            FNTEditor.DataContext = null;
         }
     }
 }

@@ -11,9 +11,7 @@ namespace PersonaEditorLib.Interfaces
 {   
     public interface IFile
     {
-        bool IsLittleEndian { get; set; }
         int Size { get; }
-        byte[] Get(bool IsLittleEndian);
-       // void Get(BinaryWriter writer);
+        byte[] Get();
     }
 }

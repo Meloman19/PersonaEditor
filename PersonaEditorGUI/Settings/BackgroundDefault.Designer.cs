@@ -25,30 +25,6 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
-        public string SelectedBackground {
-            get {
-                return ((string)(this["SelectedBackground"]));
-            }
-            set {
-                this["SelectedBackground"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
-        public string SelectedBackgroundVisual {
-            get {
-                return ((string)(this["SelectedBackgroundVisual"]));
-            }
-            set {
-                this["SelectedBackgroundVisual"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public double EmptyGlyphScale {
             get {
@@ -85,37 +61,13 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#FFFFFFFF")]
+        [global::System.Configuration.DefaultSettingValueAttribute("#FF808080")]
         public global::System.Windows.Media.Color EmptyBackgroundColor {
             get {
                 return ((global::System.Windows.Media.Color)(this["EmptyBackgroundColor"]));
             }
             set {
                 this["EmptyBackgroundColor"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("70")]
-        public int EmptyTextX {
-            get {
-                return ((int)(this["EmptyTextX"]));
-            }
-            set {
-                this["EmptyTextX"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50")]
-        public int EmptyTextY {
-            get {
-                return ((int)(this["EmptyTextY"]));
-            }
-            set {
-                this["EmptyTextY"] = value;
             }
         }
         
@@ -128,30 +80,6 @@ namespace PersonaEditorGUI.Settings {
             }
             set {
                 this["EmptyTextColor"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int EmptyNameX {
-            get {
-                return ((int)(this["EmptyNameX"]));
-            }
-            set {
-                this["EmptyNameX"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int EmptyNameY {
-            get {
-                return ((int)(this["EmptyNameY"]));
-            }
-            set {
-                this["EmptyNameY"] = value;
             }
         }
         
@@ -176,6 +104,30 @@ namespace PersonaEditorGUI.Settings {
             }
             set {
                 this["EmptyLineSpacing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("70,50")]
+        public global::System.Windows.Point EmptyTextPos {
+            get {
+                return ((global::System.Windows.Point)(this["EmptyTextPos"]));
+            }
+            set {
+                this["EmptyTextPos"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0,0")]
+        public global::System.Windows.Point EmptyNamePos {
+            get {
+                return ((global::System.Windows.Point)(this["EmptyNamePos"]));
+            }
+            set {
+                this["EmptyNamePos"] = value;
             }
         }
     }

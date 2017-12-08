@@ -21,9 +21,15 @@ namespace PersonaEditorLib.FileStructure.BF
             public int Size { get; set; } = 0;
             public int Count { get; set; } = 0;
             public int Position { get; set; } = 0;
+            public FileType FileType { get; set; }
 
             public Element(int index, int size, int count, int position)
             {
+                if (MAP.Find(x => x.Item2 == index) is Tuple<FileType, int> a)
+                    FileType = a.Item1;
+                else
+                    FileType = FileType.HEX;
+
                 Index = index;
                 Size = size;
                 Count = count;

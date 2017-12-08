@@ -12,9 +12,9 @@ namespace PersonaEditorLib.FileStructure
 {
     public class StringList
     {
-        List<Tuple<string, int>> list = new List<Tuple<string, int>>();
+        public List<Tuple<string, int>> list = new List<Tuple<string, int>>();
 
-        public StringList(string file, int length, CharList charlist)
+        public StringList(string file, CharList charlist)
         {
             List<byte[]> splited = SplitByNull(File.ReadAllBytes(file));
             foreach (var a in splited)
@@ -79,7 +79,7 @@ namespace PersonaEditorLib.FileStructure
             }
         }
 
-        public byte[] Get(CharList charlist)
+        public byte[] Get(CharList charlist, int lengthoffset = 0)
         {
             byte[] returned = null;
 
@@ -93,7 +93,7 @@ namespace PersonaEditorLib.FileStructure
                     {
                         temp = charlist.Encode(a.Item1.Substring(0, a.Item1.Length - index), CharList.EncodeOptions.OneChar);
                         index++;
-                    } while (temp.Length > a.Item2);
+                    } while (temp.Length > a.Item2 + lengthoffset);
 
                     if (temp.Length == 0)
                         temp = new byte[] { 0x32 };
@@ -102,7 +102,7 @@ namespace PersonaEditorLib.FileStructure
                         Logging.Write("", "StringList: Max length reach for \"" + a.Item1 + "\"");
 
                     writer.Write(temp);
-                    writer.Write(new byte[Utilities.Utilities.Alignment(temp.Length, a.Item2)]);
+                    writer.Write(new byte[Utilities.Utilities.Alignment(temp.Length, a.Item2 + lengthoffset)]);
                 }
 
                 writer.BaseStream.Position = 0;

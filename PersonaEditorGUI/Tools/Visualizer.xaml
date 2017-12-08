@@ -1,0 +1,52 @@
+﻿<Window x:Class="PersonaEditorGUI.Tools.Visualizer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PersonaEditorGUI.Tools"
+        mc:Ignorable="d"
+        Title="Visualizer" MinHeight="250" Height="350" MinWidth="400" Width="500">
+    <Grid>
+        <Grid.Background>
+            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+        </Grid.Background>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <ComboBox Width="120" ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding BackgroundSelect}"/>
+            <ComboBox Width="60" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
+        </Menu>
+
+        <Image Grid.Row="1">
+            <Image.Source>
+                <DrawingImage>
+                    <DrawingImage.Drawing>
+                        <DrawingGroup>
+                            <DrawingGroup.Children>
+                                <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
+
+                                <ImageDrawing ImageSource="{Binding NameImage}" Rect="{Binding NameRect}"/>
+
+                                <ImageDrawing ImageSource="{Binding TextImage}" Rect="{Binding TextRect}"/>
+                            </DrawingGroup.Children>
+                            <DrawingGroup.ClipGeometry>
+                                <RectangleGeometry Rect="{Binding BackgroundRect}"/>
+                            </DrawingGroup.ClipGeometry>
+                        </DrawingGroup>
+                    </DrawingImage.Drawing>
+                </DrawingImage>
+            </Image.Source>
+        </Image>
+
+        <TextBox Grid.Row="2" Margin="4" Width="200" HorizontalAlignment="Left" MaxLines="1" Text="{Binding NameTB, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Row="3" Margin="15,4,4,4" AcceptsReturn="True" TextWrapping="NoWrap" Text="{Binding TextTB, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Row="4" Margin="15,4,4,4" AcceptsReturn="False" TextWrapping="Wrap" Text="{Binding HexTB, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+</Window>

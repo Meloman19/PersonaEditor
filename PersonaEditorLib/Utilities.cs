@@ -175,22 +175,24 @@ namespace PersonaEditorLib.Utilities
 
     public static class PersonaFile
     {
-        public static object OpenFile(string name, byte[] data, FileType type, bool IsLittleEndian)
+        public static object OpenFile(string name, byte[] data, FileType type)
         {
             try
             {
                 if (type == FileType.BIN)
                     return new FileStructure.BIN.BIN(name, data);
                 else if (type == FileType.SPR)
-                    return new FileStructure.SPR.SPR(name, data, IsLittleEndian);
+                    return new FileStructure.SPR.SPR(name, data, true);
                 else if (type == FileType.TMX)
-                    return new FileStructure.TMX.TMX(name, data, IsLittleEndian);
-                //else if (type == FileType.BF)
-                //    return new FileStructure.BF.BF(data, IsLittleEndian);
-                //else if (type == FileType.BMD)
-                //    return new FileStructure.BMD.BMD(data, IsLittleEndian);
+                    return new FileStructure.TMX.TMX(name, data, true);
+                else if (type == FileType.BF)
+                    return new FileStructure.BF.BF(name, data);
+                else if (type == FileType.BMD)
+                    return new FileStructure.BMD.BMD(name, data);
                 else if (type == FileType.PTP)
                     return new FileStructure.PTP.PTP(name, data);
+                else if (type == FileType.FNT)
+                    return new FileStructure.FNT.FNT(name, data);
                 else
                     return new FileStructure.HEX(name, data);
             }
@@ -198,24 +200,25 @@ namespace PersonaEditorLib.Utilities
             {
                 return null;
             }
-
         }
 
         public static FileType GetFileType(string name)
         {
             string ext = Path.GetExtension(name);
-            if (ext.ToLower() == ".bin")
+            if (ext.ToLower() == ".bin" | ext.ToLower() == ".pak")
                 return FileType.BIN;
             else if (ext.ToLower() == ".spr")
                 return FileType.SPR;
             else if (ext.ToLower() == ".tmx")
                 return FileType.TMX;
-            //else if (ext.ToLower() == ".bf")
-            //    return FileType.BF;
-            //else if (ext.ToLower() == ".bmd")
-            //    return FileType.BMD;
+            else if (ext.ToLower() == ".bf")
+                return FileType.BF;
+            else if (ext.ToLower() == ".bmd")
+                return FileType.BMD;
             else if (ext.ToLower() == ".ptp")
                 return FileType.PTP;
+            else if (ext.ToLower() == ".fnt")
+                return FileType.FNT;
             else
                 return FileType.HEX;
         }

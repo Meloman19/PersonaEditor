@@ -186,7 +186,7 @@ namespace PersonaEditorLib.FileStructure.TMX
             }
         }
         
-        public byte[] Get(bool IsLittleEndian)
+        public byte[] Get()
         {
             byte[] returned = new byte[0];
 

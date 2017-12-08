@@ -19,7 +19,7 @@
                     </Hyperlink>
             </TextBlock>
             <TextBlock></TextBlock>
-            <TextBlock Text="Based on Amicitia"/>
+            <TextBlock Text="Partially based on Amicitia"/>
             <TextBlock>
                     <Hyperlink NavigateUri="https://github.com/TGEnigma/Amicitia"  RequestNavigate="Hyperlink_RequestNavigate">
                         https://github.com/TGEnigma/Amicitia

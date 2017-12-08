@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -13,21 +14,9 @@ using System.Xml.Linq;
 
 namespace PersonaEditorGUI.Classes.Media.Visual
 {
-    public class BackgroundImage : INotifyPropertyChanged
+    public class BackgroundImage : PersonaEditorLib.BindingObject
     {
-        #region INotifyPropertyChanged implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void Notify(string propertyName)
-        {
-            if (this.PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion INotifyPropertyChanged implementation
-
-        double _glyphScale = 1;
+        double _glyphScale;
         BitmapSource _Image;
         Color _ColorText;
         Color _ColorName;
@@ -80,13 +69,11 @@ namespace PersonaEditorGUI.Classes.Media.Visual
                 if (value != _Image)
                 {
                     _Image = value;
-                    Drawing.ImageSource = _Image;
                     Rect = new Rect(0, 0, _Image.Width, _Image.Height);
-                    Drawing.Rect = Rect;
-                    RectG.Rect = Rect;
                     Notify("Image");
                     Notify("Rect");
                     Notify("Drawing");
+
                 }
             }
         }
@@ -127,28 +114,13 @@ namespace PersonaEditorGUI.Classes.Media.Visual
             }
         }
 
-        public ImageDrawing Drawing { get; private set; } = new ImageDrawing();
-        public RectangleGeometry RectG { get; private set; } = new RectangleGeometry();
         public Rect Rect { get; private set; } = new Rect();
-
-        public void SetDefault()
-        {
-            int Width = Settings.BackgroundDefault.Default.EmptyWidth;
-            int Height = Settings.BackgroundDefault.Default.EmptyHeight;
-            TextStart = new Point(Settings.BackgroundDefault.Default.EmptyTextX, Settings.BackgroundDefault.Default.EmptyTextY);
-            NameStart = new Point(Settings.BackgroundDefault.Default.EmptyNameX, Settings.BackgroundDefault.Default.EmptyNameY);
-
-            GlyphScale = Settings.BackgroundDefault.Default.EmptyGlyphScale;
-            ColorName = Settings.BackgroundDefault.Default.EmptyNameColor;
-            ColorText = Settings.BackgroundDefault.Default.EmptyTextColor;
-            LineSpacing = Settings.BackgroundDefault.Default.EmptyLineSpacing;
-
-            Image = BitmapSource.Create(Width, Height, 96, 96, PixelFormats.Indexed1, new BitmapPalette(new List<Color> { Settings.BackgroundDefault.Default.EmptyBackgroundColor }), new byte[Width * Height], Width);
-        }
     }
 
-    public class Backgrounds
+    public class Backgrounds : PersonaEditorLib.BindingObject
     {
+        PersonaEditorLib.EventWrapper SettingEW;
+
         public string BackgroundDirPath { get; set; } = "";
 
         public delegate void BackgroundImageChanged(BackgroundImage background);
@@ -157,14 +129,44 @@ namespace PersonaEditorGUI.Classes.Media.Visual
 
         public BackgroundImage CurrentBackground { get; } = new BackgroundImage();
 
-        public List<string> BackgroundList { get; } = new List<string>();
+        ObservableCollection<string> backgroundList { get; } = new ObservableCollection<string>() { "Empty" };
+
+        private ReadOnlyObservableCollection<string> _BackgroundList;
+        public ReadOnlyObservableCollection<string> BackgroundList => _BackgroundList;
 
         public Backgrounds(string dir = "")
         {
-            BackgroundList.Add("Default");
-            CurrentBackground.SetDefault();
+            _BackgroundList = new ReadOnlyObservableCollection<string>(backgroundList);
+            SettingEW = new PersonaEditorLib.EventWrapper(Settings.BackgroundDefault.Default, this);
+            SetDefault();
             BackgroundDirPath = dir;
             GetBackgroundList();
+        }
+
+        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_SelectedIndex == 0)
+            {
+                if (e.PropertyName == "EmptyTextPos")
+                    CurrentBackground.TextStart = Settings.BackgroundDefault.Default.EmptyTextPos;
+                else if (e.PropertyName == "EmptyNamePos")
+                    CurrentBackground.NameStart = Settings.BackgroundDefault.Default.EmptyNamePos;
+                else if (e.PropertyName == "EmptyGlyphScale")
+                    CurrentBackground.GlyphScale = Settings.BackgroundDefault.Default.EmptyGlyphScale;
+                else if (e.PropertyName == "EmptyLineSpacing")
+                    CurrentBackground.LineSpacing = Settings.BackgroundDefault.Default.EmptyLineSpacing;
+                else if (e.PropertyName == "EmptyNameColor")
+                    CurrentBackground.ColorName = Settings.BackgroundDefault.Default.EmptyNameColor;
+                else if (e.PropertyName == "EmptyTextColor")
+                    CurrentBackground.ColorText = Settings.BackgroundDefault.Default.EmptyTextColor;
+                else if (e.PropertyName == "EmptyBackgroundColor" | e.PropertyName == "EmptyWidth" | e.PropertyName == "EmptyHeight")
+                {
+                    int Width = Settings.BackgroundDefault.Default.EmptyWidth;
+                    int Height = Settings.BackgroundDefault.Default.EmptyHeight;
+                    CurrentBackground.Image = BitmapSource.Create(Width, Height, 96, 96, PixelFormats.Indexed1,
+                        new BitmapPalette(new List<Color> { Settings.BackgroundDefault.Default.EmptyBackgroundColor }), new byte[Width * Height], Width);
+                }
+            }
         }
 
         private void GetBackgroundList()
@@ -173,28 +175,61 @@ namespace PersonaEditorGUI.Classes.Media.Visual
             {
                 DirectoryInfo DI = new DirectoryInfo(BackgroundDirPath);
                 foreach (var file in DI.GetFiles(@"*.png"))
-                    BackgroundList.Add(file.Name);
+                    backgroundList.Add(file.Name);
             }
         }
 
-        private int CurrentIndex = 0;
+        private int _SelectedIndex = 0;
+        public int SelectedIndex
+        {
+            get { return _SelectedIndex; }
+            set { SetBackground(value); }
+        }
+
+        private string _SelectedItem = "Empty";
+        public string SelectedItem
+        {
+            get { return _SelectedItem; }
+            set { SetBackground(value); }
+        }
 
         public bool SetBackground(int index)
         {
-            CurrentIndex = index;
-            return Update(BackgroundList[index]);
+            if (index >= 0 && index < BackgroundList.Count)
+                if (Update(BackgroundList[index]))
+                {
+                    _SelectedIndex = index;
+                    _SelectedItem = BackgroundList[index];
+                    Notify("SelectedIndex");
+                    Notify("SelectedItem");
+                    return true;
+                }
+
+            Notify("SelectedIndex");
+            return false;
         }
 
-        public bool CurrentUpdate()
+        public bool SetBackground(string name)
         {
-            return Update(BackgroundList[CurrentIndex]);
+            if (BackgroundList.Contains(name))
+                if (Update(name))
+                {
+                    _SelectedItem = name;
+                    _SelectedIndex = BackgroundList.IndexOf(name);
+                    Notify("SelectedItem");
+                    Notify("SelectedIndex");
+                    return true;
+                }
+
+            Notify("SelectedItem");
+            return false;
         }
 
         bool Update(string FileName)
         {
-            if (Equals(FileName, "Default"))
+            if (Equals(FileName, "Empty"))
             {
-                CurrentBackground.SetDefault();
+                SetDefault();
                 BackgroundChanged?.Invoke(CurrentBackground);
                 return true;
             }
@@ -202,8 +237,8 @@ namespace PersonaEditorGUI.Classes.Media.Visual
             {
                 try
                 {
-                    CurrentBackground.Image = new BitmapImage(new Uri(Path.Combine(BackgroundDirPath, FileName)));
-                    string xml = Path.Combine(BackgroundDirPath, Path.GetFileNameWithoutExtension(FileName) + ".xml");
+                    CurrentBackground.Image = new BitmapImage(new Uri(Path.Combine(Path.GetFullPath(BackgroundDirPath), FileName)));
+                    string xml = Path.Combine(Path.GetFullPath(BackgroundDirPath), Path.GetFileNameWithoutExtension(FileName) + ".xml");
                     ParseDescription(xml);
                     BackgroundChanged?.Invoke(CurrentBackground);
                     return true;
@@ -225,9 +260,25 @@ namespace PersonaEditorGUI.Classes.Media.Visual
                     MessageBox.Show(e.GetType().ToString());
                     MessageBox.Show(e.ToString());
                 }
-                CurrentBackground.SetDefault();
+                SetDefault();
                 return false;
             }
+        }
+
+        void SetDefault()
+        {
+            int Width = Settings.BackgroundDefault.Default.EmptyWidth;
+            int Height = Settings.BackgroundDefault.Default.EmptyHeight;
+            CurrentBackground.TextStart = Settings.BackgroundDefault.Default.EmptyTextPos;
+            CurrentBackground.NameStart = Settings.BackgroundDefault.Default.EmptyNamePos;
+
+            CurrentBackground.GlyphScale = Settings.BackgroundDefault.Default.EmptyGlyphScale;
+            CurrentBackground.ColorName = Settings.BackgroundDefault.Default.EmptyNameColor;
+            CurrentBackground.ColorText = Settings.BackgroundDefault.Default.EmptyTextColor;
+            CurrentBackground.LineSpacing = Settings.BackgroundDefault.Default.EmptyLineSpacing;
+
+            CurrentBackground.Image = BitmapSource.Create(Width, Height, 96, 96, PixelFormats.Indexed1,
+                new BitmapPalette(new List<Color> { Settings.BackgroundDefault.Default.EmptyBackgroundColor }), new byte[Width * Height], Width);
         }
 
         void ParseDescription(string FileName)

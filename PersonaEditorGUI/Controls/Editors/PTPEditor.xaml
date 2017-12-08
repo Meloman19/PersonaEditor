@@ -4,17 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
+             xmlns:local2="clr-namespace:PersonaEditorGUI.Classes"
              xmlns:media="clr-namespace:PersonaEditorGUI.Classes.Media.Visual"
              mc:Ignorable="d" Name="USC"
-             d:DesignHeight="300" d:DesignWidth="300" DataContext="{x:Null}">
-
-    <UserControl.Resources>
-        <local:BytesToString x:Key="BytesToString"/>
-        <local:MSGListToSystem x:Key="MSGListToSystem"/>
-        <local:MSGListToText x:Key="MSGListToText"/>
-
-        <ImageDrawing x:Key="BackgroundImage"/>
-    </UserControl.Resources>
+             d:DesignHeight="300" d:DesignWidth="300" DataContext="{x:Null}" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -22,9 +15,12 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Menu Grid.Row="0">
-            <ComboBox></ComboBox>
-        </Menu>
+        <Border BorderBrush="Black" BorderThickness="0,0,0,1">
+            <Menu Grid.Row="0">
+                <ComboBox ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Menu>
+        </Border>
+
         <ScrollViewer Name="ScrollView" Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.RowDefinitions>
@@ -43,24 +39,16 @@
 
                                 <Grid Grid.Column="0">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
                                     <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
                                     <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
-                                    <TextBox Grid.Column="3" Margin="2" IsReadOnly="True">
-                                        <TextBox.Text>
-                                            <MultiBinding Converter="{StaticResource BytesToString}">
-                                                <Binding Path="OldName"/>
-                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.OldCharList"/>
-                                            </MultiBinding>
-                                        </TextBox.Text>
-                                    </TextBox>
-
+                                    <TextBox Grid.Column="3" Margin="2" Text="{Binding OldName, Mode=OneWay}"/>
                                 </Grid>
 
                                 <TextBox Grid.Column="1" Margin="2" Text="{Binding NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -80,7 +68,7 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel>
-                                                <Separator ></Separator>
+                                                <Separator/>
 
                                                 <Grid>
                                                     <Grid.RowDefinitions>
@@ -89,7 +77,7 @@
                                                         <RowDefinition Height="Auto"></RowDefinition>
                                                     </Grid.RowDefinitions>
 
-                                                    <TextBlock TextWrapping="Wrap" Grid.Row="0" Text="{Binding Prefix, Converter={StaticResource MSGListToSystem}}" HorizontalAlignment="Center" />
+                                                    <TextBlock TextWrapping="Wrap" Grid.Row="0" Text="{Binding Prefix, Mode=OneWay}" HorizontalAlignment="Center" />
 
                                                     <Grid Grid.Row="1" Margin="5">
                                                         <Grid.ColumnDefinitions>
@@ -101,14 +89,7 @@
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
 
-                                                        <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Auto">
-                                                            <TextBox.Text>
-                                                                <MultiBinding Converter="{StaticResource MSGListToText}">
-                                                                    <Binding Path="OldString"/>
-                                                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}" Path="DataContext.OldCharList"/>
-                                                                </MultiBinding>
-                                                            </TextBox.Text>
-                                                        </TextBox>
+                                                        <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" Text="{Binding OldString, Mode=OneWay}"/>
                                                         <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                                                         <Image Grid.Column="0" Grid.Row="1" Margin="2">
@@ -117,11 +98,37 @@
                                                                     <DrawingImage.Drawing>
                                                                         <DrawingGroup>
                                                                             <DrawingGroup.Children>
-                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.Image}"
-                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.Rect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundImage}"
+                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundRect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.OldNameImage}"
+                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.OldNameRect}"/>
+
+                                                                                <ImageDrawing ImageSource="{Binding Path=OldTextSource}" Rect="{Binding Path=OldTextRect}"/>
                                                                             </DrawingGroup.Children>
                                                                             <DrawingGroup.ClipGeometry>
-                                                                                <RectangleGeometry Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.Rect}"/>
+                                                                                <RectangleGeometry Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundRect}"/>
+                                                                            </DrawingGroup.ClipGeometry>
+                                                                        </DrawingGroup>
+                                                                    </DrawingImage.Drawing>
+                                                                </DrawingImage>
+                                                            </Image.Source>
+                                                        </Image>
+
+                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2">
+                                                            <Image.Source>
+                                                                <DrawingImage>
+                                                                    <DrawingImage.Drawing>
+                                                                        <DrawingGroup>
+                                                                            <DrawingGroup.Children>
+                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundImage}"
+                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundRect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.NewNameImage}"
+                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.NewNameRect}"/>
+
+                                                                                <ImageDrawing ImageSource="{Binding Path=NewTextSource}" Rect="{Binding Path=NewTextRect}"/>
+                                                                            </DrawingGroup.Children>
+                                                                            <DrawingGroup.ClipGeometry>
+                                                                                <RectangleGeometry Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundRect}"/>
                                                                             </DrawingGroup.ClipGeometry>
                                                                         </DrawingGroup>
                                                                     </DrawingImage.Drawing>
@@ -133,7 +140,7 @@
                                                         <Image Grid.Column="1" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="NewVisualizer_Loaded"/>-->
                                                     </Grid>
 
-                                                    <TextBlock TextWrapping="Wrap"  Grid.Row="2" Text="{Binding Postfix, Converter={StaticResource MSGListToSystem}}" HorizontalAlignment="Center"/>
+                                                    <TextBlock TextWrapping="Wrap"  Grid.Row="2" Text="{Binding Postfix, Mode=OneWay}" HorizontalAlignment="Center"/>
                                                 </Grid>
 
                                                 <Separator ></Separator>

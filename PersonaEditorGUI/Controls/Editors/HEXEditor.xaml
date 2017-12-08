@@ -7,6 +7,17 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-            
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid>
+
+            </Grid>
+
+            <ScrollBar Orientation="Vertical" Grid.Column="1" Minimum="0" Maximum="100" Value="40"/>
+        </Grid>
     </Grid>
 </UserControl>

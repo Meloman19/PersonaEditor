@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using PersonaEditorLib.FileTypes;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using PersonaEditorLib.FileStructure;
@@ -14,12 +13,12 @@ namespace PersonaEditorLib.Extension
 {
     public static class ListExtentsion
     {
-        public static string GetString(this IList<FileStructure.PTP.TextBaseElement> ByteCollection, CharList CharList, bool LineSplit)
+        public static string GetString(this IList<FileStructure.PTP.TextBaseElement> ByteCollection, CharList CharList, bool LineSplit = true)
         {
             string returned = "";
 
             foreach (var MSG in ByteCollection)
-                returned += MSG.GetText(CharList);
+                returned += MSG.GetText(CharList, LineSplit);
 
             return returned;
         }

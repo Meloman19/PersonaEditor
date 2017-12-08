@@ -30,20 +30,8 @@ namespace PersonaEditorGUI.Files
         }
     }
 
-    class UserTreeViewItem : INotifyPropertyChanged
+    class UserTreeViewItem : BindingObject
     {
-        #region INotifyPropertyChanged implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void Notify(string propertyName)
-        {
-            if (this.PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion INotifyPropertyChanged implementation
-
         public ObservableCollection<UserTreeViewItem> SubItems { get; } = new ObservableCollection<UserTreeViewItem>();
 
         private string header = "";
@@ -86,13 +74,11 @@ namespace PersonaEditorGUI.Files
             if (context is IPersonaFile item)
             {
                 Header = item.Name;
-                
+
                 Update(item);
             }
             else
                 throw new Exception("UserTreeViewItem: context not IPersonaFile");
-
-
         }
 
         private void Update(IPersonaFile item)
@@ -168,7 +154,7 @@ namespace PersonaEditorGUI.Files
             SFD.OverwritePrompt = true;
             if (SFD.ShowDialog() == true)
             {
-                File.WriteAllBytes(SFD.FileName, (personaFile as IFile).Get(true));
+                File.WriteAllBytes(SFD.FileName, (personaFile as IFile).Get());
             }
         }
 
@@ -199,13 +185,13 @@ namespace PersonaEditorGUI.Files
             if (CtrlDown && personaFile is IImage img)
             {
                 string[] paths = new string[] { Path.Combine(Path.GetDirectoryName(filepath), Path.GetFileNameWithoutExtension(filepath) + ".png") };
-                PersonaEditorLib.Extension.Imaging.SavePNG(img.Image, paths[0]);
+                PersonaEditorLib.Extension.Imaging.SaveBMP(img.Image, paths[0]);
                 data.SetData(DataFormats.FileDrop, paths);
             }
             else
             {
                 string[] paths = new string[] { filepath };
-                File.WriteAllBytes(paths[0], (personaFile as IFile).Get(true));
+                File.WriteAllBytes(paths[0], (personaFile as IFile).Get());
                 data.SetData(DataFormats.FileDrop, paths);
             }
 

@@ -15,12 +15,6 @@ namespace PersonaEditorLib.FileStructure.PTP
 {
     public delegate void MsgElementListChanged(IList<TextBaseElement> array);
 
-    public interface ListMsg
-    {
-        event MsgElementListChanged Old;
-        event MsgElementListChanged New;
-    }
-
     public struct TextBaseElement
     {
         public TextBaseElement(string type, byte[] array)
@@ -29,11 +23,14 @@ namespace PersonaEditorLib.FileStructure.PTP
             Array = array;
         }
 
-        public string GetText(CharList CharList)
+        public string GetText(CharList CharList, bool linesplit = true)
         {
             if (Type == "System")
                 if (Array[0] == 0x0A)
-                    return "\n";
+                    if (linesplit)
+                        return "\n";
+                    else
+                        return GetSystem();
                 else
                     return GetSystem();
             else
@@ -60,168 +57,130 @@ namespace PersonaEditorLib.FileStructure.PTP
         public byte[] Array { get; set; }
     }
 
+    public class PTPName : BindingObject
+    {
+        public PTPName(int index, string oldName, string newName)
+        {
+            Index = index;
+            NewName = newName;
+            OldName = Utilities.String.SplitString(oldName, '-');
+        }
+
+        public PTPName(int index, byte[] oldName, string newName)
+        {
+            Index = index;
+            NewName = newName;
+            OldName = oldName;
+        }
+
+        public PTPName() { }
+
+        private byte[] _OldName;
+        private string _NewName;
+
+        public int Index { get; set; }
+        public byte[] OldName
+        {
+            get { return _OldName; }
+            set
+            {
+                _OldName = value;
+                Notify("OldName");
+            }
+        }
+        public string NewName
+        {
+            get { return _NewName; }
+            set
+            {
+                _NewName = value;
+                Notify("NewName");
+            }
+        }
+    }
+
+    public class MSG : BindingObject
+    {
+        public class MSGstr : BindingObject
+        {
+            public MSGstr(int index, string newstring)
+            {
+                Index = index;
+                NewString = newstring;
+                OldString.ListChanged += OldString_ListChanged;
+
+            }
+
+            private void OldString_ListChanged(object sender, ListChangedEventArgs e)
+            {
+                Notify("OldString");
+            }
+
+            private string _NewString = "";
+
+            public int Index { get; set; }
+            public int CharacterIndex { get; set; }
+            public BindingList<TextBaseElement> Prefix { get; set; } = new BindingList<TextBaseElement>();
+            public BindingList<TextBaseElement> OldString { get; set; } = new BindingList<TextBaseElement>();
+            public BindingList<TextBaseElement> Postfix { get; set; } = new BindingList<TextBaseElement>();
+            public string NewString
+            {
+                get { return _NewString; }
+                set
+                {
+                    if (_NewString != value)
+                    {
+                        _NewString = value;
+                        Notify("NewString");
+                    }
+                }
+            }
+        }
+
+        public MSG(int index, string type, string name, int charindex, string array)
+        {
+            Index = index;
+            Type = type;
+            Name = name;
+            CharacterIndex = charindex;
+            MsgBytes = Utilities.String.SplitString(array, '-');
+        }
+
+        public MSG(int index, string type, string name, int charindex, byte[] array)
+        {
+            Index = index;
+            Type = type;
+            Name = name;
+            CharacterIndex = charindex;
+            MsgBytes = array;
+        }
+
+        public int Index { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public int CharacterIndex { get; set; }
+        public byte[] MsgBytes { get; set; }
+
+        public BindingList<MSGstr> Strings { get; set; } = new BindingList<MSGstr>();
+    }
+
     public class PTP : IPersonaFile, IFile
     {
         private string _Name = "";
 
-        public PTP(string OldFont, string OldMap, string NewFont, string NewMap)
-        {
-            new CharList(OldMap, new FNT.FNT(File.OpenRead(OldFont), 0)).CopyTo(OldCharList);
-            new CharList(NewMap, new FNT.FNT(File.OpenRead(NewFont), 0)).CopyTo(NewCharList);
-        }
-
-        public PTP(CharList OldCharList, CharList NewCharList)
-        {
-            OldCharList.CopyTo(this.OldCharList);
-            NewCharList.CopyTo(this.NewCharList);
-        }
-
         public PTP(string Name, byte[] data)
         {
-            _Name = Name;
             using (MemoryStream MS = new MemoryStream(data))
-                Open(MS);
+                Open(Name, MS);
         }
 
-        public CharList OldCharList { get; } = new CharList();
-        public CharList NewCharList { get; } = new CharList();
-
-        public string OpenFileName = "";
-
-        public class Names : ListMsg
+        public PTP()
         {
-            public event MsgElementListChanged Old;
-            public event MsgElementListChanged New;
 
-            CharList NewChar;
-
-            public Names(int Index, string OldName, string NewName, CharList New)
-            {
-                NewChar = New;
-                this.Index = Index;
-                this.NewName = NewName;
-                this.OldName = Utilities.String.SplitString(OldName, '-');
-            }
-
-            public Names(int Index, byte[] OldName, string NewName, CharList New)
-            {
-                NewChar = New;
-                this.Index = Index;
-                this.NewName = NewName;
-                this.OldName = OldName;
-            }
-
-            private byte[] _OldName;
-            private string _NewName;
-
-            public int Index { get; set; }
-            public byte[] OldName
-            {
-                get { return _OldName; }
-                set
-                {
-                    _OldName = value;
-                    Old?.Invoke(_OldName.GetTextBaseList());
-                }
-            }
-            public string NewName
-            {
-                get { return _NewName; }
-                set
-                {
-                    _NewName = value;
-                    New?.Invoke(_NewName.GetTextBaseList(NewChar));
-                }
-            }
         }
 
-        public class MSG
-        {
-            public class MSGstr : INotifyPropertyChanged, ListMsg
-            {
-                public event MsgElementListChanged Old;
-                public event MsgElementListChanged New;
-
-                CharList NewChar;
-
-                public MSGstr(int index, string newstring, CharList New)
-                {
-                    NewChar = New;
-                    Index = index;
-                    NewString = newstring;
-                    OldString.ListChanged += OldString_ListChanged;
-
-                }
-
-                private void OldString_ListChanged(object sender, ListChangedEventArgs e)
-                {
-                    Old?.Invoke(OldString);
-                    Notify("OldString");
-                }
-
-                #region INotifyPropertyChanged implementation
-                public event PropertyChangedEventHandler PropertyChanged;
-
-                protected void Notify(string propertyName)
-                {
-                    if (this.PropertyChanged != null)
-                    {
-                        PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-                    }
-                }
-                #endregion INotifyPropertyChanged implementation
-
-                private string _NewString = "";
-
-                public int Index { get; set; }
-                public int CharacterIndex { get; set; }
-                public BindingList<TextBaseElement> Prefix { get; set; } = new BindingList<TextBaseElement>();
-                public BindingList<TextBaseElement> OldString { get; set; } = new BindingList<TextBaseElement>();
-                public BindingList<TextBaseElement> Postfix { get; set; } = new BindingList<TextBaseElement>();
-                public string NewString
-                {
-                    get { return _NewString; }
-                    set
-                    {
-                        if (_NewString != value)
-                        {
-                            _NewString = value;
-                            New?.Invoke(_NewString.GetTextBaseList(NewChar));
-                            Notify("NewString");
-                        }
-                    }
-                }
-            }
-
-            public MSG(int index, string type, string name, int charindex, string array)
-            {
-                Index = index;
-                Type = type;
-                Name = name;
-                CharacterIndex = charindex;
-                MsgBytes = Utilities.String.SplitString(array, '-');
-            }
-
-            public MSG(int index, string type, string name, int charindex, byte[] array)
-            {
-                Index = index;
-                Type = type;
-                Name = name;
-                CharacterIndex = charindex;
-                MsgBytes = array;
-            }
-
-            public int Index { get; set; }
-            public string Type { get; set; }
-            public string Name { get; set; }
-            public int CharacterIndex { get; set; }
-            public byte[] MsgBytes { get; set; }
-
-            public BindingList<MSGstr> Strings { get; set; } = new BindingList<MSGstr>();
-        }
-
-        public ObservableCollection<Names> names { get; set; } = new ObservableCollection<Names>();
-        public ObservableCollection<MSG> msg { get; set; } = new ObservableCollection<MSG>();
+        public ObservableCollection<PTPName> names { get; } = new ObservableCollection<PTPName>();
+        public ObservableCollection<MSG> msg { get; } = new ObservableCollection<MSG>();
 
         public bool Open(string path)
         {
@@ -240,7 +199,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                     string OldNameSource = NAME.Element("OldNameSource").Value;
                     string NewName = NAME.Element("NewName").Value;
 
-                    names.Add(new Names(Index, OldNameSource, NewName, NewCharList));
+                    names.Add(new PTPName(Index, OldNameSource, NewName));
                 }
 
                 foreach (var Message in MSG1Doc.Element("MSG").Elements())
@@ -260,7 +219,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                         int StringIndex = Convert.ToInt32(Strings.Attribute("Index").Value);
                         string NewString = Strings.Element("NewString").Value;
 
-                        MSG.MSGstr temp2 = new MSG.MSGstr(StringIndex, NewString, NewCharList) { CharacterIndex = CharacterNameIndex };
+                        MSG.MSGstr temp2 = new MSG.MSGstr(StringIndex, NewString) { CharacterIndex = CharacterNameIndex };
                         temp.Strings.Add(temp2);
 
                         foreach (var Prefix in Strings.Elements("PrefixBytes"))
@@ -292,20 +251,20 @@ namespace PersonaEditorLib.FileStructure.PTP
                     }
                 }
 
-                OpenFileName = Path.GetFileName(Path.GetFullPath(path));
+                _Name = Path.GetFileName(Path.GetFullPath(path));
                 return true;
             }
             catch (Exception e)
             {
                 names.Clear();
                 msg.Clear();
-                OpenFileName = "";
+                _Name = "";
                 Logging.Write("PTPfactory", e.ToString());
                 return false;
             }
         }
 
-        public bool Open(Stream stream)
+        public bool Open(string name, Stream stream)
         {
             try
             {
@@ -322,7 +281,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                     string OldNameSource = NAME.Element("OldNameSource").Value;
                     string NewName = NAME.Element("NewName").Value;
 
-                    names.Add(new Names(Index, OldNameSource, NewName, NewCharList));
+                    names.Add(new PTPName(Index, OldNameSource, NewName));
                 }
 
                 foreach (var Message in MSG1Doc.Element("MSG").Elements())
@@ -342,7 +301,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                         int StringIndex = Convert.ToInt32(Strings.Attribute("Index").Value);
                         string NewString = Strings.Element("NewString").Value;
 
-                        MSG.MSGstr temp2 = new MSG.MSGstr(StringIndex, NewString, NewCharList) { CharacterIndex = CharacterNameIndex };
+                        MSG.MSGstr temp2 = new MSG.MSGstr(StringIndex, NewString) { CharacterIndex = CharacterNameIndex };
                         temp.Strings.Add(temp2);
 
                         foreach (var Prefix in Strings.Elements("PrefixBytes"))
@@ -374,20 +333,20 @@ namespace PersonaEditorLib.FileStructure.PTP
                     }
                 }
 
-                //OpenFileName = Path.GetFileName(Path.GetFullPath(path));
+                _Name = name;
                 return true;
             }
             catch (Exception e)
             {
                 names.Clear();
                 msg.Clear();
-                OpenFileName = "";
+                _Name = "";
                 Logging.Write("PTPfactory", e.ToString());
                 return false;
             }
         }
 
-        public bool Open(BMD.BMD BMD, bool CopyOld2New)
+        public bool Open(BMD.BMD BMD, bool CopyOld2New, CharList Old, CharList New)
         {
             try
             {
@@ -400,7 +359,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                     byte[] OldNameSource = NAME.NameBytes;
                     string NewName = "";
 
-                    names.Add(new Names(Index, OldNameSource, NewName, NewCharList));
+                    names.Add(new PTPName(Index, OldNameSource, NewName));
                 }
 
                 foreach (var Message in BMD.msg)
@@ -410,35 +369,35 @@ namespace PersonaEditorLib.FileStructure.PTP
                     string Name = Message.Name;
                     int CharacterNameIndex = Message.CharacterIndex;
                     byte[] SourceBytes_str = Message.MsgBytes;
-                    MSG temp = new MSG(Index, Type, Name, CharacterNameIndex, SourceBytes_str) { CharacterIndex = CharacterNameIndex };
-                    temp.Strings.ParseStrings(SourceBytes_str, NewCharList);
+                    MSG temp = new MSG(Index, Type, Name, CharacterNameIndex, SourceBytes_str);
+                    temp.Strings.ParseStrings(SourceBytes_str, New);
                     msg.Add(temp);
                 }
 
                 if (CopyOld2New)
-                    this.CopyOld2New();
+                    this.CopyOld2New(Old);
 
-                OpenFileName = Path.GetFileNameWithoutExtension(Path.GetFullPath(BMD.OpenFileName)) + ".PTP";
+                _Name = Path.GetFileNameWithoutExtension(Path.GetFullPath(BMD.Name)) + ".PTP";
                 return true;
             }
             catch (Exception e)
             {
                 names.Clear();
                 msg.Clear();
-                OpenFileName = "";
+                _Name = "";
                 Logging.Write("PTPfactory", e.ToString());
                 return false;
             }
         }
 
-        public void CopyOld2New()
+        public void CopyOld2New(CharList Old)
         {
             foreach (var Name in names)
-                Name.NewName = Name.OldName.GetTextBaseList().GetString(OldCharList, false);
+                Name.NewName = Name.OldName.GetTextBaseList().GetString(Old, false);
 
             foreach (var Msg in msg)
                 foreach (var Str in Msg.Strings)
-                    Str.NewString = Str.OldString.GetString(OldCharList, false);
+                    Str.NewString = Str.OldString.GetString(Old, false);
         }
 
         private class LineMap
@@ -494,7 +453,7 @@ namespace PersonaEditorLib.FileStructure.PTP
             }
         }
 
-        public bool ExportTXT(string output, string map, bool removesplit)
+        public bool ExportTXT(string output, string map, bool removesplit, CharList Old, CharList New)
         {
             var temp = new LineMap(map).GetList();
 
@@ -507,16 +466,16 @@ namespace PersonaEditorLib.FileStructure.PTP
 
                     foreach (var type in temp)
                     {
-                        if (type == LineMap.Type.FileName) returned += OpenFileName + "\t";
+                        if (type == LineMap.Type.FileName) returned += _Name + "\t";
                         else if (type == LineMap.Type.MSGindex) returned += a.Index + "\t";
                         else if (type == LineMap.Type.MSGname) returned += a.Name + "\t";
                         else if (type == LineMap.Type.StringIndex) returned += b.Index + "\t";
-                        else if (type == LineMap.Type.OldText) returned += removesplit ? b.OldString.GetString(OldCharList, false).Replace("\n", " ") + "\t" : b.OldString.GetString(OldCharList, false).Replace("\n", "\\n") + "\t";
+                        else if (type == LineMap.Type.OldText) returned += removesplit ? b.OldString.GetString(Old, false).Replace("\n", " ") + "\t" : b.OldString.GetString(Old, false).Replace("\n", "\\n") + "\t";
                         else if (type == LineMap.Type.NewText) returned += removesplit ? b.NewString.Replace("\n", " ") + "\t" : b.NewString.Replace("\n", "\\n") + "\t";
                         else if (type == LineMap.Type.OldName)
                         {
                             var name = names.FirstOrDefault(x => x.Index == a.CharacterIndex);
-                            returned += name == null ? " \t" : name.OldName.GetTextBaseList().GetString(OldCharList, false).Replace("\n", " ") + "\t";
+                            returned += name == null ? " \t" : name.OldName.GetTextBaseList().GetString(Old, false).Replace("\n", " ") + "\t";
                         }
                         else if (type == LineMap.Type.NewName)
                         {
@@ -533,7 +492,7 @@ namespace PersonaEditorLib.FileStructure.PTP
             return true;
         }
 
-        public void ImportTXT(string txtfile, string map, bool auto, int width, bool skip, Encoding encoding)
+        public void ImportTXT(string txtfile, string map, bool auto, int width, bool skip, Encoding encoding, CharList Old, CharList New)
         {
             int Width = (int)Math.Round((double)width / 0.9375);
             LineMap MAP = new LineMap(map);
@@ -548,14 +507,14 @@ namespace PersonaEditorLib.FileStructure.PTP
 
                         if (MAP.CanGetText)
                         {
-                            if (OpenFileName.Equals(linespl[MAP[LineMap.Type.FileName]], StringComparison.OrdinalIgnoreCase))
+                            if (_Name.Equals(linespl[MAP[LineMap.Type.FileName]], StringComparison.OrdinalIgnoreCase))
                             {
                                 string NewText = linespl[MAP[LineMap.Type.NewText]];
 
                                 if (!(NewText == "" & skip))
                                 {
                                     if (auto)
-                                        NewText = NewText.SplitByWidth(NewCharList, Width);
+                                        NewText = NewText.SplitByWidth(New, Width);
                                     else
                                         NewText = NewText.Replace("\\n", "\n");
 
@@ -575,7 +534,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                             }
                         }
                         else if (MAP.CanGetName)
-                            ImportNameByName(linespl[MAP[LineMap.Type.OldName]], linespl[MAP[LineMap.Type.NewName]]);
+                            ImportNameByName(linespl[MAP[LineMap.Type.OldName]], linespl[MAP[LineMap.Type.NewName]], Old);
                     }
                 }
             }
@@ -617,12 +576,12 @@ namespace PersonaEditorLib.FileStructure.PTP
                 ImportName(names.FirstOrDefault(x => x.Index == MSG.CharacterIndex), NewName);
         }
 
-        private void ImportNameByName(string OldName, string NewName)
+        private void ImportNameByName(string OldName, string NewName, CharList Old)
         {
-            ImportName(names.FirstOrDefault(x => x.OldName.GetTextBaseList().GetString(OldCharList, true) == OldName), NewName);
+            ImportName(names.FirstOrDefault(x => x.OldName.GetTextBaseList().GetString(Old, true) == OldName), NewName);
         }
 
-        private void ImportName(Names Name, string NewName)
+        private void ImportName(PTPName Name, string NewName)
         {
             if (Name != null)
                 Name.NewName = NewName;
@@ -717,7 +676,7 @@ namespace PersonaEditorLib.FileStructure.PTP
 
         public bool Replace(object a)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public List<ContextMenuItems> ContextMenuList
@@ -751,11 +710,11 @@ namespace PersonaEditorLib.FileStructure.PTP
 
         #region IFile
 
-        public bool IsLittleEndian { get; set; } = true;
-
         public int Size => Get(true).Length;
 
-        public byte[] Get(bool temp)
+        public byte[] Get(bool temp) { return Get(); }
+
+        public byte[] Get()
         {
             try
             {

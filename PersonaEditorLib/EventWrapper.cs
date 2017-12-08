@@ -7,27 +7,26 @@ using System.Threading.Tasks;
 
 namespace PersonaEditorLib
 {
-    public interface IEventWrapper
+    public interface IEventWrapper : INotifyPropertyChanged
     {
-        event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged(object sender, PropertyChangedEventArgs e);
     }
 
     public class EventWrapper
     {
-        IEventWrapper eventSource;
-        WeakReference wr;
+        INotifyPropertyChanged eventSource;
+        WeakReference eventDestination;
 
-        public EventWrapper(IEventWrapper eventSource, IEventWrapper obj)
+        public EventWrapper(INotifyPropertyChanged eventSource, IEventWrapper eventDestination)
         {
             this.eventSource = eventSource;
-            this.wr = new WeakReference(obj);
+            this.eventDestination = new WeakReference(eventDestination);
             eventSource.PropertyChanged += OnEvent;
         }
 
         void OnEvent(object sender, PropertyChangedEventArgs e)
         {
-            IEventWrapper obj = (IEventWrapper)wr.Target;
+            IEventWrapper obj = (IEventWrapper)eventDestination.Target;
             if (obj != null)
                 obj.OnPropertyChanged(sender, e);
             else
@@ -38,7 +37,7 @@ namespace PersonaEditorLib
         {
             eventSource.PropertyChanged -= OnEvent;
             eventSource = null;
-            wr = null;
+            eventDestination = null;
         }
     }
 }

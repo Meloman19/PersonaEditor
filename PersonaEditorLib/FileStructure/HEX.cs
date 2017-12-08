@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PersonaEditorLib.FileStructure
 {
-    class HEX : IPersonaFile, IFile
+    public class HEX : IPersonaFile, IFile
     {
         public byte[] Data { get; set; } = new byte[0];
 
@@ -71,19 +71,19 @@ namespace PersonaEditorLib.FileStructure
         #endregion IPersonaFile
 
         #region IFile
-
-        public bool IsLittleEndian { get; set; } = true;
-
+        
         public int Size
         {
             get { return Data.Length; }
         }
 
-        public byte[] Get(bool IsLittleEndian)
+        public byte[] Get()
         {
             return Data;
         }
 
         #endregion IFile
+
+        public object Tag { get; set; }
     }
 }

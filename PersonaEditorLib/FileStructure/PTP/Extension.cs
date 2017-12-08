@@ -99,14 +99,14 @@ namespace PersonaEditorLib.FileStructure.PTP
             return returned;
         }
 
-        public static void ParseStrings(this IList<PTP.MSG.MSGstr> Strings, byte[] SourceBytes, CharList New)
+        public static void ParseStrings(this IList<MSG.MSGstr> Strings, byte[] SourceBytes, CharList New)
         {
             Strings.Clear();
 
             int Index = 0;
             foreach (var Bytes in SplitSourceBytes(SourceBytes))
             {
-                PTP.MSG.MSGstr MSG = new PTP.MSG.MSGstr(Index, "", New);
+                MSG.MSGstr MSG = new MSG.MSGstr(Index, "");
 
                 List<TextBaseElement> temp = Bytes.GetTextBaseList();
 

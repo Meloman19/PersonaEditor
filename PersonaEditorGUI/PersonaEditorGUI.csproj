@@ -32,15 +32,33 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFHexaEditor.1.2.9\lib\net45\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -53,9 +71,6 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="WPFHexaEditor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WPFHexaEditor.1.2.9\lib\net45\WPFHexaEditor.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -66,15 +81,23 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Controls\RelativePanel.cs" />
+    <Compile Include="Classes\Media\Visual\MSGVisual.cs" />
+    <Compile Include="Classes\ResourceItem.cs" />
     <Compile Include="Controls\ClosableTabItem.xaml.cs">
       <DependentUpon>ClosableTabItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Editors\BMDEditor.xaml.cs">
       <DependentUpon>BMDEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Editors\BMDEditorVM.cs" />
+    <Compile Include="Controls\Editors\FNTEditor.xaml.cs">
+      <DependentUpon>FNTEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Editors\FNTEditorVM.cs" />
     <Compile Include="Controls\Editors\HEXEditor.xaml.cs">
       <DependentUpon>HEXEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Editors\HEXEditorVM.cs" />
     <Compile Include="Controls\Editors\PTPEditorVM.cs" />
     <Compile Include="Controls\Editors\SPREditor.xaml.cs">
       <DependentUpon>SPREditor.xaml</DependentUpon>
@@ -96,10 +119,26 @@
     </Compile>
     <Compile Include="Files\UserTreeViewItem.cs" />
     <Compile Include="Classes\Media\Visual\Background.cs" />
+    <Compile Include="MainWindowVM.cs" />
+    <Compile Include="Settings\App.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>App.settings</DependentUpon>
+    </Compile>
     <Compile Include="Settings\BackgroundDefault.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>BackgroundDefault.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\DefaultBackgroundVM.cs" />
+    <Compile Include="Settings\DefaultBackground.xaml.cs">
+      <DependentUpon>DefaultBackground.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\Main.xaml.cs">
+      <DependentUpon>Main.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\SetSettings.xaml.cs">
+      <DependentUpon>SetSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\SPREditor.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -111,6 +150,17 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>WindowSetting.settings</DependentUpon>
     </Compile>
+    <Compile Include="Test.xaml.cs">
+      <DependentUpon>Test.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\SetChar.xaml.cs">
+      <DependentUpon>SetChar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\SetCharVM.cs" />
+    <Compile Include="Tools\Visualizer.xaml.cs">
+      <DependentUpon>Visualizer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\VisualizerVM.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -120,6 +170,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\Editors\BMDEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Editors\FNTEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -166,12 +220,39 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Settings\DefaultBackground.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Settings\Main.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Settings\SetSettings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Test.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\SetChar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\Visualizer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="packages.config" />
+    <None Include="Settings\App.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>App.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Settings\BackgroundDefault.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>BackgroundDefault.Designer.cs</LastGenOutput>
@@ -196,6 +277,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\Background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\settings-work-tool.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controls\Primitive\" />

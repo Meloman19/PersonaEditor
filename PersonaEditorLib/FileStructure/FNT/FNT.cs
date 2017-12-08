@@ -1,5 +1,5 @@
 ﻿using PersonaEditorLib.Extension;
-using PersonaEditorLib.FileTypes;
+using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace PersonaEditorLib.FileStructure.FNT
 {
-    public class FNT
+    public class FNT : IPersonaFile, IFile, IPreview, IImage
     {
         public FNTHeader Header { get; set; }
         public FNTPalette Palette { get; set; }
@@ -32,6 +32,13 @@ namespace PersonaEditorLib.FileStructure.FNT
                 Read(FS, 0);
         }
 
+        public FNT(string name, byte[] data)
+        {
+            Name = name;
+            using (MemoryStream MS = new MemoryStream(data))
+                Read(MS, 0);
+        }
+
         private void Read(Stream stream, long position)
         {
             stream.Position = position;
@@ -49,11 +56,6 @@ namespace PersonaEditorLib.FileStructure.FNT
                 reader.BaseStream.Position = Header.LastPosition;
                 Last = new FNTLast(reader, Header.Glyphs.Count);
             }
-        }
-
-        public int Size()
-        {
-            return Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size();
         }
 
         private BitmapSource GetFontImage()
@@ -164,7 +166,94 @@ namespace PersonaEditorLib.FileStructure.FNT
             Logging.Write("PersonaEditorLib", "Width Table was writed. Get " + index + " glyphs");
         }
 
-        private byte[] Get()
+        public BitmapSource Image
+        {
+            get { return GetFontImage(); }
+            set { SetFontImage(value); }
+        }
+        public XDocument Table
+        {
+            get { return GetWidthTable(); }
+            set { SetWidthTable(value); }
+        }
+
+        private object GetControl()
+        {
+            System.Windows.Controls.Image image = new System.Windows.Controls.Image();
+            image.Source = Image;
+            return image;
+        }
+
+        #region IPreview
+
+        private object _control = null;
+        public object Control
+        {
+            get
+            {
+                if (_control == null)
+                    _control = GetControl();
+
+                return _control;
+            }
+        }
+
+        #endregion IPreview
+
+        #region IPersonaFile
+
+        public string Name { get; private set; } = "";
+
+        public FileType Type => FileType.FNT;
+
+        public List<object> GetSubFiles()
+        {
+            return new List<object>();
+        }
+
+        public bool Replace(object newdata)
+        {
+            return false;
+        }
+
+        public List<ContextMenuItems> ContextMenuList
+        {
+            get
+            {
+                List<ContextMenuItems> returned = new List<ContextMenuItems>();
+
+                returned.Add(ContextMenuItems.Export);
+                returned.Add(ContextMenuItems.Import);
+
+                return returned;
+            }
+        }
+
+        public Dictionary<string, object> GetProperties
+        {
+            get
+            {
+                Dictionary<string, object> returned = new Dictionary<string, object>();
+
+                returned.Add("Glyph Count", Header.Glyphs.Count);
+                returned.Add("Color Count", Header.Glyphs.NumberOfColor);
+                returned.Add("Unpack Font Size", Compressed.Header.UncompressedFontSize);
+                returned.Add("Type", Type);
+
+                return returned;
+            }
+        }
+
+        #endregion IPersonaFile
+
+        #region IFile
+
+        public int Size
+        {
+            get { return Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size(); }
+        }
+
+        public byte[] Get()
         {
             byte[] returned;
 
@@ -189,19 +278,6 @@ namespace PersonaEditorLib.FileStructure.FNT
             return returned;
         }
 
-        public BitmapSource Image
-        {
-            get { return GetFontImage(); }
-            set { SetFontImage(value); }
-        }
-        public XDocument Table
-        {
-            get { return GetWidthTable(); }
-            set { SetWidthTable(value); }
-        }
-        public byte[] This
-        {
-            get { return Get(); }
-        }
+        #endregion IFile
     }
 }

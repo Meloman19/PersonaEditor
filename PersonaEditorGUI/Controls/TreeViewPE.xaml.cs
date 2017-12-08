@@ -34,7 +34,7 @@ namespace PersonaEditorGUI.Controls
             get { return (bool)GetValue(HasOneItemProperty); }
             set { SetValue(HasOneItemProperty, value); }
         }
-        
+
         public TreeViewPE()
         {
 
@@ -76,7 +76,7 @@ namespace PersonaEditorGUI.Controls
                         if (temp.Length > 0)
                             if (MessageBox.Show("Replace " + userTreeViewItem.Name + "?", "Replace?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
                             {
-                                var personaFile = PersonaEditorLib.Utilities.PersonaFile.OpenFile(userTreeViewItem.Name, File.ReadAllBytes(temp[0]), userTreeViewItem.Type, true);
+                                var personaFile = PersonaEditorLib.Utilities.PersonaFile.OpenFile(userTreeViewItem.Name, File.ReadAllBytes(temp[0]), userTreeViewItem.Type);
                                 if (personaFile != null)
                                 {
                                     treeitem.Replace(personaFile);
@@ -93,7 +93,6 @@ namespace PersonaEditorGUI.Controls
         {
             if (e.NewValue is ObservableCollection<UserTreeViewItem> list)
             {
-
                 int count = 0;
 
                 foreach (var a in list)
@@ -105,6 +104,7 @@ namespace PersonaEditorGUI.Controls
 
                 if (count == 1)
                 {
+                    SelectedItemDataOpen?.Invoke(list[0]);
                     HasOneItem = true;
                     return;
                 }
@@ -137,5 +137,6 @@ namespace PersonaEditorGUI.Controls
                 if (textblock.DataContext is UserTreeViewItem item)
                     item.IsMouseOver = true;
         }
+
     }
 }

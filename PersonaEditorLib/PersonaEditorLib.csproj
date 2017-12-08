@@ -90,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BindingObject.cs" />
+    <Compile Include="CharList.cs" />
     <Compile Include="ColorPicker\ColorPickerTool.xaml.cs">
       <DependentUpon>ColorPickerTool.xaml</DependentUpon>
     </Compile>

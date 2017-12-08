@@ -10,75 +10,76 @@ using System.Threading.Tasks;
 
 namespace PersonaEditorLib.FileStructure.BMD
 {
-    public class BMD //: IPersonaFile, IFile
+    public class BMD : IPersonaFile, IFile
     {
         public BMD()
         {
 
         }
 
-        public BMD(byte[] data, bool IsLittleEndian)
+        public BMD(string name, byte[] data)
         {
-            var d = Open(data, IsLittleEndian);
+            var d = Open(data, name);
         }
 
-        public bool Open(string filepath, bool IsLittleEndian)
+        public bool Open(string filepath)
         {
             try
             {
-                using (BinaryReader reader = Utilities.IO.OpenReadFile(filepath, IsLittleEndian))
-                    ParseMSG1(reader);
+                name.Clear();
+                msg.Clear();
 
-                OpenFileName = Path.GetFileName(Path.GetFullPath(filepath));
+                using (FileStream FS = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+                    Open(FS);
+
+                Name = Path.GetFileName(Path.GetFullPath(filepath));
                 return true;
             }
             catch (Exception e)
             {
                 name.Clear();
                 msg.Clear();
-                OpenFileName = "";
+                Name = "";
                 Logging.Write("PTPfactory", e.ToString());
                 return false;
             }
         }
 
-        public bool Open(Stream stream, string filepath, bool IsLittleEndian)
+        public bool Open(Stream stream, string filepath)
         {
             try
             {
                 name.Clear();
                 msg.Clear();
-                stream.Position = 0;
-                BinaryReader reader = Utilities.IO.OpenReadFile(stream, IsLittleEndian);
 
-                ParseMSG1(reader);
+                Open(stream);
 
-                OpenFileName = filepath == "" ? "" : Path.GetFileNameWithoutExtension(Path.GetFullPath(filepath)) + ".BMD";
+                Name = filepath == "" ? "" : Path.GetFileNameWithoutExtension(Path.GetFullPath(filepath)) + ".BMD";
                 return true;
             }
             catch (Exception e)
             {
                 name.Clear();
                 msg.Clear();
-                OpenFileName = "";
+                Name = "";
                 Logging.Write("PTPfactory", e.ToString());
                 return false;
             }
         }
 
-        public bool Open(byte[] data, bool IsLittleEndian)
+        public bool Open(byte[] data, string filepath)
         {
-            return Open(data, "", IsLittleEndian);
+            using (MemoryStream MS = new MemoryStream(data))
+                return Open(MS, filepath);
         }
 
-        public bool Open(PTP.PTP PTP)
+        public bool Open(PTP.PTP PTP, CharList New)
         {
-            OpenFileName = Path.GetFileNameWithoutExtension(Path.GetFullPath(PTP.OpenFileName)) + ".BMD";
-            CharList CharList = PTP.NewCharList;
+            Name = PTP.Name;
             name.Clear();
             msg.Clear();
             foreach (var a in PTP.names)
-                name.Add(new Names(a.Index, a.NewName.GetTextBaseList(CharList).GetByteArray().ToArray()));
+                name.Add(new Names(a.Index, a.NewName.GetTextBaseList(New).GetByteArray().ToArray()));
 
             foreach (var a in PTP.msg)
             {
@@ -93,7 +94,7 @@ namespace PersonaEditorLib.FileStructure.BMD
                     foreach (var c in b.Prefix)
                         Msg.AddRange(c.Array.ToArray());
 
-                    Msg.AddRange(b.NewString.GetTextBaseList(CharList).GetByteArray().ToArray());
+                    Msg.AddRange(b.NewString.GetTextBaseList(New).GetByteArray().ToArray());
 
                     foreach (var c in b.Postfix)
                         Msg.AddRange(c.Array.ToArray());
@@ -106,10 +107,15 @@ namespace PersonaEditorLib.FileStructure.BMD
             return true;
         }
 
-        public bool Open(byte[] array, string filepath, bool IsLittleEndian)
+        private void Open(Stream stream)
         {
-            using (MemoryStream MS = new MemoryStream(array))
-                return Open(new MemoryStream(array), filepath, IsLittleEndian);
+            stream.Position = 0x8;
+            byte[] temp = new byte[4];
+            stream.Read(temp, 0, 4);
+            IsLittleEndian = Encoding.ASCII.GetString(temp) == "MSG1";
+            stream.Position = 0;
+            using (BinaryReader reader = Utilities.IO.OpenReadFile(stream, IsLittleEndian))
+                ParseMSG1(reader);
         }
 
         private void ParseMSG1(BinaryReader BR)
@@ -243,9 +249,6 @@ namespace PersonaEditorLib.FileStructure.BMD
             public int CharacterIndex { get; set; }
             public byte[] MsgBytes { get; set; }
         }
-
-        public CharList CharList { get; private set; }
-        public string OpenFileName { get; private set; } = "";
 
         public List<MSGs> msg { get; set; } = new List<MSGs>();
         public List<Names> name { get; set; } = new List<Names>();
@@ -496,17 +499,49 @@ namespace PersonaEditorLib.FileStructure.BMD
             }
         }
 
+        public bool IsLittleEndian { get; set; } = true;
+
         #region IPersonaFile
+
+        public string Name { get; private set; } = "";
 
         public FileType Type => FileType.BMD;
 
-        public List<TreeItem> GetTreeItemsList()
+        public List<object> GetSubFiles()
         {
-            return new List<TreeItem>();
+            return new List<object>();
         }
 
-        public void SetTreeItemsList(List<Tuple<string, byte[]>> list)
+        public bool Replace(object newdata)
         {
+            if (newdata is BMD bmd)
+            {
+                Name = bmd.Name;
+
+                name.Clear();
+                msg.Clear();
+
+                foreach (var a in bmd.name)
+                {
+                    int index = a.Index;
+                    byte[] namearray = a.NameBytes.ToArray();
+                    name.Add(new Names(index, namearray));
+                }
+
+                foreach (var a in bmd.msg)
+                {
+                    int index = a.Index;
+                    MSGs.MsgType type = a.Type;
+                    string msgname = a.Name;
+                    int charindex = a.CharacterIndex;
+                    byte[] array = a.MsgBytes.ToArray();
+                    msg.Add(new MSGs(index, msgname, type, charindex, array));
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         public List<ContextMenuItems> ContextMenuList
@@ -552,33 +587,16 @@ namespace PersonaEditorLib.FileStructure.BMD
             }
         }
 
-        public string Name => throw new NotImplementedException();
-
-        public byte[] Get(bool IsLittleEndian)
+        public byte[] Get()
         {
             byte[] returned = new byte[0];
             using (MemoryStream MS = new MemoryStream())
             {
                 BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
-                Get(writer);
+                GetNewBMD.Get(msg, name, writer);
                 returned = MS.ToArray();
             }
             return returned;
-        }
-
-        public void Get(BinaryWriter writer)
-        {
-            GetNewBMD.Get(msg, name, writer);
-        }
-
-        public List<object> GetSubFiles()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Replace(object a)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion IFile

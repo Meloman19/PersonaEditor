@@ -97,9 +97,11 @@ namespace PersonaEditorGUI.Controls
 
         private void Add(object UIElement, string name)
         {
-            TabItem item = new TabItem();
-            item.Header = name;
-            item.Content = UIElement;
+            TabItem item = new TabItem
+            {
+                Header = name,
+                Content = UIElement
+            };
             DockMain.Items.Add(item);
             DockMain.SelectedIndex = DockMain.Items.Count - 1;
         }

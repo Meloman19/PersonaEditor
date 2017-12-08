@@ -152,7 +152,7 @@ namespace PersonaEditorLib.FileStructure.SPR
             }
         }
 
-        public byte[] Get(bool IsLittleEndian)
+        public byte[] Get()
         {
             byte[] returned;
 
@@ -178,12 +178,12 @@ namespace PersonaEditorLib.FileStructure.SPR
 
                 UpdateOffsets(TextureOffsetList, (int)writer.BaseStream.Position);
 
-                writer.Write((TextureList[0] as IFile).Get(true));
+                writer.Write((TextureList[0] as IFile).Get());
                 for (int i = 1; i < TextureList.Count; i++)
                 {
                     int temp2 = Utilities.Utilities.Alignment(writer.BaseStream.Length, 16);
                     writer.Write(new byte[temp2 == 0 ? 16 : temp2]);
-                    writer.Write((TextureList[i] as IFile).Get(true));
+                    writer.Write((TextureList[i] as IFile).Get());
                 }
 
                 writer.BaseStream.Position = Header.Size;

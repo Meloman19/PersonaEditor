@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
-    /// <summary>
-    /// Логика взаимодействия для BMDEditor.xaml
-    /// </summary>
     public partial class BMDEditor : UserControl
     {
         public BMDEditor()

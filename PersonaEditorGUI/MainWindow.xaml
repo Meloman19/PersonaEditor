@@ -17,6 +17,7 @@
 
     <Window.Resources>
         <controls:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <BitmapImage x:Key="Setting" UriSource="Resource/settings-work-tool.png"/>
     </Window.Resources>
 
     <Grid>
@@ -29,10 +30,21 @@
             <MenuItem Header="File">
                 <MenuItem Header="Open" Click="OpenFile_Click"/>
             </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Settings" Click="Setting_Click">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Setting}" RenderOptions.BitmapScalingMode="HighQuality"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Visualizer" Click="Tool_Visualizer_Click"/>
+                <MenuItem Header="Char Set" Click="Tool_CharSet_Click"/>
+            </MenuItem>
             <MenuItem Header="Test" Click="MenuItem_Click"/>
             <MenuItem Header="About" Click="About_Click"/>
         </Menu>
 
-        <controls:MultiFileEdit Grid.Row="1" x:Name="MainControl"/>
+        <controls:MultiFileEdit DataContext="{Binding MainControlDC}" Grid.Row="1" x:Name="MainControl"/>
     </Grid>
 </Window>

@@ -9,50 +9,71 @@ using System.Threading.Tasks;
 
 namespace PersonaEditorLib.FileStructure.BF
 {
-    public class BF //: IPersonaFile, IFile
+    public class BF : IPersonaFile, IFile
     {
         BFHeader Header;
         BFTable Table;
 
-        List<BFElement> List = new List<BFElement>();
+        List<object> List = new List<object>();
 
-        public BF(string path, bool IsLittleEndian) : this(File.OpenRead(path), IsLittleEndian)
+        List<BFElement> List2 = new List<BFElement>();
+
+        public BF(string path)
         {
+            using (FileStream FS = File.OpenRead(path))
+                Open(FS);
 
+            Name = Path.GetFileName(path);
         }
 
-        public BF(Stream Stream, bool IsLittleEndian)
+        public BF(string name, Stream Stream)
         {
-            BinaryReader reader = Utilities.IO.OpenReadFile(Stream, IsLittleEndian);
-
-            Open(reader);
+            Name = name;
+            Open(Stream);
         }
 
-        public BF(byte[] data, bool IsLittleEndian)
+        public BF(string name, byte[] data)
         {
+            Name = name;
             using (MemoryStream MS = new MemoryStream(data))
-                Open(Utilities.IO.OpenReadFile(MS, IsLittleEndian));
+                Open(MS);
         }
 
-        private void Open(BinaryReader reader)
+        private void Open(Stream stream)
         {
+            stream.Position = 0x10;
+            if (stream.ReadByte() == 0)
+                IsLittleEndian = false;
+            else
+                IsLittleEndian = true;
+
+            stream.Position = 0;
+            BinaryReader reader = Utilities.IO.OpenReadFile(stream, IsLittleEndian);
+
             Header = new BFHeader(reader);
             Table = new BFTable(reader.ReadInt32ArrayArray(Header.TableLineCount, 4));
 
             foreach (var element in Table.Table)
                 if (element.Count * element.Size > 0)
-                    List.Add(new BFElement(reader, element));
+                {
+                    reader.BaseStream.Position = element.Position;
+
+                    List.Add(Utilities.PersonaFile.OpenFile(Name, reader.ReadBytes(element.Count * element.Size), element.FileType));
+
+                    List2.Add(new BFElement(reader, element));
+                }
+
         }
 
         public byte[] GetBMD()
         {
-            var temp = List.Find(x => x.Type == FileType.BMD);
+            var temp = List2.Find(x => x.Type == FileType.BMD);
             return temp == null ? new byte[0] : temp.Count == 0 ? new byte[0] : (temp as BFElement).List[0].ToArray();
-        }               
+        }
 
         public void SetBMD(byte[] bmd)
         {
-            var temp = List.Find(x => x.Type == FileType.BMD) as BFElement;
+            var temp = List2.Find(x => x.Type == FileType.BMD) as BFElement;
             if (temp != null)
             {
                 temp.List.Clear();
@@ -60,26 +81,17 @@ namespace PersonaEditorLib.FileStructure.BF
             }
         }
 
+        public bool IsLittleEndian { get; set; } = true;
+
         #region IPersonaFile
+
+        public string Name { get; private set; } = "";
 
         public FileType Type => FileType.BF;
 
-        public List<TreeItem> GetTreeItemsList()
+        public List<object> GetSubFiles()
         {
-            List<TreeItem> returned = new List<TreeItem>();
-
-            returned.Add(new TreeItem()
-            {
-                Data = GetBMD(),
-                Type = FileType.BMD
-            });
-
-            return returned;
-        }
-
-        public void SetTreeItemsList(List<Tuple<string, byte[]>> list)
-        {
-            SetBMD(list[0].Item2);
+            return List;
         }
 
         public List<ContextMenuItems> ContextMenuList
@@ -101,7 +113,7 @@ namespace PersonaEditorLib.FileStructure.BF
             {
                 Dictionary<string, object> returned = new Dictionary<string, object>();
 
-                returned.Add("Entry Count", List.Count);
+                returned.Add("Entry Count", List2.Count);
                 returned.Add("Type", Type);
 
                 return returned;
@@ -119,15 +131,13 @@ namespace PersonaEditorLib.FileStructure.BF
                 int returned = 0;
 
                 returned += Header.Size + Table.Size;
-                List.ForEach(x => returned += x.Size);
+                List2.ForEach(x => returned += x.Size);
 
                 return returned;
             }
         }
 
-        public string Name => throw new NotImplementedException();
-
-        public byte[] Get(bool IsLittleEndian)
+        public byte[] Get()
         {
             byte[] returned = new byte[0];
 
@@ -135,30 +145,20 @@ namespace PersonaEditorLib.FileStructure.BF
             {
                 BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
 
-                Get(writer);
+                Table.Update(List2);
+
+                Header.FileSize = Header.Size + Table.Size;
+                List2.ForEach(x => Header.FileSize += x.Size);
+
+                Header.Get(writer);
+                Table.Get(writer);
+
+                List2.OrderBy(x => x.Type).ToList().ForEach(x => x.Get(writer));
 
                 returned = MS.ToArray();
             }
 
             return returned;
-        }
-
-        public void Get(BinaryWriter writer)
-        {
-            Table.Update(List);
-
-            Header.FileSize = Header.Size + Table.Size;
-            List.ForEach(x => Header.FileSize += x.Size);
-
-            Header.Get(writer);
-            Table.Get(writer);
-
-            List.OrderBy(x => x.Type).ToList().ForEach(x => x.Get(writer));
-        }
-
-        public List<object> GetSubFiles()
-        {
-            throw new NotImplementedException();
         }
 
         public bool Replace(object a)
