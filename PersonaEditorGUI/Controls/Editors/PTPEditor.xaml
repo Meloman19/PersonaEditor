@@ -7,27 +7,31 @@
              xmlns:local2="clr-namespace:PersonaEditorGUI.Classes"
              xmlns:media="clr-namespace:PersonaEditorGUI.Classes.Media.Visual"
              mc:Ignorable="d" Name="USC"
-             d:DesignHeight="300" d:DesignWidth="300" DataContext="{x:Null}" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+             d:DesignHeight="300" d:DesignWidth="300" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
-    <Grid>
+    <Grid DataContext="{Binding DataContext}" >
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Border BorderBrush="Black" BorderThickness="0,0,0,1">
-            <Menu Grid.Row="0">
-                <ComboBox ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            </Menu>
-        </Border>
+        <StatusBar Grid.Row="0">
+            <ComboBox ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <TextBlock Text="Old Font:"/>
+            <ComboBox ItemsSource="{Binding OldFontList}" SelectedIndex="{Binding OldFontIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Text="Old Font:"/>
+            <ComboBox ItemsSource="{Binding NewFontList}" SelectedIndex="{Binding NewFontIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </StatusBar>
+        <Separator Grid.Row="1"/>
 
-        <ScrollViewer Name="ScrollView" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Name="ScrollView" Grid.Row="2" VerticalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-
                 <ItemsControl Grid.Row="0" Name="IC_NAME" ItemsSource="{Binding Path=Names}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -48,7 +52,7 @@
                                     <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
                                     <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
                                     <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
-                                    <TextBox Grid.Column="3" Margin="2" Text="{Binding OldName, Mode=OneWay}"/>
+                                    <TextBox Grid.Column="3" Margin="2" Text="{Binding OldName, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap"/>
                                 </Grid>
 
                                 <TextBox Grid.Column="1" Margin="2" Text="{Binding NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

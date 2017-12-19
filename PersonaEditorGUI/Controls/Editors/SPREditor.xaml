@@ -7,9 +7,9 @@
              xmlns:classes ="clr-namespace:PersonaEditorGUI.Classes.Controls"
              xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500" DataContext="{x:Null}" MouseMove="UserControl_MouseMove_1">
+             d:DesignHeight="300" d:DesignWidth="500" MouseMove="UserControl_MouseMove_1">
 
-    <Grid>
+    <Grid DataContext="{Binding DataContext}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>

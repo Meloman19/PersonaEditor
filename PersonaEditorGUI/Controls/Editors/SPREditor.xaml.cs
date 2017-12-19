@@ -74,10 +74,10 @@ namespace PersonaEditorGUI.Controls.Editors
 
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            foreach (SPRKey a in e.RemovedItems)
+            foreach (SPRKeyVM a in e.RemovedItems)
                 a.IsSelected = false;
 
-            foreach (SPRKey a in e.AddedItems)
+            foreach (SPRKeyVM a in e.AddedItems)
                 a.IsSelected = true;
         }
 
@@ -86,7 +86,7 @@ namespace PersonaEditorGUI.Controls.Editors
             if (sender is MenuItem item)
                 if (item.Tag is Color color)
                 {
-                    PersonaEditorLib.ColorPicker.ColorPickerTool tool = new PersonaEditorLib.ColorPicker.ColorPickerTool(color);
+                    ColorPicker.ColorPickerTool tool = new ColorPicker.ColorPickerTool(color);
                     if (tool.ShowDialog() == true)
                         item.Tag = tool.Color;
                 }

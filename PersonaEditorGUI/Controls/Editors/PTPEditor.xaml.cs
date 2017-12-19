@@ -1,5 +1,5 @@
 ﻿using PersonaEditorLib;
-using PersonaEditorLib.FileStructure.PTP;
+using PersonaEditorLib.FileStructure.Text;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

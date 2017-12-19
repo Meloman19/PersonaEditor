@@ -4,17 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PersonaEditorGUI.Tools"
+        xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
         mc:Ignorable="d"
-        Title="SetChar" Height="590.663" Width="552.885" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" Closing="Window_Closing">
+        Title="SetChar" Height="590.663" Width="552.885" WindowStartupLocation="CenterScreen" classes:Event.Closing="{Binding Path=Closing}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Menu>
+        <StatusBar>
             <ComboBox Width="100" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
-        </Menu>
+        </StatusBar>
         
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <ItemsControl Name="wrap" ItemsSource="{Binding GlyphList}">

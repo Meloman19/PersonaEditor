@@ -19,7 +19,7 @@
                     <TextBlock Text="Default Background" Width="70" TextWrapping="Wrap" TextAlignment="Center"/>
                 </TabItem.Header>
                 <TabItem.Content>
-                    <local:DefaultBackground x:Name="DefaultBack"></local:DefaultBackground>
+                    <local:DefaultBackground DataContext="{Binding DefaultBackgroundVM}"></local:DefaultBackground>
                 </TabItem.Content>
             </TabItem>
             
@@ -41,9 +41,9 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button Content="OK" Margin="5" Grid.Column="1" Width="60" Height="25" Click="ButtonOK_Click"/>
+            <Button Content="OK" Margin="5" Grid.Column="1" Width="60" Height="25" Click="ButtonOK_Click" Command="{Binding Path=ClickOk}"/>
             <Button Content="Cancel" Margin="5" Grid.Column="2" Width="60" Height="25" Click="ButtonCancel_Click"/>
-            <Button Content="Apply" Margin="5" Grid.Column="3" Width="60" Height="25" Click="Button_Click" IsEnabled="{Binding ElementName=SettingSetWindow, Path=SettingChange}"/>
+            <Button Content="Apply" Margin="5" Grid.Column="3" Width="60" Height="25" IsEnabled="{Binding Path=SettingChange}" Command="{Binding Path=ClickApply}"/>
         </Grid>
     </Grid>
 </Window>

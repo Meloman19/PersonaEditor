@@ -13,7 +13,7 @@ namespace PersonaEditorLib.Extension
 {
     public static class ListExtentsion
     {
-        public static string GetString(this IList<FileStructure.PTP.TextBaseElement> ByteCollection, CharList CharList, bool LineSplit = true)
+        public static string GetString(this IList<FileStructure.Text.TextBaseElement> ByteCollection, CharList CharList, bool LineSplit = true)
         {
             string returned = "";
 
@@ -23,7 +23,7 @@ namespace PersonaEditorLib.Extension
             return returned;
         }
 
-        public static string GetString(this IList<FileStructure.PTP.TextBaseElement> ByteCollection)
+        public static string GetString(this IList<FileStructure.Text.TextBaseElement> ByteCollection)
         {
             string returned = "";
 
@@ -33,7 +33,7 @@ namespace PersonaEditorLib.Extension
             return returned;
         }
 
-        public static byte[] GetByteArray(this IList<FileStructure.PTP.TextBaseElement> ByteCollection)
+        public static byte[] GetByteArray(this IList<FileStructure.Text.TextBaseElement> ByteCollection)
         {
             List<byte> temp = new List<byte>();
             foreach (var a in ByteCollection)
@@ -239,6 +239,21 @@ namespace PersonaEditorLib.Extension
             BmpBitmapDecoder BMPdecoder = new BmpBitmapDecoder(new FileStream(path, FileMode.Open), BitmapCreateOptions.None, BitmapCacheOption.Default);
 
             return BMPdecoder.Frames[0];
+        }
+
+        public static BitmapSource OpenPNG(string path)
+        {
+            return new BitmapImage(new Uri(Path.GetFullPath(path)));
+
+            //using (FileStream FS = new FileStream(path, FileMode.Open))
+            //{
+            //    var returned = new BitmapImage(new Uri(Path.GetFullPath(path)));
+            //    returned.BeginInit();
+            //    returned.StreamSource = FS;
+            //    returned.EndInit();
+
+            //    return returned;
+            //}
         }
     }
 }

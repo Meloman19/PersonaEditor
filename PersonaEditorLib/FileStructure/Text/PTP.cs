@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 using PersonaEditorLib.Interfaces;
 using System.Collections.ObjectModel;
 
-namespace PersonaEditorLib.FileStructure.PTP
+namespace PersonaEditorLib.FileStructure.Text
 {
     public delegate void MsgElementListChanged(IList<TextBaseElement> array);
 
@@ -164,7 +164,7 @@ namespace PersonaEditorLib.FileStructure.PTP
         public BindingList<MSGstr> Strings { get; set; } = new BindingList<MSGstr>();
     }
 
-    public class PTP : IPersonaFile, IFile
+    public class PTP : IPersonaFile
     {
         private string _Name = "";
 
@@ -346,14 +346,14 @@ namespace PersonaEditorLib.FileStructure.PTP
             }
         }
 
-        public bool Open(BMD.BMD BMD, bool CopyOld2New, CharList Old, CharList New)
+        public bool Open(string bmdname, Text.BMD bmd)
         {
             try
             {
                 names.Clear();
                 msg.Clear();
 
-                foreach (var NAME in BMD.name)
+                foreach (var NAME in bmd.name)
                 {
                     int Index = NAME.Index;
                     byte[] OldNameSource = NAME.NameBytes;
@@ -362,7 +362,7 @@ namespace PersonaEditorLib.FileStructure.PTP
                     names.Add(new PTPName(Index, OldNameSource, NewName));
                 }
 
-                foreach (var Message in BMD.msg)
+                foreach (var Message in bmd.msg)
                 {
                     int Index = Message.Index;
                     string Type = Message.Type.ToString();
@@ -370,14 +370,11 @@ namespace PersonaEditorLib.FileStructure.PTP
                     int CharacterNameIndex = Message.CharacterIndex;
                     byte[] SourceBytes_str = Message.MsgBytes;
                     MSG temp = new MSG(Index, Type, Name, CharacterNameIndex, SourceBytes_str);
-                    temp.Strings.ParseStrings(SourceBytes_str, New);
+                    temp.Strings.ParseStrings(SourceBytes_str);
                     msg.Add(temp);
                 }
 
-                if (CopyOld2New)
-                    this.CopyOld2New(Old);
-
-                _Name = Path.GetFileNameWithoutExtension(Path.GetFullPath(BMD.Name)) + ".PTP";
+                _Name = Path.GetFileNameWithoutExtension(Path.GetFullPath(bmdname)) + ".PTP";
                 return true;
             }
             catch (Exception e)
@@ -669,14 +666,9 @@ namespace PersonaEditorLib.FileStructure.PTP
 
         public FileType Type => FileType.PTP;
 
-        public List<object> GetSubFiles()
+        public List<ObjectFile> GetSubFiles()
         {
-            return new List<object>();
-        }
-
-        public bool Replace(object a)
-        {
-            return false;
+            return new List<ObjectFile>();
         }
 
         public List<ContextMenuItems> ContextMenuList
@@ -685,8 +677,8 @@ namespace PersonaEditorLib.FileStructure.PTP
             {
                 List<ContextMenuItems> returned = new List<ContextMenuItems>();
 
-                returned.Add(ContextMenuItems.Export);
-                returned.Add(ContextMenuItems.Import);
+                returned.Add(ContextMenuItems.SaveAs);
+                returned.Add(ContextMenuItems.Replace);
 
                 return returned;
             }

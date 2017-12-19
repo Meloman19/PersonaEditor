@@ -22,10 +22,9 @@ namespace PersonaEditorGUI.Tools
         readonly CharList CharList = new CharList();
         EventWrapper CharListEW;
 
-        string Dir;
-
         private int _FontSelect = 0;
-        public ObservableCollection<string> FontList { get; } = new ObservableCollection<string>();
+        public ReadOnlyObservableCollection<string> FontList => CharList.FontList;
+
         public int FontSelect
         {
             get { return _FontSelect; }
@@ -34,22 +33,11 @@ namespace PersonaEditorGUI.Tools
                 if (Save())
                 {
                     _FontSelect = value;
-                    string font = Path.Combine(Dir, FontList[_FontSelect]);
-                    string fontmp = Path.Combine(Dir, Path.GetFileNameWithoutExtension(FontList[_FontSelect]) + ".txt");
+                    string font = Path.Combine(Static.Paths.DirFont, FontList[_FontSelect]);
+                    string fontmp = Path.Combine(Static.Paths.DirFont, Path.GetFileNameWithoutExtension(FontList[_FontSelect]) + ".txt");
                     CharList.Open(font, fontmp);
                 }
                 else { Notify("FontSelect"); }
-            }
-        }
-
-        private void LoadFontList(string dir = "")
-        {
-            Dir = Path.GetFullPath(dir);
-            if (Directory.Exists(Dir))
-            {
-                DirectoryInfo DI = new DirectoryInfo(Dir);
-                foreach (var file in DI.GetFiles(@"*.fnt"))
-                    FontList.Add(file.Name);
             }
         }
 
@@ -67,8 +55,7 @@ namespace PersonaEditorGUI.Tools
         {
             GlyphList.ListChanged += GlyphList_ListChanged;
             CharListEW = new EventWrapper(CharList, this);
-            LoadFontList(Static.Paths.DirFont);
-            FontSelect = 0;
+            CharList.GetFontList(Static.Paths.DirFont);
         }
 
         private void GlyphList_ListChanged(object sender, ListChangedEventArgs e)
@@ -107,7 +94,7 @@ namespace PersonaEditorGUI.Tools
                 {
                     for (int i = 0; i < GlyphList.Count; i++)
                         CharList.List[i].Char = GlyphList[i].Char;
-                    CharList.SaveFontMap(Path.Combine(Dir, Path.GetFileNameWithoutExtension(FontList[_FontSelect]) + ".txt"));
+                    CharList.SaveFontMap(Path.Combine(Static.Paths.DirFont, Path.GetFileNameWithoutExtension(FontList[_FontSelect]) + ".txt"));
                 }
                 else if (result == MessageBoxResult.Cancel)
                     return false;
@@ -116,6 +103,13 @@ namespace PersonaEditorGUI.Tools
                 return true;
             }
             else return true;
+        }
+
+        public CancelEventHandler Closing => Window_Closing;
+
+        void Window_Closing(object sender, CancelEventArgs e)
+        {
+            Save();
         }
     }
 }

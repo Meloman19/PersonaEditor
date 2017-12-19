@@ -12,7 +12,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
-using PersonaEditorLib.FileStructure.PTP;
+using PersonaEditorLib.FileStructure.Text;
 using System.Collections.ObjectModel;
 
 namespace PersonaEditorLib
@@ -353,10 +353,18 @@ namespace PersonaEditorLib
         {
             if (FontList.Contains(name))
             {
-                string Font = Path.Combine(FontDirPath, name);
-                string FontMap = Path.Combine(FontDirPath, Path.GetFileNameWithoutExtension(name) + ".txt");
+                if (name == "Empty")
+                {
+                    Clear();
+                    Update();
+                }
+                else
+                {
+                    string Font = Path.Combine(FontDirPath, name);
+                    string FontMap = Path.Combine(FontDirPath, Path.GetFileNameWithoutExtension(name) + ".txt");
 
-                Open(Font, FontMap);
+                    Open(Font, FontMap);
+                }
 
                 _SelectedIndex = FontList.IndexOf(name);
                 _SelectedItem = name;
@@ -367,14 +375,28 @@ namespace PersonaEditorLib
         {
             if (index >= 0 && index < FontList.Count)
             {
-                string Font = Path.Combine(FontDirPath, FontList[index]);
-                string FontMap = Path.Combine(FontDirPath, Path.GetFileNameWithoutExtension(FontList[index]) + ".txt");
+                if (index == 0)
+                {
+                    Clear();
+                    Update();
+                }
+                else
+                {
+                    string Font = Path.Combine(FontDirPath, FontList[index]);
+                    string FontMap = Path.Combine(FontDirPath, Path.GetFileNameWithoutExtension(FontList[index]) + ".txt");
 
-                Open(Font, FontMap);
+                    Open(Font, FontMap);
+                }
 
                 _SelectedIndex = index;
                 _SelectedItem = FontList[index];
             }
+        }
+
+        private void Clear()
+        {
+            List.Clear();
+            Palette = null;
         }
     }
 }

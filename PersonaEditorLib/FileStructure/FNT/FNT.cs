@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace PersonaEditorLib.FileStructure.FNT
 {
-    public class FNT : IPersonaFile, IFile, IPreview, IImage
+    public class FNT : IPersonaFile, IPreview, IImage
     {
         public FNTHeader Header { get; set; }
         public FNTPalette Palette { get; set; }
@@ -41,6 +41,12 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         private void Read(Stream stream, long position)
         {
+            Console.WriteLine("---------------------------------------------------");
+            Console.WriteLine("-----Font decompressor/compressor by Meloman19-----");
+            Console.WriteLine("-------------------Persona 3/4/5-------------------");
+            Console.WriteLine("----------Based on RikuKH3's decompressor----------");
+            Console.WriteLine("---------------------------------------------------");
+
             stream.Position = position;
             BinaryReader reader = new BinaryReader(stream);
 
@@ -58,70 +64,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             }
         }
 
-        private BitmapSource GetFontImage()
-        {
-            List<byte[]> data = Compressed.GetDecompressedData();
-
-            PixelFormat currentPF;
-            if (Header.Glyphs.BitsPerPixel == 4)
-            {
-                currentPF = PixelFormats.Indexed4;
-                Util.ReverseByteInList(data);
-            }
-            else if (Header.Glyphs.BitsPerPixel == 8)
-                currentPF = PixelFormats.Indexed8;
-            else return null;
-
-            ImageData BMP = new ImageData();
-            ImageData Line = new ImageData();
-
-            int glyphindex = 0;
-            foreach (var a in data)
-            {
-                Line = ImageData.MergeLeftRight(Line, new ImageData(a, currentPF, Header.Glyphs.Size1, Header.Glyphs.Size2), 1);
-                glyphindex++;
-                if (glyphindex % 16 == 0)
-                {
-                    BMP = ImageData.MergeUpDown(BMP, Line, 0);
-                    Line = new ImageData();
-                }
-            }
-            BMP = ImageData.MergeUpDown(BMP, Line, 0);
-
-            return BitmapSource.Create(BMP.PixelWidth, BMP.PixelHeight, 96, 96, BMP.PixelFormat, Palette.Pallete, BMP.Data, BMP.Stride);
-        }
-
-        private void SetFontImage(BitmapSource image)
-        {
-            int stride = (image.Format.BitsPerPixel * image.PixelWidth + 7) / 8;
-            byte[] data = new byte[image.PixelHeight * stride];
-            image.CopyPixels(data, stride, 0);
-
-            ImageData BMP = new ImageData(data, image.Format, image.PixelWidth, image.PixelHeight);
-            List<byte[]> BMPdata = new List<byte[]>();
-
-            int row = 0;
-            int column = 0;
-
-            for (int i = 0; i < Header.Glyphs.Count; i++)
-            {
-                BMPdata.Add(ImageData.Crop(BMP, new ImageData.Rect(column * Header.Glyphs.Size1,
-                    row * Header.Glyphs.Size2, Header.Glyphs.Size1, Header.Glyphs.Size2)).Data);
-                column++;
-                if (column == 16)
-                {
-                    row++;
-                    column = 0;
-                }
-            }
-
-            if (Header.Glyphs.BitsPerPixel == 4)
-                Util.ReverseByteInList(BMPdata);
-
-            Compressed.CompressData(BMPdata);
-        }
-
-        private XDocument GetWidthTable()
+        public XDocument GetWidthTable()
         {
             XDocument xDoc = new XDocument();
             XElement WT = new XElement("WidthTable");
@@ -147,7 +90,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             return xDoc;
         }
 
-        private void SetWidthTable(XDocument xDoc)
+        public void SetWidthTable(XDocument xDoc)
         {
             XElement WT = xDoc.Element("WidthTable");
 
@@ -166,23 +109,107 @@ namespace PersonaEditorLib.FileStructure.FNT
             Logging.Write("PersonaEditorLib", "Width Table was writed. Get " + index + " glyphs");
         }
 
-        public BitmapSource Image
-        {
-            get { return GetFontImage(); }
-            set { SetFontImage(value); }
-        }
-        public XDocument Table
-        {
-            get { return GetWidthTable(); }
-            set { SetWidthTable(value); }
-        }
-
         private object GetControl()
         {
             System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-            image.Source = Image;
+            image.Source = GetImage();
             return image;
         }
+
+        private BitmapPalette GetImagePalette(BitmapPalette bitmapPalette)
+        {
+            List<Color> palette = new List<Color>();
+            foreach (var color in bitmapPalette.Colors)
+            {
+                Color temp = color;
+                temp.A = 0xFF;
+                palette.Add(temp);
+            }
+
+            return new BitmapPalette(palette);
+        }
+
+        #region IImage
+
+        public BitmapSource GetImage()
+        {
+            List<byte[]> data = Compressed.GetDecompressedData();
+
+            PixelFormat currentPF;
+            if (Header.Glyphs.BitsPerPixel == 4)
+            {
+                currentPF = PixelFormats.Indexed4;
+                Util.ReverseByteInList(data);
+            }
+            else if (Header.Glyphs.BitsPerPixel == 8)
+                currentPF = PixelFormats.Indexed8;
+            else return null;
+
+            ImageData BMP = new ImageData();
+            ImageData Line = new ImageData();
+
+            int glyphindex = 0;
+            foreach (var a in data)
+            {
+                Line = ImageData.MergeLeftRight(Line, new ImageData(a, currentPF, Header.Glyphs.Size1, Header.Glyphs.Size2), 0);
+                glyphindex++;
+                if (glyphindex % 16 == 0)
+                {
+                    BMP = ImageData.MergeUpDown(BMP, Line, 0);
+                    Line = new ImageData();
+                }
+            }
+            BMP = ImageData.MergeUpDown(BMP, Line, 0);
+
+            return BitmapSource.Create(BMP.PixelWidth, BMP.PixelHeight, 96, 96, BMP.PixelFormat, GetImagePalette(Palette.Pallete), BMP.Data, BMP.Stride);
+        }
+
+        public void SetImage(BitmapSource image)
+        {
+            PixelFormat pixelFormat;
+            if (Header.Glyphs.BitsPerPixel == 4)
+                pixelFormat = PixelFormats.Indexed4;
+            else if (Header.Glyphs.BitsPerPixel == 8)
+                pixelFormat = PixelFormats.Indexed8;
+            else
+                throw new Exception("FNT: Unknown Pixel Format");
+
+            FormatConvertedBitmap bitmap = new FormatConvertedBitmap();
+            bitmap.BeginInit();
+            bitmap.Source = image;
+            bitmap.DestinationFormat = pixelFormat;
+            bitmap.DestinationPalette = GetImagePalette(Palette.Pallete);
+            bitmap.EndInit();
+
+            int stride = (bitmap.Format.BitsPerPixel * bitmap.PixelWidth + 7) / 8;
+            byte[] data = new byte[bitmap.PixelHeight * stride];
+            bitmap.CopyPixels(data, stride, 0);
+
+            ImageData BMP = new ImageData(data, bitmap.Format, bitmap.PixelWidth, bitmap.PixelHeight);
+            List<byte[]> BMPdata = new List<byte[]>();
+
+            int row = 0;
+            int column = 0;
+
+            for (int i = 0; i < Header.Glyphs.Count; i++)
+            {
+                BMPdata.Add(ImageData.Crop(BMP, new ImageData.Rect(column * Header.Glyphs.Size1,
+                    row * Header.Glyphs.Size2, Header.Glyphs.Size1, Header.Glyphs.Size2)).Data);
+                column++;
+                if (column == 16)
+                {
+                    row++;
+                    column = 0;
+                }
+            }
+
+            if (Header.Glyphs.BitsPerPixel == 4)
+                Util.ReverseByteInList(BMPdata);
+
+            Compressed.CompressData(BMPdata);
+        }
+
+        #endregion IImage
 
         #region IPreview
 
@@ -206,14 +233,9 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public FileType Type => FileType.FNT;
 
-        public List<object> GetSubFiles()
+        public List<ObjectFile> GetSubFiles()
         {
-            return new List<object>();
-        }
-
-        public bool Replace(object newdata)
-        {
-            return false;
+            return new List<ObjectFile>();
         }
 
         public List<ContextMenuItems> ContextMenuList
@@ -222,8 +244,8 @@ namespace PersonaEditorLib.FileStructure.FNT
             {
                 List<ContextMenuItems> returned = new List<ContextMenuItems>();
 
-                returned.Add(ContextMenuItems.Export);
-                returned.Add(ContextMenuItems.Import);
+                returned.Add(ContextMenuItems.SaveAs);
+                returned.Add(ContextMenuItems.Replace);
 
                 return returned;
             }

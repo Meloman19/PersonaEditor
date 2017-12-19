@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PersonaEditorLib;
-using PersonaEditorLib.FileStructure.PTP;
+using PersonaEditorLib.FileStructure.Text;
 using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows;

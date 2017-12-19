@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PersonaEditorLib.ColorPicker.Controls
+namespace PersonaEditorGUI.Controls.ColorPicker.Controls
 {
     public class RGBSliderToThumb : IMultiValueConverter
     {

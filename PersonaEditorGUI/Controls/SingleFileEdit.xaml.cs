@@ -1,4 +1,4 @@
-﻿using PersonaEditorGUI.Files;
+﻿using PersonaEditorGUI.Classes;
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -30,12 +30,6 @@ namespace PersonaEditorGUI.Controls
             if (sender is Button but)
                 if (but.DataContext is SingleFileEditVM vm)
                     vm.Close();
-        }
-
-        private void SingleFileEdit_Drop(object sender, DragEventArgs e)
-        {
-            if (DataContext is SingleFileEditVM vm)
-                vm.Open((e.Data.GetData(typeof(UserTreeViewItem)) as UserTreeViewItem).personaFile);
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Media;
-using PersonaEditorLib.FileStructure.PTP;
+using PersonaEditorLib.FileStructure.Text;
 using PersonaEditorLib.Extension;
 
 namespace PersonaEditorGUI.Tools

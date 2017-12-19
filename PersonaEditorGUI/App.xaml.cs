@@ -1,17 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace PersonaEditorGUI
 {
-    /// <summary>
-    /// Логика взаимодействия для App.xaml
-    /// </summary>
     public partial class App : Application
     {
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            MainWindowVM VM;
+            if (e.Args.Length > 0)
+                VM = new MainWindowVM(e.Args[0]);
+            else
+                VM = new MainWindowVM();
+
+            MainWindow window = new MainWindow() { DataContext = VM };
+            MainWindow = window;
+            window.Show();
+        }
     }
 }

@@ -55,10 +55,31 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release FULL|AnyCPU'">
+    <OutputPath>bin\Release FULL\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release FULL|x86'">
+    <OutputPath>..\..\PersonaEditor Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -82,9 +103,25 @@
     </Compile>
     <Compile Include="Classes\Controls\RelativePanel.cs" />
     <Compile Include="Classes\Media\Visual\MSGVisual.cs" />
+    <Compile Include="Classes\Event.cs" />
     <Compile Include="Classes\ResourceItem.cs" />
     <Compile Include="Controls\ClosableTabItem.xaml.cs">
       <DependentUpon>ClosableTabItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\ColorPickerTool.xaml.cs">
+      <DependentUpon>ColorPickerTool.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\Controls\CanvasRGB.xaml.cs">
+      <DependentUpon>CanvasRGB.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\Controls\NumericColorRGBA.xaml.cs">
+      <DependentUpon>NumericColorRGBA.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\Controls\NumericIncDec.xaml.cs">
+      <DependentUpon>NumericIncDec.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ColorPicker\Controls\SliderRGB.xaml.cs">
+      <DependentUpon>SliderRGB.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Editors\BMDEditor.xaml.cs">
       <DependentUpon>BMDEditor.xaml</DependentUpon>
@@ -117,8 +154,9 @@
     <Compile Include="Controls\TreeViewPE.xaml.cs">
       <DependentUpon>TreeViewPE.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Files\UserTreeViewItem.cs" />
+    <Compile Include="Classes\UserTreeViewItem.cs" />
     <Compile Include="Classes\Media\Visual\Background.cs" />
+    <Compile Include="Controls\TreeViewPEVM.cs" />
     <Compile Include="MainWindowVM.cs" />
     <Compile Include="Settings\App.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -140,6 +178,7 @@
     <Compile Include="Settings\SetSettings.xaml.cs">
       <DependentUpon>SetSettings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Settings\SetSettingsVM.cs" />
     <Compile Include="Settings\SPREditor.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -150,6 +189,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>WindowSetting.settings</DependentUpon>
     </Compile>
+    <Compile Include="Static.cs" />
     <Compile Include="Test.xaml.cs">
       <DependentUpon>Test.xaml</DependentUpon>
     </Compile>
@@ -168,6 +208,26 @@
     <Page Include="Controls\ClosableTabItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ColorPicker\ColorPickerTool.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ColorPicker\Controls\CanvasRGB.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ColorPicker\Controls\NumericColorRGBA.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ColorPicker\Controls\NumericIncDec.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ColorPicker\Controls\SliderRGB.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\Editors\BMDEditor.xaml">
       <SubType>Designer</SubType>
@@ -282,6 +342,7 @@
     <Resource Include="Resource\settings-work-tool.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Controls\HexEdit\" />
     <Folder Include="Controls\Primitive\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

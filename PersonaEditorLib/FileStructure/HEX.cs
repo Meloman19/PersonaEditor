@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PersonaEditorLib.FileStructure
 {
-    public class HEX : IPersonaFile, IFile
+    public class HEX : IPersonaFile
     {
         public byte[] Data { get; set; } = new byte[0];
 
@@ -24,32 +24,19 @@ namespace PersonaEditorLib.FileStructure
 
         public FileType Type => FileType.HEX;
 
-        public List<object> GetSubFiles()
+        public List<ObjectFile> GetSubFiles()
         {
-            return new List<object>();
+            return new List<ObjectFile>();
         }
-
-        public bool Replace(object newdata)
-        {
-            if (newdata is IPersonaFile pfile)
-                if (pfile.Type == Type)
-                    if (newdata is HEX hex)
-                    {
-                        Data = hex.Data;
-                        return true;
-                    }
-
-            return false;
-        }
-
+        
         public List<ContextMenuItems> ContextMenuList
         {
             get
             {
                 List<ContextMenuItems> returned = new List<ContextMenuItems>();
 
-                returned.Add(ContextMenuItems.Export);
-                returned.Add(ContextMenuItems.Import);
+                returned.Add(ContextMenuItems.SaveAs);
+                returned.Add(ContextMenuItems.Replace);
 
                 return returned;
             }
@@ -71,7 +58,7 @@ namespace PersonaEditorLib.FileStructure
         #endregion IPersonaFile
 
         #region IFile
-        
+
         public int Size
         {
             get { return Data.Length; }

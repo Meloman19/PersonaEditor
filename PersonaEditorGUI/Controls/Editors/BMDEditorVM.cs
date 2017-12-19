@@ -4,12 +4,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PersonaEditorLib.FileStructure.BMD;
+using PersonaEditorLib.FileStructure.Text;
 using PersonaEditorLib;
 using PersonaEditorLib.Extension;
-using PersonaEditorLib.FileStructure.PTP;
+using PersonaEditorLib.FileStructure.Text;
 using System.ComponentModel;
 using System.Windows;
+using PersonaEditorLib.Interfaces;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
@@ -128,9 +129,9 @@ namespace PersonaEditorGUI.Controls.Editors
         }
     }
 
-    class BMDEditorVM : BindingObject
+    class BMDEditorVM : BindingObject, IViewModel
     {
-        readonly CharList charList = new CharList();
+        CharList charList = new CharList();
 
         private bool _IsEdit = false;
         public bool IsEdit
@@ -174,9 +175,11 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public ObservableCollection<BMDMsgVM> MsgList { get; } = new ObservableCollection<BMDMsgVM>();
 
+        private string Name = "";
+
         private bool Save()
         {
-            var result = MessageBox.Show("Save changes?", "Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
+            var result = MessageBox.Show("Save changes?", Name, MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
             if (result == MessageBoxResult.Yes | result == MessageBoxResult.No)
             {
                 bool save = result == MessageBoxResult.Yes ? true : false;
@@ -191,15 +194,31 @@ namespace PersonaEditorGUI.Controls.Editors
             else return false;
         }
 
-        public BMDEditorVM(BMD bmd)
+        public bool Close()
         {
-            charList.GetFontList(Static.Paths.DirFont);
-            charList.SelectedItem = Settings.App.Default.BMDFontDefault;
+            if (IsEdit)
+                if (!Save())
+                    return false;
 
-            foreach (var a in bmd.name)
-                NameList.Add(new BMDNameVM(a, charList));
-            foreach (var a in bmd.msg)
-                MsgList.Add(new BMDMsgVM(a, charList));
+            NameList.Clear();
+            MsgList.Clear();
+            return true;
+        }
+
+        public BMDEditorVM(ObjectFile objbmd)
+        {
+            if (objbmd.Object is BMD bmd)
+            {
+                charList.GetFontList(Static.Paths.DirFont);
+                charList.SelectedItem = Settings.App.Default.BMDFontDefault;
+
+                foreach (var a in bmd.name)
+                    NameList.Add(new BMDNameVM(a, charList));
+                foreach (var a in bmd.msg)
+                    MsgList.Add(new BMDMsgVM(a, charList));
+
+                Name = objbmd.Name;
+            }
         }
     }
 }

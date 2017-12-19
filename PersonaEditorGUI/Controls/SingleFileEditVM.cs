@@ -1,4 +1,5 @@
-﻿using PersonaEditorLib;
+﻿using PersonaEditorGUI.Classes;
+using PersonaEditorLib;
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -6,25 +7,20 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PersonaEditorGUI.Controls
 {
     class SingleFileEditVM : BindingObject
     {
-        Editors.SPREditor SPREditor { get; } = new Editors.SPREditor();
-        Editors.PTPEditor PTPEditor { get; } = new Editors.PTPEditor();
-        Editors.HEXEditor HEXEditor { get; } = new Editors.HEXEditor();
-        Editors.BMDEditor BMDEditor { get; } = new Editors.BMDEditor();
-        Editors.FNTEditor FNTEditor { get; } = new Editors.FNTEditor();
-
-        private object _SingleFileEditContent = null;
-        public object SingleFileEditContent
+        private object _SingleFileDataContext = null;
+        public object DataContext
         {
-            get { return _SingleFileEditContent; }
+            get { return _SingleFileDataContext; }
             private set
             {
-                _SingleFileEditContent = value;
-                Notify("SingleFileEditContent");
+                _SingleFileDataContext = value;
+                Notify("DataContext");
             }
         }
 
@@ -42,47 +38,75 @@ namespace PersonaEditorGUI.Controls
             }
         }
 
-        public void Open(object data)
+        private string _dataContextType = "";
+        public string DataContextType => _dataContextType;
+
+        public void Open(ObjectFile data)
         {
-            if (data is IPersonaFile pf)
+            if (data.Object is IPersonaFile pf)
             {
-                Name = pf.Name;
+                Name = data.Name;
                 if (pf.Type == FileType.SPR)
                 {
-                    SPREditor.DataContext = new Editors.SPREditorVM(data as PersonaEditorLib.FileStructure.SPR.SPR);
-                    SingleFileEditContent = SPREditor;
+                    DataContext = new Editors.SPREditorVM(data.Object as PersonaEditorLib.FileStructure.SPR.SPR);
+                    _dataContextType = "SPR";
                 }
                 else if (pf.Type == FileType.PTP)
                 {
-                    PTPEditor.DataContext = new Editors.PTPEditorVM(data as PersonaEditorLib.FileStructure.PTP.PTP);
-                    SingleFileEditContent = PTPEditor;
+                    DataContext = new Editors.PTPEditorVM(data.Object as PersonaEditorLib.FileStructure.Text.PTP);
+                    _dataContextType = "PTP";
                 }
                 else if (pf.Type == FileType.BMD)
                 {
-                    BMDEditor.DataContext = new Editors.BMDEditorVM(data as PersonaEditorLib.FileStructure.BMD.BMD);
-                    SingleFileEditContent = BMDEditor;
+                    DataContext = new Editors.BMDEditorVM(data);
+                    _dataContextType = "BMD";
                 }
                 else if (pf.Type == FileType.FNT)
                 {
-                    FNTEditor.DataContext = new Editors.FNTEditorVM(data as PersonaEditorLib.FileStructure.FNT.FNT);
-                    SingleFileEditContent = FNTEditor;
+                    DataContext = new Editors.FNTEditorVM(data.Object as PersonaEditorLib.FileStructure.FNT.FNT);
+                    _dataContextType = "FNT";
                 }
                 else if (pf.Type == FileType.HEX)
                 {
-                    HEXEditor.DataContext = new Editors.HEXEditorVM(data as PersonaEditorLib.FileStructure.HEX);
-                    SingleFileEditContent = HEXEditor;
+                    DataContext = new Editors.HEXEditorVM(data.Object as PersonaEditorLib.FileStructure.HEX);
+                    _dataContextType = "HEX";
                 }
+                else
+                {
+                    DataContext = null;
+                    _dataContextType = "";
+                }
+
             }
+            else
+                _dataContextType = "";
+
+            Notify("DataContextType");
         }
 
-        public void Close()
+        public DragEventHandler Drop => SingleFileEdit_Drop;
+        private void SingleFileEdit_Drop(object sender, DragEventArgs e)
         {
-            SingleFileEditContent = null;
-            SPREditor.DataContext = null;
-            HEXEditor.DataContext = null;
-            BMDEditor.DataContext = null;
-            PTPEditor.DataContext = null;
-            FNTEditor.DataContext = null;
+            var data = e.Data.GetData(typeof(ObjectFile));
+            if (data is ObjectFile objF)
+                Open(objF);
+        }
+
+        public bool Close()
+        {
+            if (DataContext is IViewModel mod)
+            {
+                if (mod.Close())
+                {
+                    DataContext = null;
+                    _dataContextType = "";
+                    Notify("DataContextType");
+                    return true;
+                }
+                return false;
+            }
+
+            return true;
         }
     }
 }

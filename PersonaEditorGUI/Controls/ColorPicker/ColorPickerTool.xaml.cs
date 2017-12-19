@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PersonaEditorLib.ColorPicker
+namespace PersonaEditorGUI.Controls.ColorPicker
 {
     public partial class ColorPickerTool : Window, INotifyPropertyChanged
     {

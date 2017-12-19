@@ -20,7 +20,8 @@ namespace PersonaEditorLib.Interfaces
             new Tuple<FileType, string>(FileType.BF, "BF file (*.BF)|*.BF"),
             new Tuple<FileType, string>(FileType.BMD, "BMD file (*.BMD)|*.BMD"),
             new Tuple<FileType, string>(FileType.PTP, "Persona Text Project (*.PTP)|*.PTP"),
-            new Tuple<FileType, string>(FileType.FNT, "Persona Font (*.FNT)|*.FNT")
+            new Tuple<FileType, string>(FileType.FNT, "Persona Font (*.FNT)|*.FNT"),
+            new Tuple<FileType, string>(FileType.BIN, "BVP file (*.BVP)|*.BVP")
         };
     }
 
@@ -31,25 +32,27 @@ namespace PersonaEditorLib.Interfaces
         SPR,
         TMX,
         BF,
+        PM1,
         BMD,
         PTP,
-        FNT
+        FNT,
+        BVP,
+        ObjList
     }
 
     public enum ContextMenuItems
     {
-        Export,
-        Import,
+        SaveAs,
+        SaveAll,
+        Replace,
         Separator
     }
-    
-    public interface IPersonaFile
+
+    public interface IPersonaFile : IFile
     {
-        string Name { get; }
         FileType Type { get; }
 
-        List<object> GetSubFiles();
-        bool Replace(object a);
+        List<ObjectFile> GetSubFiles();
 
         List<ContextMenuItems> ContextMenuList { get; }
         Dictionary<string, object> GetProperties { get; }

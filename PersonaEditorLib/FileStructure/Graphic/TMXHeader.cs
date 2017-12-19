@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PersonaEditorLib.FileStructure.TMX
+namespace PersonaEditorLib.FileStructure.Graphic
 {
     public class TMXHeader
     {

@@ -8,18 +8,32 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace PersonaEditorLib.FileStructure.TMX
+namespace PersonaEditorLib.FileStructure.Graphic
 {
-    public class TMX : BindingObject, IFile, IPersonaFile, IPreview, IImage
+    public enum PS2PixelFormat
+    {
+        PSMTC32 = 0x00,
+        PSMTC24 = 0x01,
+        PSMTC16 = 0x02,
+        PSMTC16S = 0x0A,
+        PSMT8 = 0x13,
+        PSMT4 = 0x14,
+        PSMT8H = 0x1B,
+        PSMT4HL = 0x24,
+        PSMT4HH = 0x2C,
+        PSMZ32 = 0x30,
+        PSMZ24 = 0x31,
+        PSMZ16 = 0x32,
+        PSMZ16S = 0x3A
+    }
+
+    public class TMX : BindingObject, IPersonaFile, IPreview, IImage
     {
         TMXHeader Header;
         TMXPalette Palette;
         byte[] Data;
 
-        string _Name = "";
-        bool NameIn = false;
-
-        public TMX(Stream stream, long position, bool IsLittleEndian)
+        public TMX(Stream stream, long position)
         {
             stream.Position = position;
 
@@ -28,19 +42,16 @@ namespace PersonaEditorLib.FileStructure.TMX
             Open(reader);
         }
 
-        public TMX(string name, byte[] data, bool IsLittleEndian)
+        public TMX(byte[] data)
         {
-            _Name = name;
-            if (_Name != "")
-                NameIn = true;
-
             using (MemoryStream MS = new MemoryStream(data))
             {
                 BinaryReader reader = Utilities.IO.OpenReadFile(MS, IsLittleEndian);
-
                 Open(reader);
             }
         }
+
+        public TMX(string path, bool IsLittleEndian) : this(File.OpenRead(path), 0) { }
 
         private void Open(BinaryReader reader)
         {
@@ -53,27 +64,6 @@ namespace PersonaEditorLib.FileStructure.TMX
             Notify("Image");
         }
 
-        public TMX(string path, bool IsLittleEndian) : this(File.OpenRead(path), 0, true) { }
-
-        private BitmapSource GetBitmapSource()
-        {
-            byte[] data = Palette.Format == PixelFormats.Indexed4 ? Utilities.Utilities.DataReverse(Data) : Data;
-            return BitmapSource.Create(Header.Width, Header.Height, 96, 96, Palette.Format, Palette.Pallete, data, (Palette.Format.BitsPerPixel * Header.Width + 7) / 8);
-        }
-
-        private BitmapSource image = null;
-        public BitmapSource Image
-        {
-            get
-            {
-                if (image == null)
-                    image = GetBitmapSource();
-
-                return image;
-            }
-            set { }
-        }
-
         public string TMXname
         {
             get { return Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()); }
@@ -82,7 +72,7 @@ namespace PersonaEditorLib.FileStructure.TMX
         private object GetControl()
         {
             System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-            image.Source = Image;
+            image.Source = GetImage();
             return image;
         }
 
@@ -108,40 +98,31 @@ namespace PersonaEditorLib.FileStructure.TMX
             }
         }
 
+        public bool IsLittleEndian { get; set; } = true;
+
+        #region IImage
+
+        public BitmapSource GetImage()
+        {
+            byte[] data = Palette.Format == PixelFormats.Indexed4 ? Utilities.Utilities.DataReverse(Data) : Data;
+            return BitmapSource.Create(Header.Width, Header.Height, 96, 96, Palette.Format, Palette.Pallete, data, (Palette.Format.BitsPerPixel * Header.Width + 7) / 8);
+        }
+
+        public void SetImage(BitmapSource bitmapSource)
+        {
+        }
+
+        #endregion IImage
+
         #region IPersonaFile
 
-        public string Name
-        {
-            get
-            {
-                if (NameIn)
-                    return _Name;
-                else
-                    return Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()) + ".tmx";
-            }
-        }
+        public string Name => Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()) + ".tmx";
 
         public FileType Type => FileType.TMX;
 
-        public List<object> GetSubFiles()
+        public List<ObjectFile> GetSubFiles()
         {
-            return new List<object>();
-        }
-
-        public bool Replace(object newdata)
-        {
-            if (newdata is IPersonaFile pfile)
-                if (pfile.Type == Type)
-                    if (newdata is TMX tmx)
-                    {
-                        Header = tmx.Header;
-                        Palette = tmx.Palette;
-                        Data = tmx.Data;
-                        Notify("Image");
-                        return true;
-                    }
-
-            return false;
+            return new List<ObjectFile>();
         }
 
         public List<ContextMenuItems> ContextMenuList
@@ -150,8 +131,8 @@ namespace PersonaEditorLib.FileStructure.TMX
             {
                 List<ContextMenuItems> returned = new List<ContextMenuItems>();
 
-                returned.Add(ContextMenuItems.Export);
-                returned.Add(ContextMenuItems.Import);
+                returned.Add(ContextMenuItems.SaveAs);
+                returned.Add(ContextMenuItems.Replace);
 
                 return returned;
             }
@@ -176,8 +157,6 @@ namespace PersonaEditorLib.FileStructure.TMX
 
         #region IFile
 
-        public bool IsLittleEndian { get; set; } = true;
-
         public int Size
         {
             get
@@ -185,7 +164,7 @@ namespace PersonaEditorLib.FileStructure.TMX
                 return Header.Size + Palette.Size + Data.Length;
             }
         }
-        
+
         public byte[] Get()
         {
             byte[] returned = new byte[0];

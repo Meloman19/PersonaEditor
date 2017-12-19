@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PersonaEditorLib.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -97,6 +98,9 @@ namespace PersonaEditor
         {
             public CommandType Command { get; private set; } = CommandType.Empty;
             public CommandSubType Type { get; private set; } = CommandSubType.Empty;
+
+            public string Com { get; } = "";
+
             public string Value { get; set; } = "";
             public Parameters Parameters { get; set; } = new Parameters();
 
@@ -113,7 +117,10 @@ namespace PersonaEditor
 
                     if (arg.Length > 4)
                     {
+
                         string temp = arg.Substring(3, arg.Length - 3);
+
+                        Com = temp;
                         if (temp == "img")
                             Type = CommandSubType.Image;
                         else if (temp == "wt")
@@ -133,7 +140,9 @@ namespace PersonaEditor
 
         public List<Argument> ArgumentList { get; private set; } = new List<Argument>();
 
-        public string FileType { get; private set; } = "";
+        public string FType { get; private set; } = "";
+
+        public FileType FileType { get; }
 
         public string FileSource { get; private set; } = "";
 
@@ -143,7 +152,8 @@ namespace PersonaEditor
         {
             if (args.Length > 1)
             {
-                FileType = args[0];
+                FType = args[0];
+                FileType = GetType(args[0]);
                 FileSource = args[1];
             }
             else
@@ -191,6 +201,34 @@ namespace PersonaEditor
                     temp.Parameters = new Parameters(param);
                 param.Clear();
             }
+        }
+
+        private FileType GetType(string command)
+        {
+            if (command == "-FNT")
+                return FileType.FNT;
+            else if (command == "-TMX")
+                return FileType.TMX;
+            else if (command == "-PM1")
+                return FileType.PM1;
+            else if (command == "-BF")
+                return FileType.BF;
+            else if (command == "-BMD")
+                return FileType.BMD;
+            else if (command == "-PTP")
+                return FileType.PTP;
+            else if (command == "-BIN")
+                return FileType.BIN;
+            else if (command == "-BVP")
+                return FileType.BVP;
+            else if (command == "-SPR")
+                return FileType.SPR;
+            //else if (command == "-TBL")
+            //    work = new TBLConsole(argwrk.FileSource, argwrk.Param);
+            //else if (command == "-TEXT")
+            //    work = new TEXTConsole(argwrk.FileSource, argwrk.Param);
+            else
+                throw new ArgumentException("Open file's type unknown", "command");
         }
     }
 }

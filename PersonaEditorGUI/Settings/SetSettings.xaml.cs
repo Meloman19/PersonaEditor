@@ -15,61 +15,21 @@ using System.Windows.Shapes;
 
 namespace PersonaEditorGUI.Settings
 {
-    public partial class SetSettings : Window, INotifyPropertyChanged
+    public partial class SetSettings : Window
     {
-        #region INotifyPropertyChanged implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void Notify(string propertyName)
-        {
-            if (this.PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion INotifyPropertyChanged implementation
-
-        private bool _SettingChange = false;
-        public bool SettingChange
-        {
-            get { return _SettingChange; }
-            set
-            {
-                if (value != _SettingChange)
-                {
-                    _SettingChange = value;
-                    Notify("SettingChange");
-                }
-            }
-        }
-
-        DefaultBackgroundVM DefaultBackgroundVM = new DefaultBackgroundVM();
-
         public SetSettings()
         {
             InitializeComponent();
-            DefaultBack.DataContext = DefaultBackgroundVM;
         }
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
-            Main.Save();
-            DefaultBackgroundVM.Save();
-            // (Owner as MainWindow).OV.BackImage.CurrentUpdate();
             Close();
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)
         {
             Close();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Main.Save();
-            DefaultBackgroundVM.Save();
-            // (Owner as MainWindow).OV.BackImage.CurrentUpdate();
-            SettingChange = false;
         }
     }
 }

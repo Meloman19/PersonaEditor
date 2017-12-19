@@ -22,5 +22,13 @@ namespace PersonaEditorLib
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        protected void TunnelNotify(object sender, PropertyChangedEventArgs property)
+        {
+            if (this.PropertyChanged != null)
+            {
+                PropertyChanged(sender, property);
+            }
+        }
     }
 }

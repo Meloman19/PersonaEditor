@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:PersonaEditorGUI"
              xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
              xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
+             xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="900">
 
@@ -26,12 +27,24 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <controls:TreeViewPE x:Name="LeftCC" Grid.Column="0" DataContext="{Binding}" SelectedItemData="LeftCC_SelectedItemData" SelectedItemDataOpen="LeftCC_SelectedItemDataOpen"/>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+
+                <controls:TreeViewPE Grid.Row="0" DataContext="{Binding Tree}"/>
+                <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+                    <Grid AllowDrop="True" classes:Event.Drop="{Binding Drop}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Drop to Open"/>
+                    </Grid>
+                </Border>
+            </Grid>
 
             <GridSplitter ResizeBehavior="PreviousAndCurrent" ShowsPreview="True" Grid.Column="1" Width="4"/>
         </Grid>
 
-        <controls:SingleFileEdit Grid.Column="1" x:Name="SingleFile" x:FieldModifier="private"/>
+        <controls:SingleFileEdit DataContext="{Binding Single}" Grid.Column="1"/>
 
         <Grid Grid.Column="2">
             <Grid.ColumnDefinitions>
@@ -41,32 +54,36 @@
 
             <GridSplitter ShowsPreview="True" ResizeDirection="Columns" ResizeBehavior="CurrentAndNext"  Grid.Column="0" Width="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-            <Grid Name="RightCC" Grid.Column="1" >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
+            <Border BorderBrush="Black" Name="RightCC" BorderThickness="1,1,0,0" Grid.Column="1" >
+                <Grid Background="White" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
 
-                <Expander Grid.Row="0" HorizontalAlignment="Stretch" IsExpanded="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPropertyExpanded, Mode=TwoWay}">
-                    <Expander.Header>
-                        <TextBlock Text="Properties" Grid.Column="1" VerticalAlignment="Center"/>
-                    </Expander.Header>
-                    <StackPanel>
-                        <TextBlock Text="No available properties"  Visibility="{Binding Converter={StaticResource NullVisibilityConverter},ConverterParameter='ItemsSource', ElementName=PropertyCC, Path=ItemsSource}"/>
-                        <DataGrid Name="PropertyCC" Visibility="{Binding Converter={StaticResource NullVisibilityConverter},ConverterParameter='ItemsSourceReverse', ElementName=PropertyCC, Path=ItemsSource}" IsReadOnly="True" AutoGenerateColumns="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Property name" Binding="{Binding Path=Key}"/>
-                                <DataGridTextColumn Header="Property value" Binding="{Binding Path=Value}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </Expander>
+                    <Expander Grid.Row="0" HorizontalAlignment="Stretch" IsExpanded="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPropertyExpanded, Mode=TwoWay}">
+                        <Expander.Header>
+                            <TextBlock Text="Properties" Grid.Column="1" VerticalAlignment="Center"/>
+                        </Expander.Header>
+                        <StackPanel>
+                            <TextBlock Text="No available properties"  Visibility="{Binding Converter={StaticResource NullVisibilityConverter},ConverterParameter='ItemsSource', ElementName=PropertyCC, Path=ItemsSource}"/>
+                            <DataGrid Name="PropertyCC" Visibility="{Binding Converter={StaticResource NullVisibilityConverter},ConverterParameter='ItemsSourceReverse', ElementName=PropertyCC, Path=ItemsSource}"
+                                      IsReadOnly="True" AutoGenerateColumns="False" DataContext="{Binding Properties}" ItemsSource="{Binding}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Property name" Binding="{Binding Path=Key}"/>
+                                    <DataGridTextColumn Header="Property value" Binding="{Binding Path=Value}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Expander>
 
-                <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                            Visibility="{Binding Converter={StaticResource NullVisibilityConverter}, ElementName=PreviewCC, Path=Content}">
-                    <ContentControl Name="PreviewCC"/>
-                </Border>
-            </Grid>
+                    <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Visibility="{Binding Converter={StaticResource NullVisibilityConverter}, Path=Preview}">
+                        <ContentControl Content="{Binding Preview}"/>
+                    </Border>
+                </Grid>
+            </Border>
+
         </Grid>
     </Grid>
 </UserControl>

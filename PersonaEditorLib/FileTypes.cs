@@ -12,7 +12,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
-using PersonaEditorLib.FileStructure.PTP;
+using PersonaEditorLib.FileStructure.Text;
 using System.Collections.ObjectModel;
 
 namespace PersonaEditorLib

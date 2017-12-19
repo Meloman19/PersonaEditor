@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:PersonaEditorGUI"
         xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
         xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
+        xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
         mc:Ignorable="d"
         Title="MainWindow" 
         Left="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosX, Mode=TwoWay}"
@@ -13,7 +14,8 @@
         WindowState="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWState, Mode=TwoWay}"
         Height="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWHeight, Mode=TwoWay}"
         Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWWidth, Mode=TwoWay}"
-        Closing="Window_Closing">
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+        classes:Event.Closing="{Binding Path=WindowClosing}">
 
     <Window.Resources>
         <controls:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
@@ -23,28 +25,29 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="Open" Click="OpenFile_Click"/>
+                <MenuItem Header="Open" Command="{Binding Path=clickOpenFile}"/>
             </MenuItem>
             <MenuItem Header="View">
-                <MenuItem Header="Settings" Click="Setting_Click">
+                <MenuItem Header="Settings" Command="{Binding Path=clickSettingOpen}">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource Setting}" RenderOptions.BitmapScalingMode="HighQuality"></Image>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Tools">
-                <MenuItem Header="Visualizer" Click="Tool_Visualizer_Click"/>
-                <MenuItem Header="Char Set" Click="Tool_CharSet_Click"/>
+                <MenuItem Header="Visualizer" Command="{Binding Path=clickVisualizerOpen}"/>
+                <MenuItem Header="Char Set" Command="{Binding Path=clickSetCharOpen}"/>
             </MenuItem>
-            <MenuItem Header="Test" Click="MenuItem_Click"/>
-            <MenuItem Header="About" Click="About_Click"/>
+            <MenuItem Header="Test" Command="{Binding Path=clickTest}"/>
+            <MenuItem Header="About" Command="{Binding Path=clickAboutOpen}"/>
         </Menu>
-
-        <controls:MultiFileEdit DataContext="{Binding MainControlDC}" Grid.Row="1" x:Name="MainControl"/>
+        <Separator Grid.Row="1"/>
+        <controls:MultiFileEdit DataContext="{Binding MultiFile}" Grid.Row="2" x:Name="MainControl"/>
     </Grid>
 </Window>

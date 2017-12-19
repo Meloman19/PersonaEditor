@@ -91,30 +91,12 @@
   <ItemGroup>
     <Compile Include="BindingObject.cs" />
     <Compile Include="CharList.cs" />
-    <Compile Include="ColorPicker\ColorPickerTool.xaml.cs">
-      <DependentUpon>ColorPickerTool.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ColorPicker\Controls\CanvasRGB.xaml.cs">
-      <DependentUpon>CanvasRGB.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ColorPicker\Controls\NumericColorRGBA.xaml.cs">
-      <DependentUpon>NumericColorRGBA.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ColorPicker\Controls\SliderRGB.xaml.cs">
-      <DependentUpon>SliderRGB.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ColorPicker\Controls\NumericIncDec.xaml.cs">
-      <DependentUpon>NumericIncDec.xaml</DependentUpon>
-    </Compile>
     <Compile Include="EventWrapper.cs" />
     <Compile Include="Extension.cs" />
-    <Compile Include="FileStructure\BF\BF.cs" />
-    <Compile Include="FileStructure\BF\BFElement.cs" />
-    <Compile Include="FileStructure\BF\BFHeader.cs" />
-    <Compile Include="FileStructure\BF\BFTable.cs" />
-    <Compile Include="FileStructure\BIN\BIN.cs" />
-    <Compile Include="FileStructure\BMD\BMD.cs" />
-    <Compile Include="FileStructure\BVP\BVP.cs" />
+    <Compile Include="FileStructure\Container\BF.cs" />
+    <Compile Include="FileStructure\Container\BIN.cs" />
+    <Compile Include="FileStructure\Text\BMD.cs" />
+    <Compile Include="FileStructure\Container\BVP.cs" />
     <Compile Include="FileStructure\FNT\FNT.cs" />
     <Compile Include="FileStructure\FNT\FNTCompressed.cs" />
     <Compile Include="FileStructure\FNT\FNTHeader.cs" />
@@ -124,6 +106,7 @@
     <Compile Include="FileStructure\FNT\FNTUnknown.cs" />
     <Compile Include="FileStructure\FNT\FNTWidthTable.cs" />
     <Compile Include="FileStructure\HEX.cs" />
+    <Compile Include="FileStructure\ObjList.cs" />
     <Compile Include="FileStructure\PM1\PM1Element.cs" />
     <Compile Include="FileStructure\PM1\PM1ElementBMD.cs" />
     <Compile Include="FileStructure\PM1\PM1ElementEPL.cs" />
@@ -133,16 +116,16 @@
     <Compile Include="FileStructure\PM1\PM1ElementRMDHead.cs" />
     <Compile Include="FileStructure\PM1\PM1Header.cs" />
     <Compile Include="FileStructure\PM1\PM1Table.cs" />
-    <Compile Include="FileStructure\PTP\Extension.cs" />
-    <Compile Include="FileStructure\PTP\PTP.cs" />
+    <Compile Include="FileStructure\Text\Extension.cs" />
+    <Compile Include="FileStructure\Text\PTP.cs" />
     <Compile Include="FileStructure\SPR\SPR.cs" />
     <Compile Include="FileStructure\SPR\SPRHeader.cs" />
     <Compile Include="FileStructure\SPR\SPRKeyList.cs" />
     <Compile Include="FileStructure\StringList.cs" />
     <Compile Include="FileStructure\TBL\TBL.cs" />
-    <Compile Include="FileStructure\TMX\TMX.cs" />
-    <Compile Include="FileStructure\TMX\TMXHeader.cs" />
-    <Compile Include="FileStructure\TMX\TMXPalette.cs" />
+    <Compile Include="FileStructure\Graphic\TMX.cs" />
+    <Compile Include="FileStructure\Graphic\TMXHeader.cs" />
+    <Compile Include="FileStructure\Graphic\TMXPalette.cs" />
     <Compile Include="FileTypes.cs" />
     <Compile Include="FileStructure\PM1\PM1.cs" />
     <Compile Include="Interfaces\IImage.cs" />
@@ -150,30 +133,12 @@
     <Compile Include="Interfaces\IPersonaFile.cs" />
     <Compile Include="Interfaces\IPersonaFileElement.cs" />
     <Compile Include="Interfaces\IPreview.cs" />
+    <Compile Include="Interfaces\IViewModel.cs" />
+    <Compile Include="ObjectFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RelayCommand.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Page Include="ColorPicker\ColorPickerTool.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ColorPicker\Controls\CanvasRGB.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ColorPicker\Controls\NumericColorRGBA.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ColorPicker\Controls\SliderRGB.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ColorPicker\Controls\NumericIncDec.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

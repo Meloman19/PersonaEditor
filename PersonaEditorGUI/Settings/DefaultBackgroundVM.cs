@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media;
+using PersonaEditorLib;
 
 namespace PersonaEditorGUI.Settings
 {
@@ -167,15 +169,50 @@ namespace PersonaEditorGUI.Settings
             BackgroundDefault.Default.Reload();
         }
 
+        public void Reset()
+        {
+            tempSetting.Reload();
+            _IsChanged = false;
+            Notify("IsChanged");
+        }
+
         public DefaultBackgroundVM()
         {
             tempSetting.PropertyChanged += TempSetting_PropertyChanged;
+            SetColor = new RelayCommandWeak(x => SetColot_Click(x));
         }
 
         private void TempSetting_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             _IsChanged = true;
             Notify("IsChanged");
+        }
+
+        public ICommand SetColor { get; private set; }
+
+        private void SetColot_Click(object param)
+        {
+            if ((string)param == "Text")
+            {
+                var a = ColorConverter.ConvertFromString(TextColor);
+                Controls.ColorPicker.ColorPickerTool colorPicker = new Controls.ColorPicker.ColorPickerTool((Color)a);
+                if (colorPicker.ShowDialog() == true)
+                    TextColor = colorPicker.Color.ToString();
+            }
+            else if ((string)param == "Name")
+            {
+                var a = ColorConverter.ConvertFromString(NameColor);
+                Controls.ColorPicker.ColorPickerTool colorPicker = new Controls.ColorPicker.ColorPickerTool((Color)a);
+                if (colorPicker.ShowDialog() == true)
+                    NameColor = colorPicker.Color.ToString();
+            }
+            else if ((string)param == "Back")
+            {
+                var a = ColorConverter.ConvertFromString(BackgroundColor);
+                Controls.ColorPicker.ColorPickerTool colorPicker = new Controls.ColorPicker.ColorPickerTool((Color)a);
+                if (colorPicker.ShowDialog() == true)
+                    BackgroundColor = colorPicker.Color.ToString();
+            }
         }
     }
 }

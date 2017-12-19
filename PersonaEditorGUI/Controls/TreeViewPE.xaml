@@ -4,28 +4,29 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls"
+             xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
-    <TreeView SelectedItemChanged="TreeView_SelectedItemChanged"
-                  DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext}"
-                  ItemsSource="{Binding}" DataContextChanged="TreeView_DataContextChanged">
-        <TreeView.ContextMenu>
-            <ContextMenu ItemsSource="{Binding Path=ContextMenuItems}"></ContextMenu>
-        </TreeView.ContextMenu>
-
+    <TreeView ItemsSource="{Binding Tree}">
         <TreeView.ItemTemplate>
             <HierarchicalDataTemplate ItemsSource="{Binding Path=SubItems}">
-                <TextBlock Text="{Binding Path=Header}" AllowDrop="True" MouseLeave="TextBlock_MouseLeave" MouseEnter="TextBlock_MouseEnter"/>
+                <TextBlock Text="{Binding Path=Header}" AllowDrop="True" classes:Event.MouseLeave="{Binding Path=Leave}" classes:Event.Drop="{Binding Path=Drop}">
+                    <TextBlock.ContextMenu>
+                        <ContextMenu ItemsSource="{Binding Path=ContextMenu}"/>
+                    </TextBlock.ContextMenu>
+                </TextBlock>
             </HierarchicalDataTemplate>
         </TreeView.ItemTemplate>
+
         <TreeView.ItemContainerStyle>
             <Style TargetType="TreeViewItem">
-                <EventSetter Event="PreviewKeyDown" Handler="TreeView_PreviewKeyDown"/>
-                <EventSetter Event="PreviewKeyUp" Handler="TreeView_PreviewKeyUp"/>
-                <EventSetter Event="Drop" Handler="TreeViewItem_Drop"/>
-                <EventSetter Event="MouseEnter" Handler="TextBlock_MouseEnter"/>
-                <EventSetter Event="PreviewMouseDoubleClick" Handler="TreeViewItem_PreviewMouseDoubleClick"/>
+                <Setter Property="classes:Event.PreviewKeyDown" Value="{Binding Path=PreviewDown}"/>
+                <Setter Property="classes:Event.PreviewKeyUp" Value="{Binding Path=PreviewUp}"/>
+                <Setter Property="classes:Event.MouseDoubleClick" Value="{Binding Path=DoubleClick}"/>
+                <Setter Property="classes:Event.Loaded" Value="{Binding Path=Loaded}"/>
+                <Setter Property="classes:Event.Unloaded" Value="{Binding Path=Unloaded}"/>
+                <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
             </Style>
         </TreeView.ItemContainerStyle>
     </TreeView>

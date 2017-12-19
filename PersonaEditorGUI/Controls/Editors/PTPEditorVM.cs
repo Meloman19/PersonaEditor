@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PersonaEditorLib.FileStructure.PTP;
+using PersonaEditorLib.FileStructure.Text;
 using System.IO;
 using System.Windows.Data;
 using System.Globalization;
@@ -15,10 +15,11 @@ using System.Windows.Media.Imaging;
 using PersonaEditorGUI.Classes.Media.Visual;
 using System.Windows;
 using System.Windows.Media;
+using PersonaEditorLib.Interfaces;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
-    class PTPMsgStrVM : BindingObject
+    class PTPMsgStrEditVM : BindingObject
     {
         TextVisual OldText;
         EventWrapper OldTextEW;
@@ -46,7 +47,7 @@ namespace PersonaEditorGUI.Controls.Editors
         }
         public string OldString
         {
-            get { return str.OldString.GetString(OldChar, true); ; }
+            get { return str.OldString.GetString(OldChar, true); }
         }
         public string NewString
         {
@@ -60,23 +61,22 @@ namespace PersonaEditorGUI.Controls.Editors
         public ImageSource NewTextSource => NewText.Image;
         public Rect NewTextRect => NewText.Rect;
 
-
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is TextVisual visual)
             {
                 if (visual.Tag == "Old")
                 {
-                    if (e.PropertyName == "TextImage")
+                    if (e.PropertyName == "Image")
                         Notify("OldTextSource");
-                    else if (e.PropertyName == "TextRect")
+                    else if (e.PropertyName == "Rect")
                         Notify("OldTextRect");
                 }
                 else if (visual.Tag == "New")
                 {
-                    if (e.PropertyName == "TextImage")
+                    if (e.PropertyName == "Image")
                         Notify("NewTextSource");
-                    else if (e.PropertyName == "TextRect")
+                    else if (e.PropertyName == "Rect")
                         Notify("NewTextRect");
                 }
             }
@@ -119,7 +119,7 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public PTPMsgStrVM(MSG.MSGstr str, CharList Old, CharList New, BackgroundImage backgroundImage)
+        public PTPMsgStrEditVM(MSG.MSGstr str, CharList Old, CharList New, BackgroundImage backgroundImage)
         {
             this.str = str;
             strEW = new EventWrapper(str, this);
@@ -177,6 +177,45 @@ namespace PersonaEditorGUI.Controls.Editors
         }
     }
 
+    class PTPNameEditVM : BindingObject
+    {
+        PTPName name;
+        EventWrapper OldCharEW;
+
+        private string _OldName = "";
+
+        public int Index => name.Index;
+        public string OldName => _OldName;
+        public string NewName
+        {
+            get { return name.NewName; }
+            set
+            {
+                if (name.NewName != value)
+                {
+                    name.NewName = value;
+                    Notify("NewName");
+                }
+            }
+        }
+
+        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is CharList charlist)
+            {
+                _OldName = name.OldName.GetTextBaseList().GetString(charlist);
+                Notify("OldName");
+            }
+        }
+
+        public PTPNameEditVM(PTPName name, CharList Old)
+        {
+            this.name = name;
+            OldCharEW = new EventWrapper(Old, this);
+            _OldName = name.OldName.GetTextBaseList().GetString(Old);
+        }
+    }
+
     class PTPMsgVM : BindingObject
     {
         MSG msg;
@@ -198,7 +237,7 @@ namespace PersonaEditorGUI.Controls.Editors
         public ImageSource NewNameImage => NewName.Image;
         public Rect NewNameRect => NewName.Rect;
 
-        public ObservableCollection<PTPMsgStrVM> Strings { get; } = new ObservableCollection<PTPMsgStrVM>();
+        public ObservableCollection<PTPMsgStrEditVM> Strings { get; } = new ObservableCollection<PTPMsgStrEditVM>();
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -257,7 +296,7 @@ namespace PersonaEditorGUI.Controls.Editors
             this.msg = msg;
 
             foreach (var a in msg.Strings)
-                Strings.Add(new PTPMsgStrVM(a, Old, New, backgroundImage));
+                Strings.Add(new PTPMsgStrEditVM(a, Old, New, backgroundImage));
 
             BackgroundEW = new EventWrapper(backgroundImage, this);
 
@@ -294,70 +333,57 @@ namespace PersonaEditorGUI.Controls.Editors
         }
     }
 
-    class PTPNameVM : BindingObject
-    {
-        PTPName name;
-        EventWrapper OldCharEW;
-
-        private string _OldName = "";
-
-        public int Index => name.Index;
-        public string OldName => _OldName;
-        public string NewName
-        {
-            get { return name.NewName; }
-            set
-            {
-                if (name.NewName != value)
-                {
-                    name.NewName = value;
-                    Notify("NewName");
-                }
-            }
-        }
-
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (sender is CharList charlist)
-            {
-                _OldName = name.OldName.GetTextBaseList().GetString(charlist);
-                Notify("OldName");
-            }
-        }
-
-        public PTPNameVM(PTPName name, CharList Old)
-        {
-            this.name = name;
-            OldCharEW = new EventWrapper(Old, this);
-            _OldName = name.OldName.GetTextBaseList().GetString(Old);
-        }
-    }
-
-    class PTPEditorVM : BindingObject
+    class PTPEditorVM : BindingObject, IViewModel
     {
         #region Private
 
         EventWrapper BackgroundEW;
-
-        PTP ptp;
         Backgrounds BackImage { get; } = new Backgrounds(Settings.App.Default.DirBackground);
 
-        CharList OldCharList { get; } = new CharList();
-        CharList NewCharList { get; } = new CharList();
+        CharList OldCharList { get; } = new CharList() { Tag = "Old" };
+        CharList NewCharList { get; } = new CharList() { Tag = "New" };
 
         #endregion Private
 
-        public ReadOnlyCollection<string> BackgroundList => BackImage.BackgroundList;
+        public ReadOnlyObservableCollection<string> BackgroundList => BackImage.BackgroundList;
         public int SelectedIndex
         {
             get { return BackImage.SelectedIndex; }
-            set { BackImage.SelectedIndex = value; }
+            set
+            {
+                BackImage.SelectedIndex = value;
+                Settings.App.Default.PTPBackgroundDefault = BackImage.SelectedItem;
+            }
+        }
+
+        public ReadOnlyObservableCollection<string> OldFontList => OldCharList.FontList;
+        public int OldFontIndex
+        {
+            get { return OldCharList.SelectedIndex; }
+            set
+            {
+                OldCharList.SelectedIndex = value;
+                Settings.App.Default.PTPOldDefault = OldCharList.SelectedItem;
+                Notify("OldFontIndex");
+            }
+        }
+
+        public ReadOnlyObservableCollection<string> NewFontList => NewCharList.FontList;
+        public int NewFontIndex
+        {
+            get { return NewCharList.SelectedIndex; }
+            set
+            {
+                NewCharList.SelectedIndex = value;
+                Settings.App.Default.PTPNewDefault = NewCharList.SelectedItem;
+                Notify("NewFontIndex");
+            }
         }
 
         public BitmapSource BackgroundImage => BackImage.CurrentBackground.Image;
         public Rect BackgroundRect => BackImage.CurrentBackground.Rect;
 
-        public ObservableCollection<PTPNameVM> Names { get; } = new ObservableCollection<PTPNameVM>();
+        public ObservableCollection<PTPNameEditVM> Names { get; } = new ObservableCollection<PTPNameEditVM>();
         public ObservableCollection<PTPMsgVM> MSG { get; } = new ObservableCollection<PTPMsgVM>();
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -373,20 +399,25 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public PTPEditorVM(PTP ptp)
         {
+            BackImage.SelectedItem = Settings.App.Default.PTPBackgroundDefault;
+
             OldCharList.GetFontList(Settings.App.Default.DirFont);
             OldCharList.SelectedItem = Settings.App.Default.PTPOldDefault;
             NewCharList.GetFontList(Settings.App.Default.DirFont);
             NewCharList.SelectedItem = Settings.App.Default.PTPNewDefault;
 
-            this.ptp = ptp;
-
             BackgroundEW = new EventWrapper(BackImage.CurrentBackground, this);
 
             foreach (var a in ptp.names)
-                Names.Add(new PTPNameVM(a, OldCharList));
+                Names.Add(new PTPNameEditVM(a, OldCharList));
 
             foreach (var a in ptp.msg)
                 MSG.Add(new PTPMsgVM(a, ptp.names, OldCharList, NewCharList, BackImage.CurrentBackground));
+        }
+
+        public bool Close()
+        {
+            return true;
         }
     }
 }

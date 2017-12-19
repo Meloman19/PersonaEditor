@@ -29,9 +29,9 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="X Position" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=TextXpos}"/>
+                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=TextXpos, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Y Position" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=TextYpos}"/>
+                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=TextYpos, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <Grid Grid.Row="1" Grid.ColumnSpan="4">
                     <Grid.ColumnDefinitions>
@@ -41,8 +41,8 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
-                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=TextColor}"/>
-                    <Button Grid.Column="2" Margin="5" Content="Pick" Click="TextColor_Pick"/>
+                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=TextColor, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Command="{Binding Path=SetColor}" CommandParameter="Text"/>
                 </Grid>
 
             </Grid>
@@ -62,9 +62,9 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="X Position" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=NameXpos}"/>
+                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=NameXpos, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Y Position" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=NameYpos}"/>
+                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=NameYpos, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <Grid Grid.Row="1" Grid.ColumnSpan="4">
                     <Grid.ColumnDefinitions>
@@ -74,8 +74,8 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
-                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=NameColor}"/>
-                    <Button Grid.Column="2" Margin="5" Content="Pick" Click="NameColor_Pick"/>
+                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=NameColor, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Command="{Binding Path=SetColor}" CommandParameter="Name"/>
                 </Grid>
 
             </Grid>
@@ -95,9 +95,9 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="Width" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundWidth}"/>
+                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundWidth, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Height" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundHeight}"/>
+                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundHeight, UpdateSourceTrigger=PropertyChanged}"/>
 
 
                 <Grid Grid.Row="1" Grid.ColumnSpan="4">
@@ -108,8 +108,8 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
-                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundColor}"/>
-                    <Button Grid.Column="2" Margin="5" Content="Pick" Click="BackgroundColor_Pick"/>
+                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundColor, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Command="{Binding Path=SetColor}" CommandParameter="Back"/>
                 </Grid>
 
             </Grid>
@@ -129,9 +129,9 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="Glyph Scale" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=GlyphScale}"/>
+                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=GlyphScale, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Text="Line Spacing" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
-                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=LineSpacing}"/>
+                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=LineSpacing, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
         </GroupBox>
     </Grid>

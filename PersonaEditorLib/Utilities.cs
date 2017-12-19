@@ -75,6 +75,27 @@ namespace PersonaEditorLib.Utilities
         }
     }
 
+    public static class Array
+    {
+        public static List<T[]> SplitArray<T>(T[] array, int[] pos)
+        {
+            List<T[]> returned = new List<T[]>();
+
+            for (int i = 0; i < pos.Length - 1; i++)
+            {
+                T[] temp = new T[pos[i + 1] - pos[i]];
+                System.Array.Copy(array, pos[i], temp, 0, temp.Length);
+                returned.Add(temp);
+            }
+
+            T[] temp2 = new T[array.Length - pos.Last()];
+            System.Array.Copy(array, pos.Last(), temp2, 0, temp2.Length);
+            returned.Add(temp2);
+
+            return returned;
+        }
+    }
+
     public static class Utilities
     {
         public static int Alignment(int Size, int Align)
@@ -175,31 +196,40 @@ namespace PersonaEditorLib.Utilities
 
     public static class PersonaFile
     {
-        public static object OpenFile(string name, byte[] data, FileType type)
+        public static ObjectFile OpenFile(string name, byte[] data, FileType type)
         {
             try
             {
+                object Obj;
+
                 if (type == FileType.BIN)
-                    return new FileStructure.BIN.BIN(name, data);
+                    Obj = new FileStructure.Container.BIN(data);
                 else if (type == FileType.SPR)
-                    return new FileStructure.SPR.SPR(name, data, true);
+                    Obj = new FileStructure.SPR.SPR(data);
                 else if (type == FileType.TMX)
-                    return new FileStructure.TMX.TMX(name, data, true);
+                    Obj = new FileStructure.Graphic.TMX(data);
                 else if (type == FileType.BF)
-                    return new FileStructure.BF.BF(name, data);
+                {
+                    var temp = new FileStructure.Container.BF(data);
+                    temp.SetName(name);
+                    Obj = temp;
+                }
                 else if (type == FileType.BMD)
-                    return new FileStructure.BMD.BMD(name, data);
+                    Obj = new FileStructure.Text.BMD(data);
+                else if (type == FileType.PM1)
+                    Obj = new FileStructure.PM1.PM1(data);
                 else if (type == FileType.PTP)
-                    return new FileStructure.PTP.PTP(name, data);
+                    Obj = new FileStructure.Text.PTP(name, data);
                 else if (type == FileType.FNT)
-                    return new FileStructure.FNT.FNT(name, data);
+                    Obj = new FileStructure.FNT.FNT(name, data);
+                else if (type == FileType.BVP)
+                    Obj = new FileStructure.Container.BVP(name, data);
                 else
-                    return new FileStructure.HEX(name, data);
+                    Obj = new FileStructure.HEX(name, data);
+
+                return new ObjectFile(name, Obj);
             }
-            catch
-            {
-                return null;
-            }
+            catch { return null; }
         }
 
         public static FileType GetFileType(string name)
@@ -213,12 +243,16 @@ namespace PersonaEditorLib.Utilities
                 return FileType.TMX;
             else if (ext.ToLower() == ".bf")
                 return FileType.BF;
-            else if (ext.ToLower() == ".bmd")
+            else if (ext.ToLower() == ".pm1")
+                return FileType.PM1;
+            else if (ext.ToLower() == ".bmd" | ext.ToLower() == ".msg")
                 return FileType.BMD;
             else if (ext.ToLower() == ".ptp")
                 return FileType.PTP;
             else if (ext.ToLower() == ".fnt")
                 return FileType.FNT;
+            else if (ext.ToLower() == ".bvp")
+                return FileType.BVP;
             else
                 return FileType.HEX;
         }

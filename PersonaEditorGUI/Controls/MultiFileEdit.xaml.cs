@@ -1,4 +1,4 @@
-﻿using PersonaEditorGUI.Files;
+﻿using PersonaEditorGUI.Classes;
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,35 +19,11 @@ namespace PersonaEditorGUI.Controls
 {
     public partial class MultiFileEdit : UserControl
     {
-        MultiFileEditVM MultiFileEditVM = new MultiFileEditVM();
-        SingleFileEditVM SingleFileEditVM = new SingleFileEditVM();
-
         public MultiFileEdit()
         {
-            DataContext = MultiFileEditVM;
             InitializeComponent();
-
-            SingleFile.DataContext = SingleFileEditVM;
-        }
-
-        private void LeftCC_SelectedItemData(object sender)
-        {
-            if (sender is IPersonaFile file)
-                PropertyCC.ItemsSource = file.GetProperties;
-            else
-                PropertyCC.ItemsSource = null;
-
-            if (sender is IPreview preview)
-                PreviewCC.Content = preview.Control;
-            else
-                PreviewCC.Content = null;
         }
         
-        private void LeftCC_SelectedItemDataOpen(object sender)
-        {
-            SingleFileEditVM.Open((sender as UserTreeViewItem).personaFile);
-        }
-
         double temp = 0;
         private void GridSplitter_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {

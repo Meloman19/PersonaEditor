@@ -16,43 +16,11 @@ using System.Windows.Shapes;
 
 namespace PersonaEditorGUI.Settings
 {
-    public partial class Main : UserControl, INotifyPropertyChanged
+    public partial class Main : UserControl
     {
-        #region INotifyPropertyChanged implementation
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void Notify(string propertyName)
-        {
-            if (this.PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion INotifyPropertyChanged implementation
-
-        private bool _IsLittleEndian;
-        public bool IsLIttleEndian
-        {
-            get { return _IsLittleEndian; }
-            set
-            {
-                if (value != _IsLittleEndian)
-                    _IsLittleEndian = value;
-
-                Notify("IsLIttleEndian");
-            }
-        }
-
         public Main()
         {
             InitializeComponent();
-           // IsLIttleEndian = Current.Default.IsLittleEndian;
-        }
-
-
-        public void Save()
-        {
-           // Current.Default.IsLittleEndian = IsLIttleEndian;
         }
     }
 }

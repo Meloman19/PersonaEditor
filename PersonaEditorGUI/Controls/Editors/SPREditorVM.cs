@@ -9,10 +9,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using PersonaEditorLib;
 using System.Windows;
+using PersonaEditorLib.Interfaces;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
-    class SPRKey : BindingObject
+    class SPRKeyVM : BindingObject
     {
         PersonaEditorLib.FileStructure.SPR.SPRKey Key;
         EventWrapper EW;
@@ -93,7 +94,7 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public SPRKey(PersonaEditorLib.FileStructure.SPR.SPRKey key)
+        public SPRKeyVM(PersonaEditorLib.FileStructure.SPR.SPRKey key)
         {
             Key = key ?? throw new ArgumentNullException("key");
             EW = new EventWrapper(key, this);
@@ -102,7 +103,7 @@ namespace PersonaEditorGUI.Controls.Editors
 
     class TMXVM : BindingObject
     {
-        PersonaEditorLib.FileStructure.TMX.TMX Tmx;
+        ObjectFile tmx;
         EventWrapper EW;
 
         private BitmapSource _TextureImage = null;
@@ -113,32 +114,32 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             if (e.PropertyName == "Image")
             {
-                if (sender is PersonaEditorLib.FileStructure.TMX.TMX tmx)
+                if (sender is PersonaEditorLib.FileStructure.Graphic.TMX tmx)
                 {
-                    TextureImage = tmx.Image;
+                    TextureImage = tmx.GetImage();
                 }
             }
         }
 
-        public TMXVM(PersonaEditorLib.FileStructure.TMX.TMX tmx, IList<PersonaEditorLib.FileStructure.SPR.SPRKey> keylist, int textureindex)
+        public TMXVM(ObjectFile tmx, IList<PersonaEditorLib.FileStructure.SPR.SPRKey> keylist, int textureindex)
         {
-            Tmx = tmx ?? throw new ArgumentNullException("tmx");
+            this.tmx = tmx ?? throw new ArgumentNullException("tmx");
+            if (tmx.Object == null) throw new ArgumentNullException("tmx.Object");
             var list = (keylist ?? throw new ArgumentNullException("keylist")).Where(x => x.mTextureIndex == textureindex);
-            TextureImage = tmx.Image;
+
+
+            TextureImage = (tmx.Object as PersonaEditorLib.FileStructure.Graphic.TMX).GetImage();
             EW = new EventWrapper(tmx, this);
 
             foreach (var a in list)
-                KeyList.Add(new SPRKey(a));
+                KeyList.Add(new SPRKeyVM(a));
         }
 
         #region PublicProperties
 
-        public ObservableCollection<SPRKey> KeyList { get; } = new ObservableCollection<SPRKey>();
+        public ObservableCollection<SPRKeyVM> KeyList { get; } = new ObservableCollection<SPRKeyVM>();
 
-        public string Name
-        {
-            get { return Tmx.Name; }
-        }
+        public string Name => (tmx.Object as PersonaEditorLib.FileStructure.Graphic.TMX).Name;
 
         public BitmapSource TextureImage
         {
@@ -152,10 +153,7 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public Rect Rect
-        {
-            get { return _Rect; }
-        }
+        public Rect Rect => _Rect;
 
         public Point Point
         {
@@ -170,7 +168,7 @@ namespace PersonaEditorGUI.Controls.Editors
         #endregion PublicProperties
     }
 
-    class SPREditorVM : BindingObject
+    class SPREditorVM : BindingObject, IViewModel
     {
         public ObservableCollection<TMXVM> TextureList { get; set; } = new ObservableCollection<TMXVM>();
 
@@ -178,8 +176,13 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             for (int i = 0; i < spr.TextureList.Count; i++)
             {
-                TextureList.Add(new TMXVM(spr.TextureList[i] as PersonaEditorLib.FileStructure.TMX.TMX, spr.KeyList.List, i));
+                TextureList.Add(new TMXVM(spr.TextureList[i], spr.KeyList.List, i));
             }
+        }
+
+        public bool Close()
+        {
+            return true;
         }
     }
 }

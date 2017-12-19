@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace PersonaEditorLib.FileStructure.PTP
+namespace PersonaEditorLib.FileStructure.Text
 {
     public static class Extension
     {
@@ -99,7 +99,7 @@ namespace PersonaEditorLib.FileStructure.PTP
             return returned;
         }
 
-        public static void ParseStrings(this IList<MSG.MSGstr> Strings, byte[] SourceBytes, CharList New)
+        public static void ParseStrings(this IList<MSG.MSGstr> Strings, byte[] SourceBytes)
         {
             Strings.Clear();
 
