@@ -11,9 +11,15 @@ using PersonaEditorGUI.Classes;
 using PersonaEditorGUI.Controls;
 using System.Windows.Input;
 using System.ComponentModel;
+using PersonaEditorLib.PersonaEncoding;
 
 namespace PersonaEditorGUI
 {
+    public static class TestClass
+    {
+        public static PersonaEncoding personaEncoding = new PersonaEncoding("font\\P4.FNTMAP");
+    }
+
     class MainWindowVM : BindingObject
     {
         Settings.SetSettings setSettings;
@@ -38,17 +44,22 @@ namespace PersonaEditorGUI
         public CancelEventHandler WindowClosing => Window_Closing;
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (visualizer != null)
-                visualizer.Close();
-            if (setSettings != null)
-                setSettings.Close();
-            if (setchar != null)
-                setchar.Close();
+            if (MultiFile.CloseFile())
+            {
+                if (visualizer != null)
+                    visualizer.Close();
+                if (setSettings != null)
+                    setSettings.Close();
+                if (setchar != null)
+                    setchar.Close();
 
-            Settings.App.Default.Save();
-            Settings.BackgroundDefault.Default.Save();
-            Settings.SPREditor.Default.Save();
-            Settings.WindowSetting.Default.Save();
+                Settings.App.Default.Save();
+                Settings.BackgroundDefault.Default.Save();
+                Settings.SPREditor.Default.Save();
+                Settings.WindowSetting.Default.Save();
+            }
+            else
+                e.Cancel = true;
         }
 
         public ICommand clickOpenFile { get; }
@@ -57,6 +68,28 @@ namespace PersonaEditorGUI
             OpenFileDialog OFD = new OpenFileDialog();
             if (OFD.ShowDialog() == true)
                 MultiFile.OpenFile(OFD.FileName);
+        }
+
+        public ICommand clickSaveAsFile { get; }
+        private void SaveAsFile()
+        {
+            SaveFileDialog SFD = new SaveFileDialog();
+            SFD.OverwritePrompt = true;
+
+            if (MultiFile.OpenFileName != "")
+            {
+                string dirpath = Path.GetDirectoryName(MultiFile.OpenFileName);
+                string filename = Path.GetFileName(MultiFile.OpenFileName);
+                if (Directory.Exists(dirpath))
+                    SFD.InitialDirectory = dirpath;
+                SFD.FileName = filename;
+
+                string ext = Path.GetExtension(MultiFile.OpenFileName).Remove(0, 1);
+                SFD.Filter = ext.ToUpper() + "|*." + ext;
+            }
+
+            if (SFD.ShowDialog() == true)
+                MultiFile.SaveFile(SFD.FileName);
         }
 
         public ICommand clickSettingOpen { get; }
@@ -117,6 +150,7 @@ namespace PersonaEditorGUI
         public MainWindowVM(string startarg = "")
         {
             clickOpenFile = new RelayCommand(OpenFile);
+            clickSaveAsFile = new RelayCommand(SaveAsFile);
             clickSettingOpen = new RelayCommand(SettingOpen);
             clickVisualizerOpen = new RelayCommand(ToolVisualizerOpen);
             clickSetCharOpen = new RelayCommand(ToolSetCharOpen);

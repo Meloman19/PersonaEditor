@@ -33,25 +33,25 @@ namespace PersonaEditorLib.FileStructure.PM1
     {
         public static byte[] GetBMD(PM1 pm1)
         {
-            var temp = pm1.List2.Find(x => x.Type == TypeMap.BMD);
-            return temp == null ? new byte[0] : (temp as PM1ElementBMD).BMD.ToArray();
+            var temp = pm1.List.Find(x => (int)(x.Tag as object[])[0] == (int)TypeMap.BMD);
+            return temp == null ? new byte[0] : (temp.Object as IPersonaFile).Get();
         }
 
         public static void SetBMD(PM1 pm1, byte[] bmd)
         {
-            var temp = pm1.List2.Find(x => x.Type == TypeMap.BMD);
-            if (temp != null)
-                (temp as PM1ElementBMD).BMD = bmd;
+            var bmdfile = Utilities.PersonaFile.OpenFile("", bmd, FileType.BMD);
+            var temp = pm1.List.Find(x => (int)(x.Tag as object[])[0] == (int)TypeMap.BMD);
+            if (bmdfile != null && temp != null)
+                temp.Object = bmdfile.Object;
         }
 
         PM1Header Header;
         PM1Table Table;
+        int textsize = 0x20;
 
         public List<ObjectFile> List { get; } = new List<ObjectFile>();
 
         public List<ObjectFile> HidList { get; } = new List<ObjectFile>();
-
-        public List<IPM1Element> List2 { get; } = new List<IPM1Element>();
 
         public PM1(Stream stream)
         {
@@ -94,34 +94,6 @@ namespace PersonaEditorLib.FileStructure.PM1
             Header = new PM1Header(reader);
             Table = new PM1Table(reader.ReadInt32ArrayArray(Header.TableLineCount, 4));
 
-            foreach (var element in Table.Table)
-                if (element.Count * element.Size > 0)
-                    switch (element.Index)
-                    {
-                        case ((int)TypeMap.FileList):
-                            List2.Add(new PM1ElementFileNames(reader, element));
-                            break;
-                        case ((int)TypeMap.BMD):
-                            List2.Add(new PM1ElementBMD(reader, element));
-                            break;
-                        case ((int)TypeMap.RMDHead):
-                            var rmdhead = new PM1ElementRMDHead(reader, element);
-                            List2.Add(rmdhead);
-                            List2.Add(new PM1ElementRMD(reader, rmdhead));
-                            break;
-                        case ((int)TypeMap.EPLHead):
-                            List2.Add(new PM1ElementEPLHead(reader, element));
-                            break;
-                        case ((int)TypeMap.RMD):
-                            break;
-                        case ((int)TypeMap.EPL):
-                            List2.Add(new PM1ElementEPL(reader, element, List2.Find(x => x.Type == TypeMap.EPLHead) as PM1ElementEPLHead));
-                            break;
-                        default:
-                            List2.Add(new PM1Element(reader, element));
-                            break;
-                    }
-
             string[] list = ReadFileList(reader);
             int ind = 0;
 
@@ -160,7 +132,7 @@ namespace PersonaEditorLib.FileStructure.PM1
             {
                 reader.BaseStream.Position = element.Position;
                 var returned = Utilities.PersonaFile.OpenFile(name[0], reader.ReadBytes(element.Size), FileType.BMD);
-                returned.Tag = element.Index;
+                returned.Tag = new object[] { element.Index };
                 List.Add(returned);
             }
             else if (element.Index == (int)TypeMap.EPLHead)
@@ -168,44 +140,30 @@ namespace PersonaEditorLib.FileStructure.PM1
                 var elementEPL = Table.Table.Find(x => x.Index == (int)TypeMap.EPL);
 
                 reader.BaseStream.Position = element.Position;
-                int[] eplpos = new int[element.Count];
+                int[][] eplpos = reader.ReadInt32ArrayArray(element.Count, 4);
 
-                for (int i = 0; i < element.Count; i++)
-                {
-                    reader.BaseStream.Position += 4;
-                    eplpos[i] = reader.ReadInt32() - elementEPL.Position;
-                    reader.BaseStream.Position += 8;
-                }
                 reader.BaseStream.Position = elementEPL.Position;
                 byte[] EPL = reader.ReadBytes(elementEPL.Size);
 
-                var splited = Utilities.Array.SplitArray(EPL, eplpos);
+                var splited = Utilities.Array.SplitArray(EPL, eplpos.Select(x => x[1] - elementEPL.Position).ToArray());
 
                 for (int i = 0; i < splited.Count; i++)
                 {
                     var returned = Utilities.PersonaFile.OpenFile(name[i], splited[i], FileType.HEX);
-                    returned.Tag = element.Index;
+                    returned.Tag = new object[] { element.Index, eplpos[i] };
                     List.Add(returned);
                 }
             }
             else if (element.Index == (int)TypeMap.RMDHead)
             {
-                int[][] RMD = new int[element.Count][];
-
-                for (int i = 0; i < element.Count; i++)
-                {
-                    reader.BaseStream.Position += 0x10;
-                    int pos = reader.ReadInt32();
-                    int size = reader.ReadInt32();
-                    reader.BaseStream.Position += 0x8;
-                    RMD[i] = new int[2] { pos, size };
-                }
+                reader.BaseStream.Position = element.Position;
+                int[][] RMD = reader.ReadInt32ArrayArray(element.Count, 8);
 
                 for (int i = 0; i < RMD.Length; i++)
                 {
-                    reader.BaseStream.Position = RMD[i][0];
-                    var returned = Utilities.PersonaFile.OpenFile(name[i], reader.ReadBytes(RMD[i][1]), FileType.HEX);
-                    returned.Tag = element.Index;
+                    reader.BaseStream.Position = RMD[i][4];
+                    var returned = Utilities.PersonaFile.OpenFile(name[i], reader.ReadBytes(RMD[i][5]), FileType.HEX);
+                    returned.Tag = new object[] { element.Index, RMD[i] };
                     List.Add(returned);
                 }
             }
@@ -219,53 +177,13 @@ namespace PersonaEditorLib.FileStructure.PM1
             var FileList = Table.Table.Find(x => x.Index == (int)TypeMap.FileList);
             List<string> fileList = new List<string>();
 
-            reader.BaseStream.Position = FileList.Position;
-            for (int i = 0; i < FileList.Count; i++)
-                fileList.Add(Encoding.ASCII.GetString(reader.ReadBytes(FileList.Size).Where(x => x != 0).ToArray()));
-            return fileList.ToArray();
-        }
-
-        private void Update()
-        {
-            foreach (var element in List2)
+            if (FileList != null)
             {
-                switch (element.Type)
-                {
-                    case (TypeMap.RMDHead):
-                        PM1ElementRMDHead rmdhead = element as PM1ElementRMDHead;
-                        PM1ElementRMD rmd = List2.Find(x => x.Type == TypeMap.RMD) as PM1ElementRMD;
-                        for (int i = 0; i < rmdhead.List.Count; i++)
-                        {
-                            int ret = 0;
-                            List2.ForEach(x =>
-                            {
-                                if (x.Type < TypeMap.RMD)
-                                    ret += x.Size;
-                            });
-
-                            rmdhead.List[i].Position = rmd.Position(i) + Header.Size + Table.Size + ret;
-                            rmdhead.List[i].Size = (int)rmd.List[i].Length;
-                        }
-                        break;
-                    case (TypeMap.EPLHead):
-                        PM1ElementEPLHead eplhead = element as PM1ElementEPLHead;
-                        PM1ElementEPL epl = List2.Find(x => x.Type == TypeMap.EPL) as PM1ElementEPL;
-                        for (int i = 0; i < eplhead.List.Count; i++)
-                        {
-                            int ret = 0;
-                            List2.ForEach(x =>
-                            {
-                                if (x.Type < TypeMap.EPL)
-                                    ret += x.Size;
-                            });
-
-                            eplhead.List[i].Position = epl.Position(i) + Header.Size + Table.Size + ret;
-                        }
-                        break;
-                    default:
-                        break;
-                }
+                reader.BaseStream.Position = FileList.Position;
+                for (int i = 0; i < FileList.Count; i++)
+                    fileList.Add(System.Text.Encoding.ASCII.GetString(reader.ReadBytes(FileList.Size).Where(x => x != 0).ToArray()));
             }
+            return fileList.ToArray();
         }
 
         #region IPersonaFile
@@ -302,44 +220,99 @@ namespace PersonaEditorLib.FileStructure.PM1
 
         public bool IsLittleEndian { get; set; } = true;
 
+        #endregion IPersonaFile
+
         #region IFile
 
         public int Size
         {
             get
             {
-                int returned = 0;
+                //  int returned = 0;
 
-                return returned;
+                return Get().Length;
+
+                //  return returned;
             }
         }
 
         public byte[] Get()
         {
-            byte[] returned = new byte[0];
-
             using (MemoryStream MS = new MemoryStream())
             {
                 BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
 
-                Update();
-                Table.Update(List2);
-
-                Header.FileSize = Header.Size + Table.Size;
-                List2.ForEach(x => Header.FileSize += x.Size);
-
                 Header.Get(writer);
                 Table.Get(writer);
 
-                List2.OrderBy(x => x.Type).ToList().ForEach(x => x.Get(writer));
-                returned = MS.ToArray();
-            }
+                List<int[]> table = new List<int[]>();
 
-            return returned;
+                var filelist = List.Select(x => x.Name).ToArray();
+                foreach (var file in filelist)
+                    writer.WriteString(file, textsize);
+
+                var RMD = List.FindAll(x => (int)(x.Tag as object[])[0] == (int)TypeMap.RMDHead);
+                long RMDHeadPos = 0;
+
+                if (RMD.Count != 0)
+                {
+                    RMDHeadPos = writer.BaseStream.Position;
+                    writer.Write(new byte[RMD.Count * 0x20]);
+                }
+
+                var BMD = List.Find(x => (int)(x.Tag as object[])[0] == (int)TypeMap.BMD);
+                if (BMD != null)
+                {
+                    writer.Write((BMD.Object as IPersonaFile).Get());
+                    writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, 0x10)]);
+                }
+
+                var EPL = List.FindAll(x => (int)(x.Tag as object[])[0] == (int)TypeMap.EPLHead);
+                long EPLHeadPos = 0;
+
+                if (EPL.Count != 0)
+                {
+                    EPLHeadPos = writer.BaseStream.Position;
+                    writer.Write(new byte[EPL.Count * 0x10]);
+
+                    foreach (var a in EPL)
+                    {
+                        int[] eplhead = (int[])(a.Tag as object[])[1];
+                        eplhead[1] = (int)writer.BaseStream.Position;
+                        writer.Write((a.Object as IPersonaFile).Get());
+                        writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, 0x10)]);
+                    }
+                }
+
+                if (RMD.Count != 0)
+                {
+                    foreach (var a in RMD)
+                    {
+                        int[] rmdhead = (int[])(a.Tag as object[])[1];
+                        rmdhead[4] = (int)writer.BaseStream.Position;
+                        writer.Write((a.Object as IPersonaFile).Get());
+                        writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, 0x10)]);
+                    }
+                }
+
+                if (EPLHeadPos != 0)
+                {
+                    writer.BaseStream.Position = EPLHeadPos;
+                    foreach (var a in EPL)
+                        writer.WriteInt32Array((int[])(a.Tag as object[])[1]);
+                }
+
+                if (RMDHeadPos != 0)
+                {
+                    writer.BaseStream.Position = RMDHeadPos;
+                    foreach (var a in RMD)
+                        writer.WriteInt32Array((int[])(a.Tag as object[])[1]);
+                }
+
+                return MS.ToArray();
+            }
         }
 
         #endregion IFile
-
-        #endregion IPersonaFile
     }
 }

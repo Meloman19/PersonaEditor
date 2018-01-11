@@ -12,18 +12,40 @@ using System.Windows.Media.Imaging;
 
 namespace PersonaEditorGUI.Tools
 {
-    class SetCharGlyphVM : BindingObject
-    {
-
-    }
-
     class SetCharVM : BindingObject
     {
-        readonly CharList CharList = new CharList();
-        EventWrapper CharListEW;
+        public class FnMpImg : BindingObject
+        {
+            public int Index { get; set; } = 0;
 
-        private int _FontSelect = 0;
-        public ReadOnlyObservableCollection<string> FontList => CharList.FontList;
+            private string _Char = "";
+            public string Char
+            {
+                get { return _Char; }
+                set
+                {
+                    if (_Char != value)
+                    {
+                        _Char = value;
+                        Notify("Char");
+                    }
+                }
+            }
+
+            private BitmapSource _Image;
+            public BitmapSource Image
+            {
+                get { return _Image; }
+                set
+                {
+                    _Image = value;
+                    Notify("Image");
+                }
+            }
+        }
+
+        private int _FontSelect = -1;
+        public ReadOnlyObservableCollection<string> FontList => Static.FontManager.FontList;
 
         public int FontSelect
         {
@@ -33,29 +55,17 @@ namespace PersonaEditorGUI.Tools
                 if (Save())
                 {
                     _FontSelect = value;
-                    string font = Path.Combine(Static.Paths.DirFont, FontList[_FontSelect]);
-                    string fontmp = Path.Combine(Static.Paths.DirFont, Path.GetFileNameWithoutExtension(FontList[_FontSelect]) + ".txt");
-                    CharList.Open(font, fontmp);
+                    GlyphListUpdate();
                 }
                 else { Notify("FontSelect"); }
             }
         }
 
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (sender is CharList chr)
-            {
-                GlyphListUpdate();
-            }
-        }
-
-        public BindingList<CharList.FnMpImg> GlyphList { get; } = new BindingList<CharList.FnMpImg>();
+        public BindingList<FnMpImg> GlyphList { get; } = new BindingList<FnMpImg>();
 
         public SetCharVM()
         {
             GlyphList.ListChanged += GlyphList_ListChanged;
-            CharListEW = new EventWrapper(CharList, this);
-            CharList.GetFontList(Static.Paths.DirFont);
         }
 
         private void GlyphList_ListChanged(object sender, ListChangedEventArgs e)
@@ -70,17 +80,23 @@ namespace PersonaEditorGUI.Tools
         {
             GlyphList.ListChanged -= GlyphList_ListChanged;
             GlyphList.Clear();
-            foreach (var a in CharList.List)
-            {
-                var temp = new CharList.FnMpImg()
+            var font = Static.FontManager.GetPersonaFont(_FontSelect);
+            if (font != null)
+                foreach (var a in font.DataList)
                 {
-                    Index = a.Index,
-                    Char = a.Char,
-                    Image = BitmapSource.Create(CharList.Width, CharList.Height, 96, 96, CharList.PixelFormat, CharList.Palette,
-                    a.Image_data, (CharList.PixelFormat.BitsPerPixel * CharList.Width + 7) / 8)
-                };
-                GlyphList.Add(temp);
-            }
+                    var temp = new FnMpImg()
+                    {
+                        Index = a.Key,
+                        Image = BitmapSource.Create(font.Width, font.Height, 96, 96, font.PixelFormat, font.Palette, a.Value, (font.PixelFormat.BitsPerPixel * font.Width + 7) / 8)
+                    };
+                    GlyphList.Add(temp);
+                }
+            var enc = Static.EncodingManager.GetPersonaEncoding(Static.FontManager.GetPersonaFontName(_FontSelect));
+
+            foreach (var a in GlyphList)
+                if (enc.Dictionary.ContainsKey(a.Index))
+                    a.Char = enc.Dictionary[a.Index].ToString();
+
             GlyphList.ListChanged += GlyphList_ListChanged;
         }
 
@@ -92,9 +108,24 @@ namespace PersonaEditorGUI.Tools
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    for (int i = 0; i < GlyphList.Count; i++)
-                        CharList.List[i].Char = GlyphList[i].Char;
-                    CharList.SaveFontMap(Path.Combine(Static.Paths.DirFont, Path.GetFileNameWithoutExtension(FontList[_FontSelect]) + ".txt"));
+                    var enc = Static.EncodingManager.GetPersonaEncoding(Static.FontManager.GetPersonaFontName(_FontSelect));
+                    if (enc.Tag == "Empty")
+                    {
+                        PersonaEditorLib.PersonaEncoding.PersonaEncoding personaEncoding = new PersonaEditorLib.PersonaEncoding.PersonaEncoding();
+                        foreach (var a in GlyphList)
+                            if (a.Char.Length > 0)
+                                personaEncoding.Add(a.Index, a.Char[0]);
+
+                        personaEncoding.SaveFNTMAP(Path.Combine(Static.FontManager.sourcedir, Static.FontManager.GetPersonaFontName(_FontSelect) + ".FNTMAP"));
+                    }
+                    else
+                    {
+                        foreach (var a in GlyphList)
+                            if (a.Char.Length > 0)
+                                enc.Add(a.Index, a.Char[0]);
+                        enc.SaveFNTMAP(enc.FilePath);
+                        Static.EncodingManager.Update(Static.FontManager.GetPersonaFontName(_FontSelect));
+                    }
                 }
                 else if (result == MessageBoxResult.Cancel)
                     return false;
@@ -109,7 +140,8 @@ namespace PersonaEditorGUI.Tools
 
         void Window_Closing(object sender, CancelEventArgs e)
         {
-            Save();
+            if (!Save())
+                e.Cancel = true;
         }
     }
 }

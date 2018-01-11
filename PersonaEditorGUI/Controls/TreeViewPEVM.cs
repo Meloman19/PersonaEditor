@@ -37,7 +37,15 @@ namespace PersonaEditorGUI.Controls
             tree.Add(item);
             treeEW.Add(new EventWrapper(item, this));
         }
-        
+
+        public ObjectFile GetRoot()
+        {
+            if (tree.Count > 0)
+                return tree[0].personaFile;
+            else
+                return null;
+        }
+
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is UserTreeViewItem item)

@@ -10,19 +10,19 @@ namespace PersonaEditorLib.FileStructure.Text
 {
     public static class Extension
     {
-        public static List<TextBaseElement> GetTextBaseList(this string String, CharList FontMap)
+        public static List<TextBaseElement> GetTextBaseList(this string String, Encoding FontMap)
         {
             List<TextBaseElement> MyByteArrayList = new List<TextBaseElement>();
 
             foreach (var a in Regex.Split(String, "(\r\n|\r|\n)"))
                 if (Regex.IsMatch(a, "\r\n|\r|\n"))
-                    MyByteArrayList.Add(new TextBaseElement("System", new byte[] { 0x0A }));
+                    MyByteArrayList.Add(new TextBaseElement(false, new byte[] { 0x0A }));
                 else
                     foreach (var b in Regex.Split(a, @"({[^}]+})"))
                         if (Regex.IsMatch(b, @"{.+}"))
-                            MyByteArrayList.Add(new TextBaseElement("System", Utilities.String.SplitString(b.Substring(1, b.Length - 2), ' ')));
+                            MyByteArrayList.Add(new TextBaseElement(false, Utilities.String.SplitString(b.Substring(1, b.Length - 2), ' ')));
                         else
-                            MyByteArrayList.Add(new TextBaseElement("Text", FontMap.Encode(b, CharList.EncodeOptions.Bracket)));
+                            MyByteArrayList.Add(new TextBaseElement(true, FontMap.GetBytes(b)));
 
             return MyByteArrayList;
         }
@@ -31,6 +31,7 @@ namespace PersonaEditorLib.FileStructure.Text
         {
             List<TextBaseElement> returned = new List<TextBaseElement>();
 
+            bool isText = true;
             string type = "Text";
             List<byte> temp = new List<byte>();
 
@@ -52,28 +53,32 @@ namespace PersonaEditorLib.FileStructure.Text
                     {
                         if (temp.Count != 0)
                         {
-                            returned.Add(new TextBaseElement(type, temp.ToArray()));
+                            returned.Add(new TextBaseElement(isText, temp.ToArray()));
                             temp.Clear();
                         }
 
                         type = "System";
+                        isText = false;
                         temp.Add(array[i]);
 
-                        returned.Add(new TextBaseElement(type, temp.ToArray()));
+                        returned.Add(new TextBaseElement(isText, temp.ToArray()));
                         type = "Text";
+                        isText = true;
                         temp.Clear();
                     }
                     else
                     {
                         if (temp.Count != 0)
                         {
-                            returned.Add(new TextBaseElement(type, temp.ToArray()));
+                            returned.Add(new TextBaseElement(isText, temp.ToArray()));
                             type = "Text";
+                            isText = true;
                             temp.Clear();
                         }
 
 
                         type = "System";
+                        isText = false;
                         temp.Add(array[i]);
                         int count = (array[i] - 0xF0) * 2 - 1;
                         for (int k = 0; k < count; k++)
@@ -82,8 +87,9 @@ namespace PersonaEditorLib.FileStructure.Text
                             temp.Add(array[i]);
                         }
 
-                        returned.Add(new TextBaseElement(type, temp.ToArray()));
+                        returned.Add(new TextBaseElement(isText, temp.ToArray()));
                         type = "Text";
+                        isText = true;
                         temp.Clear();
                     }
                 }
@@ -91,7 +97,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
             if (temp.Count != 0)
             {
-                returned.Add(new TextBaseElement(type, temp.ToArray()));
+                returned.Add(new TextBaseElement(isText, temp.ToArray()));
                 temp.Clear();
             }
 
@@ -115,26 +121,26 @@ namespace PersonaEditorLib.FileStructure.Text
 
                 for (int i = 0; i < temp.Count; i++)
                 {
-                    if (temp[i].Type == "System")
-                        MSG.Prefix.Add(temp[i]);
-                    else
+                    if (temp[i].IsText)
                     {
                         tempdown = i;
                         i = temp.Count;
                     }
+                    else
+                        MSG.Prefix.Add(temp[i]);
                 }
 
                 if (MSG.Prefix.Count < temp.Count)
                 {
                     for (int i = temp.Count - 1; i >= tempdown; i--)
                     {
-                        if (temp[i].Type == "System")
-                            MSG.Postfix.Add(temp[i]);
-                        else
+                        if (temp[i].IsText)
                         {
                             temptop = i;
                             i = 0;
                         }
+                        else
+                            MSG.Postfix.Add(temp[i]);
                     }
 
                     var temparray = MSG.Postfix.Reverse().ToList();
@@ -153,7 +159,7 @@ namespace PersonaEditorLib.FileStructure.Text
             }
         }
 
-        public static string SplitByWidth(this string String, CharList FontMap, int width)
+        public static string SplitByWidth(this string String, Encoding FontMap, PersonaEncoding.PersonaFont Font, int width)
         {
             string returned = String.Join(" ", Regex.Split(String, @"\\n"));
 
@@ -162,41 +168,30 @@ namespace PersonaEditorLib.FileStructure.Text
 
             foreach (var a in temp)
             {
-                if (a.Type == "Text")
+                if (a.IsText)
                     for (int i = 0; i < a.Array.Length; i++)
                     {
-                        CharList.FnMpData fnmp = null;
+                        VerticalCut verticalCut = new VerticalCut();
                         if (a.Array[i] == 0x20)
                         {
                             widthlist.Add(9);
                             continue;
                         }
-                        else if (0x20 < a.Array[i] & a.Array[i] < 0x80) fnmp = FontMap.List.FirstOrDefault(x => x.Index == a.Array[i]);
+                        else if (0x20 < a.Array[i] & a.Array[i] < 0x80)
+                            verticalCut = Font.GetVerticalCut(a.Array[i]);
                         else if (0x80 <= a.Array[i] & a.Array[i] < 0xF0)
                         {
                             int newindex = (a.Array[i] - 0x81) * 0x80 + a.Array[i + 1] + 0x20;
                             i++;
-                            fnmp = FontMap.List.FirstOrDefault(x => x.Index == newindex);
+                            verticalCut = Font.GetVerticalCut(newindex);
                         }
 
-                        if (fnmp != null)
-                        {
-                            if (fnmp.Cut.Right - fnmp.Cut.Left > 0)
-                                widthlist.Add(fnmp.Cut.Right - fnmp.Cut.Left - 1);
-                            else
-                                widthlist.Add(fnmp.Cut.Right - fnmp.Cut.Left);
-
-                            if (fnmp.Char.Length > 1)
-                            {
-                                widthlist.AddRange(new int[2] { 0, 0 });
-                                for (int k = 1; k < fnmp.Char.Length; k++)
-                                    widthlist.Add(0);
-                            }
-                        }
+                        if (verticalCut.Right - verticalCut.Left > 0)
+                            widthlist.Add(verticalCut.Right - verticalCut.Left - 1);
                         else
-                            widthlist.Add(0);
+                            widthlist.Add(verticalCut.Right - verticalCut.Left);
                     }
-                else if (a.Type == "System")
+                else
                     widthlist.AddRange(new int[a.GetSystem().Length]);
             }
 

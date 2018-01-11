@@ -20,9 +20,9 @@
             <ComboBox ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <TextBlock Text="Old Font:"/>
-            <ComboBox ItemsSource="{Binding OldFontList}" SelectedIndex="{Binding OldFontIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <ComboBox ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedOldFont, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Text="Old Font:"/>
-            <ComboBox ItemsSource="{Binding NewFontList}" SelectedIndex="{Binding NewFontIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <ComboBox ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedNewFont, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StatusBar>
         <Separator Grid.Row="1"/>
 
@@ -102,15 +102,12 @@
                                                                     <DrawingImage.Drawing>
                                                                         <DrawingGroup>
                                                                             <DrawingGroup.Children>
-                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundImage}"
-                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundRect}"/>
-                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.OldNameImage}"
-                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.OldNameRect}"/>
-
-                                                                                <ImageDrawing ImageSource="{Binding Path=OldTextSource}" Rect="{Binding Path=OldTextRect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding OldNameSource}" Rect="{Binding OldNameRect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding OldTextSource}" Rect="{Binding OldTextRect}"/>
                                                                             </DrawingGroup.Children>
                                                                             <DrawingGroup.ClipGeometry>
-                                                                                <RectangleGeometry Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundRect}"/>
+                                                                                <RectangleGeometry Rect="{Binding BackgroundRect}"/>
                                                                             </DrawingGroup.ClipGeometry>
                                                                         </DrawingGroup>
                                                                     </DrawingImage.Drawing>
@@ -124,30 +121,24 @@
                                                                     <DrawingImage.Drawing>
                                                                         <DrawingGroup>
                                                                             <DrawingGroup.Children>
-                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundImage}"
-                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundRect}"/>
-                                                                                <ImageDrawing ImageSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.NewNameImage}"
-                                                                                              Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.NewNameRect}"/>
-
-                                                                                <ImageDrawing ImageSource="{Binding Path=NewTextSource}" Rect="{Binding Path=NewTextRect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding NewNameSource}" Rect="{Binding NewNameRect}"/>
+                                                                                <ImageDrawing ImageSource="{Binding NewTextSource}" Rect="{Binding NewTextRect}"/>
                                                                             </DrawingGroup.Children>
                                                                             <DrawingGroup.ClipGeometry>
-                                                                                <RectangleGeometry Rect="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.BackgroundRect}"/>
+                                                                                <RectangleGeometry Rect="{Binding BackgroundRect}"/>
                                                                             </DrawingGroup.ClipGeometry>
                                                                         </DrawingGroup>
                                                                     </DrawingImage.Drawing>
                                                                 </DrawingImage>
                                                             </Image.Source>
                                                         </Image>
-
-                                                        <!--<Image Grid.Column="0" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="OldVisualizer_Loaded"/>
-                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2" Initialized="Image_Initialized" Loaded="NewVisualizer_Loaded"/>-->
                                                     </Grid>
 
                                                     <TextBlock TextWrapping="Wrap"  Grid.Row="2" Text="{Binding Postfix, Mode=OneWay}" HorizontalAlignment="Center"/>
                                                 </Grid>
 
-                                                <Separator ></Separator>
+                                                <Separator/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

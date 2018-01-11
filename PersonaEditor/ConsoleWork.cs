@@ -38,10 +38,6 @@ namespace PersonaEditor
     {
         public class Parameters
         {
-            public string NewFont { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_NEW.FNT");
-            public string OldFont { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_OLD.FNT");
-            public string NewMap { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_NEW.TXT");
-            public string OldMap { get; private set; } = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "font", "FONT_OLD.TXT");
             public bool IsLittleEndian { get; private set; } = true;
             public string Map { get; private set; } = "";
             public bool Auto { get; private set; } = false;
@@ -52,16 +48,13 @@ namespace PersonaEditor
             public bool Old { get; private set; } = true;
             public bool SkipEmpty { get; private set; } = false;
             public Encoding Encode { get; private set; } = Encoding.UTF8;
+            public bool Sub { get; private set; } = false;
 
             public void Update(List<string[]> ParList)
             {
                 foreach (var a in ParList)
                 {
-                    if (a[0] == "nf") NewFont = a[1];
-                    else if (a[0] == "of") OldFont = a[1];
-                    else if (a[0] == "nm") NewMap = a[1];
-                    else if (a[0] == "om") OldMap = a[1];
-                    else if (a[0] == "be") IsLittleEndian = false;
+                    if (a[0] == "be") IsLittleEndian = false;
                     else if (a[0] == "map") Map = a[1];
                     else if (a[0] == "auto")
                     {
@@ -80,6 +73,7 @@ namespace PersonaEditor
                         if (a[1] == "UTF-16")
                             Encode = Encoding.Unicode;
                     }
+                    else if (a[0] == "sub") Sub = true;
                 }
             }
 
@@ -154,7 +148,7 @@ namespace PersonaEditor
             {
                 FType = args[0];
                 FileType = GetType(args[0]);
-                FileSource = args[1];
+                FileSource = Path.GetFullPath(args[1]);
             }
             else
                 return;

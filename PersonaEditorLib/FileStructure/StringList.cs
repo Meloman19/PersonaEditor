@@ -14,11 +14,11 @@ namespace PersonaEditorLib.FileStructure
     {
         public List<Tuple<string, int>> list = new List<Tuple<string, int>>();
 
-        public StringList(string file, CharList charlist)
+        public StringList(string file, Encoding encoding)
         {
             List<byte[]> splited = SplitByNull(File.ReadAllBytes(file));
             foreach (var a in splited)
-                list.Add(new Tuple<string, int>(charlist.Decode(a.Where(x => x != 0).ToArray()), a.Length));
+                list.Add(new Tuple<string, int>(encoding.GetString(a.Where(x => x != 0).ToArray()), a.Length));
         }
 
         public List<byte[]> SplitByNull(byte[] array)
@@ -79,7 +79,7 @@ namespace PersonaEditorLib.FileStructure
             }
         }
 
-        public byte[] Get(CharList charlist, int lengthoffset = 0)
+        public byte[] Get(Encoding encoding, int lengthoffset = 0)
         {
             byte[] returned = null;
 
@@ -91,7 +91,7 @@ namespace PersonaEditorLib.FileStructure
                     int index = 0;
                     do
                     {
-                        temp = charlist.Encode(a.Item1.Substring(0, a.Item1.Length - index), CharList.EncodeOptions.OneChar);
+                        temp = encoding.GetBytes(a.Item1.Substring(0, a.Item1.Length - index));
                         index++;
                     } while (temp.Length > a.Item2 + lengthoffset);
 

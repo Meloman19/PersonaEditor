@@ -8,21 +8,22 @@ using System.Windows.Media;
 using PersonaEditorLib.FileStructure;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
+using System.Windows.Documents;
+using System.Windows.Controls;
 
 namespace PersonaEditorLib.Extension
 {
     public static class ListExtentsion
     {
-        public static string GetString(this IList<FileStructure.Text.TextBaseElement> ByteCollection, CharList CharList, bool LineSplit = true)
+        public static string GetString(this IList<FileStructure.Text.TextBaseElement> ByteCollection, Encoding encoding, bool LineSplit = false)
         {
             string returned = "";
 
             foreach (var MSG in ByteCollection)
-                returned += MSG.GetText(CharList, LineSplit);
+                returned += MSG.GetText(encoding, LineSplit);
 
             return returned;
         }
-
         public static string GetString(this IList<FileStructure.Text.TextBaseElement> ByteCollection)
         {
             string returned = "";
@@ -146,6 +147,7 @@ namespace PersonaEditorLib.Extension
             {
                 byte[] buffer = System.Text.Encoding.ASCII.GetBytes(String);
                 BW.Write(buffer);
+
                 for (int i = 0; i < Length - String.Length; i++)
                 {
                     BW.Write((byte)0);
@@ -254,6 +256,23 @@ namespace PersonaEditorLib.Extension
 
             //    return returned;
             //}
+        }
+    }
+
+    public static class StringExtension
+    {
+        public static string[] SplitBySystem(this string String)
+        {
+            List<string> returned = new List<string>();
+            var temp = Regex.Split(String, @"({[^}]+})");
+
+            foreach(var a in temp)
+            {
+                if (a.Length > 0)
+                    returned.Add(a);
+            }
+
+            return returned.ToArray();
         }
     }
 }

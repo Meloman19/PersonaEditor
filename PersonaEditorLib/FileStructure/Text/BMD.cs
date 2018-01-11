@@ -22,7 +22,7 @@ namespace PersonaEditorLib.FileStructure.Text
             using (MemoryStream MS = new MemoryStream(data))
                 Open(MS);
         }
-        
+
         public bool Open(string filepath)
         {
             using (FileStream FS = new FileStream(filepath, FileMode.Open, FileAccess.Read))
@@ -57,7 +57,7 @@ namespace PersonaEditorLib.FileStructure.Text
             }
         }
 
-        public bool Open(Text.PTP PTP, CharList New)
+        public bool Open(PTP PTP, Encoding New)
         {
             name.Clear();
             msg.Clear();
@@ -533,6 +533,6 @@ namespace PersonaEditorLib.FileStructure.Text
             return returned;
         }
 
-        #endregion IFile
+        #endregion IFile        
     }
 }

@@ -17,6 +17,9 @@ namespace PersonaEditorGUI.Controls
         public TreeViewPEVM Tree { get; } = new TreeViewPEVM();
         public SingleFileEditVM Single { get; } = new SingleFileEditVM();
 
+        private string _OpenFileName = "";
+        public string OpenFileName => _OpenFileName;
+
         public void OpenFile(string path)
         {
             if (Single.Close())
@@ -26,8 +29,48 @@ namespace PersonaEditorGUI.Controls
                     PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)));
 
                 if (file.Object != null)
+                {
                     Tree.SetRoot(file);
+                    if (file.Object is IPersonaFile pfile && pfile.GetSubFiles().Count == 0)
+                    {
+                        Tree_SelectedItemDataOpen(file);
+                    }
+
+                    _OpenFileName = Path.GetFullPath(path);
+                }
             }
+        }
+
+        public void SaveFile(string path)
+        {
+            if (Single.Close())
+            {
+                var root = Tree.GetRoot();
+                if (root != null)
+                    if (root.Object is IPersonaFile pFile)
+                        File.WriteAllBytes(path, pFile.Get());
+            }
+        }
+
+        public bool CloseFile()
+        {
+            if (Single.Close())
+                if (OpenFileName != "")
+                {
+                    return true;
+                    var result = MessageBox.Show("Save file?\n" + OpenFileName, Path.GetFileName(OpenFileName), MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        SaveFile(OpenFileName);
+                        return true;
+                    }
+                    else if (result == MessageBoxResult.No)
+                        return true;
+                }
+                else
+                    return true;
+
+            return false;
         }
 
         private object _Preview = null;

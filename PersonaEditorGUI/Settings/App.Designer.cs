@@ -25,7 +25,7 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("P4.FNT")]
+        [global::System.Configuration.DefaultSettingValueAttribute("P4")]
         public string BMDFontDefault {
             get {
                 return ((string)(this["BMDFontDefault"]));
@@ -37,7 +37,7 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("P4.FNT")]
+        [global::System.Configuration.DefaultSettingValueAttribute("P4")]
         public string PTPOldDefault {
             get {
                 return ((string)(this["PTPOldDefault"]));
@@ -49,7 +49,7 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("P4_RUS.FNT")]
+        [global::System.Configuration.DefaultSettingValueAttribute("P4_RUS")]
         public string PTPNewDefault {
             get {
                 return ((string)(this["PTPNewDefault"]));
@@ -92,6 +92,18 @@ namespace PersonaEditorGUI.Settings {
             }
             set {
                 this["DirBackground"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("P4")]
+        public string BMDFontDestDefault {
+            get {
+                return ((string)(this["BMDFontDestDefault"]));
+            }
+            set {
+                this["BMDFontDestDefault"] = value;
             }
         }
     }

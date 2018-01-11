@@ -16,7 +16,7 @@
         <StatusBar>
             <ComboBox Width="100" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
         </StatusBar>
-        
+
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <ItemsControl Name="wrap" ItemsSource="{Binding GlyphList}">
                 <ItemsControl.ItemsPanel>
@@ -32,9 +32,9 @@
                                 <Border.Background>
                                     <SolidColorBrush Color="Black"/>
                                 </Border.Background>
-                                <Image  Width="70" Height="70" Source="{Binding Path=Image}" OpacityMask="{x:Null}"/>
+                                <Image Width="70" Height="70" Source="{Binding Path=Image}" OpacityMask="{x:Null}"/>
                             </Border>
-                            <TextBox MaxLength="3" Text="{Binding Path=Char, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="16" TextAlignment="Center" />
+                            <TextBox MaxLength="1" Text="{Binding Path=Char, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="16" TextAlignment="Center" />
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

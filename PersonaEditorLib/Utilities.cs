@@ -138,6 +138,8 @@ namespace PersonaEditorLib.Utilities
             return Colors;
         }
 
+        
+
         public static string[] GetAllFiles(DirectoryInfo rootdirinfo, List<string> root)
         {
             root.Add(rootdirinfo.Name);
@@ -235,7 +237,7 @@ namespace PersonaEditorLib.Utilities
         public static FileType GetFileType(string name)
         {
             string ext = Path.GetExtension(name);
-            if (ext.ToLower() == ".bin" | ext.ToLower() == ".pak")
+            if (ext.ToLower() == ".bin" | ext.ToLower() == ".pak" | ext.ToLower() == ".pac")
                 return FileType.BIN;
             else if (ext.ToLower() == ".spr")
                 return FileType.SPR;

@@ -17,15 +17,18 @@ namespace PersonaEditorLib.FileStructure.Text
 
     public struct TextBaseElement
     {
-        public TextBaseElement(string type, byte[] array)
+        public TextBaseElement(bool isText, byte[] array)
         {
-            Type = type;
             Array = array;
+            IsText = isText;
         }
-
-        public string GetText(CharList CharList, bool linesplit = true)
+        
+        public string GetText(Encoding encoding, bool linesplit = false)
         {
-            if (Type == "System")
+            if (IsText)
+                return String.Concat(encoding.GetChars(Array));
+            else
+            {
                 if (Array[0] == 0x0A)
                     if (linesplit)
                         return "\n";
@@ -33,8 +36,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         return GetSystem();
                 else
                     return GetSystem();
-            else
-                return CharList.Decode(Array);
+            }
         }
 
         public string GetSystem()
@@ -53,7 +55,7 @@ namespace PersonaEditorLib.FileStructure.Text
             return returned;
         }
 
-        public string Type { get; set; }
+        public bool IsText { get; set; }
         public byte[] Array { get; set; }
     }
 
@@ -226,9 +228,10 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             int PrefixIndex = Convert.ToInt32(Prefix.Attribute("Index").Value);
                             string PrefixType = Prefix.Attribute("Type").Value;
+
                             string PrefixBytes = Prefix.Value;
 
-                            temp2.Prefix.Add(new TextBaseElement(PrefixType, Utilities.String.SplitString(PrefixBytes, '-')));
+                            temp2.Prefix.Add(new TextBaseElement(PrefixType == "Text" ? true : false, Utilities.String.SplitString(PrefixBytes, '-')));
                         }
 
                         foreach (var Old in Strings.Elements("OldStringBytes"))
@@ -237,7 +240,7 @@ namespace PersonaEditorLib.FileStructure.Text
                             string OldType = Old.Attribute("Type").Value;
                             string OldBytes = Old.Value;
 
-                            temp2.OldString.Add(new TextBaseElement(OldType, Utilities.String.SplitString(OldBytes, '-')));
+                            temp2.OldString.Add(new TextBaseElement(OldType == "Text" ? true : false, Utilities.String.SplitString(OldBytes, '-')));
                         }
 
                         foreach (var Postfix in Strings.Elements("PostfixBytes"))
@@ -246,7 +249,7 @@ namespace PersonaEditorLib.FileStructure.Text
                             string PostfixType = Postfix.Attribute("Type").Value;
                             string PostfixBytes = Postfix.Value;
 
-                            temp2.Postfix.Add(new TextBaseElement(PostfixType, Utilities.String.SplitString(PostfixBytes, '-')));
+                            temp2.Postfix.Add(new TextBaseElement(PostfixType == "Text" ? true : false, Utilities.String.SplitString(PostfixBytes, '-')));
                         }
                     }
                 }
@@ -310,7 +313,7 @@ namespace PersonaEditorLib.FileStructure.Text
                             string PrefixType = Prefix.Attribute("Type").Value;
                             string PrefixBytes = Prefix.Value;
 
-                            temp2.Prefix.Add(new TextBaseElement(PrefixType, Utilities.String.SplitString(PrefixBytes, '-')));
+                            temp2.Prefix.Add(new TextBaseElement(PrefixType == "Text" ? true : false, Utilities.String.SplitString(PrefixBytes, '-')));
                         }
 
                         foreach (var Old in Strings.Elements("OldStringBytes"))
@@ -319,7 +322,7 @@ namespace PersonaEditorLib.FileStructure.Text
                             string OldType = Old.Attribute("Type").Value;
                             string OldBytes = Old.Value;
 
-                            temp2.OldString.Add(new TextBaseElement(OldType, Utilities.String.SplitString(OldBytes, '-')));
+                            temp2.OldString.Add(new TextBaseElement(OldType == "Text" ? true : false, Utilities.String.SplitString(OldBytes, '-')));
                         }
 
                         foreach (var Postfix in Strings.Elements("PostfixBytes"))
@@ -328,7 +331,7 @@ namespace PersonaEditorLib.FileStructure.Text
                             string PostfixType = Postfix.Attribute("Type").Value;
                             string PostfixBytes = Postfix.Value;
 
-                            temp2.Postfix.Add(new TextBaseElement(PostfixType, Utilities.String.SplitString(PostfixBytes, '-')));
+                            temp2.Postfix.Add(new TextBaseElement(PostfixType == "Text" ? true : false, Utilities.String.SplitString(PostfixBytes, '-')));
                         }
                     }
                 }
@@ -346,7 +349,7 @@ namespace PersonaEditorLib.FileStructure.Text
             }
         }
 
-        public bool Open(string bmdname, Text.BMD bmd)
+        public bool Open(string bmdname, BMD bmd)
         {
             try
             {
@@ -387,14 +390,14 @@ namespace PersonaEditorLib.FileStructure.Text
             }
         }
 
-        public void CopyOld2New(CharList Old)
+        public void CopyOld2New(Encoding Old)
         {
             foreach (var Name in names)
-                Name.NewName = Name.OldName.GetTextBaseList().GetString(Old, false);
+                Name.NewName = Name.OldName.GetTextBaseList().GetString(Old, true);
 
             foreach (var Msg in msg)
                 foreach (var Str in Msg.Strings)
-                    Str.NewString = Str.OldString.GetString(Old, false);
+                    Str.NewString = Str.OldString.GetString(Old, true);
         }
 
         private class LineMap
@@ -450,7 +453,7 @@ namespace PersonaEditorLib.FileStructure.Text
             }
         }
 
-        public bool ExportTXT(string output, string map, bool removesplit, CharList Old, CharList New)
+        public bool ExportTXT(string output, string map, bool removesplit, Encoding Old, Encoding New)
         {
             var temp = new LineMap(map).GetList();
 
@@ -467,7 +470,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         else if (type == LineMap.Type.MSGindex) returned += a.Index + "\t";
                         else if (type == LineMap.Type.MSGname) returned += a.Name + "\t";
                         else if (type == LineMap.Type.StringIndex) returned += b.Index + "\t";
-                        else if (type == LineMap.Type.OldText) returned += removesplit ? b.OldString.GetString(Old, false).Replace("\n", " ") + "\t" : b.OldString.GetString(Old, false).Replace("\n", "\\n") + "\t";
+                        else if (type == LineMap.Type.OldText) returned += removesplit ? b.OldString.GetString(Old, removesplit).Replace("\n", " ") + "\t" : b.OldString.GetString(Old, removesplit).Replace("\n", "\\n") + "\t";
                         else if (type == LineMap.Type.NewText) returned += removesplit ? b.NewString.Replace("\n", " ") + "\t" : b.NewString.Replace("\n", "\\n") + "\t";
                         else if (type == LineMap.Type.OldName)
                         {
@@ -489,14 +492,14 @@ namespace PersonaEditorLib.FileStructure.Text
             return true;
         }
 
-        public void ImportTXT(string txtfile, string map, bool auto, int width, bool skip, Encoding encoding, CharList Old, CharList New)
+        public void ImportTXT(string txtfile, string map, bool auto, int width, bool skip, Encoding fileEncoding, Encoding oldEncoding, Encoding newEncoding, PersonaEncoding.PersonaFont newFont)
         {
             int Width = (int)Math.Round((double)width / 0.9375);
             LineMap MAP = new LineMap(map);
 
             if (MAP.CanGetText | MAP.CanGetName)
             {
-                using (StreamReader SR = new StreamReader(File.OpenRead(txtfile), encoding))
+                using (StreamReader SR = new StreamReader(File.OpenRead(txtfile), fileEncoding))
                 {
                     while (SR.EndOfStream == false)
                     {
@@ -511,7 +514,7 @@ namespace PersonaEditorLib.FileStructure.Text
                                 if (!(NewText == "" & skip))
                                 {
                                     if (auto)
-                                        NewText = NewText.SplitByWidth(New, Width);
+                                        NewText = NewText.SplitByWidth(newEncoding, newFont, Width);
                                     else
                                         NewText = NewText.Replace("\\n", "\n");
 
@@ -531,7 +534,7 @@ namespace PersonaEditorLib.FileStructure.Text
                             }
                         }
                         else if (MAP.CanGetName)
-                            ImportNameByName(linespl[MAP[LineMap.Type.OldName]], linespl[MAP[LineMap.Type.NewName]], Old);
+                            ImportNameByName(linespl[MAP[LineMap.Type.OldName]], linespl[MAP[LineMap.Type.NewName]], oldEncoding);
                     }
                 }
             }
@@ -573,7 +576,7 @@ namespace PersonaEditorLib.FileStructure.Text
                 ImportName(names.FirstOrDefault(x => x.Index == MSG.CharacterIndex), NewName);
         }
 
-        private void ImportNameByName(string OldName, string NewName, CharList Old)
+        private void ImportNameByName(string OldName, string NewName, Encoding Old)
         {
             ImportName(names.FirstOrDefault(x => x.OldName.GetTextBaseList().GetString(Old, true) == OldName), NewName);
         }
@@ -627,7 +630,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             XElement PrefixBytes = new XElement("PrefixBytes", BitConverter.ToString(STR.Prefix[i].Array));
                             PrefixBytes.Add(new XAttribute("Index", i));
-                            PrefixBytes.Add(new XAttribute("Type", STR.Prefix[i].Type));
+                            PrefixBytes.Add(new XAttribute("Type", STR.Prefix[i].IsText ? "Text" : "System"));
                             String.Add(PrefixBytes);
                         }
 
@@ -635,7 +638,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             XElement OldStringBytes = new XElement("OldStringBytes", BitConverter.ToString(STR.OldString[i].Array));
                             OldStringBytes.Add(new XAttribute("Index", i));
-                            OldStringBytes.Add(new XAttribute("Type", STR.OldString[i].Type));
+                            OldStringBytes.Add(new XAttribute("Type", STR.OldString[i].IsText ? "Text" : "System"));
                             String.Add(OldStringBytes);
                         }
 
@@ -645,7 +648,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             XElement PostfixBytes = new XElement("PostfixBytes", BitConverter.ToString(STR.Postfix[i].Array));
                             PostfixBytes.Add(new XAttribute("Index", i));
-                            PostfixBytes.Add(new XAttribute("Type", STR.Postfix[i].Type));
+                            PostfixBytes.Add(new XAttribute("Type", STR.Postfix[i].IsText ? "Text" : "System"));
                             String.Add(PostfixBytes);
                         }
                     }
@@ -749,7 +752,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             XElement PrefixBytes = new XElement("PrefixBytes", BitConverter.ToString(STR.Prefix[i].Array));
                             PrefixBytes.Add(new XAttribute("Index", i));
-                            PrefixBytes.Add(new XAttribute("Type", STR.Prefix[i].Type));
+                            PrefixBytes.Add(new XAttribute("Type", STR.Prefix[i].IsText ? "Text" : "System"));
                             String.Add(PrefixBytes);
                         }
 
@@ -757,7 +760,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             XElement OldStringBytes = new XElement("OldStringBytes", BitConverter.ToString(STR.OldString[i].Array));
                             OldStringBytes.Add(new XAttribute("Index", i));
-                            OldStringBytes.Add(new XAttribute("Type", STR.OldString[i].Type));
+                            OldStringBytes.Add(new XAttribute("Type", STR.OldString[i].IsText ? "Text" : "System"));
                             String.Add(OldStringBytes);
                         }
 
@@ -767,7 +770,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             XElement PostfixBytes = new XElement("PostfixBytes", BitConverter.ToString(STR.Postfix[i].Array));
                             PostfixBytes.Add(new XAttribute("Index", i));
-                            PostfixBytes.Add(new XAttribute("Type", STR.Postfix[i].Type));
+                            PostfixBytes.Add(new XAttribute("Type", STR.Postfix[i].IsText ? "Text" : "System"));
                             String.Add(PostfixBytes);
                         }
                     }
@@ -788,6 +791,6 @@ namespace PersonaEditorLib.FileStructure.Text
             }
         }
 
-        #endregion IFile
+        #endregion IFile        
     }
 }

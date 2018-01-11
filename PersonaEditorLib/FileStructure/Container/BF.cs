@@ -108,10 +108,11 @@ namespace PersonaEditorLib.FileStructure.Container
             foreach (var a in List)
             {
                 FileType fileType = (a.Object as IPersonaFile).Type;
+                string ext = Path.GetExtension(name);
                 if (fileType == FileType.HEX)
-                    a.Name = Path.GetFileNameWithoutExtension(name) + "(" + ((int)a.Tag).ToString().PadLeft(2, '0') + ").DAT";
+                    a.Name = name.Substring(0, name.Length - ext.Length) + "(" + ((int)a.Tag).ToString().PadLeft(2, '0') + ").DAT";
                 else
-                    a.Name = Path.GetFileNameWithoutExtension(name) + "." + fileType.ToString();
+                    a.Name = name.Substring(0, name.Length - ext.Length) + "." + fileType.ToString();
             }
         }
 

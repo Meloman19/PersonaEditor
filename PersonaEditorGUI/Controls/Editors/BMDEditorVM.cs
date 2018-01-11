@@ -7,50 +7,53 @@ using System.Threading.Tasks;
 using PersonaEditorLib.FileStructure.Text;
 using PersonaEditorLib;
 using PersonaEditorLib.Extension;
-using PersonaEditorLib.FileStructure.Text;
 using System.ComponentModel;
 using System.Windows;
 using PersonaEditorLib.Interfaces;
+using System.Windows.Documents;
+using System.Windows.Controls;
+using PersonaEditorGUI.Classes;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
     class BMDMsgStrVM : BindingObject
     {
-        CharList charList;
-        EventWrapper CharListEW;
+        int sourceFont;
 
         public byte[] data { get; private set; }
 
         public string Text { get; set; }
 
-        public void Changes(bool save)
+        // public FlowDocument Document { get; } = new FlowDocument();
+
+        public void Changes(bool save, int destFont)
         {
             if (save)
-                data = Text.GetTextBaseList(charList).GetByteArray();
+                data = Text.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(sourceFont)).GetByteArray();
             else
             {
-                Text = data.GetTextBaseList().GetString(charList, false);
+                Text = data.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
                 Notify("Text");
             }
         }
 
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        public void Update(int sourceFont)
         {
-            if (sender is CharList charlist)
-            {
-                Text = data.GetTextBaseList().GetString(charList, false);
-                Notify("Text");
-            }
+            this.sourceFont = sourceFont;
+            Text = data.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
+            Notify("Text");
         }
 
-        public BMDMsgStrVM(byte[] array, CharList charList)
+        public BMDMsgStrVM(byte[] array, int sourceFont)
         {
             data = array;
+            this.sourceFont = sourceFont;
 
-            this.charList = charList;
-            CharListEW = new EventWrapper(charList, this);
-
-            Text = data.GetTextBaseList().GetString(charList, false);
+            Text = data.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
+            //  Style style = new Style(typeof(Paragraph));
+            //  style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
+            //  Document.Resources.Add(typeof(Paragraph), style);
+            //  Document.Blocks.Add(data.GetTextBaseList().GetDocument(TestClass.personaEncoding, false));
         }
     }
 
@@ -62,10 +65,10 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public ObservableCollection<BMDMsgStrVM> StringList { get; } = new ObservableCollection<BMDMsgStrVM>();
 
-        public void Changes(bool save)
+        public void Changes(bool save, int destFont)
         {
             foreach (var a in StringList)
-                a.Changes(save);
+                a.Changes(save, destFont);
 
             if (save)
             {
@@ -77,61 +80,60 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public BMDMsgVM(BMD.MSGs msg, CharList charList)
+        public void Update(int sourceFont)
+        {
+            foreach (var a in StringList)
+                a.Update(sourceFont);
+        }
+
+        public BMDMsgVM(BMD.MSGs msg, int sourceFont)
         {
             this.msg = msg;
 
             var list = msg.MsgBytes.SplitSourceBytes();
             foreach (var a in list)
-                StringList.Add(new BMDMsgStrVM(a, charList));
+                StringList.Add(new BMDMsgStrVM(a, sourceFont));
         }
     }
 
     class BMDNameVM : BindingObject
     {
-        CharList CharList;
-        EventWrapper CharListEW;
-
         BMD.Names name;
+        int sourceFont;
 
         public int Index => name.Index;
 
         public string Name { get; set; }
 
-        public void Changes(bool save)
+        public void Changes(bool save, int destFont)
         {
             if (save)
-                name.NameBytes = CharList.Encode(Name, CharList.EncodeOptions.Bracket);
+                name.NameBytes = Static.EncodingManager.GetPersonaEncoding(destFont).GetBytes(Name);
             else
             {
-                Name = name.NameBytes.GetTextBaseList().GetString(CharList);
+                Name = name.NameBytes.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
                 Notify("Name");
             }
         }
 
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        public void Update(int sourceFont)
         {
-            if (sender is CharList charlist)
-            {
-                Name = name.NameBytes.GetTextBaseList().GetString(CharList);
-                Notify("Name");
-            }
+            this.sourceFont = sourceFont;
+            Name = name.NameBytes.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
+            Notify("Name");
         }
 
-        public BMDNameVM(BMD.Names name, CharList charList)
+        public BMDNameVM(BMD.Names name, int sourceFont)
         {
             this.name = name;
-
-            CharList = charList;
-            CharListEW = new EventWrapper(charList, this);
-
-            Name = name.NameBytes.GetTextBaseList().GetString(CharList);
+            this.sourceFont = sourceFont;
+            Name = name.NameBytes.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
         }
     }
 
     class BMDEditorVM : BindingObject, IViewModel
     {
-        CharList charList = new CharList();
+        EventWrapper EncodingEW;
 
         private bool _IsEdit = false;
         public bool IsEdit
@@ -154,21 +156,38 @@ namespace PersonaEditorGUI.Controls.Editors
                         Notify("IsSelectCharList");
                     }
                 }
+
+                Notify("IsEdit");
             }
         }
 
+        private int sourceFont;
+        private int destFont;
 
-        public int SelectedIndex
+        public int SelectedSourceFont
         {
-            get { return charList.SelectedIndex; }
+            get { return sourceFont; }
             set
             {
-                charList.SelectedIndex = value;
-                Notify("SelectedIndex");
+                sourceFont = value;
+                Settings.App.Default.BMDFontDefault = Static.EncodingManager.GetPersonaEncodingName(value);
+                Update();
+                Notify("SelectedSourceFont");
             }
         }
 
-        public ReadOnlyObservableCollection<string> FontList => charList.FontList;
+        public int SelectedDestFont
+        {
+            get { return destFont; }
+            set
+            {
+                destFont = value;
+                Settings.App.Default.BMDFontDestDefault = Static.EncodingManager.GetPersonaEncodingName(value);
+                Notify("SelectedDestFont");
+            }
+        }
+
+        public ReadOnlyObservableCollection<string> FontList => Static.EncodingManager.EncodingList;
         public bool IsSelectCharList { get; set; } = true;
 
         public ObservableCollection<BMDNameVM> NameList { get; } = new ObservableCollection<BMDNameVM>();
@@ -185,13 +204,21 @@ namespace PersonaEditorGUI.Controls.Editors
                 bool save = result == MessageBoxResult.Yes ? true : false;
 
                 foreach (var a in NameList)
-                    a.Changes(save);
+                    a.Changes(save, destFont);
                 foreach (var a in MsgList)
-                    a.Changes(save);
+                    a.Changes(save, destFont);
 
                 return true;
             }
             else return false;
+        }
+
+        private void Update()
+        {
+            foreach (var a in NameList)
+                a.Update(sourceFont);
+            foreach (var a in MsgList)
+                a.Update(sourceFont);
         }
 
         public bool Close()
@@ -205,17 +232,37 @@ namespace PersonaEditorGUI.Controls.Editors
             return true;
         }
 
+        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
+            {
+                if (IsSelectCharList && e.PropertyName == man.GetPersonaEncodingName(sourceFont))
+                    Update();
+            }
+        }
+
         public BMDEditorVM(ObjectFile objbmd)
         {
             if (objbmd.Object is BMD bmd)
             {
-                charList.GetFontList(Static.Paths.DirFont);
-                charList.SelectedItem = Settings.App.Default.BMDFontDefault;
+                EncodingEW = new EventWrapper(Static.EncodingManager, this);
+                int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.App.Default.BMDFontDefault);
+                if (sourceInd >= 0)
+                    sourceFont = sourceInd;
+                else
+                    sourceFont = 0;
+
+                sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.App.Default.BMDFontDestDefault);
+                if (sourceInd >= 0)
+                    destFont = sourceInd;
+                else
+                    destFont = 0;
+
 
                 foreach (var a in bmd.name)
-                    NameList.Add(new BMDNameVM(a, charList));
+                    NameList.Add(new BMDNameVM(a, sourceFont));
                 foreach (var a in bmd.msg)
-                    MsgList.Add(new BMDMsgVM(a, charList));
+                    MsgList.Add(new BMDMsgVM(a, sourceFont));
 
                 Name = objbmd.Name;
             }

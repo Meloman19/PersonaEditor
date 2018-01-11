@@ -185,7 +185,7 @@ namespace PersonaEditorLib
         public VerticalCut(byte[] bytes)
         {
             if (bytes != null)
-                if (bytes.Length > 2)
+                if (bytes.Length >= 2)
                 {
                     Left = bytes[0];
                     Right = bytes[1];
@@ -377,16 +377,45 @@ namespace PersonaEditorLib
             return returned;
 
         }
-
-        public static ImageData DrawText(IList<TextBaseElement> text, CharList CharList, Dictionary<int, byte> Shift, int LineSpacing)
+        
+        public static ImageData DrawText(IList<TextBaseElement> text, PersonaEncoding.PersonaFont personaFont, Dictionary<int, byte> Shift, int LineSpacing)
         {
-            if (text != null)
+            if (text != null && personaFont != null)
             {
                 ImageData returned = new ImageData();
                 ImageData line = new ImageData();
                 foreach (var a in text)
                 {
-                    if (a.Type == "System")
+                    if (a.IsText)
+                    {
+                        for (int i = 0; i < a.Array.Length; i++)
+                        {
+                            int index = 0;
+
+                            if (0x20 <= a.Array[i] & a.Array[i] < 0x80)
+                                index = a.Array[i];
+                            else if (0x80 <= a.Array[i] & a.Array[i] < 0xF0)
+                            {
+                                index = (a.Array[i] - 0x81) * 0x80 + a.Array[i + 1] + 0x20;
+                                i++;
+                            }
+
+                            var Glyph = personaFont.GetGlyph(index);
+
+                            if (Glyph.Item1 != null)
+                            {
+                                byte shift;
+                                bool shiftb = Shift.TryGetValue(index, out shift);
+                                ImageData glyph = new ImageData(Glyph.Item1, personaFont.PixelFormat, personaFont.Width, personaFont.Height);
+                                byte Left = Glyph.Item2.Left;
+                                byte Right = Glyph.Item2.Right;
+                                glyph = shiftb == false ? ImageData.Crop(glyph, new ImageData.Rect(Left, 0, Right - Left, glyph.PixelHeight))
+                                    : ImageData.Shift(ImageData.Crop(glyph, new ImageData.Rect(Left, 0, Right - Left, glyph.PixelHeight)), shift);
+                                line = ImageData.MergeLeftRight(line, glyph, 1);
+                            }
+                        }
+                    }
+                    else
                     {
                         if (Util.ByteArrayCompareWithSimplest(a.Array, new byte[] { 0x0A }))
                         {
@@ -413,41 +442,6 @@ namespace PersonaEditorLib
                                     returned = MergeUpDown(returned, line, LineSpacing);
                                     line = new ImageData();
                                 }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < a.Array.Length; i++)
-                        {
-                            CharList.FnMpData fnmp;
-                            if (0x20 <= a.Array[i] & a.Array[i] < 0x80)
-                            {
-                                fnmp = CharList.List.FirstOrDefault(x => x.Index == a.Array[i]);
-                            }
-                            else if (0x80 <= a.Array[i] & a.Array[i] < 0xF0)
-                            {
-                                int newindex = (a.Array[i] - 0x81) * 0x80 + a.Array[i + 1] + 0x20;
-
-                                i++;
-                                fnmp = CharList.List.FirstOrDefault(x => x.Index == newindex);
-                            }
-                            else
-                            {
-                                Console.WriteLine("ASD");
-                                fnmp = null;
-                            }
-
-                            if (fnmp != null)
-                            {
-                                byte shift;
-                                bool shiftb = Shift.TryGetValue(fnmp.Index, out shift);
-                                ImageData glyph = new ImageData(fnmp.Image_data, CharList.PixelFormat, CharList.Width, CharList.Height);
-                                byte Left = fnmp.Cut.Left;
-                                byte Right = fnmp.Cut.Right;
-                                glyph = shiftb == false ? ImageData.Crop(glyph, new ImageData.Rect(Left, 0, Right - Left, glyph.PixelHeight))
-                                    : ImageData.Shift(ImageData.Crop(glyph, new ImageData.Rect(Left, 0, Right - Left, glyph.PixelHeight)), shift);
-                                line = ImageData.MergeLeftRight(line, glyph, 1);
                             }
                         }
                     }

@@ -32,6 +32,7 @@
         <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Open" Command="{Binding Path=clickOpenFile}"/>
+                <MenuItem Header="Save As..." Command="{Binding Path=clickSaveAsFile}"/>
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Settings" Command="{Binding Path=clickSettingOpen}">

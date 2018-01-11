@@ -27,6 +27,7 @@ namespace PersonaEditorLib.Interfaces
 
     public enum FileType
     {
+        Unknown,
         HEX,
         BIN,
         SPR,

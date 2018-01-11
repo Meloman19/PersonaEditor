@@ -19,20 +19,52 @@ using PersonaEditorLib.Interfaces;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
+    class PTPNameEditVM : BindingObject
+    {
+        PTPName name;
+        private string _OldName = "";
+        private string OldEncoding;
+
+        public int Index => name.Index;
+        public string OldName => _OldName;
+        public string NewName
+        {
+            get { return name.NewName; }
+            set
+            {
+                if (name.NewName != value)
+                {
+                    name.NewName = value;
+                    Notify("NewName");
+                }
+            }
+        }
+
+        public void UpdateOldEncoding(string OldEncoding)
+        {
+            this.OldEncoding = OldEncoding;
+            _OldName = name.OldName.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(OldEncoding));
+            Notify("OldName");
+        }
+
+        public PTPNameEditVM(PTPName name, string OldEncoding)
+        {
+            this.name = name;
+            this.OldEncoding = OldEncoding;
+            _OldName = name.OldName.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(OldEncoding));
+        }
+    }
+
     class PTPMsgStrEditVM : BindingObject
     {
         TextVisual OldText;
-        EventWrapper OldTextEW;
         TextVisual NewText;
-        EventWrapper NewTextEW;
 
         BackgroundImage BackgroundImg;
         EventWrapper BackgroundEW;
 
-        CharList OldChar;
-        CharList NewChar;
-        EventWrapper OldCharEW;
-        EventWrapper NewCharEW;
+        private string OldEncoding;
+        private string NewEncoding;
 
         MSG.MSGstr str;
         EventWrapper strEW;
@@ -47,7 +79,7 @@ namespace PersonaEditorGUI.Controls.Editors
         }
         public string OldString
         {
-            get { return str.OldString.GetString(OldChar, true); }
+            get { return str.OldString.GetString(Static.EncodingManager.GetPersonaEncoding(OldEncoding), true); }
         }
         public string NewString
         {
@@ -55,44 +87,123 @@ namespace PersonaEditorGUI.Controls.Editors
             set { str.NewString = value; }
         }
 
-        public ImageSource OldTextSource => OldText.Image;
-        public Rect OldTextRect => OldText.Rect;
+        public BitmapSource BackgroundImage => BackgroundImg.Image;
+        public Rect BackgroundRect => BackgroundImg.Rect;
 
-        public ImageSource NewTextSource => NewText.Image;
-        public Rect NewTextRect => NewText.Rect;
+        private ImageSource oldTextSource = null;
+        private Rect oldTextRect;
+        public ImageSource OldTextSource
+        {
+            get { return oldTextSource; }
+            set
+            {
+                if (oldTextSource != value)
+                {
+                    oldTextSource = value;
+                    Notify("OldTextSource");
+                }
+            }
+        }
+        public Rect OldTextRect
+        {
+            get { return oldTextRect; }
+            set
+            {
+                if (oldTextRect != value)
+                {
+                    oldTextRect = value;
+                    Notify("OldTextRect");
+                }
+            }
+        }
+
+        private ImageSource oldNameSource = null;
+        private Rect oldNameRect;
+        public ImageSource OldNameSource
+        {
+            get { return oldNameSource; }
+            set
+            {
+                if (oldNameSource != value)
+                {
+                    oldNameSource = value;
+                    Notify("OldNameSource");
+                }
+            }
+        }
+        public Rect OldNameRect
+        {
+            get { return oldNameRect; }
+            set
+            {
+                if (oldNameRect != value)
+                {
+                    oldNameRect = value;
+                    Notify("OldNameRect");
+                }
+            }
+        }
+
+        private ImageSource newTextSource = null;
+        private Rect newTextRect;
+        public ImageSource NewTextSource
+        {
+            get { return newTextSource; }
+            set
+            {
+                if (newTextSource != value)
+                {
+                    newTextSource = value;
+                    Notify("NewTextSource");
+                }
+            }
+        }
+        public Rect NewTextRect
+        {
+            get { return newTextRect; }
+            set
+            {
+                if (newTextRect != value)
+                {
+                    newTextRect = value;
+                    Notify("NewTextRect");
+                }
+            }
+        }
+
+        private ImageSource newNameSource = null;
+        private Rect newNameRect;
+        public ImageSource NewNameSource
+        {
+            get { return newNameSource; }
+            set
+            {
+                if (newNameSource != value)
+                {
+                    newNameSource = value;
+                    Notify("NewNameSource");
+                }
+            }
+        }
+        public Rect NewNameRect
+        {
+            get { return newNameRect; }
+            set
+            {
+                if (newNameRect != value)
+                {
+                    newNameRect = value;
+                    Notify("NewNameRect");
+                }
+            }
+        }
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is TextVisual visual)
-            {
-                if (visual.Tag == "Old")
-                {
-                    if (e.PropertyName == "Image")
-                        Notify("OldTextSource");
-                    else if (e.PropertyName == "Rect")
-                        Notify("OldTextRect");
-                }
-                else if (visual.Tag == "New")
-                {
-                    if (e.PropertyName == "Image")
-                        Notify("NewTextSource");
-                    else if (e.PropertyName == "Rect")
-                        Notify("NewTextRect");
-                }
-            }
-            else if (sender is MSG.MSGstr Msg)
+            if (sender is MSG.MSGstr Msg)
             {
                 if (e.PropertyName == "NewString")
-                {
-                    NewText.UpdateText(str.NewString.GetTextBaseList(NewChar));
-                }
-            }
-            else if (sender is CharList charlist)
-            {
-                if (charlist.Tag == "New")
-                    Notify("NewString");
-                else if (charlist.Tag == "Old")
-                    Notify("OldString");
+                    NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
             }
             else if (sender is BackgroundImage image)
             {
@@ -119,27 +230,69 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public PTPMsgStrEditVM(MSG.MSGstr str, CharList Old, CharList New, BackgroundImage backgroundImage)
+        public void UpdateOldEncoding(string OldEncoding)
+        {
+            this.OldEncoding = OldEncoding;
+            OldText.UpdateFont(Static.FontManager.GetPersonaFont(OldEncoding));
+            Notify("OldString");
+        }
+
+        public void UpdateNewEncoding(string NewEncoding)
+        {
+            this.NewEncoding = NewEncoding;
+            NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)), Static.FontManager.GetPersonaFont(NewEncoding));
+        }
+
+        public void UpdateBackground()
+        {
+            Notify("BackgroundImage");
+            Notify("BackgroundRect");
+        }
+
+        public PTPMsgStrEditVM(MSG.MSGstr str, string OldEncoding, string NewEncoding, BackgroundImage backgroundImage)
         {
             this.str = str;
-            strEW = new EventWrapper(str, this);
+            this.OldEncoding = OldEncoding;
+            this.NewEncoding = NewEncoding;
 
-            NewChar = New;
-            OldChar = Old;
-            OldCharEW = new EventWrapper(Old, this);
-            NewCharEW = new EventWrapper(New, this);
+            strEW = new EventWrapper(str, this);
 
             BackgroundImg = backgroundImage;
             BackgroundEW = new EventWrapper(backgroundImage, this);
 
-            OldText = new TextVisual(Old) { Tag = "Old" };
-            OldTextEW = new EventWrapper(OldText, this);
-            OldText.UpdateText(str.OldString);
-            NewText = new TextVisual(New) { Tag = "New" };
-            NewTextEW = new EventWrapper(NewText, this);
-            NewText.UpdateText(str.NewString);
+            OldText = new TextVisual(Static.FontManager.GetPersonaFont(OldEncoding)) { Tag = "Old" };
+            NewText = new TextVisual(Static.FontManager.GetPersonaFont(NewEncoding)) { Tag = "New" };
+            OldText.VisualChanged += OldText_VisualChanged;
+            NewText.VisualChanged += NewText_VisualChanged;
 
             SetBack(backgroundImage);
+
+            OldText.UpdateText(str.OldString);
+            NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
+        }
+
+        public void OldName_VisualChanged(ImageSource imageSource, Rect rect)
+        {
+            OldNameSource = imageSource;
+            OldNameRect = rect;
+        }
+
+        public void NewName_VisualChanged(ImageSource imageSource, Rect rect)
+        {
+            NewNameSource = imageSource;
+            NewNameRect = rect;
+        }
+
+        private void OldText_VisualChanged(ImageSource imageSource, Rect rect)
+        {
+            OldTextSource = imageSource;
+            OldTextRect = rect;
+        }
+
+        private void NewText_VisualChanged(ImageSource imageSource, Rect rect)
+        {
+            NewTextSource = imageSource;
+            NewTextRect = rect;
         }
 
         string MSGListToSystem(IList<TextBaseElement> list)
@@ -177,65 +330,19 @@ namespace PersonaEditorGUI.Controls.Editors
         }
     }
 
-    class PTPNameEditVM : BindingObject
-    {
-        PTPName name;
-        EventWrapper OldCharEW;
-
-        private string _OldName = "";
-
-        public int Index => name.Index;
-        public string OldName => _OldName;
-        public string NewName
-        {
-            get { return name.NewName; }
-            set
-            {
-                if (name.NewName != value)
-                {
-                    name.NewName = value;
-                    Notify("NewName");
-                }
-            }
-        }
-
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (sender is CharList charlist)
-            {
-                _OldName = name.OldName.GetTextBaseList().GetString(charlist);
-                Notify("OldName");
-            }
-        }
-
-        public PTPNameEditVM(PTPName name, CharList Old)
-        {
-            this.name = name;
-            OldCharEW = new EventWrapper(Old, this);
-            _OldName = name.OldName.GetTextBaseList().GetString(Old);
-        }
-    }
-
     class PTPMsgVM : BindingObject
     {
         MSG msg;
+        PTPName name;
+        private string NewEncoding;
 
         EventWrapper BackgroundEW;
-
         EventWrapper PTPNameEW;
 
         TextVisual OldName;
-        EventWrapper OldNameEW;
         TextVisual NewName;
-        EventWrapper NewNameEW;
 
         public string Name => msg.Name;
-
-        public ImageSource OldNameImage => OldName.Image;
-        public Rect OldNameRect => OldName.Rect;
-
-        public ImageSource NewNameImage => NewName.Image;
-        public Rect NewNameRect => NewName.Rect;
 
         public ObservableCollection<PTPMsgStrEditVM> Strings { get; } = new ObservableCollection<PTPMsgStrEditVM>();
 
@@ -244,26 +351,9 @@ namespace PersonaEditorGUI.Controls.Editors
             if (sender is PTPName name)
             {
                 if (e.PropertyName == "NewName")
-                    NewName.UpdateText(name.NewName);
+                    NewName.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
                 else if (e.PropertyName == "OldName")
                     OldName.UpdateText(name.OldName);
-            }
-            else if (sender is TextVisual vis)
-            {
-                if (vis.Tag == "Old")
-                {
-                    if (e.PropertyName == "Image")
-                        Notify("OldNameImage");
-                    else if (e.PropertyName == "Rect")
-                        Notify("OldNameRect");
-                }
-                else if (vis.Tag == "New")
-                {
-                    if (e.PropertyName == "Image")
-                        Notify("NewNameImage");
-                    else if (e.PropertyName == "Rect")
-                        Notify("NewNameRect");
-                }
             }
             else if (sender is BackgroundImage image)
             {
@@ -288,33 +378,66 @@ namespace PersonaEditorGUI.Controls.Editors
                     NewName.GlyphScale = image.GlyphScale;
                 }
             }
-
         }
 
-        public PTPMsgVM(MSG msg, IList<PTPName> names, CharList Old, CharList New, BackgroundImage backgroundImage)
+        public void UpdateOldEncoding(string OldEncoding)
+        {
+            OldName.UpdateFont(Static.FontManager.GetPersonaFont(OldEncoding));
+            foreach (var a in Strings)
+                a.UpdateOldEncoding(OldEncoding);
+        }
+
+        public void UpdateNewEncoding(string NewEncoding)
+        {
+            this.NewEncoding = NewEncoding;
+            if (name != null)
+                NewName.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
+            NewName.UpdateFont(Static.FontManager.GetPersonaFont(NewEncoding));
+            foreach (var a in Strings)
+                a.UpdateNewEncoding(NewEncoding);
+        }
+
+        public void UpdateBackground()
+        {
+            foreach (var a in Strings)
+                a.UpdateBackground();
+        }
+
+        public PTPMsgVM(MSG msg, PTPName name, string OldEncoding, string NewEncoding, BackgroundImage backgroundImage)
         {
             this.msg = msg;
-
-            foreach (var a in msg.Strings)
-                Strings.Add(new PTPMsgStrEditVM(a, Old, New, backgroundImage));
+            this.name = name;
+            this.NewEncoding = NewEncoding;
 
             BackgroundEW = new EventWrapper(backgroundImage, this);
 
+            foreach (var a in msg.Strings)
+                Strings.Add(new PTPMsgStrEditVM(a, OldEncoding, NewEncoding, backgroundImage));
 
-
-            OldName = new TextVisual(Old) { Tag = "Old" };
-            NewName = new TextVisual(New) { Tag = "New" };
-
-            if (names.FirstOrDefault(x => x.Index == msg.CharacterIndex) is PTPName name)
+            if (name != null)
             {
-                OldNameEW = new EventWrapper(OldName, this);
+                OldName = new TextVisual(Static.FontManager.GetPersonaFont(OldEncoding)) { Tag = "Old" };
+                NewName = new TextVisual(Static.FontManager.GetPersonaFont(NewEncoding)) { Tag = "New" };
+                SetBack(backgroundImage);
+                OldName.VisualChanged += OldName_VisualChanged;
+                NewName.VisualChanged += NewName_VisualChanged;
+
                 OldName.UpdateText(name.OldName);
-                NewNameEW = new EventWrapper(NewName, this);
-                NewName.UpdateText(name.NewName);
+                NewName.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
                 PTPNameEW = new EventWrapper(name, this);
             }
+        }
 
-            SetBack(backgroundImage);
+        private void OldName_VisualChanged(ImageSource imageSource, Rect rect)
+        {
+            foreach (var a in Strings)
+                a.OldName_VisualChanged(imageSource, rect);
+        }
+
+        private void NewName_VisualChanged(ImageSource imageSource, Rect rect)
+        {
+            foreach (var a in Strings)
+                a.NewName_VisualChanged(imageSource, rect);
         }
 
         private void SetBack(BackgroundImage image)
@@ -338,10 +461,8 @@ namespace PersonaEditorGUI.Controls.Editors
         #region Private
 
         EventWrapper BackgroundEW;
+        EventWrapper EncodingManagerEW;
         Backgrounds BackImage { get; } = new Backgrounds(Settings.App.Default.DirBackground);
-
-        CharList OldCharList { get; } = new CharList() { Tag = "Old" };
-        CharList NewCharList { get; } = new CharList() { Tag = "New" };
 
         #endregion Private
 
@@ -356,32 +477,34 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public ReadOnlyObservableCollection<string> OldFontList => OldCharList.FontList;
-        public int OldFontIndex
+        private int OldEncoding;
+        private int NewEncoding;
+
+        public ReadOnlyObservableCollection<string> FontList => Static.EncodingManager.EncodingList;
+
+        public int SelectedOldFont
         {
-            get { return OldCharList.SelectedIndex; }
+            get { return OldEncoding; }
             set
             {
-                OldCharList.SelectedIndex = value;
-                Settings.App.Default.PTPOldDefault = OldCharList.SelectedItem;
-                Notify("OldFontIndex");
+                OldEncoding = value;
+                Settings.App.Default.PTPOldDefault = Static.EncodingManager.GetPersonaEncodingName(value);
+                UpdateOldEncoding(Settings.App.Default.PTPOldDefault);
+                Notify("SelectedOldFont");
             }
         }
 
-        public ReadOnlyObservableCollection<string> NewFontList => NewCharList.FontList;
-        public int NewFontIndex
+        public int SelectedNewFont
         {
-            get { return NewCharList.SelectedIndex; }
+            get { return NewEncoding; }
             set
             {
-                NewCharList.SelectedIndex = value;
-                Settings.App.Default.PTPNewDefault = NewCharList.SelectedItem;
-                Notify("NewFontIndex");
+                NewEncoding = value;
+                Settings.App.Default.PTPNewDefault = Static.EncodingManager.GetPersonaEncodingName(value);
+                UpdateNewEncoding(Settings.App.Default.PTPNewDefault);
+                Notify("SelectedNewFont");
             }
         }
-
-        public BitmapSource BackgroundImage => BackImage.CurrentBackground.Image;
-        public Rect BackgroundRect => BackImage.CurrentBackground.Rect;
 
         public ObservableCollection<PTPNameEditVM> Names { get; } = new ObservableCollection<PTPNameEditVM>();
         public ObservableCollection<PTPMsgVM> MSG { get; } = new ObservableCollection<PTPMsgVM>();
@@ -390,29 +513,62 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             if (sender is BackgroundImage image)
             {
-                if (e.PropertyName == "Image")
-                    Notify("BackgroundImage");
-                else if (e.PropertyName == "Rect")
-                    Notify("BackgroundRect");
+                if (e.PropertyName == "Image" | e.PropertyName == "Rect")
+                    UpdateBackground();
             }
+            else if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
+            {
+                if (e.PropertyName == man.GetPersonaEncodingName(OldEncoding))
+                    UpdateOldEncoding(Settings.App.Default.PTPOldDefault);
+                if (e.PropertyName == man.GetPersonaEncodingName(NewEncoding))
+                    UpdateNewEncoding(Settings.App.Default.PTPNewDefault);
+            }
+        }
+
+        public void UpdateOldEncoding(string OldEncoding)
+        {
+            foreach (var a in Names)
+                a.UpdateOldEncoding(OldEncoding);
+            foreach (var a in MSG)
+                a.UpdateOldEncoding(OldEncoding);
+        }
+
+        public void UpdateNewEncoding(string NewEncoding)
+        {
+            foreach (var a in MSG)
+                a.UpdateNewEncoding(NewEncoding);
+        }
+
+        public void UpdateBackground()
+        {
+            foreach (var a in MSG)
+                a.UpdateBackground();
         }
 
         public PTPEditorVM(PTP ptp)
         {
             BackImage.SelectedItem = Settings.App.Default.PTPBackgroundDefault;
 
-            OldCharList.GetFontList(Settings.App.Default.DirFont);
-            OldCharList.SelectedItem = Settings.App.Default.PTPOldDefault;
-            NewCharList.GetFontList(Settings.App.Default.DirFont);
-            NewCharList.SelectedItem = Settings.App.Default.PTPNewDefault;
+            int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.App.Default.PTPOldDefault);
+            if (sourceInd >= 0)
+                OldEncoding = sourceInd;
+            else
+                OldEncoding = 0;
+
+            sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.App.Default.PTPNewDefault);
+            if (sourceInd >= 0)
+                NewEncoding = sourceInd;
+            else
+                NewEncoding = 0;
 
             BackgroundEW = new EventWrapper(BackImage.CurrentBackground, this);
+            EncodingManagerEW = new EventWrapper(Static.EncodingManager, this);
 
             foreach (var a in ptp.names)
-                Names.Add(new PTPNameEditVM(a, OldCharList));
+                Names.Add(new PTPNameEditVM(a, Settings.App.Default.PTPOldDefault));
 
             foreach (var a in ptp.msg)
-                MSG.Add(new PTPMsgVM(a, ptp.names, OldCharList, NewCharList, BackImage.CurrentBackground));
+                MSG.Add(new PTPMsgVM(a, ptp.names.FirstOrDefault(x => x.Index == a.CharacterIndex), Settings.App.Default.PTPOldDefault, Settings.App.Default.PTPNewDefault, BackImage.CurrentBackground));
         }
 
         public bool Close()

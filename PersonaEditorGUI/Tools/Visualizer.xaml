@@ -19,10 +19,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Menu Grid.Row="0">
+        <StatusBar Grid.Row="0">
             <ComboBox Width="120" ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding BackgroundSelect}"/>
-            <ComboBox Width="60" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
-        </Menu>
+            <ComboBox Width="90" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
+        </StatusBar>
 
         <Image Grid.Row="1">
             <Image.Source>

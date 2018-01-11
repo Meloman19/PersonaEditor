@@ -101,8 +101,14 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Controls\BindableRichTextBox.cs" />
+    <Compile Include="Classes\Controls\EditorRichTextBox.cs" />
     <Compile Include="Classes\Controls\RelativePanel.cs" />
-    <Compile Include="Classes\Media\Visual\MSGVisual.cs" />
+    <Compile Include="Classes\Controls\UserImage.cs" />
+    <Compile Include="Classes\Controls\UserInlineUIContainer.cs" />
+    <Compile Include="Classes\Controls\UserTextBlock.cs" />
+    <Compile Include="Classes\Extention.cs" />
+    <Compile Include="Classes\Media\Visual\TextVisual.cs" />
     <Compile Include="Classes\Event.cs" />
     <Compile Include="Classes\ResourceItem.cs" />
     <Compile Include="Controls\ClosableTabItem.xaml.cs">

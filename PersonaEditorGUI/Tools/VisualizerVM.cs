@@ -18,31 +18,42 @@ namespace PersonaEditorGUI.Tools
 {
     class VisualizerVM : BindingObject
     {
-        readonly CharList CharList = new CharList();
-        EventWrapper CharListEW;
+        #region PrivateField
+
+        private ImageSource nameImage = null;
+        private Rect nameRect;
+
+        private ImageSource textImage = null;
+        private Rect textRect;
+
+        #endregion PrivateField
 
         readonly Backgrounds backgrounds = new Backgrounds(Static.Paths.DirBackgrounds);
 
+        PersonaEditorLib.PersonaEncoding.PersonaEncoding PersonaEncoding;
+        PersonaEditorLib.PersonaEncoding.PersonaFont PersonaFont;
         EventWrapper BackgroundEW;
 
-        string Dir;
-
         TextVisual Text;
-        EventWrapper TextEW;
         TextVisual Name;
-        EventWrapper NameEW;
 
         private int _FontSelect;
-        public ObservableCollection<string> FontList { get; } = new ObservableCollection<string>();
+
+        public ReadOnlyObservableCollection<string> FontList => Static.EncodingManager.EncodingList;
         public int FontSelect
         {
             get { return _FontSelect; }
             set
             {
                 _FontSelect = value;
-                string font = Path.Combine(Dir, FontList[_FontSelect]);
-                string fontmp = Path.Combine(Dir, Path.GetFileNameWithoutExtension(FontList[_FontSelect]) + ".txt");
-                CharList.Open(font, fontmp);
+                PersonaEncoding = Static.EncodingManager.GetPersonaEncoding(_FontSelect);
+                PersonaFont = Static.FontManager.GetPersonaFont(Static.EncodingManager.GetPersonaEncodingName(_FontSelect));
+                Notify("FontSelect");
+                Text.UpdateText(_TextTB.GetTextBaseList(PersonaEncoding));
+                Name.UpdateText(_NameTB.GetTextBaseList(PersonaEncoding));
+                Text.UpdateFont(PersonaFont);
+                Name.UpdateFont(PersonaFont);
+                Text2HEX();
             }
         }
 
@@ -56,13 +67,69 @@ namespace PersonaEditorGUI.Tools
         public BitmapSource BackgroundImage => backgrounds.CurrentBackground.Image;
         public Rect BackgroundRect => backgrounds.CurrentBackground.Rect;
 
-        public ImageSource TextImage => Text.Image;
-        public Rect TextRect => Text.Rect;
+        public ImageSource NameImage
+        {
+            get { return nameImage; }
+            set
+            {
+                if (nameImage != value)
+                {
+                    nameImage = value;
+                    Notify("NameImage");
+                }
+            }
+        }
+        public Rect NameRect
+        {
+            get { return nameRect; }
+            set
+            {
+                if (nameRect != value)
+                {
+                    nameRect = value;
+                    Notify("NameRect");
+                }
+            }
+        }
 
-        public ImageSource NameImage => Name.Image;
-        public Rect NameRect => Name.Rect;
+        public ImageSource TextImage
+        {
+            get { return textImage; }
+            set
+            {
+                if (textImage != value)
+                {
+                    textImage = value;
+                    Notify("TextImage");
+                }
+            }
+        }
+        public Rect TextRect
+        {
+            get { return textRect; }
+            set
+            {
+                if (textRect != value)
+                {
+                    textRect = value;
+                    Notify("TextRect");
+                }
+            }
+        }
 
-        public string NameTB { set { Name.UpdateText(value); } }
+        private string _NameTB = "";
+        public string NameTB
+        {
+            get { return _NameTB; }
+            set
+            {
+                if (_NameTB != value)
+                {
+                    _NameTB = value;
+                    Name.UpdateText(value.GetTextBaseList(PersonaEncoding));
+                }
+            }
+        }
 
         private string _TextTB = "";
         public string TextTB
@@ -74,7 +141,7 @@ namespace PersonaEditorGUI.Tools
                 {
                     _TextTB = value;
                     Text2HEX();
-                    Text.UpdateText(_TextTB);
+                    Text.UpdateText(_TextTB.GetTextBaseList(PersonaEncoding));
                 }
             }
         }
@@ -95,7 +162,7 @@ namespace PersonaEditorGUI.Tools
 
         private void Text2HEX()
         {
-            var temp = _TextTB.GetTextBaseList(CharList).GetByteArray();
+            var temp = _TextTB.GetTextBaseList(PersonaEncoding).GetByteArray();
             _HexTB = BitConverter.ToString(temp).Replace('-', ' ');
             Notify("HexTB");
         }
@@ -107,19 +174,28 @@ namespace PersonaEditorGUI.Tools
 
         public VisualizerVM()
         {
-            Text = new TextVisual(CharList) { Tag = "Text" };
-            TextEW = new EventWrapper(Text, this);
-            Name = new TextVisual(CharList) { Tag = "Name" };
-            NameEW = new EventWrapper(Name, this);
+            Text = new TextVisual(PersonaFont) { Tag = "Text" };
+            Name = new TextVisual(PersonaFont) { Tag = "Name" };
+            Text.VisualChanged += Text_VisualChanged;
+            Name.VisualChanged += Name_VisualChanged;
 
-            CharListEW = new EventWrapper(CharList, this);
+            FontSelect = 0;
 
             BackgroundEW = new EventWrapper(backgrounds.CurrentBackground, this);
 
-            LoadFontList(Static.Paths.DirFont);
-            FontSelect = 0;
-
             SetBack(backgrounds.CurrentBackground);
+        }
+
+        private void Name_VisualChanged(ImageSource imageSource, Rect rect)
+        {
+            NameImage = imageSource;
+            NameRect = rect;
+        }
+
+        private void Text_VisualChanged(ImageSource imageSource, Rect rect)
+        {
+            TextImage = imageSource;
+            TextRect = rect;
         }
 
         private void SetBack(BackgroundImage image)
@@ -139,24 +215,7 @@ namespace PersonaEditorGUI.Tools
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is TextVisual vis)
-            {
-                if (vis.Tag == "Text")
-                {
-                    if (e.PropertyName == "Image")
-                        Notify("TextImage");
-                    else if (e.PropertyName == "Rect")
-                        Notify("TextRect");
-                }
-                else if (vis.Tag == "Name")
-                {
-                    if (e.PropertyName == "Image")
-                        Notify("NameImage");
-                    else if (e.PropertyName == "Rect")
-                        Notify("NameRect");
-                }
-            }
-            else if (sender is BackgroundImage image)
+            if (sender is BackgroundImage image)
             {
                 if (e.PropertyName == "Image")
                     Notify("BackgroundImage");
@@ -181,20 +240,10 @@ namespace PersonaEditorGUI.Tools
                     Name.GlyphScale = image.GlyphScale;
                 }
             }
-            else if (sender is CharList chr)
+            else if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
             {
-                Text2HEX();
-            }
-        }
-
-        private void LoadFontList(string dir = "")
-        {
-            Dir = Path.GetFullPath(dir);
-            if (Directory.Exists(Dir))
-            {
-                DirectoryInfo DI = new DirectoryInfo(Dir);
-                foreach (var file in DI.GetFiles(@"*.fnt"))
-                    FontList.Add(file.Name);
+                if (e.PropertyName == man.GetPersonaEncodingName(FontSelect))
+                    Text2HEX();
             }
         }
     }
