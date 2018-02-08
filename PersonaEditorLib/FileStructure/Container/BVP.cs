@@ -11,7 +11,7 @@ namespace PersonaEditorLib.FileStructure.Container
 {
     public class BVP : IPersonaFile
     {
-        List<int> ListUnknown = new List<int>();
+        List<int> FlagList = new List<int>();
         public List<ObjectFile> List = new List<ObjectFile>();
 
         public BVP(string path)
@@ -31,17 +31,15 @@ namespace PersonaEditorLib.FileStructure.Container
             using (BinaryReader reader = Utilities.IO.OpenReadFile(new MemoryStream(data), IsLittleEndian))
             {
                 List<int[]> Entry = new List<int[]>();
-                int[] temp = reader.ReadInt32Array(3);
 
-                while (temp[1] != 0)
+                do
                 {
-                    Entry.Add(temp);
-                    ListUnknown.Add(temp[0]);
-                    temp = reader.ReadInt32Array(3);
-                }
+                    Entry.Add(reader.ReadInt32Array(3));
+                } while (Entry[Entry.Count - 1][1] != 0);
 
-                for (int i = 0; i < Entry.Count; i++)
+                for (int i = 0; i < Entry.Count - 1; i++)
                 {
+                    FlagList.Add(Entry[i][0]);
                     reader.BaseStream.Position = Entry[i][1];
                     string name = Path.GetFileNameWithoutExtension(Name) + "(" + i.ToString().PadLeft(3, '0') + ").BMD";
                     List.Add(Utilities.PersonaFile.OpenFile(name, reader.ReadBytes(Entry[i][2]), FileType.BMD));
@@ -119,32 +117,24 @@ namespace PersonaEditorLib.FileStructure.Container
         {
             get
             {
-                int returned = 0;
-
-                foreach (IFile a in List)
-                    returned += a.Size;
-
-                return returned;
+                return Get().Length;
             }
         }
 
         public byte[] Get()
         {
-            byte[] returned = null;
-
-            using (BinaryWriter writer = Utilities.IO.OpenWriteFile(new MemoryStream(), IsLittleEndian))
+            using (MemoryStream MS = new MemoryStream())
+            using (BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian))
             {
-                writer.Write(new byte[ListUnknown.Count * 12]);
-                writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Position, 16)]);
+                writer.BaseStream.Position = (List.Count + 1) * 12;
 
                 List<int[]> Entry = new List<int[]>();
 
                 for (int i = 0; i < List.Count; i++)
                 {
-                    var temp = List[i] as IFile;
-                    Entry.Add(new int[] { ListUnknown[i], (int)writer.BaseStream.Position, temp.Size });
+                    var temp = List[i].Object as IFile;
+                    Entry.Add(new int[] { FlagList[i], (int)writer.BaseStream.Position, temp.Size });
 
-                    writer.Write(temp.Size);
                     writer.Write(temp.Get());
                     writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Position, 16)]);
                 }
@@ -154,12 +144,8 @@ namespace PersonaEditorLib.FileStructure.Container
                 foreach (var a in Entry)
                     writer.WriteInt32Array(a);
 
-                writer.BaseStream.Position = 0;
-                returned = new byte[writer.BaseStream.Length];
-                writer.BaseStream.Read(returned, 0, returned.Length);
+                return MS.ToArray();
             }
-
-            return returned;
         }
 
         #endregion IFile

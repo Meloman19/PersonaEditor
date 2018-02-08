@@ -16,21 +16,21 @@
         <TabControl Grid.Row ="0">
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="Default Background" Width="70" TextWrapping="Wrap" TextAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource setting_Main}"/>
                 </TabItem.Header>
                 <TabItem.Content>
-                    <local:DefaultBackground DataContext="{Binding DefaultBackgroundVM}"></local:DefaultBackground>
+                    <local:Main DataContext="{Binding MainVM}"/>
                 </TabItem.Content>
             </TabItem>
-            
+
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="Main" Width="70" TextWrapping="Wrap" TextAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource setting_DefaultBack}"/>
                 </TabItem.Header>
                 <TabItem.Content>
-                    <local:Main x:Name="Main"></local:Main>
+                    <local:DefaultBackground DataContext="{Binding DefaultBackgroundVM}"/>
                 </TabItem.Content>
-            </TabItem>
+            </TabItem>            
         </TabControl>
 
         <Grid Grid.Row="1">

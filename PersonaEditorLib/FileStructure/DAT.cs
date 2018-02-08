@@ -8,27 +8,26 @@ using System.Threading.Tasks;
 
 namespace PersonaEditorLib.FileStructure
 {
-    public class HEX : IPersonaFile
+    public class DAT : IPersonaFile
     {
         public byte[] Data { get; set; } = new byte[0];
 
-        public HEX(string name, byte[] data)
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
+
+        public DAT(byte[] data)
         {
-            Name = name;
             Data = data;
         }
 
         #region IPersonaFile
 
-        public string Name { get; private set; } = "";
-
-        public FileType Type => FileType.HEX;
+        public FileType Type => FileType.DAT;
 
         public List<ObjectFile> GetSubFiles()
         {
-            return new List<ObjectFile>();
+            return SubFiles;
         }
-        
+
         public List<ContextMenuItems> ContextMenuList
         {
             get

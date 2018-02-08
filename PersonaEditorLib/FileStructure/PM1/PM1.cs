@@ -117,7 +117,7 @@ namespace PersonaEditorLib.FileStructure.PM1
                         reader.BaseStream.Position = a.Position;
                         for (int i = 0; i < a.Count; i++)
                         {
-                            var temp = Utilities.PersonaFile.OpenFile("", reader.ReadBytes(a.Size), FileType.HEX);
+                            var temp = Utilities.PersonaFile.OpenFile("", reader.ReadBytes(a.Size), FileType.DAT);
                             temp.Tag = a.Index;
                             HidList.Add(temp);
                         }
@@ -149,7 +149,7 @@ namespace PersonaEditorLib.FileStructure.PM1
 
                 for (int i = 0; i < splited.Count; i++)
                 {
-                    var returned = Utilities.PersonaFile.OpenFile(name[i], splited[i], FileType.HEX);
+                    var returned = Utilities.PersonaFile.OpenFile(name[i], splited[i], FileType.DAT);
                     returned.Tag = new object[] { element.Index, eplpos[i] };
                     List.Add(returned);
                 }
@@ -162,7 +162,7 @@ namespace PersonaEditorLib.FileStructure.PM1
                 for (int i = 0; i < RMD.Length; i++)
                 {
                     reader.BaseStream.Position = RMD[i][4];
-                    var returned = Utilities.PersonaFile.OpenFile(name[i], reader.ReadBytes(RMD[i][5]), FileType.HEX);
+                    var returned = Utilities.PersonaFile.OpenFile(name[i], reader.ReadBytes(RMD[i][5]), FileType.DAT);
                     returned.Tag = new object[] { element.Index, RMD[i] };
                     List.Add(returned);
                 }

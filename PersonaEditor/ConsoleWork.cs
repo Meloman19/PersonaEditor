@@ -5,16 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PersonaEditorLib.Extension;
 
 namespace PersonaEditor
 {
-    public interface IConsoleWork
-    {
-        void Export(CommandSubType com, ArgumentsWork.Parameters parameters, string dest);
-        void Import(CommandSubType com, ArgumentsWork.Parameters parameters, string source);
-        void Save(ArgumentsWork.Parameters parameters, string dest);
-    }
-
     public enum CommandType
     {
         Empty,
@@ -28,201 +22,161 @@ namespace PersonaEditor
         Empty,
         Image,
         Table,
-        BMD,
         PTP,
-        TXT,
-        ALL
+        Text,
+        All
+    }
+
+    public class Parameters
+    {
+        public string Map { get; } = "";
+        public int Width { get; } = 0;
+        public bool RemoveSplit { get; } = false;
+        public bool CopyOld2New { get; } = false;
+        public int Length { get; } = 0;
+        public bool Old { get; } = true;
+        public bool SkipEmpty { get; } = false;
+        public Encoding Encode { get; } = Encoding.UTF8;
+        public bool Sub { get; } = false;
+
+        public Parameters()
+        {
+
+        }
+
+        public Parameters(string[][] parameters)
+        {
+            foreach (var a in parameters)
+            {
+                if (a[0] == "/map")
+                    Map = a[1];
+                else if (a[0] == "/auto")
+                    Width = Convert.ToInt32(a[1]);
+                else if (a[0] == "/rmvspl")
+                    RemoveSplit = true;
+                else if (a[0] == "/co2n")
+                    CopyOld2New = true;
+                else if (a[0] == "/len")
+                    Length = Convert.ToInt32(a[1]);
+                else if (a[0] == "/new")
+                    Old = false;
+                else if (a[0] == "/skipempty")
+                    SkipEmpty = true;
+                else if (a[0] == "/enc")
+                {
+                    if (a[1] == "UTF-7")
+                        Encode = Encoding.UTF7;
+                    if (a[1] == "UTF-16")
+                        Encode = Encoding.Unicode;
+                    if (a[1] == "UTF-32")
+                        Encode = Encoding.UTF32;
+                }
+                else if (a[0] == "/sub")
+                    Sub = true;
+            }
+        }
+    }
+
+    public class Argument
+    {
+        public CommandType Command { get; } = CommandType.Empty;
+        public CommandSubType Type { get; } = CommandSubType.Empty;
+        public FileType FileType { get; } = FileType.Unknown;
+
+        public string Value { get; } = "";
+        public Parameters Parameters { get; } = new Parameters();
+
+        public Argument(string[] args)
+        {
+            var split = args.SplitInclude(x => x.StartsWith("/"), true).ToArray();
+
+            string com = split[0][0].ToLower();
+            if (com == "-save")
+                Command = CommandType.Save;
+            else if (com.StartsWith("-exp"))
+                Command = CommandType.Export;
+            else if (com.StartsWith("-imp"))
+                Command = CommandType.Import;
+            else
+                return;
+
+            if ((Command == CommandType.Export | Command == CommandType.Import) && com.Length > 4)
+            {
+                string temp = com.Substring(4, com.Length - 4);
+                if (temp == "image")
+                    Type = CommandSubType.Image;
+                else if (temp == "table")
+                    Type = CommandSubType.Table;
+                else if (temp == "ptp")
+                    Type = CommandSubType.PTP;
+                else if (temp == "text")
+                    Type = CommandSubType.Text;
+                else if (temp == "all")
+                    Type = CommandSubType.All;
+                else
+                    FileType = GetFileType(temp);
+            }
+
+            if (split[0].Length > 1)
+                Value = split[0][1];
+            if (split.Length > 1)
+                Parameters = new Parameters(split.Skip(1).ToArray());
+            else
+                Parameters = new Parameters();
+        }
+
+        static FileType GetFileType(string type)
+        {
+            if (type == "bin")
+                return FileType.BIN;
+            else if (type == "spr")
+                return FileType.SPR;
+            else if (type == "tmx")
+                return FileType.TMX;
+            else if (type == "bf")
+                return FileType.BF;
+            else if (type == "pm1")
+                return FileType.PM1;
+            else if (type == "bmd")
+                return FileType.BMD;
+            else if (type == "fnt")
+                return FileType.FNT;
+            else if (type == "bvp")
+                return FileType.BVP;
+            else if (type == "hex")
+                return FileType.DAT;
+            else
+                return FileType.Unknown;
+        }
     }
 
     public class ArgumentsWork
     {
-        public class Parameters
-        {
-            public bool IsLittleEndian { get; private set; } = true;
-            public string Map { get; private set; } = "";
-            public bool Auto { get; private set; } = false;
-            public int Width { get; private set; } = 0;
-            public bool RemoveSplit { get; private set; } = false;
-            public bool CopyOld2New { get; private set; } = false;
-            public int Length { get; private set; } = 0;
-            public bool Old { get; private set; } = true;
-            public bool SkipEmpty { get; private set; } = false;
-            public Encoding Encode { get; private set; } = Encoding.UTF8;
-            public bool Sub { get; private set; } = false;
+        public List<Argument> ArgumentList { get; } = new List<Argument>();
 
-            public void Update(List<string[]> ParList)
-            {
-                foreach (var a in ParList)
-                {
-                    if (a[0] == "be") IsLittleEndian = false;
-                    else if (a[0] == "map") Map = a[1];
-                    else if (a[0] == "auto")
-                    {
-                        Auto = true;
-                        Width = Convert.ToInt32(a[1]);
-                    }
-                    else if (a[0] == "rmvspl") RemoveSplit = true;
-                    else if (a[0] == "co2n") CopyOld2New = true;
-                    else if (a[0] == "len") Length = Convert.ToInt32(a[1]);
-                    else if (a[0] == "new") Old = false;
-                    else if (a[0] == "skipempty") SkipEmpty = true;
-                    else if (a[0] == "enc")
-                    {
-                        if (a[1] == "UTF-7")
-                            Encode = Encoding.UTF7;
-                        if (a[1] == "UTF-16")
-                            Encode = Encoding.Unicode;
-                    }
-                    else if (a[0] == "sub") Sub = true;
-                }
-            }
+        public string OpenedFile { get; } = "";
 
-            public Parameters()
-            {
+        public string OpenedFileDir { get; } = "";
 
-            }
-
-            public Parameters(List<string[]> ParList)
-            {
-                Update(ParList);
-            }
-        }
-
-        public class Argument
-        {
-            public CommandType Command { get; private set; } = CommandType.Empty;
-            public CommandSubType Type { get; private set; } = CommandSubType.Empty;
-
-            public string Com { get; } = "";
-
-            public string Value { get; set; } = "";
-            public Parameters Parameters { get; set; } = new Parameters();
-
-            public Argument(string arg)
-            {
-                if (arg == "save")
-                    Command = CommandType.Save;
-                else
-                {
-                    if (arg.StartsWith("exp"))
-                        Command = CommandType.Export;
-                    else if (arg.StartsWith("imp"))
-                        Command = CommandType.Import;
-
-                    if (arg.Length > 4)
-                    {
-
-                        string temp = arg.Substring(3, arg.Length - 3);
-
-                        Com = temp;
-                        if (temp == "img")
-                            Type = CommandSubType.Image;
-                        else if (temp == "wt")
-                            Type = CommandSubType.Table;
-                        else if (temp == "bmd")
-                            Type = CommandSubType.BMD;
-                        else if (temp == "ptp")
-                            Type = CommandSubType.PTP;
-                        else if (temp == "txt")
-                            Type = CommandSubType.TXT;
-                        else if (temp == "all")
-                            Type = CommandSubType.ALL;
-                    }
-                }
-            }
-        }
-
-        public List<Argument> ArgumentList { get; private set; } = new List<Argument>();
-
-        public string FType { get; private set; } = "";
-
-        public FileType FileType { get; }
-
-        public string FileSource { get; private set; } = "";
-
-        public Parameters Param { get; private set; } = new Parameters();
+        public string OpenedArgument { get; } = "";
 
         public ArgumentsWork(string[] args)
         {
-            if (args.Length > 1)
+            var split = args.SplitInclude(x => x.StartsWith("-"), true).ToArray();
+
+            if (File.Exists(split[0][0]))
             {
-                FType = args[0];
-                FileType = GetType(args[0]);
-                FileSource = Path.GetFullPath(args[1]);
+                OpenedFile = Path.GetFullPath(args[0]);
+                OpenedFileDir = Path.GetDirectoryName(args[0]);
+
+                if (split[0].Length > 1)
+                    OpenedArgument = split[0][1];
             }
             else
                 return;
 
-            List<string[]> param = new List<string[]>();
-
-            for (int i = 2; i < args.Length; i++)
-            {
-                if (args[i][0] == '-')
-                {
-                    if (param.Count > 0)
-                    {
-                        var temp = ArgumentList.LastOrDefault();
-                        if (temp == null)
-                            Param.Update(param);
-                        else
-                            temp.Parameters.Update(param);
-                        param.Clear();
-                    }
-                    ArgumentList.Add(new Argument(args[i].Substring(1).ToLower()));
-                }
-                else if (args[i][0] == '/')
-                    param.Add(new string[] { args[i].Substring(1).ToLower(), "" });
-                else
-                {
-                    var temp = param.LastOrDefault();
-                    if (temp != null)
-                        temp[1] = args[i];
-                    else
-                    {
-                        var lastarg = ArgumentList.Last();
-                        if (lastarg != null)
-                            lastarg.Value = args[i];
-                    }
-                }
-            }
-
-            if (param.Count > 0)
-            {
-                var temp = ArgumentList.Last();
-                if (temp == null)
-                    Param.Update(param);
-                else
-                    temp.Parameters = new Parameters(param);
-                param.Clear();
-            }
-        }
-
-        private FileType GetType(string command)
-        {
-            if (command == "-FNT")
-                return FileType.FNT;
-            else if (command == "-TMX")
-                return FileType.TMX;
-            else if (command == "-PM1")
-                return FileType.PM1;
-            else if (command == "-BF")
-                return FileType.BF;
-            else if (command == "-BMD")
-                return FileType.BMD;
-            else if (command == "-PTP")
-                return FileType.PTP;
-            else if (command == "-BIN")
-                return FileType.BIN;
-            else if (command == "-BVP")
-                return FileType.BVP;
-            else if (command == "-SPR")
-                return FileType.SPR;
-            //else if (command == "-TBL")
-            //    work = new TBLConsole(argwrk.FileSource, argwrk.Param);
-            //else if (command == "-TEXT")
-            //    work = new TEXTConsole(argwrk.FileSource, argwrk.Param);
-            else
-                throw new ArgumentException("Open file's type unknown", "command");
+            for (int i = 1; i < split.Length; i++)
+                ArgumentList.Add(new Argument(split[i]));
         }
     }
 }

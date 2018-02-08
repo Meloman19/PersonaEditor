@@ -8,7 +8,7 @@
         xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
         xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="Persona Editor GUI" 
         Left="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosX, Mode=TwoWay}"
         Top="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosY, Mode=TwoWay}"
         WindowState="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWState, Mode=TwoWay}"
@@ -30,23 +30,22 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <MenuItem Header="File">
-                <MenuItem Header="Open" Command="{Binding Path=clickOpenFile}"/>
-                <MenuItem Header="Save As..." Command="{Binding Path=clickSaveAsFile}"/>
+            <MenuItem Header="{DynamicResource main_File}">
+                <MenuItem Header="{DynamicResource main_OpenFile}" Command="{Binding Path=clickOpenFile}"/>
+                <MenuItem Header="{DynamicResource main_SaveAs}" Command="{Binding Path=clickSaveAsFile}"/>
             </MenuItem>
-            <MenuItem Header="View">
-                <MenuItem Header="Settings" Command="{Binding Path=clickSettingOpen}">
+            <MenuItem Header="{DynamicResource main_Tools}">
+                <MenuItem Header="{DynamicResource main_Visualizer}" Command="{Binding Path=clickVisualizerOpen}"/>
+                <MenuItem Header="{DynamicResource main_CharSet}" Command="{Binding Path=clickSetCharOpen}"/>
+                <Separator/>
+                <MenuItem Header="{DynamicResource main_Settings}" Command="{Binding Path=clickSettingOpen}">
                     <MenuItem.Icon>
                         <Image Source="{StaticResource Setting}" RenderOptions.BitmapScalingMode="HighQuality"></Image>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Header="Tools">
-                <MenuItem Header="Visualizer" Command="{Binding Path=clickVisualizerOpen}"/>
-                <MenuItem Header="Char Set" Command="{Binding Path=clickSetCharOpen}"/>
-            </MenuItem>
             <MenuItem Header="Test" Command="{Binding Path=clickTest}"/>
-            <MenuItem Header="About" Command="{Binding Path=clickAboutOpen}"/>
+            <MenuItem Header="{DynamicResource main_About}" Command="{Binding Path=clickAboutOpen}"/>
         </Menu>
         <Separator Grid.Row="1"/>
         <controls:MultiFileEdit DataContext="{Binding MultiFile}" Grid.Row="2" x:Name="MainControl"/>

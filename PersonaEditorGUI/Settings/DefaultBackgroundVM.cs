@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using PersonaEditorLib;
+using PersonaEditorLib.Interfaces;
 
 namespace PersonaEditorGUI.Settings
 {
-    class DefaultBackgroundVM : PersonaEditorLib.BindingObject
+    class DefaultBackgroundVM : BindingObject, ISetting
     {
         BackgroundDefault tempSetting = new BackgroundDefault();
 

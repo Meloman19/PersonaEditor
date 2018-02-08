@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PersonaEditorGUI"
         mc:Ignorable="d"
-        Title="About" Height="170" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="{DynamicResource main_About}" Height="170" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>

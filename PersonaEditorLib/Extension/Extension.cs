@@ -266,7 +266,7 @@ namespace PersonaEditorLib.Extension
             List<string> returned = new List<string>();
             var temp = Regex.Split(String, @"({[^}]+})");
 
-            foreach(var a in temp)
+            foreach (var a in temp)
             {
                 if (a.Length > 0)
                     returned.Add(a);

@@ -11,43 +11,14 @@ namespace PersonaEditorLib.FileStructure.Container
 {
     public class BF : IPersonaFile
     {
-        public static byte[] GetBMD(BF bf)
+        private static Dictionary<int, FileType> MAP = new Dictionary<int, FileType>()
         {
-            var bmd = bf.List.Find(x => (x.Object as IPersonaFile).Type == FileType.BMD).Object as IPersonaFile;
-            if (bmd != null)
-            {
-                return bmd.Get();
-            }
-            else
-                return new byte[0];
-        }
-
-        public static void SetBMD(BF bf, object bmd)
-        {
-            if (bmd is IPersonaFile pFile)
-                if (pFile.Type == FileType.BMD)
-                {
-                    var temp = bf.List.Find(x => (x.Object as IPersonaFile).Type == FileType.BMD);
-                    temp.Object = bmd;
-                }
-        }
-
-        private static List<Tuple<FileType, int>> MAP = new List<Tuple<FileType, int>>()
-        {
-            new Tuple<FileType, int>(FileType.HEX, 0x0),
-            new Tuple<FileType, int>(FileType.HEX, 0x1),
-            new Tuple<FileType, int>(FileType.HEX, 0x2),
-            new Tuple<FileType, int>(FileType.BMD, 0x3),
-            new Tuple<FileType, int>(FileType.HEX, 0x4)
+            {0x0, FileType.DAT },
+            {0x1, FileType.DAT },
+            {0x2, FileType.DAT },
+            {0x3, FileType.BMD },
+            {0x4, FileType.DAT }
         };
-
-        private static FileType getType(int index)
-        {
-            if (MAP.Find(x => x.Item2 == index) is Tuple<FileType, int> a)
-                return a.Item1;
-            else
-                return FileType.ObjList;
-        }
 
         private static bool GetTable(int[][] table, List<ObjectFile> list, int tableoffset)
         {
@@ -109,7 +80,7 @@ namespace PersonaEditorLib.FileStructure.Container
             {
                 FileType fileType = (a.Object as IPersonaFile).Type;
                 string ext = Path.GetExtension(name);
-                if (fileType == FileType.HEX)
+                if (fileType == FileType.DAT)
                     a.Name = name.Substring(0, name.Length - ext.Length) + "(" + ((int)a.Tag).ToString().PadLeft(2, '0') + ").DAT";
                 else
                     a.Name = name.Substring(0, name.Length - ext.Length) + "." + fileType.ToString();
@@ -139,11 +110,8 @@ namespace PersonaEditorLib.FileStructure.Container
                     reader.BaseStream.Position = element[3];
 
                     string tempN;
-                    var type = getType(element[0]);
-                    if (type == FileType.ObjList)
-                        tempN = "(" + element[0].ToString().PadLeft(2, '0') + ").DAT";
-                    else
-                        tempN = "." + type.ToString();
+                    FileType type = MAP[element[0]];
+                    tempN = "." + type.ToString();
 
                     var item = Utilities.PersonaFile.OpenFile(tempN, reader.ReadBytes(element[1] * element[2]), type);
                     item.Tag = element[0];
@@ -220,12 +188,13 @@ namespace PersonaEditorLib.FileStructure.Container
                     if (temp == null)
                         return new byte[0];
 
-                    writer.Write(0x0);
+                    writer.Write(0);
                     writer.Write(Size - temp[1] * temp[2]);
                     writer.Write(Encoding.ASCII.GetBytes("FLW0"));
+                    writer.Write(0);
                     writer.Write(Table.Length);
                     writer.Write(Unknown);
-                    writer.Write(Utilities.Utilities.Alignment(writer.BaseStream.Length, 0x20));
+                    writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, 0x20)]);
 
                     foreach (var a in Table)
                         foreach (var b in a)

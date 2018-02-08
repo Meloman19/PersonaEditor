@@ -106,5 +106,17 @@ namespace PersonaEditorGUI.Settings {
                 this["BMDFontDestDefault"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
+        public string DefaultLocalization {
+            get {
+                return ((string)(this["DefaultLocalization"]));
+            }
+            set {
+                this["DefaultLocalization"] = value;
+            }
+        }
     }
 }

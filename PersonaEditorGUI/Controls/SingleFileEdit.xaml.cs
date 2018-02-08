@@ -2,6 +2,7 @@
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,16 +21,27 @@ namespace PersonaEditorGUI.Controls
 {
     public partial class SingleFileEdit : UserControl
     {
+        public static readonly DependencyProperty FileOpenProperty = DependencyProperty.Register("FileOpen", typeof(bool), typeof(SingleFileEdit),
+           new FrameworkPropertyMetadata(false));
+
+        [Bindable(true)]
+        public bool FileOpen
+        {
+            get { return (bool)GetValue(FileOpenProperty); }
+            set { SetValue(FileOpenProperty, value); }
+        }
+
         public SingleFileEdit()
         {
             InitializeComponent();
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        
+        private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (sender is Button but)
-                if (but.DataContext is SingleFileEditVM vm)
-                    vm.Close();
+            if (e.NewValue == null)
+                FileOpen = false;
+            else
+                FileOpen = true;
         }
     }
 }

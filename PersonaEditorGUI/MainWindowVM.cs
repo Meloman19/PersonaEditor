@@ -12,14 +12,10 @@ using PersonaEditorGUI.Controls;
 using System.Windows.Input;
 using System.ComponentModel;
 using PersonaEditorLib.PersonaEncoding;
+using System.Threading;
 
 namespace PersonaEditorGUI
 {
-    public static class TestClass
-    {
-        public static PersonaEncoding personaEncoding = new PersonaEncoding("font\\P4.FNTMAP");
-    }
-
     class MainWindowVM : BindingObject
     {
         Settings.SetSettings setSettings;
@@ -145,9 +141,22 @@ namespace PersonaEditorGUI
         public ICommand clickTest { get; }
         private void TestClick()
         {
+            Thread thread = new Thread(delegate ()
+            {
+                Tools.Visualizer visualizer = new Tools.Visualizer() { DataContext = new Tools.VisualizerVM() };
+                visualizer.ShowDialog();
+            });
+            thread.ApartmentState = ApartmentState.STA;
+            thread.Start();
         }
 
-        public MainWindowVM(string startarg = "")
+        public void OpenFile(string path)
+        {
+            if (File.Exists(path))
+                MultiFile.OpenFile(path);
+        }
+
+        public MainWindowVM()
         {
             clickOpenFile = new RelayCommand(OpenFile);
             clickSaveAsFile = new RelayCommand(SaveAsFile);
@@ -157,9 +166,6 @@ namespace PersonaEditorGUI
             clickAboutOpen = new RelayCommand(AboutOpen);
 
             clickTest = new RelayCommand(TestClick);
-
-            if (File.Exists(startarg))
-                MultiFile.OpenFile(startarg);
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace PersonaEditorLib.FileStructure.FNT
 {
-    public class FNT : IPersonaFile, IPreview, IImage
+    public class FNT : IPersonaFile, IImage, ITable
     {
         public FNTHeader Header { get; set; }
         public FNTPalette Palette { get; set; }
@@ -32,9 +32,8 @@ namespace PersonaEditorLib.FileStructure.FNT
                 Read(FS, 0);
         }
 
-        public FNT(string name, byte[] data)
+        public FNT(byte[] data)
         {
-            Name = name;
             using (MemoryStream MS = new MemoryStream(data))
                 Read(MS, 0);
         }
@@ -64,58 +63,6 @@ namespace PersonaEditorLib.FileStructure.FNT
             }
         }
 
-        public XDocument GetWidthTable()
-        {
-            XDocument xDoc = new XDocument();
-            XElement WT = new XElement("WidthTable");
-            xDoc.Add(WT);
-
-            XElement Line = null;
-            int k = 0;
-            for (int i = 0; i < WidthTable.Count; i++)
-            {
-                if (i % 16 == 0)
-                {
-                    k++;
-                    Line = new XElement("Line_" + k);
-                    WT.Add(Line);
-                }
-                XElement Glyph = new XElement("Glyph_" + ((i % 16) + 1));
-                Line.Add(Glyph);
-                Glyph.Add(new XElement("LeftCut", WidthTable[i]?.Left));
-                Glyph.Add(new XElement("RightCut", WidthTable[i]?.Right));
-            }
-
-            Logging.Write("PersonaEditorLib", "Width Table was created.");
-            return xDoc;
-        }
-
-        public void SetWidthTable(XDocument xDoc)
-        {
-            XElement WT = xDoc.Element("WidthTable");
-
-            int index = 0;
-            foreach (var line in WT.Elements())
-            {
-                int lineindex = Convert.ToInt32(line.Name.LocalName.Split('_')[1]);
-                foreach (var glyph in line.Elements())
-                {
-                    int glyphindex = Convert.ToInt32(glyph.Name.LocalName.Split('_')[1]);
-                    index = (lineindex - 1) * 16 + (glyphindex - 1);
-                    WidthTable[index] = new VerticalCut(Convert.ToByte(glyph.Element("LeftCut").Value), Convert.ToByte(glyph.Element("RightCut").Value));
-                }
-            }
-
-            Logging.Write("PersonaEditorLib", "Width Table was writed. Get " + index + " glyphs");
-        }
-
-        private object GetControl()
-        {
-            System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-            image.Source = GetImage();
-            return image;
-        }
-
         private BitmapPalette GetImagePalette(BitmapPalette bitmapPalette)
         {
             List<Color> palette = new List<Color>();
@@ -128,6 +75,79 @@ namespace PersonaEditorLib.FileStructure.FNT
 
             return new BitmapPalette(palette);
         }
+        
+        #region IPersonaFile
+
+        public FileType Type => FileType.FNT;
+
+        public List<ObjectFile> GetSubFiles()
+        {
+            return new List<ObjectFile>();
+        }
+
+        public List<ContextMenuItems> ContextMenuList
+        {
+            get
+            {
+                List<ContextMenuItems> returned = new List<ContextMenuItems>();
+
+                returned.Add(ContextMenuItems.SaveAs);
+                returned.Add(ContextMenuItems.Replace);
+
+                return returned;
+            }
+        }
+
+        public Dictionary<string, object> GetProperties
+        {
+            get
+            {
+                Dictionary<string, object> returned = new Dictionary<string, object>();
+
+                returned.Add("Glyph Count", Header.Glyphs.Count);
+                returned.Add("Color Count", Header.Glyphs.NumberOfColor);
+                returned.Add("Unpack Font Size", Compressed.Header.UncompressedFontSize);
+                returned.Add("Type", Type);
+
+                return returned;
+            }
+        }
+
+        #endregion IPersonaFile
+
+        #region IFile
+
+        public int Size
+        {
+            get { return Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size(); }
+        }
+
+        public byte[] Get()
+        {
+            byte[] returned;
+
+            using (MemoryStream MS = new MemoryStream())
+            {
+                BinaryWriter writer = new BinaryWriter(MS);
+
+                Header.FileSize = 1 + Header.HeaderSize + Palette.Size + Reserved.Size + Compressed.Size();
+
+                Header.Get(writer);
+                Palette.Get(writer);
+                WidthTable.Get(writer);
+                Unknown.Get(writer);
+                Reserved.Get(writer);
+                Compressed.Get(writer);
+                if (Last != null)
+                    Last.Get(writer);
+
+                returned = MS.ToArray();
+            }
+
+            return returned;
+        }
+
+        #endregion IFile
 
         #region IImage
 
@@ -211,95 +231,53 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         #endregion IImage
 
-        #region IPreview
+        #region ITable
 
-        private object _control = null;
-        public object Control
+        public XDocument GetTable()
         {
-            get
+            XDocument xDoc = new XDocument();
+            XElement WT = new XElement("WidthTable");
+            xDoc.Add(WT);
+
+            XElement Line = null;
+            int k = 0;
+            for (int i = 0; i < WidthTable.Count; i++)
             {
-                if (_control == null)
-                    _control = GetControl();
-
-                return _control;
-            }
-        }
-
-        #endregion IPreview
-
-        #region IPersonaFile
-
-        public string Name { get; private set; } = "";
-
-        public FileType Type => FileType.FNT;
-
-        public List<ObjectFile> GetSubFiles()
-        {
-            return new List<ObjectFile>();
-        }
-
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                returned.Add(ContextMenuItems.SaveAs);
-                returned.Add(ContextMenuItems.Replace);
-
-                return returned;
-            }
-        }
-
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Glyph Count", Header.Glyphs.Count);
-                returned.Add("Color Count", Header.Glyphs.NumberOfColor);
-                returned.Add("Unpack Font Size", Compressed.Header.UncompressedFontSize);
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
-
-        #endregion IPersonaFile
-
-        #region IFile
-
-        public int Size
-        {
-            get { return Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size(); }
-        }
-
-        public byte[] Get()
-        {
-            byte[] returned;
-
-            using (MemoryStream MS = new MemoryStream())
-            {
-                BinaryWriter writer = new BinaryWriter(MS);
-
-                Header.FileSize = 1 + Header.HeaderSize + Palette.Size + Reserved.Size + Compressed.Size();
-
-                Header.Get(writer);
-                Palette.Get(writer);
-                WidthTable.Get(writer);
-                Unknown.Get(writer);
-                Reserved.Get(writer);
-                Compressed.Get(writer);
-                if (Last != null)
-                    Last.Get(writer);
-
-                returned = MS.ToArray();
+                if (i % 16 == 0)
+                {
+                    k++;
+                    Line = new XElement("Line_" + k);
+                    WT.Add(Line);
+                }
+                XElement Glyph = new XElement("Glyph_" + ((i % 16) + 1));
+                Line.Add(Glyph);
+                Glyph.Add(new XElement("LeftCut", WidthTable[i]?.Left));
+                Glyph.Add(new XElement("RightCut", WidthTable[i]?.Right));
             }
 
-            return returned;
+            Logging.Write("PersonaEditorLib", "Width Table was created.");
+            return xDoc;
         }
 
-        #endregion IFile
+        public void SetTable(XDocument xDoc)
+        {
+            XElement WT = xDoc.Element("WidthTable");
+
+            int index = 0;
+            foreach (var line in WT.Elements())
+            {
+                int lineindex = Convert.ToInt32(line.Name.LocalName.Split('_')[1]);
+                foreach (var glyph in line.Elements())
+                {
+                    int glyphindex = Convert.ToInt32(glyph.Name.LocalName.Split('_')[1]);
+                    index = (lineindex - 1) * 16 + (glyphindex - 1);
+                    WidthTable[index] = new VerticalCut(Convert.ToByte(glyph.Element("LeftCut").Value), Convert.ToByte(glyph.Element("RightCut").Value));
+                }
+            }
+
+            Logging.Write("PersonaEditorLib", "Width Table was writed. Get " + index + " glyphs");
+        }
+
+        #endregion ITable
     }
 }

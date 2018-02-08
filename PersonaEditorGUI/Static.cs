@@ -14,10 +14,7 @@ namespace PersonaEditorGUI
             public static string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             public static string DirBackgrounds = Path.Combine(CurrentFolderEXE, "background");
             public static string DirFont = Path.Combine(CurrentFolderEXE, "font");
-            public static string FontOld = Path.Combine(DirFont, "FONT_OLD.FNT");
-            public static string FontOldMap = Path.Combine(DirFont, "FONT_OLD.TXT");
-            public static string FontNew = Path.Combine(DirFont, "FONT_NEW.FNT");
-            public static string FontNewMap = Path.Combine(DirFont, "FONT_NEW.TXT");
+            public static string DirLang = Path.Combine(CurrentFolderEXE, "lang");
         }
 
         public static class FontMap

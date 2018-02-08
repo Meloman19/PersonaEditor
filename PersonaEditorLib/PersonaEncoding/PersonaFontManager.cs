@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PersonaEditorLib.PersonaEncoding
 {
@@ -18,7 +19,7 @@ namespace PersonaEditorLib.PersonaEncoding
         public ReadOnlyObservableCollection<string> FontList { get; }
 
         public PersonaFontManager(string dir)
-        {
+        {            
             sourcedir = dir;
             FontList = new ReadOnlyObservableCollection<string>(encodingList);
 

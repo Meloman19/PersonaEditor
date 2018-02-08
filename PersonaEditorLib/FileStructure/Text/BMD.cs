@@ -71,18 +71,7 @@ namespace PersonaEditorLib.FileStructure.Text
                 MSGs.MsgType Type = a.Type == "MSG" ? MSGs.MsgType.MSG : MSGs.MsgType.SEL;
                 int CharacterIndex = a.CharacterIndex;
 
-                List<byte> Msg = new List<byte>();
-                foreach (var b in a.Strings)
-                {
-                    foreach (var c in b.Prefix)
-                        Msg.AddRange(c.Array.ToArray());
-
-                    Msg.AddRange(b.NewString.GetTextBaseList(New).GetByteArray().ToArray());
-
-                    foreach (var c in b.Postfix)
-                        Msg.AddRange(c.Array.ToArray());
-                }
-                byte[] MsgBytes = Msg.ToArray();
+                byte[] MsgBytes = a.GetNew(New);
 
                 msg.Add(new MSGs(Index, Name, Type, CharacterIndex, MsgBytes.ToArray()));
             }

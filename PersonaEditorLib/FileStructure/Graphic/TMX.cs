@@ -27,7 +27,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
         PSMZ16S = 0x3A
     }
 
-    public class TMX : BindingObject, IPersonaFile, IPreview, IImage
+    public class TMX : BindingObject, IPersonaFile, IImage
     {
         TMXHeader Header;
         TMXPalette Palette;
@@ -69,25 +69,6 @@ namespace PersonaEditorLib.FileStructure.Graphic
             get { return Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()); }
         }
 
-        private object GetControl()
-        {
-            System.Windows.Controls.Image image = new System.Windows.Controls.Image();
-            image.Source = GetImage();
-            return image;
-        }
-
-        private object _control = null;
-        public object Control
-        {
-            get
-            {
-                if (_control == null)
-                    _control = GetControl();
-
-                return _control;
-            }
-        }
-
         public void Set(byte[] data, bool IsLittleEndian)
         {
             using (MemoryStream MS = new MemoryStream(data))
@@ -100,23 +81,9 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
         public bool IsLittleEndian { get; set; } = true;
 
-        #region IImage
-
-        public BitmapSource GetImage()
-        {
-            byte[] data = Palette.Format == PixelFormats.Indexed4 ? Utilities.Utilities.DataReverse(Data) : Data;
-            return BitmapSource.Create(Header.Width, Header.Height, 96, 96, Palette.Format, Palette.Pallete, data, (Palette.Format.BitsPerPixel * Header.Width + 7) / 8);
-        }
-
-        public void SetImage(BitmapSource bitmapSource)
-        {
-        }
-
-        #endregion IImage
+        public string Name => Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()) + ".tmx";
 
         #region IPersonaFile
-
-        public string Name => Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()) + ".tmx";
 
         public FileType Type => FileType.TMX;
 
@@ -153,8 +120,6 @@ namespace PersonaEditorLib.FileStructure.Graphic
             }
         }
 
-        #endregion IPersonaFile
-
         #region IFile
 
         public int Size
@@ -184,5 +149,21 @@ namespace PersonaEditorLib.FileStructure.Graphic
         }
 
         #endregion IFile
+
+        #endregion IPersonaFile
+
+        #region IImage
+
+        public BitmapSource GetImage()
+        {
+            byte[] data = Palette.Format == PixelFormats.Indexed4 ? Utilities.Utilities.DataReverse(Data) : Data;
+            return BitmapSource.Create(Header.Width, Header.Height, 96, 96, Palette.Format, Palette.Pallete, data, (Palette.Format.BitsPerPixel * Header.Width + 7) / 8);
+        }
+
+        public void SetImage(BitmapSource bitmapSource)
+        {
+        }
+
+        #endregion IImage
     }
 }

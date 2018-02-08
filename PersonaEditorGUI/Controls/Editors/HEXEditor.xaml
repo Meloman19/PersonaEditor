@@ -4,20 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
-             mc:Ignorable="d" 
+             xmlns:hexeditor="clr-namespace:PersonaEditorLib.Controls.Hex;assembly=PersonaEditorLib"
+             mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid DataContext="{Binding DataContext}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="0" Background="White">
-
-            </Grid>
-
-            <ScrollBar Orientation="Vertical" Grid.Column="1" Minimum="0" Maximum="100" Value="40"/>
-        </Grid>
+    <Grid>
+        <hexeditor:HexEditor Stream="{Binding WorkStream}"/>
     </Grid>
 </UserControl>

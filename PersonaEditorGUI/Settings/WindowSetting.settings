@@ -11,9 +11,6 @@
     <Setting Name="MWLeftWidth" Type="System.Windows.GridLength" Scope="User">
       <Value Profile="(Default)">300</Value>
     </Setting>
-    <Setting Name="MWRightWidth" Type="System.Windows.GridLength" Scope="User">
-      <Value Profile="(Default)">300</Value>
-    </Setting>
     <Setting Name="MWPropertyExpanded" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>

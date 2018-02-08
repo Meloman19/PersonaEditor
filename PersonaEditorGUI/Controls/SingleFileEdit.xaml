@@ -8,15 +8,15 @@
              xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
              xmlns:editors="clr-namespace:PersonaEditorGUI.Controls.Editors"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" DataContextChanged="UserControl_DataContextChanged">
 
     <UserControl.Resources>
         <controls:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
     </UserControl.Resources>
 
     <Grid>
-        <Canvas AllowDrop="True" classes:Event.Drop="{Binding Path=Drop}" Background="Transparent"/>
-        <Grid Visibility="{Binding Converter={StaticResource NullVisibilityConverter}, ElementName=MainControl, Path=Content}">
+        <!--<Canvas AllowDrop="True" classes:Event.Drop="{Binding Path=Drop}" Background="Transparent"/>-->
+        <Grid>
             <!--<Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
@@ -39,7 +39,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <Button Content="x" Grid.Column="1" Margin="2" Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}" Click="Button_Click"/>
+                <Button Content="x" Grid.Column="1" Margin="2" Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}" Command="{Binding FileClose}"/>
             </Grid>
 
             <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1">

@@ -21,7 +21,7 @@ namespace PersonaEditorGUI.Controls
     {
         public MultiFileEdit()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
         
         double temp = 0;

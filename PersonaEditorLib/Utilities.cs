@@ -1,4 +1,5 @@
-﻿using PersonaEditorLib.Interfaces;
+﻿using PersonaEditorLib.Extension;
+using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -138,7 +139,7 @@ namespace PersonaEditorLib.Utilities
             return Colors;
         }
 
-        
+
 
         public static string[] GetAllFiles(DirectoryInfo rootdirinfo, List<string> root)
         {
@@ -211,33 +212,34 @@ namespace PersonaEditorLib.Utilities
                 else if (type == FileType.TMX)
                     Obj = new FileStructure.Graphic.TMX(data);
                 else if (type == FileType.BF)
-                {
-                    var temp = new FileStructure.Container.BF(data);
-                    temp.SetName(name);
-                    Obj = temp;
-                }
-                else if (type == FileType.BMD)
-                    Obj = new FileStructure.Text.BMD(data);
+                    Obj = new FileStructure.Container.BF(data, name);
                 else if (type == FileType.PM1)
                     Obj = new FileStructure.PM1.PM1(data);
+                else if (type == FileType.BMD)
+                    Obj = new FileStructure.Text.BMD(data);
                 else if (type == FileType.PTP)
-                    Obj = new FileStructure.Text.PTP(name, data);
+                    Obj = new FileStructure.Text.PTP(data);
                 else if (type == FileType.FNT)
-                    Obj = new FileStructure.FNT.FNT(name, data);
+                    Obj = new FileStructure.FNT.FNT(data);
                 else if (type == FileType.BVP)
                     Obj = new FileStructure.Container.BVP(name, data);
+                else if (type == FileType.TBL)
+                    Obj = new FileStructure.Container.TBL(data, name);
                 else
-                    Obj = new FileStructure.HEX(name, data);
+                    Obj = new FileStructure.DAT(data);
 
                 return new ObjectFile(name, Obj);
             }
-            catch { return null; }
+            catch (Exception e)
+            {
+                return new ObjectFile(name, new FileStructure.DAT(data));
+            }
         }
 
         public static FileType GetFileType(string name)
         {
             string ext = Path.GetExtension(name);
-            if (ext.ToLower() == ".bin" | ext.ToLower() == ".pak" | ext.ToLower() == ".pac")
+            if (ext.ToLower() == ".bin" | ext.ToLower() == ".pak" | ext.ToLower() == ".pac" | ext.ToLower() == ".p00")
                 return FileType.BIN;
             else if (ext.ToLower() == ".spr")
                 return FileType.SPR;
@@ -255,8 +257,29 @@ namespace PersonaEditorLib.Utilities
                 return FileType.FNT;
             else if (ext.ToLower() == ".bvp")
                 return FileType.BVP;
+            else if (ext.ToLower() == ".tbl")
+                return FileType.TBL;
             else
-                return FileType.HEX;
+                return FileType.DAT;
+        }
+
+        public static FileType GetFileType(byte[] data)
+        {
+            if (data.Length >= 0xc)
+            {
+                byte[] buffer = data.SubArray(8, 4);
+                if (buffer.SequenceEqual(new byte[] { 0x31, 0x47, 0x53, 0x4D }) | buffer.SequenceEqual(new byte[] { 0x4D, 0x53, 0x47, 0x31 }))
+                    return FileType.BMD;
+                else if (buffer.SequenceEqual(new byte[] { 0x54, 0x4D, 0x58, 0x30 }))
+                    return FileType.TMX;
+                else if (buffer.SequenceEqual(new byte[] { 0x53, 0x50, 0x52, 0x30 }))
+                    return FileType.SPR;
+                else if (buffer.SequenceEqual(new byte[] { 0x46, 0x4C, 0x57, 0x30 }))
+                    return FileType.BF;
+                else if (buffer.SequenceEqual(new byte[] { 0x50, 0x4D, 0x44, 0x31 }))
+                    return FileType.PM1;
+            }
+            return FileType.Unknown;
         }
     }
 

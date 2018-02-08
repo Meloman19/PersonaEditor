@@ -9,7 +9,7 @@
              mc:Ignorable="d" Name="USC"
              d:DesignHeight="300" d:DesignWidth="300" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
-    <Grid DataContext="{Binding DataContext}" >
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -93,8 +93,8 @@
                                                             <RowDefinition Height="Auto"/>
                                                         </Grid.RowDefinitions>
 
-                                                        <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" Text="{Binding OldString, Mode=OneWay}"/>
-                                                        <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                        <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding OldString, Mode=OneWay}"/>
+                                                        <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                                                         <Image Grid.Column="0" Grid.Row="1" Margin="2">
                                                             <Image.Source>

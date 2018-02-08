@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace PersonaEditorLib.Interfaces
 {
-    public interface IPersonaFileElement
+    public interface ITable
     {
-        string Name { get; set; }
-        IPersonaFile File { get;}
-        int Size { get; }
+        XDocument GetTable();
+        void SetTable(XDocument xDocument);
     }
 }

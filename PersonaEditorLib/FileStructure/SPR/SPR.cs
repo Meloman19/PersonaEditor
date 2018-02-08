@@ -90,7 +90,7 @@ namespace PersonaEditorLib.FileStructure.SPR
                 returned.Add(ContextMenuItems.Separator);
                 returned.Add(ContextMenuItems.SaveAs);
                 returned.Add(ContextMenuItems.SaveAll);
-
+                                
                 return returned;
             }
         }
@@ -119,15 +119,19 @@ namespace PersonaEditorLib.FileStructure.SPR
                 int returned = 0;
 
                 returned += Header.Size;
-                returned += TextureOffsetList.Count * 4;
-                returned += KeyOffsetList.Count * 4;
+                returned += TextureOffsetList.Count * 8;
+                returned += KeyOffsetList.Count * 8;
                 returned += KeyList.Size;
-                returned += (TextureList[0] as IFile).Size;
+
+                int temp = Utilities.Utilities.Alignment(returned, 16);
+                returned += temp == 0 ? 16 : temp;
+
+                returned += (TextureList[0].Object as IFile).Size;
                 for (int i = 1; i < TextureList.Count; i++)
                 {
-                    int temp = Utilities.Utilities.Alignment(returned, 16);
+                    temp = Utilities.Utilities.Alignment(returned, 16);
                     returned += temp == 0 ? 16 : temp;
-                    returned += (TextureList[i] as IFile).Size;
+                    returned += (TextureList[i].Object as IFile).Size;
                 }
 
                 return returned;

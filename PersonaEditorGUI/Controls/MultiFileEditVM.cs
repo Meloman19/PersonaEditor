@@ -15,20 +15,36 @@ namespace PersonaEditorGUI.Controls
     class MultiFileEditVM : BindingObject
     {
         public TreeViewPEVM Tree { get; } = new TreeViewPEVM();
-        public SingleFileEditVM Single { get; } = new SingleFileEditVM();
+        public PreviewEditorTabControlVM Tab { get; } = new PreviewEditorTabControlVM();
+
+        private string mainWindowType = "";
+        public string MainWindowType
+        {
+            get { return mainWindowType; }
+            set
+            {
+                if (mainWindowType != value)
+                {
+                    mainWindowType = value;
+                    Notify("MainWindowType");
+                }
+            }
+        }
 
         private string _OpenFileName = "";
         public string OpenFileName => _OpenFileName;
 
+        #region Methods
+
         public void OpenFile(string path)
         {
-            if (Single.Close())
+            if (Tab.CloseAll())
             {
                 var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
                     File.ReadAllBytes(path),
                     PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)));
 
-                if (file.Object != null)
+                if (file != null)
                 {
                     Tree.SetRoot(file);
                     if (file.Object is IPersonaFile pfile && pfile.GetSubFiles().Count == 0)
@@ -43,7 +59,7 @@ namespace PersonaEditorGUI.Controls
 
         public void SaveFile(string path)
         {
-            if (Single.Close())
+            if (Tab.CloseAll())
             {
                 var root = Tree.GetRoot();
                 if (root != null)
@@ -54,9 +70,10 @@ namespace PersonaEditorGUI.Controls
 
         public bool CloseFile()
         {
-            if (Single.Close())
+            if (Tab.CloseAll())
                 if (OpenFileName != "")
                 {
+                    MainWindowType = "";
                     return true;
                     var result = MessageBox.Show("Save file?\n" + OpenFileName, Path.GetFileName(OpenFileName), MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
                     if (result == MessageBoxResult.Yes)
@@ -73,20 +90,11 @@ namespace PersonaEditorGUI.Controls
             return false;
         }
 
-        private object _Preview = null;
-        public object Preview => _Preview;
+        #endregion Methods
 
-        private Dictionary<string, object> _Properties = null;
-        public Dictionary<string, object> Properties => _Properties;
-
-        public MultiFileEditVM()
-        {
-            Tree.SelectedItemData += Tree_SelectedItemData;
-            Tree.SelectedItemDataOpen += Tree_SelectedItemDataOpen;
-        }
+        #region Events
 
         public DragEventHandler Drop => DropItem;
-
         private void DropItem(object sender, DragEventArgs e)
         {
             string[] temp = e.Data.GetData(DataFormats.FileDrop) as string[];
@@ -96,23 +104,24 @@ namespace PersonaEditorGUI.Controls
 
         private void Tree_SelectedItemDataOpen(ObjectFile sender)
         {
-            Single.Open(sender);
+            MainWindowType = "Single";
+            Tab.Open(sender);
         }
 
         private void Tree_SelectedItemData(ObjectFile sender)
         {
-            if (sender.Object is IPersonaFile file)
-                _Properties = file.GetProperties;
+            if (sender.Object is IImage image)
+                Tab.SetPreview(image.GetImage());
             else
-                _Properties = null;
+                Tab.SetPreview(null);
+        }
 
-            if (sender.Object is IPreview preview)
-                _Preview = preview.Control;
-            else
-                _Preview = null;
+        #endregion Events
 
-            Notify("Properties");
-            Notify("Preview");
+        public MultiFileEditVM()
+        {
+            Tree.SelectedItemData += Tree_SelectedItemData;
+            Tree.SelectedItemDataOpen += Tree_SelectedItemDataOpen;
         }
     }
 }

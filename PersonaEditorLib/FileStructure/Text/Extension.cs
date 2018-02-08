@@ -194,7 +194,7 @@ namespace PersonaEditorLib.FileStructure.Text
                 else
                     widthlist.AddRange(new int[a.GetSystem().Length]);
             }
-
+            
             int index = 0;
             int widthsum = 0;
             while (index < widthlist.Count)
@@ -220,7 +220,7 @@ namespace PersonaEditorLib.FileStructure.Text
                     widthsum = 0;
                 }
             }
-
+            
             return returned;
         }
 

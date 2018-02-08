@@ -23,5 +23,8 @@
     <Setting Name="BMDFontDestDefault" Type="System.String" Scope="User">
       <Value Profile="(Default)">P4</Value>
     </Setting>
+    <Setting Name="DefaultLocalization" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Default</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

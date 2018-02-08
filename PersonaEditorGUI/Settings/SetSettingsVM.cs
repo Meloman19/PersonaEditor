@@ -1,6 +1,8 @@
 ﻿using PersonaEditorLib;
+using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,11 +26,19 @@ namespace PersonaEditorGUI.Settings
             }
         }
 
+        //public ObservableCollection<ISetting> SettingList { get; } = new ObservableCollection<ISetting>()
+        //{
+        //    new DefaultBackgroundVM(),
+        //    new MainVM()
+        //};
+
         public DefaultBackgroundVM DefaultBackgroundVM { get; } = new DefaultBackgroundVM();
+        public MainVM MainVM { get; } = new MainVM();
 
         public void Reset()
         {
             DefaultBackgroundVM.Reset();
+            MainVM.Reset();
             SettingChange = false;
         }
 
@@ -36,12 +46,14 @@ namespace PersonaEditorGUI.Settings
         public void Ok()
         {
             DefaultBackgroundVM.Save();
+            MainVM.Save();
         }
 
         public ICommand ClickApply { get; }
         public void Apply()
         {
             DefaultBackgroundVM.Save();
+            MainVM.Save();
             SettingChange = false;
         }
 
@@ -50,10 +62,11 @@ namespace PersonaEditorGUI.Settings
             ClickOk = new RelayCommand(Ok);
             ClickApply = new RelayCommand(Apply);
 
-            DefaultBackgroundVM.PropertyChanged += DefaultBackgroundVM_PropertyChanged;
+            DefaultBackgroundVM.PropertyChanged += Setting_PropertyChanged;
+            MainVM.PropertyChanged += Setting_PropertyChanged;
         }
-
-        private void DefaultBackgroundVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        
+        private void Setting_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "IsChanged")
                 SettingChange = true;

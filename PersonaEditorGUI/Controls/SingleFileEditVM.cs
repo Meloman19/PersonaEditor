@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace PersonaEditorGUI.Controls
 {
@@ -66,9 +67,9 @@ namespace PersonaEditorGUI.Controls
                     DataContext = new Editors.FNTEditorVM(data.Object as PersonaEditorLib.FileStructure.FNT.FNT);
                     _dataContextType = "FNT";
                 }
-                else if (pf.Type == FileType.HEX)
+                else if (pf.Type == FileType.DAT)
                 {
-                    DataContext = new Editors.HEXEditorVM(data.Object as PersonaEditorLib.FileStructure.HEX);
+                    DataContext = new Editors.HEXEditorVM(data.Object as PersonaEditorLib.FileStructure.DAT);
                     _dataContextType = "HEX";
                 }
                 else
@@ -92,6 +93,12 @@ namespace PersonaEditorGUI.Controls
                 Open(objF);
         }
 
+        public ICommand FileClose { get; }
+        private void CloseFile()
+        {
+            Close();
+        }
+
         public bool Close()
         {
             if (DataContext is IViewModel mod)
@@ -108,5 +115,11 @@ namespace PersonaEditorGUI.Controls
 
             return true;
         }
+
+        public SingleFileEditVM()
+        {
+            FileClose = new RelayCommand(CloseFile);
+        }
+
     }
 }

@@ -7,7 +7,7 @@
              xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
              xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
              xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="900">
 
     <UserControl.Resources>
@@ -18,7 +18,6 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0">
@@ -36,7 +35,7 @@
                 <controls:TreeViewPE Grid.Row="0" DataContext="{Binding Tree}"/>
                 <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
                     <Grid AllowDrop="True" classes:Event.Drop="{Binding Drop}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Drop to Open"/>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource main_DropFile}" TextAlignment="Center"/>
                     </Grid>
                 </Border>
             </Grid>
@@ -44,12 +43,12 @@
             <GridSplitter ResizeBehavior="PreviousAndCurrent" ShowsPreview="True" Grid.Column="1" Width="4"/>
         </Grid>
 
-        <controls:SingleFileEdit DataContext="{Binding Single}" Grid.Column="1"/>
+        <controls:PreviewEditorTabControl Grid.Column="1" DataContext="{Binding Tab}"/>
 
-        <Grid Grid.Column="2">
+        <!--<Grid Grid.Column="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWRightWidth, Mode=TwoWay}"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <GridSplitter ShowsPreview="True" ResizeDirection="Columns" ResizeBehavior="CurrentAndNext"  Grid.Column="0" Width="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
@@ -84,6 +83,6 @@
                 </Grid>
             </Border>
 
-        </Grid>
+        </Grid>-->
     </Grid>
 </UserControl>

@@ -11,13 +11,13 @@ namespace PersonaEditorGUI.Controls.Editors
 {
     class HEXEditorVM : BindingObject, IViewModel
     {
-        PersonaEditorLib.FileStructure.HEX hex;
-        MemoryStream Worked;
+        PersonaEditorLib.FileStructure.DAT hex;
+        public MemoryStream WorkStream { get; set; }
 
-        public HEXEditorVM(PersonaEditorLib.FileStructure.HEX hex)
+        public HEXEditorVM(PersonaEditorLib.FileStructure.DAT hex)
         {
             this.hex = hex;
-            Worked = new MemoryStream(hex.Data);
+            WorkStream = new MemoryStream(hex.Data);
         }
 
         public bool Close()

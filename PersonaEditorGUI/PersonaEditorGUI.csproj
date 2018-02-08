@@ -75,6 +75,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>PersonaEditorGUI.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resource\PersonaText.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -108,12 +114,14 @@
     <Compile Include="Classes\Controls\UserInlineUIContainer.cs" />
     <Compile Include="Classes\Controls\UserTextBlock.cs" />
     <Compile Include="Classes\Extention.cs" />
+    <Compile Include="Classes\LocalizationManager.cs" />
     <Compile Include="Classes\Media\Visual\TextVisual.cs" />
     <Compile Include="Classes\Event.cs" />
     <Compile Include="Classes\ResourceItem.cs" />
     <Compile Include="Controls\ClosableTabItem.xaml.cs">
       <DependentUpon>ClosableTabItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ClosableTabItemVM.cs" />
     <Compile Include="Controls\ColorPicker\ColorPickerTool.xaml.cs">
       <DependentUpon>ColorPickerTool.xaml</DependentUpon>
     </Compile>
@@ -153,6 +161,10 @@
       <DependentUpon>PTPEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\MultiFileEditVM.cs" />
+    <Compile Include="Controls\PreviewEditorTabControl.xaml.cs">
+      <DependentUpon>PreviewEditorTabControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PreviewEditorTabControlVM.cs" />
     <Compile Include="Controls\SingleFileEdit.xaml.cs">
       <DependentUpon>SingleFileEdit.xaml</DependentUpon>
     </Compile>
@@ -164,6 +176,11 @@
     <Compile Include="Classes\Media\Visual\Background.cs" />
     <Compile Include="Controls\TreeViewPEVM.cs" />
     <Compile Include="MainWindowVM.cs" />
+    <Compile Include="Resource\Localization.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Localization.resx</DependentUpon>
+    </Compile>
     <Compile Include="Settings\App.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -181,6 +198,7 @@
     <Compile Include="Settings\Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Settings\MainVM.cs" />
     <Compile Include="Settings\SetSettings.xaml.cs">
       <DependentUpon>SetSettings.xaml</DependentUpon>
     </Compile>
@@ -263,6 +281,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\PreviewEditorTabControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\SingleFileEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -286,6 +308,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Resource\lang.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Settings\DefaultBackground.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -350,6 +376,15 @@
   <ItemGroup>
     <Folder Include="Controls\HexEdit\" />
     <Folder Include="Controls\Primitive\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\PersonaText.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resource\Localization.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Localization.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -108,7 +108,7 @@ namespace PersonaEditorGUI.Classes
         }
 
         private void ItemUnloaded(object sender, RoutedEventArgs e)
-        {
+        { 
         }
 
         #endregion Events
@@ -274,9 +274,10 @@ namespace PersonaEditorGUI.Classes
             {
                 string[] paths = new string[] { filepath };
                 File.WriteAllBytes(paths[0], (personaFile.Object as IFile).Get());
+              
                 data.SetData(DataFormats.FileDrop, paths);
             }
-
+            
             return data;
         }
 

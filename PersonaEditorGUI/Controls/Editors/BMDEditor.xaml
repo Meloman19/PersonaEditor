@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
-    <Grid DataContext="{Binding DataContext}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
@@ -17,10 +17,10 @@
 
         <StatusBar Grid.Row="0">
             <TextBlock Text="Source Font: " VerticalAlignment="Center"/>
-            <ComboBox Width="100" IsEnabled="{Binding IsSelectCharList}" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedSourceFont}"/>
+            <ComboBox Width="70" IsEnabled="{Binding IsSelectCharList}" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedSourceFont}"/>
 
             <TextBlock Text="Dest. Font: " VerticalAlignment="Center"/>
-            <ComboBox Width="100" IsEnabled="{Binding IsEdit, Mode=OneWay}" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedDestFont}"/>
+            <ComboBox Width="70" IsEnabled="{Binding IsEdit, Mode=OneWay}" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedDestFont}"/>
 
             <CheckBox Content="Enable Edit" IsChecked="{Binding IsEdit}" VerticalAlignment="Center"/>
         </StatusBar>

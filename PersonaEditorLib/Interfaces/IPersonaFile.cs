@@ -13,7 +13,7 @@ namespace PersonaEditorLib.Interfaces
     {
         public static List<Tuple<FileType, string>> FileInfo = new List<Tuple<FileType, string>>()
         {
-            new Tuple<FileType, string>(FileType.HEX, "Raw Data (*.*)|*.*"),
+            new Tuple<FileType, string>(FileType.DAT, "Raw Data (*.*)|*.*"),
             new Tuple<FileType, string>(FileType.BIN, "BIN file (*.BIN)|*.BIN|PAK file (*.PAK)|*.PAK"),
             new Tuple<FileType, string>(FileType.SPR, "SPR file (*.SPR)|*.SPR"),
             new Tuple<FileType, string>(FileType.TMX, "TMX file (*.TMX)|*.TMX|PNG file (*.PNG)|*.PNG"),
@@ -28,7 +28,6 @@ namespace PersonaEditorLib.Interfaces
     public enum FileType
     {
         Unknown,
-        HEX,
         BIN,
         SPR,
         TMX,
@@ -38,7 +37,9 @@ namespace PersonaEditorLib.Interfaces
         PTP,
         FNT,
         BVP,
-        ObjList
+        TBL,
+        DAT,
+        StringList
     }
 
     public enum ContextMenuItems
@@ -52,7 +53,6 @@ namespace PersonaEditorLib.Interfaces
     public interface IPersonaFile : IFile
     {
         FileType Type { get; }
-
         List<ObjectFile> GetSubFiles();
 
         List<ContextMenuItems> ContextMenuList { get; }
