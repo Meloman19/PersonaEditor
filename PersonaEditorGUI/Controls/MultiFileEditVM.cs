@@ -120,8 +120,8 @@ namespace PersonaEditorGUI.Controls
 
         public MultiFileEditVM()
         {
-            Tree.SelectedItemData += Tree_SelectedItemData;
-            Tree.SelectedItemDataOpen += Tree_SelectedItemDataOpen;
+            Tree.SelectedItemChanged += Tree_SelectedItemData;
+            Tree.SelectedItemOpen += Tree_SelectedItemDataOpen;
         }
     }
 }

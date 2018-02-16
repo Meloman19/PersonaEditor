@@ -107,16 +107,13 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\Controls\BindableRichTextBox.cs" />
-    <Compile Include="Classes\Controls\EditorRichTextBox.cs" />
     <Compile Include="Classes\Controls\RelativePanel.cs" />
-    <Compile Include="Classes\Controls\UserImage.cs" />
-    <Compile Include="Classes\Controls\UserInlineUIContainer.cs" />
-    <Compile Include="Classes\Controls\UserTextBlock.cs" />
+    <Compile Include="Classes\Controls\TreeViewExtended.cs" />
     <Compile Include="Classes\Extention.cs" />
     <Compile Include="Classes\LocalizationManager.cs" />
     <Compile Include="Classes\Media\Visual\TextVisual.cs" />
     <Compile Include="Classes\Event.cs" />
+    <Compile Include="Classes\ReadOnlyBinding.cs" />
     <Compile Include="Classes\ResourceItem.cs" />
     <Compile Include="Controls\ClosableTabItem.xaml.cs">
       <DependentUpon>ClosableTabItem.xaml</DependentUpon>
@@ -165,6 +162,9 @@
       <DependentUpon>PreviewEditorTabControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PreviewEditorTabControlVM.cs" />
+    <Compile Include="Controls\Primitive\EditableTextBlock.xaml.cs">
+      <DependentUpon>EditableTextBlock.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SingleFileEdit.xaml.cs">
       <DependentUpon>SingleFileEdit.xaml</DependentUpon>
     </Compile>
@@ -285,6 +285,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\Primitive\EditableTextBlock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\SingleFileEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -375,7 +379,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controls\HexEdit\" />
-    <Folder Include="Controls\Primitive\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\PersonaText.ico" />

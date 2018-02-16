@@ -24,6 +24,6 @@ namespace PersonaEditorGUI.Controls
         public TreeViewPE()
         {
             InitializeComponent();
-        }        
+        }
     }
 }

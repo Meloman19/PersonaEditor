@@ -96,6 +96,7 @@ namespace PersonaEditor
 
         static void Main(string[] args)
         {
+            //Test(args);
             LoadSetting();
 
             try
@@ -109,6 +110,35 @@ namespace PersonaEditor
 #if DEBUG
             //Console.ReadKey();
 #endif
+        }
+
+        static void Test(string[] args)
+        {
+            SubDir(args[0], TestAction);
+        }
+
+        static void TestAction(string path)
+        {
+            using (FileStream FS = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                FS.Position = 20;
+                byte temp = (byte)FS.ReadByte();
+                if (temp != 3)
+                {
+
+                }
+            }
+        }
+
+        static void SubDir(string path, Action<string> action)
+        {
+            DirectoryInfo DI = new DirectoryInfo(path);
+            foreach (var file in DI.GetFiles())
+                if (file.Extension.ToLower() == ".pm1")
+                    action.Invoke(file.FullName);
+
+            foreach (var dir in DI.GetDirectories())
+                SubDir(dir.FullName, action);
         }
 
         static void DoSome(string[] args)
@@ -252,7 +282,7 @@ namespace PersonaEditor
                     ptp.ImportTXT(importedtext, objectFile.Name, parameters.Map, parameters.Width, parameters.SkipEmpty, Static.OldEncoding(), Static.NewEncoding(), Static.NewFont());
                 }
             }
-            else if(objectFile.Object is PersonaEditorLib.FileStructure.Text.StringList strlst)
+            else if (objectFile.Object is PersonaEditorLib.FileStructure.Text.StringList strlst)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 string[] importedtext;

@@ -114,7 +114,6 @@
     <Compile Include="FileStructure\FNT\FNTUnknown.cs" />
     <Compile Include="FileStructure\FNT\FNTWidthTable.cs" />
     <Compile Include="FileStructure\DAT.cs" />
-    <Compile Include="FileStructure\PM1\PM1Header.cs" />
     <Compile Include="FileStructure\PM1\PM1Table.cs" />
     <Compile Include="FileStructure\Text\Extension.cs" />
     <Compile Include="FileStructure\Text\PTP.cs" />

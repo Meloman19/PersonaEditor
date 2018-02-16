@@ -377,7 +377,7 @@ namespace PersonaEditorLib
             return returned;
 
         }
-        
+
         public static ImageData DrawText(IList<TextBaseElement> text, PersonaEncoding.PersonaFont personaFont, Dictionary<int, byte> Shift, int LineSpacing)
         {
             if (text != null && personaFont != null)

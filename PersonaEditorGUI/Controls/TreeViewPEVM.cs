@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using PersonaEditorGUI.Classes;
 using PersonaEditorLib;
@@ -16,14 +17,20 @@ namespace PersonaEditorGUI.Controls
     public delegate void ObjectChangedEventHandler(ObjectFile sender);
     class TreeViewPEVM : BindingObject
     {
-        public event ObjectChangedEventHandler SelectedItemData;
-        public event ObjectChangedEventHandler SelectedItemDataOpen;
+        public event ObjectChangedEventHandler SelectedItemChanged;
+        public event ObjectChangedEventHandler SelectedItemOpen;
 
         private ObservableCollection<UserTreeViewItem> tree = new ObservableCollection<UserTreeViewItem>();
-
-        private List<EventWrapper> treeEW = new List<EventWrapper>();
-
+        
         public ReadOnlyObservableCollection<UserTreeViewItem> Tree { get; }
+
+        public MouseEventHandler Leave => MouseLeave;
+        private void MouseLeave(object sender, MouseEventArgs e)
+        {
+        }
+
+        private object _sel = 10;
+        public object Sel => _sel;
 
         public void SetRoot(ObjectFile personaFile)
         {
@@ -32,11 +39,16 @@ namespace PersonaEditorGUI.Controls
                     return;
 
             tree.Clear();
-            treeEW.Clear();
+
             UserTreeViewItem item = new UserTreeViewItem(personaFile);
+            item.SelectedItemChanged += Item_SelectedItem;
+            item.SelectedItemOpen += Item_SelectedItemOpen;
             tree.Add(item);
-            treeEW.Add(new EventWrapper(item, this));
         }
+
+        private void Item_SelectedItem(ObjectFile sender) => SelectedItemChanged?.Invoke(sender);
+
+        private void Item_SelectedItemOpen(ObjectFile sender) => SelectedItemOpen?.Invoke(sender);
 
         public ObjectFile GetRoot()
         {
@@ -51,9 +63,9 @@ namespace PersonaEditorGUI.Controls
             if (sender is UserTreeViewItem item)
             {
                 if (e.PropertyName == "IsSelected")
-                    SelectedItemData?.Invoke(item.personaFile);
+                    SelectedItemChanged?.Invoke(item.personaFile);
                 else if (e.PropertyName == "Open")
-                    SelectedItemDataOpen?.Invoke(item.personaFile);
+                    SelectedItemOpen?.Invoke(item.personaFile);
             }
         }
 

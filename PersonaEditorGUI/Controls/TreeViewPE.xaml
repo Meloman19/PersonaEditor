@@ -5,17 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls"
              xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
+             xmlns:clcontrol="clr-namespace:PersonaEditorGUI.Classes.Controls"
+             xmlns:prim="clr-namespace:PersonaEditorGUI.Controls.Primitive"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
     <TreeView ItemsSource="{Binding Tree}">
         <TreeView.ItemTemplate>
             <HierarchicalDataTemplate ItemsSource="{Binding Path=SubItems}">
-                <TextBlock Text="{Binding Path=Header}" AllowDrop="True" classes:Event.MouseLeave="{Binding Path=Leave}" classes:Event.Drop="{Binding Path=Drop}">
+
+                <prim:EditableTextBlock Text="{Binding Path=Header}" Edit="{Binding Path=Edit}"/>
+                <!--<TextBlock Text="{Binding Path=Header}" AllowDrop="True" classes:Event.MouseLeave="{Binding Path=Leave}" classes:Event.Drop="{Binding Path=Drop}">
                     <TextBlock.ContextMenu>
                         <ContextMenu ItemsSource="{Binding Path=ContextMenu}"/>
                     </TextBlock.ContextMenu>
-                </TextBlock>
+                </TextBlock>-->              
             </HierarchicalDataTemplate>
         </TreeView.ItemTemplate>
 

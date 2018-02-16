@@ -7,6 +7,7 @@
         xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
         xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
         xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
+        xmlns:v="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Persona Editor GUI" 
         Left="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosX, Mode=TwoWay}"
@@ -18,6 +19,7 @@
         classes:Event.Closing="{Binding Path=WindowClosing}">
 
     <Window.Resources>
+        <v:Int32 x:Key="MyInt">10</v:Int32>
         <controls:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <BitmapImage x:Key="Setting" UriSource="Resource/settings-work-tool.png"/>
     </Window.Resources>

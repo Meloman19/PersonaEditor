@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using PersonaEditorGUI.Controls;
 using PersonaEditorLib;
 using PersonaEditorLib.Interfaces;
 using System;
@@ -18,6 +19,9 @@ namespace PersonaEditorGUI.Classes
 {
     class UserTreeViewItem : BindingObject
     {
+        public event ObjectChangedEventHandler SelectedItemChanged;
+        public event ObjectChangedEventHandler SelectedItemOpen;
+
         public bool Close()
         {
             return true;
@@ -26,11 +30,29 @@ namespace PersonaEditorGUI.Classes
         ObservableCollection<UserTreeViewItem> _SubItems { get; } = new ObservableCollection<UserTreeViewItem>();
         public ReadOnlyObservableCollection<UserTreeViewItem> SubItems { get; }
 
-        List<EventWrapper> SubItemEW = new List<EventWrapper>();
+        private string header => _personaFile.Name;
+        public string Header
+        {
+            get { return header; }
+            set
+            {
 
-        EventWrapper fileEW;
+            }
+        }
 
-        public string Header => _personaFile.Name;
+        private bool edit;
+        public bool Edit
+        {
+            get { return edit; }
+            set
+            {
+                if (edit != value)
+                {
+                    edit = value;
+                    Notify("Edit");
+                }
+            }
+        }
 
         private ObjectFile _personaFile = null;
         public ObjectFile personaFile => _personaFile;
@@ -43,7 +65,10 @@ namespace PersonaEditorGUI.Classes
             set
             {
                 if (value)
-                    Notify("IsSelected");
+                {
+                    SelectedItemChanged?.Invoke(personaFile);
+                    Edit = true;
+                }
             }
         }
 
@@ -60,7 +85,7 @@ namespace PersonaEditorGUI.Classes
         private void MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (_SubItems.Count == 0)
-                Notify("Open");
+                SelectedItemOpen?.Invoke(personaFile);
         }
 
         private void MouseLeave(object sender, MouseEventArgs e)
@@ -108,7 +133,7 @@ namespace PersonaEditorGUI.Classes
         }
 
         private void ItemUnloaded(object sender, RoutedEventArgs e)
-        { 
+        {
         }
 
         #endregion Events
@@ -121,7 +146,6 @@ namespace PersonaEditorGUI.Classes
             actionSaveAll = new Action(SaveAll_Click);
 
             _personaFile = personaFile;
-            fileEW = new EventWrapper(personaFile, this);
 
             if (!(personaFile.Object is IPersonaFile))
                 throw new Exception("UserTreeViewItem: context not IPersonaFile");
@@ -219,25 +243,23 @@ namespace PersonaEditorGUI.Classes
             UpdateContextMenu(item.ContextMenuList);
 
             _SubItems.Clear();
-            SubItemEW.Clear();
-
 
             var list = item.GetSubFiles();
             foreach (var a in list)
             {
                 UserTreeViewItem temp = new UserTreeViewItem(a);
+                temp.SelectedItemChanged += SubFile_SelectedItemChanged;
+                temp.SelectedItemOpen += SubFile_SelectedItemOpen;
                 _SubItems.Add(temp);
-                SubItemEW.Add(new EventWrapper(temp, this));
             }
         }
 
+        private void SubFile_SelectedItemChanged(ObjectFile sender) => SelectedItemChanged?.Invoke(sender);
+
+        private void SubFile_SelectedItemOpen(ObjectFile sender) => SelectedItemOpen?.Invoke(sender);
+
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Object")
-            {
-            }
-            else
-                TunnelNotify(sender, e);
         }
 
         #region Drag
@@ -274,10 +296,10 @@ namespace PersonaEditorGUI.Classes
             {
                 string[] paths = new string[] { filepath };
                 File.WriteAllBytes(paths[0], (personaFile.Object as IFile).Get());
-              
+
                 data.SetData(DataFormats.FileDrop, paths);
             }
-            
+
             return data;
         }
 

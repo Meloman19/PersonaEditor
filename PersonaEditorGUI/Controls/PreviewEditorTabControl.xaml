@@ -80,7 +80,7 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-           
+
         </TabControl.Resources>
 
         <TabControl.ItemTemplate>
