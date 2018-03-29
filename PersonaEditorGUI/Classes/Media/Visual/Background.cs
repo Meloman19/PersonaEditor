@@ -117,6 +117,11 @@ namespace PersonaEditorGUI.Classes.Media.Visual
         public Rect Rect { get; private set; } = new Rect();
     }
 
+    public class TextBackground : PersonaEditorLib.BindingObject
+    {
+
+    }
+
     public class Backgrounds : PersonaEditorLib.BindingObject
     {
         PersonaEditorLib.EventWrapper SettingEW;

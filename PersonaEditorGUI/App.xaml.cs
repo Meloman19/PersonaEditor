@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace PersonaEditorGUI
 {
@@ -21,20 +22,18 @@ namespace PersonaEditorGUI
         {
             InitializeComponent();
             LoadLocalization();
-            //SaveLocaliztion();
+            //SaveLocalization();
         }
 
         private void LoadLocalization()
         {
-            if (Settings.App.Default.DefaultLocalization != "Default")
+            if (Settings.AppSetting.Default.DefaultLocalization != "Default")
             {
-                ResourceDictionary resourceDictionary = Resources.MergedDictionaries[0];
-
                 XDocument xDocument;
 
                 try
                 {
-                    xDocument = XDocument.Load(Path.Combine(Static.Paths.DirLang, Settings.App.Default.DefaultLocalization + ".xml"));
+                    xDocument = XDocument.Load(Path.Combine(Static.Paths.DirLang, Settings.AppSetting.Default.DefaultLocalization + ".xml"));
                 }
                 catch
                 {
@@ -43,32 +42,39 @@ namespace PersonaEditorGUI
 
                 var loc = xDocument.Element("Localization");
 
-                foreach (var a in loc?.Elements())
+                foreach (var dict in Resources.MergedDictionaries)
                 {
-                    string key = a.Attribute("Key").Value;
-                    string value = a.Value.Replace("\\n", "\n");
+                    var lang = loc.Element(Path.GetFileNameWithoutExtension(dict.Source.OriginalString));
 
-                    if (resourceDictionary.Contains(key))
-                        resourceDictionary[key] = value;
+                    foreach (var a in lang != null ? lang.Elements() : new List<XElement>())
+                    {
+                        string key = a.Attribute("Key").Value;
+                        string value = a.Value.Replace("\\n", "\n");
+
+                        if (dict.Contains(key))
+                            dict[key] = value;
+                    }
                 }
             }
         }
 
-        private void SaveLocaliztion()
+        private void SaveLocalization()
         {
-
-            ResourceDictionary resourceDictionary = Resources.MergedDictionaries[0];
-
             XDocument xDocument = new XDocument();
 
             XElement loc = new XElement("Localization");
             xDocument.Add(loc);
 
-            foreach (DictionaryEntry a in resourceDictionary)
+            foreach (var dict in Resources.MergedDictionaries)
             {
-                XElement xElement = a.Value is string str ? new XElement("String", str.Replace("\n", "\\n")) : new XElement("String", a.Value);
-                xElement.Add(new XAttribute("Key", a.Key));
-                loc.Add(xElement);
+                XElement dic = new XElement(Path.GetFileNameWithoutExtension(dict.Source.OriginalString));
+                loc.Add(dic);
+                foreach (DictionaryEntry a in dict)
+                {
+                    XElement xElement = a.Value is string str ? new XElement("String", str.Replace("\n", "\\n")) : new XElement("String", a.Value);
+                    xElement.Add(new XAttribute("Key", a.Key));
+                    dic.Add(xElement);
+                }
             }
 
             xDocument.Save("Localization.xml");
@@ -76,17 +82,20 @@ namespace PersonaEditorGUI
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            Mutex = new Mutex(true, "PersonaEditor", out bool Is);
-            if (!Is)
+            if (Settings.AppSetting.Default.Single_Instance_Application)
             {
-                NamedPipeManager.Write(e.Args);
-                Shutdown(0);
-                return;
-            }
+                Mutex = new Mutex(true, "PersonaEditor", out bool Is);
+                if (!Is)
+                {
+                    NamedPipeManager.Write(e.Args);
+                    Shutdown(0);
+                    return;
+                }
 
-            NamedPipeManager = new NamedPipeManager();
-            NamedPipeManager.ReceiveString += NamedPipeManager_ReceiveString;
-            NamedPipeManager.Start();
+                NamedPipeManager = new NamedPipeManager();
+                NamedPipeManager.ReceiveString += NamedPipeManager_ReceiveString;
+                NamedPipeManager.Start();
+            }
 
             MainWindowVM = new MainWindowVM();
             if (e.Args.Length > 0)

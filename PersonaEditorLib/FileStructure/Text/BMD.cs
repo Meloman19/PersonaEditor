@@ -128,7 +128,7 @@ namespace PersonaEditorLib.FileStructure.Text
                     if (string.IsNullOrEmpty(MSG_Name))
                         MSG_Name = "<EMPTY>";
 
-                    byte[] MSG_bytes;
+                    byte[] MSG_bytes = new byte[0];
                     MSGs.MsgType Type;
                     int CharacterIndex = 0xFFFF;
 
@@ -137,22 +137,24 @@ namespace PersonaEditorLib.FileStructure.Text
                         Type = MSGs.MsgType.MSG;
                         int count = BR.ReadUInt16();
                         CharacterIndex = BR.ReadUInt16();
-                        BR.BaseStream.Position = BR.BaseStream.Position + 4 * count;
-
-                        int size = BR.ReadInt32();
-
-                        MSG_bytes = BR.ReadBytes(size);
+                        if (count > 0)
+                        {
+                            BR.BaseStream.Position = BR.BaseStream.Position + 4 * count;
+                            int size = BR.ReadInt32();
+                            MSG_bytes = BR.ReadBytes(size);
+                        }
                     }
                     else if (MSGPosition[i][0] == 1)
                     {
                         Type = MSGs.MsgType.SEL;
                         BR.BaseStream.Position += 2;
                         int count = BR.ReadUInt16();
-                        BR.BaseStream.Position += 4 * count + 4;
-
-                        int size = BR.ReadInt32();
-
-                        MSG_bytes = BR.ReadBytes(size);
+                        if (count > 0)
+                        {
+                            BR.BaseStream.Position += 4 * count + 4;
+                            int size = BR.ReadInt32();
+                            MSG_bytes = BR.ReadBytes(size);
+                        }
                     }
                     else
                     {
@@ -392,6 +394,39 @@ namespace PersonaEditorLib.FileStructure.Text
                 // return new MemoryStream(buffer);
             }
 
+            //static byte[] getLastBlock(List<int> Addresses)
+            //{
+            //    int sum = 0;
+            //    List<byte> returned = new List<byte>();
+
+            //    for (int i = 0; i < Addresses.Count; i++)
+            //    {
+            //        int reloc = Addresses[i] - sum - 0x20;
+            //        int amount = getSeq(ref Addresses, i);
+            //        Encode(reloc, ref returned, ref sum);
+            //        if (amount > 1)
+            //        {
+            //            reloc = 7;
+            //            reloc |= ((amount - 2) / 2) << 4;
+            //            if (amount % 2 == 1)
+            //            {
+            //                reloc |= 8;
+            //            }
+
+            //            if (amount > 30)
+            //            {
+            //                Encode(reloc, ref returned, ref sum);
+            //            }
+
+            //            returned.Add((byte)reloc);
+            //            i += amount;
+            //            sum += amount * 4;
+            //        }
+            //    }
+
+            //    return returned.ToArray();
+            //}
+
             static byte[] getLastBlock(List<int> Addresses)
             {
                 int sum = 0;
@@ -410,6 +445,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             reloc |= 8;
                         }
+
                         returned.Add((byte)reloc);
                         i += amount;
                         sum += amount * 4;
@@ -469,19 +505,6 @@ namespace PersonaEditorLib.FileStructure.Text
         public List<ObjectFile> GetSubFiles()
         {
             return new List<ObjectFile>();
-        }
-
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                returned.Add(ContextMenuItems.SaveAs);
-                returned.Add(ContextMenuItems.Replace);
-
-                return returned;
-            }
         }
 
         public Dictionary<string, object> GetProperties

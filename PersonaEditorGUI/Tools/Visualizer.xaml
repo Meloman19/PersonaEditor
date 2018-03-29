@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PersonaEditorGUI.Tools"
         mc:Ignorable="d"
-        Title="Visualizer" MinHeight="250" Height="350" MinWidth="400" Width="500">
+        Title="{DynamicResource main_Visualizer}" MinHeight="250" Height="350" MinWidth="400" Width="500">
     <Grid>
         <Grid.Background>
             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
@@ -14,7 +14,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -46,7 +45,20 @@
         </Image>
 
         <TextBox Grid.Row="2" Margin="4" Width="200" HorizontalAlignment="Left" MaxLines="1" Text="{Binding NameTB, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBox Grid.Row="3" Margin="15,4,4,4" AcceptsReturn="True" TextWrapping="NoWrap" Text="{Binding TextTB, UpdateSourceTrigger=PropertyChanged}"/>
-        <TextBox Grid.Row="4" Margin="15,4,4,4" AcceptsReturn="False" TextWrapping="Wrap" Text="{Binding HexTB, UpdateSourceTrigger=PropertyChanged}"/>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Text:" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="HEX" VerticalAlignment="Center"/>
+            <TextBox Grid.Column="1" Grid.Row="0" Margin="4" AcceptsReturn="True" TextWrapping="NoWrap" Text="{Binding TextTB, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Grid.Column="1" Grid.Row="1" Margin="4" AcceptsReturn="False" TextWrapping="Wrap" Text="{Binding HexTB, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
     </Grid>
 </Window>

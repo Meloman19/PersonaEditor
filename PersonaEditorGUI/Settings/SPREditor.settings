@@ -11,5 +11,8 @@
     <Setting Name="SelectColor" Type="System.Windows.Media.Color" Scope="User">
       <Value Profile="(Default)">#80FF6600</Value>
     </Setting>
+    <Setting Name="BorderThickness" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

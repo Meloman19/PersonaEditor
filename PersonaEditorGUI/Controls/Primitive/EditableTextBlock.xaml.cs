@@ -15,15 +15,18 @@ using System.Windows.Shapes;
 
 namespace PersonaEditorGUI.Controls.Primitive
 {
-    /// <summary>
-    /// Логика взаимодействия для EditableTextBlock.xaml
-    /// </summary>
     public partial class EditableTextBlock : UserControl
     {
         public static DependencyProperty TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(EditableTextBlock), new PropertyMetadata(""));
 
-        public static DependencyProperty EditProperty = DependencyProperty.Register("Edit", typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(false));
-        
+        public static DependencyProperty EditProperty = DependencyProperty.Register("Edit", typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(false, EditPropertyChange));
+
+        private static void EditPropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is EditableTextBlock ed)
+                ed.EditChange();
+        }
+
         public string Text
         {
             get { return (string)GetValue(TextProperty); }
@@ -39,17 +42,29 @@ namespace PersonaEditorGUI.Controls.Primitive
         public EditableTextBlock()
         {
             InitializeComponent();
-            main.DataContext = this;
+            Main.DataContext = this;
         }
 
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        private void EditChange()
         {
-
+            if (Edit)
+            {
+                //   TBlock.Visibility = Visibility.Collapsed;
+                //    TBox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                //    TBlock.Visibility = Visibility.Visible;
+                //    TBox.Visibility = Visibility.Collapsed;
+            }
         }
 
-        private void TextBox_LostMouseCapture(object sender, MouseEventArgs e)
+        private void UserControl_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-
+            if ((bool)e.NewValue)
+                TBlock.Foreground = new SolidColorBrush(Colors.Black);
+            else
+                TBlock.Foreground = new SolidColorBrush(Colors.Gray);
         }
     }
 }

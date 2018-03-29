@@ -6,22 +6,15 @@
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
              xmlns:classes ="clr-namespace:PersonaEditorGUI.Classes.Controls"
              xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
+             xmlns:controls="clr-namespace:PersonaEditorGUI.Controls.Primitive"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500" MouseMove="UserControl_MouseMove_1">
+             d:DesignHeight="300" d:DesignWidth="500">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-
-        <Menu Grid.Row="0">
-            <MenuItem Header="Color">
-                <MenuItem Header="Background" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=TwoWay}"/>
-                <MenuItem Header="Border" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=TwoWay}"/>
-                <MenuItem Header="Selected Item" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=SelectColor, Mode=TwoWay}"/>
-            </MenuItem>
-        </Menu>
 
         <Grid Grid.Row="1" Background="#FFF0F0F0">
             <Grid.ColumnDefinitions>
@@ -42,43 +35,54 @@
                           Grid.Row="0" ItemsSource="{Binding Path=TextureList}" IsSynchronizedWithCurrentItem="True" SelectionMode="Single" DisplayMemberPath="Name"/>
 
                 <GridSplitter Grid.Row="1" Height="6" Background="#FFbfbfbf"  VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-                <DataGrid DataContext="{Binding Path=TextureList/}" Grid.Row="2" ItemsSource="{Binding Path=KeyList}" 
-                      AutoGenerateColumns="False" Background="#FFF0F0F0" SelectionMode="Single" SelectionChanged="DataGrid_SelectionChanged">
+                <DataGrid DataContext="{Binding Path=TextureList/}" Grid.Row="2" ItemsSource="{Binding Path=KeyList}" AutoGenerateColumns="False"
+                          Background="#FFF0F0F0" SelectionMode="Single" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" VerticalScrollBarVisibility="Visible">
                     <DataGrid.Columns>
                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}"/>
-                        <DataGridTextColumn Header="X1" Binding="{Binding X1}" />
-                        <DataGridTextColumn Header="Y1" Binding="{Binding Y1}" />
-                        <DataGridTextColumn Header="X2" Binding="{Binding X2}" />
-                        <DataGridTextColumn Header="Y2" Binding="{Binding Y2}" />
+                        <DataGridTextColumn Header="X1" Binding="{Binding X1}"/>
+                        <DataGridTextColumn Header="Y1" Binding="{Binding Y1}"/>
+                        <DataGridTextColumn Header="X2" Binding="{Binding X2}"/>
+                        <DataGridTextColumn Header="Y2" Binding="{Binding Y2}"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
-                <StatusBar DataContext="{Binding Path=TextureList/}" Grid.Row="3">
-                    <TextBlock Text="Cursor Position:"/>
-
-                    <TextBlock Text="X="/>
-                    <TextBlock Text="{Binding Path=Point.X}"/>
-                    <TextBlock Text="Y="/>
-                    <TextBlock Text="{Binding Path=Point.Y}"/>
-                </StatusBar>
             </Grid>
 
             <GridSplitter Grid.Column="1" Width="6" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
 
-            <Grid  Grid.Column="2">
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <Border DataContext="{Binding Path=TextureList/}" Grid.Row="0" BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Menu Grid.Column="0" VerticalAlignment="Center">
+                        <MenuItem Header="Color">
+                            <MenuItem Header="Background" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=TwoWay}" Command="{Binding}"/>
+                            <MenuItem Header="Border" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=TwoWay}"/>
+                            <MenuItem Header="Selected Item" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=SelectColor, Mode=TwoWay}"/>
+                        </MenuItem>
+                    </Menu>
+                    <StatusBar Grid.Column="1">
+                        <controls:NumericIncDec x:Name="NUM" x:FieldModifier="private" Min="0" Max="5" Width="40" Value="{Binding Source={x:Static settings:SPREditor.Default}, Path=BorderThickness, Mode=TwoWay}"/>
+                    </StatusBar>
+                </Grid>
+
+                <Border DataContext="{Binding Path=TextureList/}" Grid.Row="1" BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Border.Background>
                         <SolidColorBrush Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=OneWay}"/>
                     </Border.Background>
+
                     <ItemsControl Grid.Column="2" ItemsSource="{Binding Path=KeyList}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <classes:RelativePanel Rect="{Binding Path=Rect}" MouseMove="RelativePanel_MouseMove" MouseLeave="RelativePanel_MouseLeave" ClipToBounds="True">
+                                <classes:RelativePanel Rect="{Binding Path=Rect}" ClipToBounds="True">
                                     <classes:RelativePanel.Background>
                                         <ImageBrush ImageSource="{Binding Path=TextureImage}"/>
                                     </classes:RelativePanel.Background>
@@ -96,7 +100,7 @@
 
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderThickness="5" MouseMove="UserControl_MouseMove" MouseLeave="UserControl_MouseLeave" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                                <Border BorderThickness="{Binding ElementName=NUM, Path=Value}">
                                     <Border.BorderBrush>
                                         <SolidColorBrush Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=OneWay}"/>
                                     </Border.BorderBrush>
@@ -120,12 +124,6 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Border>
-
-                <StatusBar Grid.Row="1">
-                    <TextBlock Text="Current control: "/>
-
-                    <TextBlock Name="CONTR"/>
-                </StatusBar>
             </Grid>
         </Grid>
     </Grid>

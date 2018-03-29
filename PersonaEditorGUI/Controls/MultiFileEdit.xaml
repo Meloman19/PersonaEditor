@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI"
+             xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
              xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
              xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
              xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
@@ -11,7 +12,7 @@
              d:DesignHeight="450" d:DesignWidth="900">
 
     <UserControl.Resources>
-        <controls:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
     </UserControl.Resources>
 
     <Grid>

@@ -80,21 +80,6 @@ namespace PersonaEditorLib.FileStructure.SPR
             return TextureList;
         }
 
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                returned.Add(ContextMenuItems.Replace);
-                returned.Add(ContextMenuItems.Separator);
-                returned.Add(ContextMenuItems.SaveAs);
-                returned.Add(ContextMenuItems.SaveAll);
-                                
-                return returned;
-            }
-        }
-
         public Dictionary<string, object> GetProperties
         {
             get

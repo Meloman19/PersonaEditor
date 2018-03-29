@@ -4,11 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls"
+             xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Name="MainDockPanelControl">
 
     <UserControl.Resources>
-        <local:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
     </UserControl.Resources>
 
     <!--<Grid>

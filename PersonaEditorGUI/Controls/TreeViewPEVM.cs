@@ -14,14 +14,14 @@ using PersonaEditorLib.Interfaces;
 
 namespace PersonaEditorGUI.Controls
 {
-    public delegate void ObjectChangedEventHandler(ObjectFile sender);
+    public delegate void TreeViewItemEventHandler(UserTreeViewItem sender);
     class TreeViewPEVM : BindingObject
     {
-        public event ObjectChangedEventHandler SelectedItemChanged;
-        public event ObjectChangedEventHandler SelectedItemOpen;
+        public event TreeViewItemEventHandler SelectedItemChanged;
+        public event TreeViewItemEventHandler SelectedItemOpen;
 
         private ObservableCollection<UserTreeViewItem> tree = new ObservableCollection<UserTreeViewItem>();
-        
+
         public ReadOnlyObservableCollection<UserTreeViewItem> Tree { get; }
 
         public MouseEventHandler Leave => MouseLeave;
@@ -44,11 +44,14 @@ namespace PersonaEditorGUI.Controls
             item.SelectedItemChanged += Item_SelectedItem;
             item.SelectedItemOpen += Item_SelectedItemOpen;
             tree.Add(item);
+
+            if (personaFile.Object is IPersonaFile pfile && pfile.GetSubFiles().Count == 0)
+                Item_SelectedItemOpen(item);
         }
 
-        private void Item_SelectedItem(ObjectFile sender) => SelectedItemChanged?.Invoke(sender);
+        private void Item_SelectedItem(UserTreeViewItem sender) => SelectedItemChanged?.Invoke(sender);
 
-        private void Item_SelectedItemOpen(ObjectFile sender) => SelectedItemOpen?.Invoke(sender);
+        private void Item_SelectedItemOpen(UserTreeViewItem sender) => SelectedItemOpen?.Invoke(sender);
 
         public ObjectFile GetRoot()
         {
@@ -63,9 +66,9 @@ namespace PersonaEditorGUI.Controls
             if (sender is UserTreeViewItem item)
             {
                 if (e.PropertyName == "IsSelected")
-                    SelectedItemChanged?.Invoke(item.personaFile);
+                    SelectedItemChanged?.Invoke(item);
                 else if (e.PropertyName == "Open")
-                    SelectedItemOpen?.Invoke(item.personaFile);
+                    SelectedItemOpen?.Invoke(item);
             }
         }
 

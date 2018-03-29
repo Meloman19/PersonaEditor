@@ -194,7 +194,7 @@ namespace PersonaEditorLib.FileStructure.Text
                 else
                     widthlist.AddRange(new int[a.GetSystem().Length]);
             }
-            
+
             int index = 0;
             int widthsum = 0;
             while (index < widthlist.Count)
@@ -220,13 +220,16 @@ namespace PersonaEditorLib.FileStructure.Text
                     widthsum = 0;
                 }
             }
-            
+
             return returned;
         }
 
         public static List<byte[]> SplitSourceBytes(this byte[] B)
         {
             List<byte[]> returned = new List<byte[]>();
+
+            if (B.Length == 0)
+                return returned;
 
             byte[] LineSplit = B.ToArray().Take((B[0] - 0xF0) * 2).ToArray();
 

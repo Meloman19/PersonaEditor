@@ -11,16 +11,25 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PersonaEditorGUI.Settings
+namespace PersonaEditorGUI.Controls.SettingsWindow
 {
-    public partial class Main : UserControl
+    public partial class SetSettings : Window
     {
-        public Main()
+        public SetSettings()
         {
             InitializeComponent();
+        }
+
+        private void ButtonOK_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

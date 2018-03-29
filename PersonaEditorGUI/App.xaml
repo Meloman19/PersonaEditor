@@ -8,7 +8,11 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resource/lang.xaml"/>
+                <ResourceDictionary Source="Resource/lang_main.xaml"/>
+                <ResourceDictionary Source="Resource/lang_setting_main.xaml"/>
+                <ResourceDictionary Source="Resource/lang_setting_background.xaml"/>
+                <ResourceDictionary Source="Resource/lang_toolbox.xaml"/>
+                <ResourceDictionary Source="Resource/lang_tree_contextmenu.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

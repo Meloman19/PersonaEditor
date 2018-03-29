@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using PersonaEditorLib;
 using System.Windows;
 using PersonaEditorLib.Interfaces;
+using System.Windows.Input;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
@@ -108,7 +109,7 @@ namespace PersonaEditorGUI.Controls.Editors
 
         private BitmapSource _TextureImage = null;
         private Rect _Rect;
-        private Point _Point;
+        private object _SelectedItem = null;
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -132,12 +133,14 @@ namespace PersonaEditorGUI.Controls.Editors
             EW = new EventWrapper(tmx, this);
 
             foreach (var a in list)
-                KeyList.Add(new SPRKeyVM(a));
+                KeyList.Add(new SPRKeyVM(a));            
         }
 
         #region PublicProperties
 
         public ObservableCollection<SPRKeyVM> KeyList { get; } = new ObservableCollection<SPRKeyVM>();
+
+        public DrawingCollection Drawings { get; } = new DrawingCollection();
 
         public string Name => (tmx.Object as PersonaEditorLib.FileStructure.Graphic.TMX).Name;
 
@@ -154,14 +157,16 @@ namespace PersonaEditorGUI.Controls.Editors
         }
 
         public Rect Rect => _Rect;
-
-        public Point Point
+        
+        public object SelectedItem
         {
-            get { return _Point; }
             set
             {
-                _Point = new Point(Math.Floor(value.X * Rect.Width), (Math.Floor(value.Y * Rect.Height)));
-                Notify("Point");
+                if (_SelectedItem is SPRKeyVM it)
+                    it.IsSelected = false;
+                _SelectedItem = value;
+                if (_SelectedItem is SPRKeyVM it2)
+                    it2.IsSelected = true;
             }
         }
 

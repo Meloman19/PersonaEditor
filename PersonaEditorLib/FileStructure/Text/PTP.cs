@@ -618,7 +618,51 @@ namespace PersonaEditorLib.FileStructure.Text
 
             }
         }
-        
+
+        public void ImportTXT_LBL(string[] text, string map, int width, bool skipEmpty, Encoding oldEncoding, Encoding newEncoding, PersonaEncoding.PersonaFont newFont)
+        {
+            int Width = (int)Math.Round((double)width / 0.9375);
+            LineMap MAP = new LineMap(map);
+
+            int index = 0;
+
+            foreach (var a in msg)
+                foreach (var b in a.Strings)
+                {
+                    if (index >= text.Length)
+                        return;
+
+                    string[] linespl = Regex.Split(text[index], "\t");
+                    index++;
+
+                    if (MAP[LineMap.Type.NewText] < linespl.Length)
+                    {
+                        string NewText = linespl[MAP[LineMap.Type.NewText]];
+
+                        if (!(NewText == "" & skipEmpty))
+                        {
+                            if (Width > 0)
+                                NewText = NewText.SplitByWidth(newEncoding, newFont, Width);
+                            else
+                                NewText = NewText.Replace("\\n", "\n");
+
+                            b.NewString = NewText;
+                        }
+                    }
+
+                    if (MAP[LineMap.Type.NewName] < linespl.Length)
+                    {
+                        string NewName = linespl[MAP[LineMap.Type.NewName]];
+
+                        var name = names.FirstOrDefault(x => x.Index == a.CharacterIndex);
+                        if (name != null)
+                        {
+                            name.NewName = NewName;
+                        }
+                    }
+                }
+        }
+
         private void ImportText(string MSGName, int StringIndex, string Text)
         {
             ImportText(msg.FirstOrDefault(x => x.Name == MSGName), StringIndex, Text);
@@ -675,19 +719,6 @@ namespace PersonaEditorLib.FileStructure.Text
             return new List<ObjectFile>();
         }
 
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                returned.Add(ContextMenuItems.SaveAs);
-                returned.Add(ContextMenuItems.Replace);
-
-                return returned;
-            }
-        }
-
         public Dictionary<string, object> GetProperties
         {
             get
@@ -699,6 +730,8 @@ namespace PersonaEditorLib.FileStructure.Text
                 return returned;
             }
         }
+
+        #endregion IPersonaFile
 
         #region IFile
 
@@ -780,7 +813,5 @@ namespace PersonaEditorLib.FileStructure.Text
         }
 
         #endregion IFile        
-
-        #endregion IPersonaFile
     }
 }

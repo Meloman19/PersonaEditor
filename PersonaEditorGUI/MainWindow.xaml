@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PersonaEditorGUI"
+        xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
         xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
         xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
         xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
@@ -20,7 +21,7 @@
 
     <Window.Resources>
         <v:Int32 x:Key="MyInt">10</v:Int32>
-        <controls:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <BitmapImage x:Key="Setting" UriSource="Resource/settings-work-tool.png"/>
     </Window.Resources>
 
@@ -40,16 +41,13 @@
                 <MenuItem Header="{DynamicResource main_Visualizer}" Command="{Binding Path=clickVisualizerOpen}"/>
                 <MenuItem Header="{DynamicResource main_CharSet}" Command="{Binding Path=clickSetCharOpen}"/>
                 <Separator/>
-                <MenuItem Header="{DynamicResource main_Settings}" Command="{Binding Path=clickSettingOpen}">
-                    <MenuItem.Icon>
-                        <Image Source="{StaticResource Setting}" RenderOptions.BitmapScalingMode="HighQuality"></Image>
-                    </MenuItem.Icon>
-                </MenuItem>
+                <MenuItem Header="{DynamicResource main_Settings}" Command="{Binding Path=clickSettingOpen}"/>
             </MenuItem>
             <MenuItem Header="Test" Command="{Binding Path=clickTest}"/>
             <MenuItem Header="{DynamicResource main_About}" Command="{Binding Path=clickAboutOpen}"/>
         </Menu>
         <Separator Grid.Row="1"/>
-        <controls:MultiFileEdit DataContext="{Binding MultiFile}" Grid.Row="2" x:Name="MainControl"/>
+        
+        <controls:MultiFileEdit DataContext="{Binding MultiFile}" Grid.Row="2"/>
     </Grid>
 </Window>

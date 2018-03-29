@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
+using PersonaEditorGUI.Settings;
 using PersonaEditorLib;
 using PersonaEditorLib.Interfaces;
 
-namespace PersonaEditorGUI.Settings
+namespace PersonaEditorGUI.Controls.SettingsWindow
 {
-    class DefaultBackgroundVM : BindingObject, ISetting
+    class DefaultBackgroundVM : BindingObject
     {
         BackgroundDefault tempSetting = new BackgroundDefault();
 
@@ -159,34 +160,15 @@ namespace PersonaEditorGUI.Settings
             }
         }
 
-        private bool _IsChanged = false;
-        public bool IsChanged => _IsChanged;
-
         public void Save()
         {
-            _IsChanged = false;
-            Notify("IsChanged");
             tempSetting.Save();
             BackgroundDefault.Default.Reload();
         }
 
-        public void Reset()
-        {
-            tempSetting.Reload();
-            _IsChanged = false;
-            Notify("IsChanged");
-        }
-
         public DefaultBackgroundVM()
         {
-            tempSetting.PropertyChanged += TempSetting_PropertyChanged;
             SetColor = new RelayCommandWeak(x => SetColot_Click(x));
-        }
-
-        private void TempSetting_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            _IsChanged = true;
-            Notify("IsChanged");
         }
 
         public ICommand SetColor { get; private set; }

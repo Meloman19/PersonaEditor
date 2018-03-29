@@ -13,6 +13,8 @@ namespace PersonaEditorLib
         EventWrapper eventWrapper;
 
         private object _obj = null;
+        private bool _isEdit = false;
+
         public object Object
         {
             get { return _obj; }
@@ -23,7 +25,10 @@ namespace PersonaEditorLib
                     _obj = value;
 
                     if (eventWrapper != null)
+                    {
                         eventWrapper.Deregister();
+                        eventWrapper = null;
+                    }
 
                     if (value is INotifyPropertyChanged INPC)
                         eventWrapper = new EventWrapper(INPC, this);

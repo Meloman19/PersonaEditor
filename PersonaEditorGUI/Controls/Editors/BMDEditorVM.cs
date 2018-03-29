@@ -170,7 +170,7 @@ namespace PersonaEditorGUI.Controls.Editors
             set
             {
                 sourceFont = value;
-                Settings.App.Default.BMDFontDefault = Static.EncodingManager.GetPersonaEncodingName(value);
+                Settings.AppSetting.Default.BMDFontDefault = Static.EncodingManager.GetPersonaEncodingName(value);
                 Update();
                 Notify("SelectedSourceFont");
             }
@@ -182,7 +182,7 @@ namespace PersonaEditorGUI.Controls.Editors
             set
             {
                 destFont = value;
-                Settings.App.Default.BMDFontDestDefault = Static.EncodingManager.GetPersonaEncodingName(value);
+                Settings.AppSetting.Default.BMDFontDestDefault = Static.EncodingManager.GetPersonaEncodingName(value);
                 Notify("SelectedDestFont");
             }
         }
@@ -246,13 +246,14 @@ namespace PersonaEditorGUI.Controls.Editors
             if (objbmd.Object is BMD bmd)
             {
                 EncodingEW = new EventWrapper(Static.EncodingManager, this);
-                int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.App.Default.BMDFontDefault);
+
+                int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.BMDFontDefault);
                 if (sourceInd >= 0)
                     sourceFont = sourceInd;
                 else
                     sourceFont = 0;
 
-                sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.App.Default.BMDFontDestDefault);
+                sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.BMDFontDestDefault);
                 if (sourceInd >= 0)
                     destFont = sourceInd;
                 else

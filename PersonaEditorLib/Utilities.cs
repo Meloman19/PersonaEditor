@@ -1,4 +1,7 @@
-﻿using PersonaEditorLib.Extension;
+﻿using Microsoft.Win32;
+using MS.Internal.AppModel;
+using MS.Win32;
+using PersonaEditorLib.Extension;
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -13,60 +16,6 @@ using System.Windows.Media.Imaging;
 
 namespace PersonaEditorLib.Utilities
 {
-    public static class IO
-    {
-        public static class Files
-        {
-            public static List<FileInfo> GetSubFiles(DirectoryInfo rootdir)
-            {
-                List<FileInfo> returned = new List<FileInfo>();
-
-                foreach (var dir in rootdir.GetDirectories())
-                    returned.AddRange(GetSubFiles(dir));
-
-                foreach (var file in rootdir.GetFiles())
-                    returned.Add(file);
-
-                return returned;
-            }
-        }
-
-        public static BinaryReader OpenReadFile(string path, bool IsLittleEndian)
-        {
-            return OpenReadFile(File.OpenRead(path), IsLittleEndian);
-        }
-
-        public static BinaryReader OpenReadFile(Stream stream, bool IsLittleEndian)
-        {
-            BinaryReader returned;
-
-            if (IsLittleEndian)
-                returned = new BinaryReader(stream);
-            else
-                returned = new BinaryReaderBE(stream);
-
-            return returned;
-        }
-
-        public static BinaryWriter OpenWriteFile(string path, bool IsLittleEndian)
-        {
-            return OpenWriteFile(File.Create(path), IsLittleEndian);
-        }
-
-        public static BinaryWriter OpenWriteFile(Stream stream, bool IsLittleEndian)
-        {
-            BinaryWriter returned;
-
-            if (IsLittleEndian)
-                returned = new BinaryWriter(stream);
-            else
-                returned = new BinaryWriterBE(stream);
-
-            return returned;
-        }
-
-    }
-
     public static class String
     {
         public static byte[] SplitString(string str, char del)
@@ -194,92 +143,6 @@ namespace PersonaEditorLib.Utilities
             if (value < 0) { return 0; }
             else if (value > 255) { return 255; }
             else { return (byte)value; }
-        }
-    }
-
-    public static class PersonaFile
-    {
-        public static ObjectFile OpenFile(string name, byte[] data, FileType type)
-        {
-            try
-            {
-                object Obj;
-
-                if (type == FileType.BIN)
-                    Obj = new FileStructure.Container.BIN(data);
-                else if (type == FileType.SPR)
-                    Obj = new FileStructure.SPR.SPR(data);
-                else if (type == FileType.TMX)
-                    Obj = new FileStructure.Graphic.TMX(data);
-                else if (type == FileType.BF)
-                    Obj = new FileStructure.Container.BF(data, name);
-                else if (type == FileType.PM1)
-                    Obj = new FileStructure.PM1.PM1(data);
-                else if (type == FileType.BMD)
-                    Obj = new FileStructure.Text.BMD(data);
-                else if (type == FileType.PTP)
-                    Obj = new FileStructure.Text.PTP(data);
-                else if (type == FileType.FNT)
-                    Obj = new FileStructure.FNT.FNT(data);
-                else if (type == FileType.BVP)
-                    Obj = new FileStructure.Container.BVP(name, data);
-                else if (type == FileType.TBL)
-                    Obj = new FileStructure.Container.TBL(data, name);
-                else
-                    Obj = new FileStructure.DAT(data);
-
-                return new ObjectFile(name, Obj);
-            }
-            catch (Exception e)
-            {
-                return new ObjectFile(name, new FileStructure.DAT(data));
-            }
-        }
-
-        public static FileType GetFileType(string name)
-        {
-            string ext = Path.GetExtension(name);
-            if (ext.ToLower() == ".bin" | ext.ToLower() == ".pak" | ext.ToLower() == ".pac" | ext.ToLower() == ".p00")
-                return FileType.BIN;
-            else if (ext.ToLower() == ".spr")
-                return FileType.SPR;
-            else if (ext.ToLower() == ".tmx")
-                return FileType.TMX;
-            else if (ext.ToLower() == ".bf")
-                return FileType.BF;
-            else if (ext.ToLower() == ".pm1")
-                return FileType.PM1;
-            else if (ext.ToLower() == ".bmd" | ext.ToLower() == ".msg")
-                return FileType.BMD;
-            else if (ext.ToLower() == ".ptp")
-                return FileType.PTP;
-            else if (ext.ToLower() == ".fnt")
-                return FileType.FNT;
-            else if (ext.ToLower() == ".bvp")
-                return FileType.BVP;
-            else if (ext.ToLower() == ".tbl")
-                return FileType.TBL;
-            else
-                return FileType.DAT;
-        }
-
-        public static FileType GetFileType(byte[] data)
-        {
-            if (data.Length >= 0xc)
-            {
-                byte[] buffer = data.SubArray(8, 4);
-                if (buffer.SequenceEqual(new byte[] { 0x31, 0x47, 0x53, 0x4D }) | buffer.SequenceEqual(new byte[] { 0x4D, 0x53, 0x47, 0x31 }))
-                    return FileType.BMD;
-                else if (buffer.SequenceEqual(new byte[] { 0x54, 0x4D, 0x58, 0x30 }))
-                    return FileType.TMX;
-                else if (buffer.SequenceEqual(new byte[] { 0x53, 0x50, 0x52, 0x30 }))
-                    return FileType.SPR;
-                else if (buffer.SequenceEqual(new byte[] { 0x46, 0x4C, 0x57, 0x30 }))
-                    return FileType.BF;
-                else if (buffer.SequenceEqual(new byte[] { 0x50, 0x4D, 0x44, 0x31 }))
-                    return FileType.PM1;
-            }
-            return FileType.Unknown;
         }
     }
 

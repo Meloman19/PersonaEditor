@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PersonaEditorGUI.Controls.ColorPicker.Controls
+namespace PersonaEditorGUI.Controls.Primitive
 {
     public delegate void NumberChangedEventHandler(double num);
 

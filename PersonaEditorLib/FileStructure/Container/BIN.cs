@@ -23,14 +23,26 @@ namespace PersonaEditorLib.FileStructure.Container
         private void Open(byte[] data)
         {
             if (data[0] == 0)
-                OpenBE(data);
+            {
+                Old = false;
+                IsLittleEndian = false;
+                OpenNew(data);
+            }                
+            else if (data[3] == 0 && data[4] != 0)
+            {
+                Old = false;
+                IsLittleEndian = true;
+                OpenNew(data);
+            }
             else
-                OpenLE(data);
+                OpenOld(data);
         }
 
-        private void OpenLE(byte[] data)
+        private void OpenOld(byte[] data)
         {
             IsLittleEndian = true;
+            if (data.Length < 0x100)
+                throw new System.Exception("BIN: data length unacceptable");
             using (BinaryReader reader = Utilities.IO.OpenReadFile(new MemoryStream(data), true))
                 while (reader.BaseStream.Position < reader.BaseStream.Length - 0x100)
                 {
@@ -38,14 +50,17 @@ namespace PersonaEditorLib.FileStructure.Container
                     int Size = reader.ReadInt32();
                     byte[] Data = reader.ReadBytes(Size);
                     reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 0x40);
-                    SubFiles.Add(Utilities.PersonaFile.OpenFile(Name, Data, Utilities.PersonaFile.GetFileType(Name)));
+
+                    ObjectFile objectFile = Utilities.PersonaFile.OpenFile(Name, Data, Utilities.PersonaFile.GetFileType(Name));
+                    if (objectFile.Object == null)
+                        objectFile = Utilities.PersonaFile.OpenFile(Name, Data, FileType.DAT);
+                    SubFiles.Add(objectFile);
                 }
         }
-
-        private void OpenBE(byte[] data)
+        
+        private void OpenNew(byte[] data)
         {
-            IsLittleEndian = false;
-            using (BinaryReader reader = Utilities.IO.OpenReadFile(new MemoryStream(data), false))
+            using (BinaryReader reader = Utilities.IO.OpenReadFile(new MemoryStream(data), IsLittleEndian))
             {
                 int count = reader.ReadInt32();
                 for (int i = 0; i < count; i++)
@@ -53,7 +68,11 @@ namespace PersonaEditorLib.FileStructure.Container
                     string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x20)).Trim('\0');
                     int Size = reader.ReadInt32();
                     byte[] Data = reader.ReadBytes(Size);
-                    SubFiles.Add(Utilities.PersonaFile.OpenFile(Name, Data, Utilities.PersonaFile.GetFileType(Name)));
+
+                    ObjectFile objectFile = Utilities.PersonaFile.OpenFile(Name, Data, Utilities.PersonaFile.GetFileType(Name));
+                    if (objectFile.Object == null)
+                        objectFile = Utilities.PersonaFile.OpenFile(Name, Data, FileType.DAT);
+                    SubFiles.Add(objectFile);
                 }
             }
         }
@@ -77,7 +96,8 @@ namespace PersonaEditorLib.FileStructure.Container
             }
         }
 
-        public bool IsLittleEndian { get; set; } = true;
+        bool Old = true;
+        bool IsLittleEndian { get; set; } = true;
 
         #region IPersonaFile
 
@@ -86,21 +106,6 @@ namespace PersonaEditorLib.FileStructure.Container
         public List<ObjectFile> GetSubFiles()
         {
             return SubFiles;
-        }
-
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                returned.Add(ContextMenuItems.Replace);
-                returned.Add(ContextMenuItems.Separator);
-                returned.Add(ContextMenuItems.SaveAs);
-                returned.Add(ContextMenuItems.SaveAll);
-
-                return returned;
-            }
         }
 
         public Dictionary<string, object> GetProperties
@@ -135,15 +140,15 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public byte[] Get()
         {
-            if (IsLittleEndian)
-                return GetLE();
+            if (Old)
+                return GetOld();
             else
-                return GetBE();
+                return GetNew();
         }
 
         #endregion IFile
 
-        private byte[] GetLE()
+        private byte[] GetOld()
         {
             using (MemoryStream MS = new MemoryStream())
             {
@@ -155,8 +160,14 @@ namespace PersonaEditorLib.FileStructure.Container
                         byte[] name = new byte[0x100 - 4];
                         Encoding.ASCII.GetBytes(a.Name, 0, a.Name.Length, name, 0);
                         writer.Write(name);
-                        writer.Write(pfile.Size);
-                        writer.Write(pfile.Get());
+                        byte[] data = pfile.Get();
+                        int size = pfile.Size;
+                        if (data.Length != size)
+                        {
+
+                        }
+                        writer.Write(size);
+                        writer.Write(data);
                         writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 0x40)]);
                     }
 
@@ -166,7 +177,7 @@ namespace PersonaEditorLib.FileStructure.Container
             }
         }
 
-        private byte[] GetBE()
+        private byte[] GetNew()
         {
             using (MemoryStream MS = new MemoryStream())
             {
@@ -174,13 +185,16 @@ namespace PersonaEditorLib.FileStructure.Container
 
                 writer.Write((int)SubFiles.Count);
                 foreach (var a in SubFiles)
-                    if (a is IFile file)
-                        if (a is IPersonaFile pfile)
+                    if (a.Object is IFile file)
+                        if (a.Object is IPersonaFile pfile)
                         {
                             writer.Write(Encoding.ASCII.GetBytes(a.Name));
                             writer.Write(new byte[Utilities.Utilities.Alignment(a.Name.Length, 0x20)]);
-                            writer.Write(file.Size);
+                            int size = file.Size;
+                            int align = Utilities.Utilities.Alignment(size, 0x20);
+                            writer.Write(size + align);
                             writer.Write(file.Get());
+                            writer.Write(new byte[align]);
                         }
 
                 return MS.ToArray();

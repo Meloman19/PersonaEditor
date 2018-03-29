@@ -18,7 +18,6 @@ namespace PersonaEditorGUI
 {
     class MainWindowVM : BindingObject
     {
-        Settings.SetSettings setSettings;
         Tools.Visualizer visualizer;
         Tools.SetChar setchar;
 
@@ -44,12 +43,10 @@ namespace PersonaEditorGUI
             {
                 if (visualizer != null)
                     visualizer.Close();
-                if (setSettings != null)
-                    setSettings.Close();
                 if (setchar != null)
                     setchar.Close();
 
-                Settings.App.Default.Save();
+                Settings.AppSetting.Default.Save();
                 Settings.BackgroundDefault.Default.Save();
                 Settings.SPREditor.Default.Save();
                 Settings.WindowSetting.Default.Save();
@@ -69,11 +66,11 @@ namespace PersonaEditorGUI
         public ICommand clickSaveAsFile { get; }
         private void SaveAsFile()
         {
-            SaveFileDialog SFD = new SaveFileDialog();
-            SFD.OverwritePrompt = true;
-
             if (MultiFile.OpenFileName != "")
             {
+                SaveFileDialog SFD = new SaveFileDialog();
+                SFD.OverwritePrompt = true;
+
                 string dirpath = Path.GetDirectoryName(MultiFile.OpenFileName);
                 string filename = Path.GetFileName(MultiFile.OpenFileName);
                 if (Directory.Exists(dirpath))
@@ -82,24 +79,22 @@ namespace PersonaEditorGUI
 
                 string ext = Path.GetExtension(MultiFile.OpenFileName).Remove(0, 1);
                 SFD.Filter = ext.ToUpper() + "|*." + ext;
+
+                if (SFD.ShowDialog() == true)
+                    MultiFile.SaveFile(SFD.FileName);
             }
 
-            if (SFD.ShowDialog() == true)
-                MultiFile.SaveFile(SFD.FileName);
         }
 
         public ICommand clickSettingOpen { get; }
         private void SettingOpen()
         {
-            if (setSettings != null)
-                if (setSettings.IsLoaded)
-                {
-                    setSettings.Activate();
-                    return;
-                }
-
-            setSettings = new Settings.SetSettings() { DataContext = new Settings.SetSettingsVM() };
-            setSettings.Show();
+            Settings.AppSetting.Default.Save();
+            Settings.BackgroundDefault.Default.Save();
+            Settings.SPREditor.Default.Save();
+            Settings.WindowSetting.Default.Save();
+            Controls.SettingsWindow.SetSettings setSettings = new Controls.SettingsWindow.SetSettings() { DataContext = new Controls.SettingsWindow.SetSettingsVM() };
+            setSettings.ShowDialog();
         }
 
         public ICommand clickVisualizerOpen { get; }
@@ -141,13 +136,13 @@ namespace PersonaEditorGUI
         public ICommand clickTest { get; }
         private void TestClick()
         {
-            Thread thread = new Thread(delegate ()
-            {
-                Tools.Visualizer visualizer = new Tools.Visualizer() { DataContext = new Tools.VisualizerVM() };
-                visualizer.ShowDialog();
-            });
-            thread.ApartmentState = ApartmentState.STA;
-            thread.Start();
+            //Thread thread = new Thread(delegate ()
+            //{
+            //    Tools.Visualizer visualizer = new Tools.Visualizer() { DataContext = new Tools.VisualizerVM() };
+            //    visualizer.ShowDialog();
+            //});
+            //thread.ApartmentState = ApartmentState.STA;
+            //thread.Start();
         }
 
         public void OpenFile(string path)

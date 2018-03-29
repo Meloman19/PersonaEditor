@@ -1,4 +1,5 @@
-﻿using PersonaEditorLib;
+﻿using PersonaEditorGUI.Classes;
+using PersonaEditorLib;
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace PersonaEditorGUI.Controls
     {
         private ObservableCollection<ClosableTabItemVM> tabCollection = new ObservableCollection<ClosableTabItemVM>();
         private int selectedTabIndex = 0;
+        private ImagePreviewVM previewVM = new ImagePreviewVM();
 
         public ReadOnlyObservableCollection<ClosableTabItemVM> TabCollection { get; }
         public int SelectedTabIndex
@@ -34,8 +36,8 @@ namespace PersonaEditorGUI.Controls
         public DragEventHandler Drop => SingleFileEdit_Drop;
         private void SingleFileEdit_Drop(object sender, DragEventArgs e)
         {
-            var data = e.Data.GetData(typeof(ObjectFile));
-            if (data is ObjectFile objF)
+            var data = e.Data.GetData(typeof(UserTreeViewItem));
+            if (data is UserTreeViewItem objF)
                 Open(objF);
         }
 
@@ -50,39 +52,45 @@ namespace PersonaEditorGUI.Controls
             return returned;
         }
 
-        public bool Open(ObjectFile sender)
+        public bool Open(UserTreeViewItem sender)
         {
-            if (sender.Object is IPersonaFile pf)
+            if (!sender.CanEdit())
+            {
+                MessageBox.Show(String.Format("Can't open {0}", sender.Header));
+                return false;
+            }
+
+            if (sender.personaFile.Object is IPersonaFile pf)
             {
                 TabItemType DataContextType = TabItemType.Null;
                 object DataContext;
-                string Title = sender.Name;
+                string Title = sender.personaFile.Name;
 
                 if (pf.Type == FileType.SPR)
                 {
-                    DataContext = new Editors.SPREditorVM(sender.Object as PersonaEditorLib.FileStructure.SPR.SPR);
+                    DataContext = new Editors.SPREditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.SPR.SPR);
                     DataContextType = TabItemType.SPR;
                 }
                 else if (pf.Type == FileType.PTP)
                 {
-                    DataContext = new Editors.PTPEditorVM(sender.Object as PersonaEditorLib.FileStructure.Text.PTP);
+                    DataContext = new Editors.PTPEditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.Text.PTP);
                     DataContextType = TabItemType.PTP;
                 }
                 else if (pf.Type == FileType.BMD)
                 {
-                    DataContext = new Editors.BMDEditorVM(sender);
+                    DataContext = new Editors.BMDEditorVM(sender.personaFile);
                     DataContextType = TabItemType.BMD;
                 }
-                else if (pf.Type == FileType.FNT)
-                {
-                    DataContext = new Editors.FNTEditorVM(sender.Object as PersonaEditorLib.FileStructure.FNT.FNT);
-                    DataContextType = TabItemType.FNT;
-                }
-                else if (pf.Type == FileType.DAT)
-                {
-                    DataContext = new Editors.HEXEditorVM(sender.Object as PersonaEditorLib.FileStructure.DAT);
-                    DataContextType = TabItemType.HEX;
-                }
+                //else if (pf.Type == FileType.FNT)
+                //{
+                //    DataContext = new Editors.FNTEditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.FNT.FNT);
+                //    DataContextType = TabItemType.FNT;
+                //}
+                //else if (pf.Type == FileType.DAT)
+                //{
+                //    DataContext = new Editors.HEXEditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.DAT);
+                //    DataContextType = TabItemType.HEX;
+                //}
                 else
                 {
                     return false;
@@ -90,12 +98,15 @@ namespace PersonaEditorGUI.Controls
 
                 ClosableTabItemVM closableTabItemVM = new ClosableTabItemVM();
                 closableTabItemVM.DataContext = DataContext;
-                closableTabItemVM.SetDataContextType(DataContextType);
+                closableTabItemVM.DataContextType = DataContextType;
                 closableTabItemVM.TabTitle = Title;
                 closableTabItemVM.PropertyChanged += ClosableTabItemVM_PropertyChanged;
+                closableTabItemVM.PersonaFile = sender;
 
                 tabCollection.Add(closableTabItemVM);
                 SelectedTabIndex = tabCollection.IndexOf(closableTabItemVM);
+
+                sender.UnEnable();
                 return true;
             }
 
@@ -104,16 +115,7 @@ namespace PersonaEditorGUI.Controls
 
         public void SetPreview(ImageSource Preview)
         {
-            if (Preview == null)
-            {
-                tabCollection[0].SetDataContextType(TabItemType.Null);
-                tabCollection[0].DataContext = null;
-            }
-            else
-            {
-                tabCollection[0].SetDataContextType(TabItemType.Image);
-                tabCollection[0].DataContext = Preview;
-            }
+            previewVM.SourceIMG = Preview;
         }
 
         private void ClosableTabItemVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -124,10 +126,9 @@ namespace PersonaEditorGUI.Controls
         public PreviewEditorTabControlVM()
         {
             string tabtitle = "";
-            if (Application.Current.Resources.MergedDictionaries[0].Contains("fileedit_Preview"))
-                tabtitle = Application.Current.Resources.MergedDictionaries[0]["fileedit_Preview"] as string;
+            tabtitle = Application.Current.Resources.MergedDictionaries.GetString("main_Preview");
 
-            tabCollection.Add(new ClosableTabItemVM() { TabTitle = tabtitle, IsClosable = false });
+            tabCollection.Add(new ClosableTabItemVM() { TabTitle = tabtitle, IsClosable = false, DataContext = previewVM, DataContextType = TabItemType.ImagePreview });
             TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(tabCollection);
         }
     }

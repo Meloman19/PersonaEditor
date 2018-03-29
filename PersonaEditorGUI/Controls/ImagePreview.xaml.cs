@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,25 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PersonaEditorGUI.Settings
+namespace PersonaEditorGUI.Controls
 {
-    public partial class SetSettings : Window
+    /// <summary>
+    /// Логика взаимодействия для ImagePreview.xaml
+    /// </summary>
+    public partial class ImagePreview : UserControl
     {
-        public SetSettings()
+        public ImagePreview()
         {
             InitializeComponent();
-        }
-
-        private void ButtonOK_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
         }
     }
 }

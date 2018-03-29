@@ -6,35 +6,26 @@ using System.Text;
 using PersonaEditorLib.Extension;
 using PersonaEditorLib.Interfaces;
 
-namespace PersonaEditorLib.FileStructure.PM1
+namespace PersonaEditorLib.FileStructure.Container
 {
-    public interface IPM1Element
-    {
-        TypeMap Type { get; }
-        void Get(BinaryWriter writer);
-        int Size { get; }
-        int TableSize { get; }
-        int Count { get; }
-        int TableCount { get; }
-    }
-
-    public enum TypeMap
-    {
-        FileList = 0x1,
-        T3HeadList = 0x2,
-        RMDHead = 0x3,
-        BMD = 0x6,
-        EPLHead = 0x7,
-        EPL = 0x8,
-        RMD = 0x9
-    }
-
     public class PM1 : IPersonaFile
     {
-        int Unknown = 0;
+        enum TypeMap
+        {
+            FileList = 0x1,
+            T3HeadList = 0x2,
+            RMDHead = 0x3,
+            BMD = 0x6,
+            EPLHead = 0x7,
+            EPL = 0x8,
+            RMD = 0x9
+        }
 
-        PM1Table Table;
+        byte[] Unknown;
+
         int textsize = 0x20;
+
+        int[][] Table;
 
         public List<ObjectFile> List { get; } = new List<ObjectFile>();
 
@@ -73,34 +64,33 @@ namespace PersonaEditorLib.FileStructure.PM1
 
             stream.Position = 0x10;
             int tablelinecount = reader.ReadInt32();
-            Unknown = reader.ReadInt32();
+            Unknown = reader.ReadBytes(12);
             stream.Position = 0x20;
-            var table = reader.ReadInt32ArrayArray(tablelinecount, 4);
+            Table = reader.ReadInt32ArrayArray(tablelinecount, 4);
 
             stream.Position = 0x20;
-            Table = new PM1Table(reader.ReadInt32ArrayArray(tablelinecount, 4));
 
-            string[] list = ReadFileList(reader, table.FirstOrDefault(x => x[0] == (int)TypeMap.FileList));
+            string[] list = ReadFileList(reader, Table.FirstOrDefault(x => x[0] == (int)TypeMap.FileList));
             int ind = 0;
 
-            var RMDHead = table.FirstOrDefault(x => x[0] == (int)TypeMap.RMDHead);
+            var RMDHead = Table.FirstOrDefault(x => x[0] == (int)TypeMap.RMDHead);
             if (RMDHead != null && RMDHead[1] * RMDHead[2] > 0)
             {
                 ReadRMD(reader, list.SubArray(ind, RMDHead[2]), RMDHead);
                 ind += RMDHead[2];
             }
 
-            var BMD = table.FirstOrDefault(x => x[0] == (int)TypeMap.BMD);
+            var BMD = Table.FirstOrDefault(x => x[0] == (int)TypeMap.BMD);
             if (BMD != null && BMD[1] * BMD[2] > 0)
             {
                 ReadBMD(reader, list.SubArray(ind, BMD[2]), BMD);
                 ind += BMD[2];
             }
 
-            var EPLHead = table.FirstOrDefault(x => x[0] == (int)TypeMap.EPLHead);
+            var EPLHead = Table.FirstOrDefault(x => x[0] == (int)TypeMap.EPLHead);
             if (EPLHead != null && EPLHead[1] * EPLHead[2] > 0)
             {
-                ReadEPL(reader, list.SubArray(ind, EPLHead[2]), EPLHead, table.FirstOrDefault(x => x[0] == (int)TypeMap.EPL));
+                ReadEPL(reader, list.SubArray(ind, EPLHead[2]), EPLHead, Table.FirstOrDefault(x => x[0] == (int)TypeMap.EPL));
                 ind += EPLHead[2];
             }
 
@@ -109,7 +99,7 @@ namespace PersonaEditorLib.FileStructure.PM1
                 throw new Exception("PM1");
             }
 
-            foreach (var a in table)
+            foreach (var a in Table)
                 if (a[1] * a[2] > 0)
                     if (!(MainFileList.Contains(a[0])))
                     {
@@ -185,16 +175,6 @@ namespace PersonaEditorLib.FileStructure.PM1
             return List;
         }
 
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                return returned;
-            }
-        }
-
         public Dictionary<string, object> GetProperties
         {
             get
@@ -237,7 +217,7 @@ namespace PersonaEditorLib.FileStructure.PM1
                 var EPL = List.FindAll(x => (int)(x.Tag as object[])[0] == (int)TypeMap.EPL);
 
                 MS.Position = 0x20 + 0x10 * (1 + (RMD.Count == 0 ? 0 : 2) + (BMD == null ? 0 : 1) + (EPL.Count == 0 ? 0 : 2) + HidList.GroupBy(x => (int)x.Tag).Count());
-                
+
                 List<int[]> table = new List<int[]>();
 
                 var filelist = List.Select(x => x.Name).ToArray();
@@ -348,6 +328,7 @@ namespace PersonaEditorLib.FileStructure.PM1
                         writer.WriteInt32Array((int[])(a.Tag as object[])[1]);
                 }
 
+              //  table.AddRange(Table.Where(x => !table.Exists(y => y[0] == x[0])));
                 table = table.OrderBy(x => x[0]).ToList();
 
                 MS.Position = 0x4;

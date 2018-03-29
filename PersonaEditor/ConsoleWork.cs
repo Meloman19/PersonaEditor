@@ -38,6 +38,7 @@ namespace PersonaEditor
         public bool SkipEmpty { get; } = false;
         public Encoding Encode { get; } = Encoding.UTF8;
         public bool Sub { get; } = false;
+        public bool LineByLine { get; } = false;
 
         public Parameters()
         {
@@ -73,6 +74,8 @@ namespace PersonaEditor
                 }
                 else if (a[0] == "/sub")
                     Sub = true;
+                else if (a[0] == "/lbl")
+                    LineByLine = true;
             }
         }
     }

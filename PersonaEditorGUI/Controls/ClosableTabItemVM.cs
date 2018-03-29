@@ -1,4 +1,5 @@
-﻿using PersonaEditorLib;
+﻿using PersonaEditorGUI.Classes;
+using PersonaEditorLib;
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace PersonaEditorGUI.Controls
     enum TabItemType
     {
         Null,
-        Image,
+        ImagePreview,
         SPR,
         PTP,
         BMD,
@@ -33,7 +34,18 @@ namespace PersonaEditorGUI.Controls
 
         public string TabTitle { get; set; }
 
-        public string DataContextType => dataContextType.ToString();
+        public TabItemType DataContextType
+        {
+            get { return dataContextType; }
+            set
+            {
+                if (dataContextType != value)
+                {
+                    dataContextType = value;
+                    Notify("DataContextType");
+                }
+            }
+        }
         public object DataContext
         {
             get { return dataContext; }
@@ -47,12 +59,7 @@ namespace PersonaEditorGUI.Controls
             }
         }
         public bool IsClosable { get; set; } = true;
-
-        public void SetDataContextType(TabItemType tabItemType)
-        {
-            dataContextType = tabItemType;
-            Notify("DataContextType");
-        }
+        public UserTreeViewItem PersonaFile { get; set; } = null;
 
         public bool Close()
         {
@@ -65,8 +72,10 @@ namespace PersonaEditorGUI.Controls
                 Notify("Close");
             }
 
-            SetDataContextType(TabItemType.Null);
-            DataContext = null;
+            //dataContextType = TabItemType.Null;
+            //DataContext = null;
+
+            PersonaFile?.Enable();
             return true;
         }
 

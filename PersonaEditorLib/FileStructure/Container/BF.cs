@@ -47,7 +47,7 @@ namespace PersonaEditorLib.FileStructure.Container
         }
 
         int[][] Table;
-        ushort Unknown;
+        byte[] Unknown;
 
         public List<ObjectFile> List { get; } = new List<ObjectFile>();
 
@@ -99,7 +99,7 @@ namespace PersonaEditorLib.FileStructure.Container
             BinaryReader reader = Utilities.IO.OpenReadFile(stream, IsLittleEndian);
 
             int tablecount = reader.ReadInt32();
-            Unknown = reader.ReadUInt16();
+            Unknown = reader.ReadBytes(12);
 
             stream.Position = 0x20;
             Table = reader.ReadInt32ArrayArray(tablecount, 4);
@@ -113,7 +113,11 @@ namespace PersonaEditorLib.FileStructure.Container
                     FileType type = MAP[element[0]];
                     tempN = "." + type.ToString();
 
-                    var item = Utilities.PersonaFile.OpenFile(tempN, reader.ReadBytes(element[1] * element[2]), type);
+                    byte[] data = reader.ReadBytes(element[1] * element[2]);
+                    var item = Utilities.PersonaFile.OpenFile(tempN, data, type);
+                    if (item.Object == null)
+                        item = Utilities.PersonaFile.OpenFile(tempN, data, FileType.DAT);
+
                     item.Tag = element[0];
 
                     List.Add(item);
@@ -131,21 +135,6 @@ namespace PersonaEditorLib.FileStructure.Container
             return List;
         }
 
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                returned.Add(ContextMenuItems.Replace);
-                returned.Add(ContextMenuItems.Separator);
-                returned.Add(ContextMenuItems.SaveAs);
-                returned.Add(ContextMenuItems.SaveAll);
-
-                return returned;
-            }
-        }
-
         public Dictionary<string, object> GetProperties
         {
             get
@@ -158,6 +147,8 @@ namespace PersonaEditorLib.FileStructure.Container
                 return returned;
             }
         }
+
+        #endregion IPersonaFile
 
         #region IFile
 
@@ -194,7 +185,6 @@ namespace PersonaEditorLib.FileStructure.Container
                     writer.Write(0);
                     writer.Write(Table.Length);
                     writer.Write(Unknown);
-                    writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, 0x20)]);
 
                     foreach (var a in Table)
                         foreach (var b in a)
@@ -212,7 +202,5 @@ namespace PersonaEditorLib.FileStructure.Container
         }
 
         #endregion IFile
-
-        #endregion IPersonaFile
     }
 }

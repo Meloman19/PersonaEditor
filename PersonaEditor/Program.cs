@@ -155,7 +155,7 @@ namespace PersonaEditor
                     file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile),
                        PersonaEditorLib.Utilities.PersonaFile.GetFileType(argwrk.OpenedFile));
 
-                if (file != null)
+                if (file.Object != null)
                     foreach (var command in argwrk.ArgumentList)
                     {
                         Action<ObjectFile, string, string, Parameters> action = null;
@@ -198,11 +198,8 @@ namespace PersonaEditor
 
         static void ExportImage(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is IImage image)
-            {
-                string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG");
-                Imaging.SavePNG(image.GetImage(), path);
-            }
+            string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG");
+            PersonaEditorLib.Utilities.PersonaFile.SaveImageFile(objectFile, path);
         }
 
         static void ImportImage(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
@@ -266,7 +263,7 @@ namespace PersonaEditor
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 string[] exp = ptp.ExportTXT(parameters.Map, objectFile.Name, parameters.RemoveSplit, Static.OldEncoding(), Static.NewEncoding());
 
-                File.AppendAllLines(value, exp);
+                File.AppendAllLines(path, exp);
             }
         }
 
@@ -276,19 +273,22 @@ namespace PersonaEditor
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 string[] importedtext;
-                if (File.Exists(value))
+                if (File.Exists(path))
                 {
-                    importedtext = File.ReadAllLines(value, parameters.Encode);
-                    ptp.ImportTXT(importedtext, objectFile.Name, parameters.Map, parameters.Width, parameters.SkipEmpty, Static.OldEncoding(), Static.NewEncoding(), Static.NewFont());
+                    importedtext = File.ReadAllLines(path, parameters.Encode);
+                    if (parameters.LineByLine)
+                        ptp.ImportTXT_LBL(importedtext, parameters.Map, parameters.Width, parameters.SkipEmpty, Static.OldEncoding(), Static.NewEncoding(), Static.NewFont());
+                    else
+                        ptp.ImportTXT(importedtext, objectFile.Name, parameters.Map, parameters.Width, parameters.SkipEmpty, Static.OldEncoding(), Static.NewEncoding(), Static.NewFont());
                 }
             }
             else if (objectFile.Object is PersonaEditorLib.FileStructure.Text.StringList strlst)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 string[] importedtext;
-                if (File.Exists(value))
+                if (File.Exists(path))
                 {
-                    importedtext = File.ReadAllLines(value, parameters.Encode);
+                    importedtext = File.ReadAllLines(path, parameters.Encode);
                     strlst.ImportText(importedtext, parameters.Map, parameters.SkipEmpty);
                 }
             }
@@ -374,7 +374,7 @@ namespace PersonaEditor
                     if (File.Exists(newpath))
                     {
                         var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(objectFile.Name, File.ReadAllBytes(newpath), fileType);
-                        if (file != null)
+                        if (file.Object != null)
                             a.Object = file.Object;
                     }
                 }

@@ -79,7 +79,7 @@
     <StartupObject>PersonaEditorGUI.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resource\PersonaText.ico</ApplicationIcon>
+    <ApplicationIcon>Resource\PersonaEditor.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -115,6 +115,7 @@
     <Compile Include="Classes\Event.cs" />
     <Compile Include="Classes\ReadOnlyBinding.cs" />
     <Compile Include="Classes\ResourceItem.cs" />
+    <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Controls\ClosableTabItem.xaml.cs">
       <DependentUpon>ClosableTabItem.xaml</DependentUpon>
     </Compile>
@@ -128,7 +129,8 @@
     <Compile Include="Controls\ColorPicker\Controls\NumericColorRGBA.xaml.cs">
       <DependentUpon>NumericColorRGBA.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ColorPicker\Controls\NumericIncDec.xaml.cs">
+    <Compile Include="Classes\Converters\NullVisibilityConverter.cs" />
+    <Compile Include="Controls\Primitive\NumericIncDec.xaml.cs">
       <DependentUpon>NumericIncDec.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ColorPicker\Controls\SliderRGB.xaml.cs">
@@ -151,6 +153,10 @@
       <DependentUpon>SPREditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Editors\SPREditorVM.cs" />
+    <Compile Include="Controls\ImagePreview.xaml.cs">
+      <DependentUpon>ImagePreview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ImagePreviewVM.cs" />
     <Compile Include="Controls\MultiFileEdit.xaml.cs">
       <DependentUpon>MultiFileEdit.xaml</DependentUpon>
     </Compile>
@@ -169,6 +175,13 @@
       <DependentUpon>SingleFileEdit.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\SingleFileEditVM.cs" />
+    <Compile Include="Controls\ToolBox\OpenPTP.xaml.cs">
+      <DependentUpon>OpenPTP.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ToolBox\SaveAsPTP.xaml.cs">
+      <DependentUpon>SaveAsPTP.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ToolBox\ToolBox.cs" />
     <Compile Include="Controls\TreeViewPE.xaml.cs">
       <DependentUpon>TreeViewPE.xaml</DependentUpon>
     </Compile>
@@ -181,28 +194,28 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Localization.resx</DependentUpon>
     </Compile>
-    <Compile Include="Settings\App.Designer.cs">
+    <Compile Include="Settings\AppSetting.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>App.settings</DependentUpon>
+      <DependentUpon>AppSetting.settings</DependentUpon>
     </Compile>
     <Compile Include="Settings\BackgroundDefault.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>BackgroundDefault.settings</DependentUpon>
     </Compile>
-    <Compile Include="Settings\DefaultBackgroundVM.cs" />
-    <Compile Include="Settings\DefaultBackground.xaml.cs">
+    <Compile Include="Controls\SettingsWindow\DefaultBackgroundVM.cs" />
+    <Compile Include="Controls\SettingsWindow\DefaultBackground.xaml.cs">
       <DependentUpon>DefaultBackground.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settings\Main.xaml.cs">
+    <Compile Include="Controls\SettingsWindow\Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settings\MainVM.cs" />
-    <Compile Include="Settings\SetSettings.xaml.cs">
+    <Compile Include="Controls\SettingsWindow\MainVM.cs" />
+    <Compile Include="Controls\SettingsWindow\SetSettings.xaml.cs">
       <DependentUpon>SetSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settings\SetSettingsVM.cs" />
+    <Compile Include="Controls\SettingsWindow\SetSettingsVM.cs" />
     <Compile Include="Settings\SPREditor.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -245,7 +258,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\ColorPicker\Controls\NumericIncDec.xaml">
+    <Page Include="Controls\Primitive\NumericIncDec.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -266,6 +279,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\Editors\SPREditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ImagePreview.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -293,6 +310,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\ToolBox\OpenPTP.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ToolBox\SaveAsPTP.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\TreeViewPE.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -312,19 +337,35 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Resource\lang.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Settings\DefaultBackground.xaml">
+    <Page Include="Resource\lang_tree_contextmenu.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Settings\Main.xaml">
+    <Page Include="Resource\lang_setting_background.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Settings\SetSettings.xaml">
+    <Page Include="Resource\lang_setting_main.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resource\lang_main.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resource\lang_toolbox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\SettingsWindow\DefaultBackground.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SettingsWindow\Main.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SettingsWindow\SetSettings.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -345,9 +386,9 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="Settings\App.settings">
+    <None Include="Settings\AppSetting.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>App.Designer.cs</LastGenOutput>
+      <LastGenOutput>AppSetting.Designer.cs</LastGenOutput>
     </None>
     <None Include="Settings\BackgroundDefault.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -381,13 +422,13 @@
     <Folder Include="Controls\HexEdit\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resource\PersonaText.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resource\Localization.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Localization.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\PersonaEditor.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

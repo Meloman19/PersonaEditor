@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PersonaEditorGUI.Settings
+namespace PersonaEditorGUI.Controls.SettingsWindow
 {
     public partial class DefaultBackground : UserControl
     {

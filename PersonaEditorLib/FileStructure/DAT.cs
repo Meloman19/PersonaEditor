@@ -28,19 +28,6 @@ namespace PersonaEditorLib.FileStructure
             return SubFiles;
         }
 
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                returned.Add(ContextMenuItems.SaveAs);
-                returned.Add(ContextMenuItems.Replace);
-
-                return returned;
-            }
-        }
-
         public Dictionary<string, object> GetProperties
         {
             get

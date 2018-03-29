@@ -355,7 +355,7 @@ namespace PersonaEditorGUI.Controls.Editors
                 else if (e.PropertyName == "OldName")
                     OldName.UpdateText(name.OldName);
             }
-            else if (sender is BackgroundImage image)
+            else if (sender is BackgroundImage image && OldName != null && NewName != null)
             {
                 if (e.PropertyName == "NameStart")
                 {
@@ -382,7 +382,7 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public void UpdateOldEncoding(string OldEncoding)
         {
-            OldName.UpdateFont(Static.FontManager.GetPersonaFont(OldEncoding));
+            OldName?.UpdateFont(Static.FontManager.GetPersonaFont(OldEncoding));
             foreach (var a in Strings)
                 a.UpdateOldEncoding(OldEncoding);
         }
@@ -391,8 +391,8 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             this.NewEncoding = NewEncoding;
             if (name != null)
-                NewName.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
-            NewName.UpdateFont(Static.FontManager.GetPersonaFont(NewEncoding));
+                NewName?.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
+            NewName?.UpdateFont(Static.FontManager.GetPersonaFont(NewEncoding));
             foreach (var a in Strings)
                 a.UpdateNewEncoding(NewEncoding);
         }
@@ -462,7 +462,7 @@ namespace PersonaEditorGUI.Controls.Editors
 
         EventWrapper BackgroundEW;
         EventWrapper EncodingManagerEW;
-        Backgrounds BackImage { get; } = new Backgrounds(Settings.App.Default.DirBackground);
+        Backgrounds BackImage { get; } = new Backgrounds(Settings.AppSetting.Default.DirBackground);
 
         #endregion Private
 
@@ -473,7 +473,7 @@ namespace PersonaEditorGUI.Controls.Editors
             set
             {
                 BackImage.SelectedIndex = value;
-                Settings.App.Default.PTPBackgroundDefault = BackImage.SelectedItem;
+                Settings.AppSetting.Default.PTPBackgroundDefault = BackImage.SelectedItem;
             }
         }
 
@@ -488,8 +488,8 @@ namespace PersonaEditorGUI.Controls.Editors
             set
             {
                 OldEncoding = value;
-                Settings.App.Default.PTPOldDefault = Static.EncodingManager.GetPersonaEncodingName(value);
-                UpdateOldEncoding(Settings.App.Default.PTPOldDefault);
+                Settings.AppSetting.Default.PTPOldDefault = Static.EncodingManager.GetPersonaEncodingName(value);
+                UpdateOldEncoding(Settings.AppSetting.Default.PTPOldDefault);
                 Notify("SelectedOldFont");
             }
         }
@@ -500,8 +500,8 @@ namespace PersonaEditorGUI.Controls.Editors
             set
             {
                 NewEncoding = value;
-                Settings.App.Default.PTPNewDefault = Static.EncodingManager.GetPersonaEncodingName(value);
-                UpdateNewEncoding(Settings.App.Default.PTPNewDefault);
+                Settings.AppSetting.Default.PTPNewDefault = Static.EncodingManager.GetPersonaEncodingName(value);
+                UpdateNewEncoding(Settings.AppSetting.Default.PTPNewDefault);
                 Notify("SelectedNewFont");
             }
         }
@@ -519,9 +519,9 @@ namespace PersonaEditorGUI.Controls.Editors
             else if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
             {
                 if (e.PropertyName == man.GetPersonaEncodingName(OldEncoding))
-                    UpdateOldEncoding(Settings.App.Default.PTPOldDefault);
+                    UpdateOldEncoding(Settings.AppSetting.Default.PTPOldDefault);
                 if (e.PropertyName == man.GetPersonaEncodingName(NewEncoding))
-                    UpdateNewEncoding(Settings.App.Default.PTPNewDefault);
+                    UpdateNewEncoding(Settings.AppSetting.Default.PTPNewDefault);
             }
         }
 
@@ -547,15 +547,15 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public PTPEditorVM(PTP ptp)
         {
-            BackImage.SelectedItem = Settings.App.Default.PTPBackgroundDefault;
+            BackImage.SelectedItem = Settings.AppSetting.Default.PTPBackgroundDefault;
 
-            int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.App.Default.PTPOldDefault);
+            int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.PTPOldDefault);
             if (sourceInd >= 0)
                 OldEncoding = sourceInd;
             else
                 OldEncoding = 0;
 
-            sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.App.Default.PTPNewDefault);
+            sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.PTPNewDefault);
             if (sourceInd >= 0)
                 NewEncoding = sourceInd;
             else
@@ -565,10 +565,10 @@ namespace PersonaEditorGUI.Controls.Editors
             EncodingManagerEW = new EventWrapper(Static.EncodingManager, this);
 
             foreach (var a in ptp.names)
-                Names.Add(new PTPNameEditVM(a, Settings.App.Default.PTPOldDefault));
+                Names.Add(new PTPNameEditVM(a, Settings.AppSetting.Default.PTPOldDefault));
 
             foreach (var a in ptp.msg)
-                MSG.Add(new PTPMsgVM(a, ptp.names.FirstOrDefault(x => x.Index == a.CharacterIndex), Settings.App.Default.PTPOldDefault, Settings.App.Default.PTPNewDefault, BackImage.CurrentBackground));
+                MSG.Add(new PTPMsgVM(a, ptp.names.FirstOrDefault(x => x.Index == a.CharacterIndex), Settings.AppSetting.Default.PTPOldDefault, Settings.AppSetting.Default.PTPNewDefault, BackImage.CurrentBackground));
         }
 
         public bool Close()

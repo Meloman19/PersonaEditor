@@ -12,12 +12,12 @@ namespace PersonaEditorGUI.Settings {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.5.0.0")]
-    internal sealed partial class App : global::System.Configuration.ApplicationSettingsBase {
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.6.0.0")]
+    internal sealed partial class AppSetting : global::System.Configuration.ApplicationSettingsBase {
         
-        private static App defaultInstance = ((App)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new App())));
+        private static AppSetting defaultInstance = ((AppSetting)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new AppSetting())));
         
-        public static App Default {
+        public static AppSetting Default {
             get {
                 return defaultInstance;
             }
@@ -116,6 +116,90 @@ namespace PersonaEditorGUI.Settings {
             }
             set {
                 this["DefaultLocalization"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#FF000000")]
+        public global::System.Windows.Media.Color PreviewSelectedColor {
+            get {
+                return ((global::System.Windows.Media.Color)(this["PreviewSelectedColor"]));
+            }
+            set {
+                this["PreviewSelectedColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SaveAsPTP_CO2N {
+            get {
+                return ((bool)(this["SaveAsPTP_CO2N"]));
+            }
+            set {
+                this["SaveAsPTP_CO2N"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
+        public string SaveAsPTP_Font {
+            get {
+                return ((string)(this["SaveAsPTP_Font"]));
+            }
+            set {
+                this["SaveAsPTP_Font"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SaveAsPTP_NeverAskAgain {
+            get {
+                return ((bool)(this["SaveAsPTP_NeverAskAgain"]));
+            }
+            set {
+                this["SaveAsPTP_NeverAskAgain"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
+        public string OpenPTP_Font {
+            get {
+                return ((string)(this["OpenPTP_Font"]));
+            }
+            set {
+                this["OpenPTP_Font"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool OpenPTP_NeverAskAgain {
+            get {
+                return ((bool)(this["OpenPTP_NeverAskAgain"]));
+            }
+            set {
+                this["OpenPTP_NeverAskAgain"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool Single_Instance_Application {
+            get {
+                return ((bool)(this["Single_Instance_Application"]));
+            }
+            set {
+                this["Single_Instance_Application"] = value;
             }
         }
     }

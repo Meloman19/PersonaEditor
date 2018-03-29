@@ -18,45 +18,6 @@ using System.Windows.Shapes;
 
 namespace PersonaEditorGUI.Controls
 {
-    public class NullVisibilityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((string)parameter == "Reverse")
-            {
-                return value == null ? Visibility.Visible : Visibility.Collapsed;
-            }
-            else if ((string)parameter == "Bool")
-            {
-                return (bool)value == true ? Visibility.Visible : Visibility.Collapsed;
-            }
-            else if ((string)parameter == "BoolReverse")
-            {
-                return (bool)value == true ? Visibility.Collapsed : Visibility.Visible;
-            }
-            else if ((string)parameter == "ItemsSource")
-            {
-                if (value != null)
-                    if ((value as System.Collections.ICollection).Count != 0)
-                        return Visibility.Collapsed;
-                return Visibility.Visible;
-            }
-            else if ((string)parameter == "ItemsSourceReverse")
-            {
-                if (value != null)
-                    if ((value as System.Collections.ICollection).Count != 0)
-                        return Visibility.Visible;
-                return Visibility.Collapsed;
-            }
-            return value == null ? Visibility.Collapsed : Visibility.Visible;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public partial class MainDockPanel : UserControl, INotifyPropertyChanged
     {
         #region INotifyPropertyChanged implementation

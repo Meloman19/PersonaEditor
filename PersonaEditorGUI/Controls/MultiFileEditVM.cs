@@ -40,18 +40,17 @@ namespace PersonaEditorGUI.Controls
         {
             if (Tab.CloseAll())
             {
+                FileInfo fileInfo = new FileInfo(path);
+                if (fileInfo.Length > 1000000000)
+                    return;
+
                 var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
                     File.ReadAllBytes(path),
                     PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)));
 
-                if (file != null)
+                if (file.Object != null)
                 {
                     Tree.SetRoot(file);
-                    if (file.Object is IPersonaFile pfile && pfile.GetSubFiles().Count == 0)
-                    {
-                        Tree_SelectedItemDataOpen(file);
-                    }
-
                     _OpenFileName = Path.GetFullPath(path);
                 }
             }
@@ -102,15 +101,15 @@ namespace PersonaEditorGUI.Controls
                 OpenFile(temp[0]);
         }
 
-        private void Tree_SelectedItemDataOpen(ObjectFile sender)
+        private void Tree_SelectedItemDataOpen(UserTreeViewItem sender)
         {
             MainWindowType = "Single";
             Tab.Open(sender);
         }
 
-        private void Tree_SelectedItemData(ObjectFile sender)
+        private void Tree_SelectedItemData(UserTreeViewItem sender)
         {
-            if (sender.Object is IImage image)
+            if (sender.personaFile.Object is IImage image)
                 Tab.SetPreview(image.GetImage());
             else
                 Tab.SetPreview(null);

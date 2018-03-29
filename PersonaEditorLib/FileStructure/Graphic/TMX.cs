@@ -92,19 +92,6 @@ namespace PersonaEditorLib.FileStructure.Graphic
             return new List<ObjectFile>();
         }
 
-        public List<ContextMenuItems> ContextMenuList
-        {
-            get
-            {
-                List<ContextMenuItems> returned = new List<ContextMenuItems>();
-
-                returned.Add(ContextMenuItems.SaveAs);
-                returned.Add(ContextMenuItems.Replace);
-
-                return returned;
-            }
-        }
-
         public Dictionary<string, object> GetProperties
         {
             get
@@ -119,6 +106,8 @@ namespace PersonaEditorLib.FileStructure.Graphic
                 return returned;
             }
         }
+
+        #endregion IPersonaFile
 
         #region IFile
 
@@ -149,8 +138,6 @@ namespace PersonaEditorLib.FileStructure.Graphic
         }
 
         #endregion IFile
-
-        #endregion IPersonaFile
 
         #region IImage
 
