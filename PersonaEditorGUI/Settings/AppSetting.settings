@@ -12,7 +12,7 @@
       <Value Profile="(Default)">P4_RUS</Value>
     </Setting>
     <Setting Name="PTPBackgroundDefault" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Empty</Value>
+      <Value Profile="(Default)">Default</Value>
     </Setting>
     <Setting Name="DirFont" Type="System.String" Scope="User">
       <Value Profile="(Default)">font</Value>

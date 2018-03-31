@@ -12,8 +12,8 @@ namespace PersonaEditorGUI
         public static class Paths
         {
             public static string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            public static string DirBackgrounds = Path.Combine(CurrentFolderEXE, "background");
-            public static string DirFont = Path.Combine(CurrentFolderEXE, "font");
+            public static string DirBackgrounds = Path.Combine(CurrentFolderEXE, Settings.AppSetting.Default.DirBackground);
+            public static string DirFont = Path.Combine(CurrentFolderEXE, Settings.AppSetting.Default.DirFont);
             public static string DirLang = Path.Combine(CurrentFolderEXE, "lang");
         }
 

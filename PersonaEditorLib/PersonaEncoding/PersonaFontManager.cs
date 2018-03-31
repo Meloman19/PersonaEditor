@@ -19,7 +19,7 @@ namespace PersonaEditorLib.PersonaEncoding
         public ReadOnlyObservableCollection<string> FontList { get; }
 
         public PersonaFontManager(string dir)
-        {            
+        {
             sourcedir = dir;
             FontList = new ReadOnlyObservableCollection<string>(encodingList);
 
@@ -58,7 +58,7 @@ namespace PersonaEditorLib.PersonaEncoding
                 catch
                 {
                     return null;
-                }                
+                }
             }
         }
 

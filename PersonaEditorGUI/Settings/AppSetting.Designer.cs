@@ -61,7 +61,7 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
         public string PTPBackgroundDefault {
             get {
                 return ((string)(this["PTPBackgroundDefault"]));

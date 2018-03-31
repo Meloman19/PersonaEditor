@@ -134,7 +134,7 @@ namespace PersonaEditorGUI.Classes.Media.Visual
 
         public BackgroundImage CurrentBackground { get; } = new BackgroundImage();
 
-        ObservableCollection<string> backgroundList { get; } = new ObservableCollection<string>() { "Empty" };
+        ObservableCollection<string> backgroundList { get; } = new ObservableCollection<string>() { "Default" };
 
         private ReadOnlyObservableCollection<string> _BackgroundList;
         public ReadOnlyObservableCollection<string> BackgroundList => _BackgroundList;
@@ -191,7 +191,7 @@ namespace PersonaEditorGUI.Classes.Media.Visual
             set { SetBackground(value); }
         }
 
-        private string _SelectedItem = "Empty";
+        private string _SelectedItem = "Default";
         public string SelectedItem
         {
             get { return _SelectedItem; }
@@ -232,7 +232,7 @@ namespace PersonaEditorGUI.Classes.Media.Visual
 
         bool Update(string FileName)
         {
-            if (Equals(FileName, "Empty"))
+            if (Equals(FileName, "Default"))
             {
                 SetDefault();
                 BackgroundChanged?.Invoke(CurrentBackground);

@@ -150,7 +150,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                     while (Dictionary.Dictionary[i][2] != s4)
                     {
                         i++;
-                        if (Dictionary.Dictionary[i - 1][2] == 0)
+                        if (Dictionary.Dictionary[i][1] != 0)
                         {
                             if ((s4 >> 4) > ((s4 << 4) >> 4))
                             {
@@ -190,7 +190,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                 return 0;
             }
 
-            for (int i = DictPart + 1; i < Dictionary.Dictionary.Length; i++)
+            for (int i = DictPart; i < Dictionary.Dictionary.Length; i++)
             {
                 if (Dictionary.Dictionary[i][1] == v0)
                 {
@@ -210,7 +210,7 @@ namespace PersonaEditorLib.FileStructure.FNT
         {
             for (int i = 1; i < Dictionary.Dictionary.Length; i++)
             {
-                if (Dictionary.Dictionary[i][2] == 0)
+                if (Dictionary.Dictionary[i][1] != 0)
                 {
                     return i;
                 }

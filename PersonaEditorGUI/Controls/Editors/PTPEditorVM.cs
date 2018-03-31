@@ -462,7 +462,7 @@ namespace PersonaEditorGUI.Controls.Editors
 
         EventWrapper BackgroundEW;
         EventWrapper EncodingManagerEW;
-        Backgrounds BackImage { get; } = new Backgrounds(Settings.AppSetting.Default.DirBackground);
+        Backgrounds BackImage { get; } = new Backgrounds(Static.Paths.DirBackgrounds);
 
         #endregion Private
 

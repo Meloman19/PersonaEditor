@@ -22,11 +22,14 @@ namespace PersonaEditorLib.FileStructure.FNT
             get { return List.Count * 2; }
         }
 
-        public void Get(BinaryWriter writer)
+        public int Get(BinaryWriter writer)
         {
             writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, 16)]);
+            long returned = writer.BaseStream.Position;
             foreach (var a in List)
                 writer.Write(a);
+
+            return Convert.ToInt32(returned);
         }
     }
 }

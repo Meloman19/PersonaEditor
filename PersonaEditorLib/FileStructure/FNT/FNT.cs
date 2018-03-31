@@ -75,7 +75,7 @@ namespace PersonaEditorLib.FileStructure.FNT
 
             return new BitmapPalette(palette);
         }
-        
+
         #region IPersonaFile
 
         public FileType Type => FileType.FNT;
@@ -126,7 +126,11 @@ namespace PersonaEditorLib.FileStructure.FNT
                 Reserved.Get(writer);
                 Compressed.Get(writer);
                 if (Last != null)
-                    Last.Get(writer);
+                {
+                    Header.LastPosition = Last.Get(writer);
+                    writer.BaseStream.Position = 0;
+                    Header.Get(writer);
+                }
 
                 returned = MS.ToArray();
             }

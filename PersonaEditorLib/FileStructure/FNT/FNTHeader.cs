@@ -62,7 +62,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             Glyphs.Get(writer);
             writer.Write(UnknownUShort);
             writer.Write(LastPosition);
-            writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, HeaderSize)]);
+            writer.BaseStream.Position = HeaderSize;
         }
     }
 }
