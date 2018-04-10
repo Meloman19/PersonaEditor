@@ -95,6 +95,7 @@ namespace PersonaEditorGUI
             Settings.WindowSetting.Default.Save();
             Controls.SettingsWindow.SetSettings setSettings = new Controls.SettingsWindow.SetSettings() { DataContext = new Controls.SettingsWindow.SetSettingsVM() };
             setSettings.ShowDialog();
+            Static.BackManager.EmptyUpdate();
         }
 
         public ICommand clickVisualizerOpen { get; }

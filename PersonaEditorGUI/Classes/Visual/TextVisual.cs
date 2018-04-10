@@ -9,11 +9,11 @@ using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows;
 
-namespace PersonaEditorGUI.Classes.Media.Visual
+namespace PersonaEditorGUI.Classes.Visual
 {
     public delegate void VisualChangedEventHandler(ImageSource imageSource, Rect rect);
 
-    public class TextVisual : BindingObject
+    class TextVisual : BindingObject
     {
         public event VisualChangedEventHandler VisualChanged;
 
@@ -21,6 +21,7 @@ namespace PersonaEditorGUI.Classes.Media.Visual
 
         #region PrivateField
 
+        private bool isEnable = true;
         private object Text;
 
         private ImageSource _Image;
@@ -101,6 +102,17 @@ namespace PersonaEditorGUI.Classes.Media.Visual
         public Rect Rect => _Rect;
         public ImageSource Image => _Image;
 
+        public bool IsEnable
+        {
+            get { return isEnable; }
+            set
+            {
+                isEnable = value;
+                if (value)
+                    Data = CreateImageData(Text);
+            }
+        }
+
         ImageData CreateImageData(object Text)
         {
             if (Text is IList<TextBaseElement> list)
@@ -122,21 +134,24 @@ namespace PersonaEditorGUI.Classes.Media.Visual
             Text = List.ToArray();
             if (Font != null)
                 this.Font = Font;
-            Data = CreateImageData(Text);
+            if (IsEnable)
+                Data = CreateImageData(Text);
         }
 
         public void UpdateText(byte[] array)
         {
             Text = array;
-            Data = CreateImageData(Text);
+            if (IsEnable)
+                Data = CreateImageData(Text);
         }
 
         public void UpdateFont(PersonaEditorLib.PersonaEncoding.PersonaFont Font)
         {
             this.Font = Font;
-            Data = CreateImageData(Text);
+            if (IsEnable)
+                Data = CreateImageData(Text);
         }
-        
+
         public TextVisual(PersonaEditorLib.PersonaEncoding.PersonaFont Font)
         {
             this.Font = Font;

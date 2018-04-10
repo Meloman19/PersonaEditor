@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,12 +14,12 @@ namespace PersonaEditorGUI.Classes.Visual
     {
         Dictionary<string, Background> backgrounds = new Dictionary<string, Background>()
         {
-            { "Default", new Background() }
+            { "Empty", new Background() }
         };
 
         string sourcedir;
 
-        ObservableCollection<string> backgroundList = new ObservableCollection<string>() { "Default" };
+        ObservableCollection<string> backgroundList = new ObservableCollection<string>() { "Empty" };
 
         public ReadOnlyObservableCollection<string> BackgroundList { get; }
 
@@ -34,10 +35,12 @@ namespace PersonaEditorGUI.Classes.Visual
                     if (Path.GetExtension(file).ToLower() == ".png")
                     {
                         var temp = Path.GetFileNameWithoutExtension(file);
-                        if (temp != "Default")
+                        if (temp != "Empty")
                             backgroundList.Add(temp);
                     }
             }
+
+            new EventWrapper(Settings.BackgroundDefault.Default, this);
         }
 
         public Background GetBackground(int index)
@@ -52,9 +55,17 @@ namespace PersonaEditorGUI.Classes.Visual
                 return backgrounds[name];
             else
             {
-                var bckg = new Background(Path.Combine(sourcedir, name + ".png"), Path.Combine(sourcedir, name + ".xml"));
-                backgrounds.Add(name, bckg);
-                return bckg;
+                try
+                {
+                    var bckg = new Background(Path.Combine(sourcedir, name + ".png"), Path.Combine(sourcedir, name + ".xml"));
+                    backgrounds.Add(name, bckg);
+                    return bckg;
+                }
+                catch
+                {
+                    backgrounds.Add(name, null);
+                    return null;
+                }
             }
         }
 
@@ -72,6 +83,11 @@ namespace PersonaEditorGUI.Classes.Visual
                 return backgroundList[index];
             else
                 return "";
+        }
+
+        public void EmptyUpdate()
+        {
+            GetBackground(0).SetEmpty();
         }
     }
 }

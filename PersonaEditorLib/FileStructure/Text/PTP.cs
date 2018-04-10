@@ -556,8 +556,13 @@ namespace PersonaEditorLib.FileStructure.Text
                         else if (type == LineMap.Type.NewText) returned += removesplit ? b.NewString.Replace("\n", " ") + "\t" : b.NewString.Replace("\n", "\\n") + "\t";
                         else if (type == LineMap.Type.OldName)
                         {
-                            var name = names.FirstOrDefault(x => x.Index == a.CharacterIndex);
-                            returned += name == null ? " \t" : name.OldName.GetTextBaseList().GetString(Old, false).Replace("\n", " ") + "\t";
+                            if (a.Type == "SEL")
+                                returned += "<SELECT>\t";
+                            else
+                            {
+                                var name = names.FirstOrDefault(x => x.Index == a.CharacterIndex);
+                                returned += name == null ? " \t" : name.OldName.GetTextBaseList().GetString(Old, false).Replace("\n", " ") + "\t";
+                            }
                         }
                         else if (type == LineMap.Type.NewName)
                         {

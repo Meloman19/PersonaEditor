@@ -32,5 +32,6 @@ namespace PersonaEditorGUI
 
         public static PersonaEditorLib.PersonaEncoding.PersonaEncodingManager EncodingManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaEncodingManager(Paths.DirFont);
         public static PersonaEditorLib.PersonaEncoding.PersonaFontManager FontManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaFontManager(Paths.DirFont);
+        public static PersonaEditorGUI.Classes.Visual.BackgroundManager BackManager { get; } = new Classes.Visual.BackgroundManager(Paths.DirBackgrounds);
     }
 }

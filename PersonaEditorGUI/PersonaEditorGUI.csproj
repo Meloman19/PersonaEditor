@@ -126,7 +126,7 @@
     <Compile Include="Classes\Controls\TreeViewExtended.cs" />
     <Compile Include="Classes\Extention.cs" />
     <Compile Include="Classes\LocalizationManager.cs" />
-    <Compile Include="Classes\Media\Visual\TextVisual.cs" />
+    <Compile Include="Classes\Visual\TextVisual.cs" />
     <Compile Include="Classes\Event.cs" />
     <Compile Include="Classes\ReadOnlyBinding.cs" />
     <Compile Include="Classes\ResourceItem.cs" />
@@ -203,7 +203,6 @@
       <DependentUpon>TreeViewPE.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\UserTreeViewItem.cs" />
-    <Compile Include="Classes\Media\Visual\Background.cs" />
     <Compile Include="Controls\TreeViewPEVM.cs" />
     <Compile Include="MainWindowVM.cs" />
     <Compile Include="Resource\Localization.Designer.cs">

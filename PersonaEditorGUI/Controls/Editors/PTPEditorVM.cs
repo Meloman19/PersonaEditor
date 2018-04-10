@@ -12,7 +12,7 @@ using System.Windows.Data;
 using System.Globalization;
 using PersonaEditorLib.Extension;
 using System.Windows.Media.Imaging;
-using PersonaEditorGUI.Classes.Media.Visual;
+using PersonaEditorGUI.Classes.Visual;
 using System.Windows;
 using System.Windows.Media;
 using PersonaEditorLib.Interfaces;
@@ -59,9 +59,7 @@ namespace PersonaEditorGUI.Controls.Editors
     {
         TextVisual OldText;
         TextVisual NewText;
-
-        BackgroundImage BackgroundImg;
-        EventWrapper BackgroundEW;
+        private int BackgroundIndex;
 
         private string OldEncoding;
         private string NewEncoding;
@@ -87,8 +85,8 @@ namespace PersonaEditorGUI.Controls.Editors
             set { str.NewString = value; }
         }
 
-        public BitmapSource BackgroundImage => BackgroundImg.Image;
-        public Rect BackgroundRect => BackgroundImg.Rect;
+        public BitmapSource BackgroundImage => Static.BackManager.GetBackground(BackgroundIndex).Image;
+        public Rect BackgroundRect => Static.BackManager.GetBackground(BackgroundIndex).Rect;
 
         private ImageSource oldTextSource = null;
         private Rect oldTextRect;
@@ -205,29 +203,6 @@ namespace PersonaEditorGUI.Controls.Editors
                 if (e.PropertyName == "NewString")
                     NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
             }
-            else if (sender is BackgroundImage image)
-            {
-                if (e.PropertyName == "TextStart")
-                {
-                    OldText.Start = image.TextStart;
-                    NewText.Start = image.TextStart;
-                }
-                else if (e.PropertyName == "ColorText")
-                {
-                    OldText.Color = image.ColorText;
-                    NewText.Color = image.ColorText;
-                }
-                else if (e.PropertyName == "LineSpacing")
-                {
-                    OldText.LineSpacing = image.LineSpacing;
-                    NewText.LineSpacing = image.LineSpacing;
-                }
-                else if (e.PropertyName == "GlyphScale")
-                {
-                    OldText.GlyphScale = image.GlyphScale;
-                    NewText.GlyphScale = image.GlyphScale;
-                }
-            }
         }
 
         public void UpdateOldEncoding(string OldEncoding)
@@ -243,29 +218,39 @@ namespace PersonaEditorGUI.Controls.Editors
             NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)), Static.FontManager.GetPersonaFont(NewEncoding));
         }
 
-        public void UpdateBackground()
+        public void BackgroundUpdate()
         {
+            SetBack();
             Notify("BackgroundImage");
             Notify("BackgroundRect");
         }
 
-        public PTPMsgStrEditVM(MSG.MSGstr str, string OldEncoding, string NewEncoding, BackgroundImage backgroundImage)
+        public void BackgroundChange(int BackgroundIndex)
         {
+            this.BackgroundIndex = BackgroundIndex;
+            SetBack();
+            Notify("BackgroundImage");
+            Notify("BackgroundRect");
+        }
+
+        public PTPMsgStrEditVM(MSG.MSGstr str, string OldEncoding, string NewEncoding, int backgroundIndex)
+        {
+            BackgroundIndex = backgroundIndex;
             this.str = str;
             this.OldEncoding = OldEncoding;
             this.NewEncoding = NewEncoding;
 
             strEW = new EventWrapper(str, this);
 
-            BackgroundImg = backgroundImage;
-            BackgroundEW = new EventWrapper(backgroundImage, this);
-
             OldText = new TextVisual(Static.FontManager.GetPersonaFont(OldEncoding)) { Tag = "Old" };
             NewText = new TextVisual(Static.FontManager.GetPersonaFont(NewEncoding)) { Tag = "New" };
+            OldText.IsEnable = Settings.AppSetting.Default.PTPImageView;
+            NewText.IsEnable = Settings.AppSetting.Default.PTPImageView;
+
             OldText.VisualChanged += OldText_VisualChanged;
             NewText.VisualChanged += NewText_VisualChanged;
 
-            SetBack(backgroundImage);
+            SetBack();
 
             OldText.UpdateText(str.OldString);
             NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
@@ -314,19 +299,22 @@ namespace PersonaEditorGUI.Controls.Editors
             return returned;
         }
 
-        private void SetBack(BackgroundImage image)
+        private void SetBack()
         {
-            OldText.Start = image.TextStart;
-            NewText.Start = image.TextStart;
+            if (Static.BackManager.GetBackground(BackgroundIndex) is Classes.Visual.Background back)
+            {
+                OldText.Start = back.TextStart;
+                NewText.Start = back.TextStart;
 
-            OldText.Color = image.ColorText;
-            NewText.Color = image.ColorText;
+                OldText.Color = back.ColorText;
+                NewText.Color = back.ColorText;
 
-            OldText.LineSpacing = image.LineSpacing;
-            NewText.LineSpacing = image.LineSpacing;
+                OldText.LineSpacing = back.LineSpacing;
+                NewText.LineSpacing = back.LineSpacing;
 
-            OldText.GlyphScale = image.GlyphScale;
-            NewText.GlyphScale = image.GlyphScale;
+                OldText.GlyphScale = back.GlyphScale;
+                NewText.GlyphScale = back.GlyphScale;
+            }
         }
     }
 
@@ -335,8 +323,7 @@ namespace PersonaEditorGUI.Controls.Editors
         MSG msg;
         PTPName name;
         private string NewEncoding;
-
-        EventWrapper BackgroundEW;
+        private int BackgroundIndex;
         EventWrapper PTPNameEW;
 
         TextVisual OldName;
@@ -354,29 +341,6 @@ namespace PersonaEditorGUI.Controls.Editors
                     NewName.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
                 else if (e.PropertyName == "OldName")
                     OldName.UpdateText(name.OldName);
-            }
-            else if (sender is BackgroundImage image && OldName != null && NewName != null)
-            {
-                if (e.PropertyName == "NameStart")
-                {
-                    OldName.Start = image.NameStart;
-                    NewName.Start = image.NameStart;
-                }
-                else if (e.PropertyName == "ColorName")
-                {
-                    OldName.Color = image.ColorName;
-                    NewName.Color = image.ColorName;
-                }
-                else if (e.PropertyName == "LineSpacing")
-                {
-                    OldName.LineSpacing = image.LineSpacing;
-                    NewName.LineSpacing = image.LineSpacing;
-                }
-                else if (e.PropertyName == "GlyphScale")
-                {
-                    OldName.GlyphScale = image.GlyphScale;
-                    NewName.GlyphScale = image.GlyphScale;
-                }
             }
         }
 
@@ -399,26 +363,47 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public void UpdateBackground()
         {
-            foreach (var a in Strings)
-                a.UpdateBackground();
+            //foreach (var a in Strings)
+            //    a.UpdateBackground();
         }
 
-        public PTPMsgVM(MSG msg, PTPName name, string OldEncoding, string NewEncoding, BackgroundImage backgroundImage)
+        public void BackgroundUpdate()
         {
+            if (OldName != null && NewName != null)
+                SetBack();
+
+            foreach (var a in Strings)
+                a.BackgroundUpdate();
+        }
+
+        public void BackgroundChange(int BackgroundIndex)
+        {
+            this.BackgroundIndex = BackgroundIndex;
+            if (OldName != null && NewName != null)
+                SetBack();
+
+            foreach (var a in Strings)
+                a.BackgroundChange(BackgroundIndex);
+        }
+
+        public PTPMsgVM(MSG msg, PTPName name, string OldEncoding, string NewEncoding, int backgroundIndex)
+        {
+            BackgroundIndex = backgroundIndex;
             this.msg = msg;
             this.name = name;
             this.NewEncoding = NewEncoding;
 
-            BackgroundEW = new EventWrapper(backgroundImage, this);
-
             foreach (var a in msg.Strings)
-                Strings.Add(new PTPMsgStrEditVM(a, OldEncoding, NewEncoding, backgroundImage));
+                Strings.Add(new PTPMsgStrEditVM(a, OldEncoding, NewEncoding, BackgroundIndex));
 
             if (name != null)
             {
                 OldName = new TextVisual(Static.FontManager.GetPersonaFont(OldEncoding)) { Tag = "Old" };
                 NewName = new TextVisual(Static.FontManager.GetPersonaFont(NewEncoding)) { Tag = "New" };
-                SetBack(backgroundImage);
+                OldName.IsEnable = Settings.AppSetting.Default.PTPImageView;
+                NewName.IsEnable = Settings.AppSetting.Default.PTPImageView;
+
+                SetBack();
                 OldName.VisualChanged += OldName_VisualChanged;
                 NewName.VisualChanged += NewName_VisualChanged;
 
@@ -440,19 +425,22 @@ namespace PersonaEditorGUI.Controls.Editors
                 a.NewName_VisualChanged(imageSource, rect);
         }
 
-        private void SetBack(BackgroundImage image)
+        private void SetBack()
         {
-            OldName.Start = image.NameStart;
-            NewName.Start = image.NameStart;
+            if (Static.BackManager.GetBackground(BackgroundIndex) is Classes.Visual.Background back)
+            {
+                OldName.Start = back.NameStart;
+                NewName.Start = back.NameStart;
 
-            OldName.Color = image.ColorName;
-            NewName.Color = image.ColorName;
+                OldName.Color = back.ColorName;
+                NewName.Color = back.ColorName;
 
-            OldName.LineSpacing = image.LineSpacing;
-            NewName.LineSpacing = image.LineSpacing;
+                OldName.LineSpacing = back.LineSpacing;
+                NewName.LineSpacing = back.LineSpacing;
 
-            OldName.GlyphScale = image.GlyphScale;
-            NewName.GlyphScale = image.GlyphScale;
+                OldName.GlyphScale = back.GlyphScale;
+                NewName.GlyphScale = back.GlyphScale;
+            }
         }
     }
 
@@ -460,25 +448,55 @@ namespace PersonaEditorGUI.Controls.Editors
     {
         #region Private
 
-        EventWrapper BackgroundEW;
         EventWrapper EncodingManagerEW;
-        Backgrounds BackImage { get; } = new Backgrounds(Static.Paths.DirBackgrounds);
 
         #endregion Private
 
-        public ReadOnlyObservableCollection<string> BackgroundList => BackImage.BackgroundList;
-        public int SelectedIndex
+        private int Background;
+
+        private Background selectBack = null;
+        private Background SelectBack
         {
-            get { return BackImage.SelectedIndex; }
+            get { return selectBack; }
             set
             {
-                BackImage.SelectedIndex = value;
-                Settings.AppSetting.Default.PTPBackgroundDefault = BackImage.SelectedItem;
+                if (selectBack != value)
+                {
+                    if (selectBack != null)
+                        selectBack.BackgroundChanged -= SelectBack_BackgroundChanged;
+                    selectBack = value;
+                    if (selectBack != null)
+                        selectBack.BackgroundChanged += SelectBack_BackgroundChanged;
+                }
+            }
+        }
+
+        private void SelectBack_BackgroundChanged(Classes.Visual.Background background)
+        {
+            BackgroundUpdate();
+        }
+
+        public ReadOnlyObservableCollection<string> BackgroundList => Static.BackManager.BackgroundList;
+        public int SelectedIndex
+        {
+            get { return Background; }
+            set
+            {
+                if (SelectBack != Static.BackManager.GetBackground(value) && Static.BackManager.GetBackground(value) != null)
+                {
+                    SelectBack = Static.BackManager.GetBackground(value);
+                    Background = value;
+                    Settings.AppSetting.Default.PTPBackgroundDefault = Static.BackManager.GetBackgroundName(value);
+                    BackgroundChange(value);
+                }
+
+                Notify("SelectedIndex");
             }
         }
 
         private int OldEncoding;
         private int NewEncoding;
+        private bool View;
 
         public ReadOnlyObservableCollection<string> FontList => Static.EncodingManager.EncodingList;
 
@@ -506,17 +524,26 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
+        public bool ViewImage
+        {
+            get { return View; }
+            set
+            {
+                if (View != value)
+                {
+                    View = value;
+                    Settings.AppSetting.Default.PTPImageView = value;
+                    Notify("ViewImage");
+                }
+            }
+        }
+
         public ObservableCollection<PTPNameEditVM> Names { get; } = new ObservableCollection<PTPNameEditVM>();
         public ObservableCollection<PTPMsgVM> MSG { get; } = new ObservableCollection<PTPMsgVM>();
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is BackgroundImage image)
-            {
-                if (e.PropertyName == "Image" | e.PropertyName == "Rect")
-                    UpdateBackground();
-            }
-            else if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
+            if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
             {
                 if (e.PropertyName == man.GetPersonaEncodingName(OldEncoding))
                     UpdateOldEncoding(Settings.AppSetting.Default.PTPOldDefault);
@@ -539,16 +566,20 @@ namespace PersonaEditorGUI.Controls.Editors
                 a.UpdateNewEncoding(NewEncoding);
         }
 
-        public void UpdateBackground()
+        private void BackgroundUpdate()
         {
             foreach (var a in MSG)
-                a.UpdateBackground();
+                a.BackgroundUpdate();
+        }
+
+        private void BackgroundChange(int BackgroundIndex)
+        {
+            foreach (var a in MSG)
+                a.BackgroundChange(BackgroundIndex);
         }
 
         public PTPEditorVM(PTP ptp)
         {
-            BackImage.SelectedItem = Settings.AppSetting.Default.PTPBackgroundDefault;
-
             int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.PTPOldDefault);
             if (sourceInd >= 0)
                 OldEncoding = sourceInd;
@@ -561,18 +592,25 @@ namespace PersonaEditorGUI.Controls.Editors
             else
                 NewEncoding = 0;
 
-            BackgroundEW = new EventWrapper(BackImage.CurrentBackground, this);
+            sourceInd = Static.BackManager.GetBackgroundIndex(Settings.AppSetting.Default.PTPBackgroundDefault);
+            if (sourceInd >= 0)
+                SelectedIndex = sourceInd;
+            else
+                SelectedIndex = 0;
+
+            View = Settings.AppSetting.Default.PTPImageView;
             EncodingManagerEW = new EventWrapper(Static.EncodingManager, this);
 
             foreach (var a in ptp.names)
                 Names.Add(new PTPNameEditVM(a, Settings.AppSetting.Default.PTPOldDefault));
 
             foreach (var a in ptp.msg)
-                MSG.Add(new PTPMsgVM(a, ptp.names.FirstOrDefault(x => x.Index == a.CharacterIndex), Settings.AppSetting.Default.PTPOldDefault, Settings.AppSetting.Default.PTPNewDefault, BackImage.CurrentBackground));
+                MSG.Add(new PTPMsgVM(a, ptp.names.FirstOrDefault(x => x.Index == a.CharacterIndex), Settings.AppSetting.Default.PTPOldDefault, Settings.AppSetting.Default.PTPNewDefault, SelectedIndex));
         }
 
         public bool Close()
         {
+            SelectBack = null;
             return true;
         }
     }

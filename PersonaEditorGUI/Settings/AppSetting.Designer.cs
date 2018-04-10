@@ -61,7 +61,7 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
         public string PTPBackgroundDefault {
             get {
                 return ((string)(this["PTPBackgroundDefault"]));
@@ -200,6 +200,18 @@ namespace PersonaEditorGUI.Settings {
             }
             set {
                 this["Single_Instance_Application"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PTPImageView {
+            get {
+                return ((bool)(this["PTPImageView"]));
+            }
+            set {
+                this["PTPImageView"] = value;
             }
         }
     }

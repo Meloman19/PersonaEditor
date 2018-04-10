@@ -5,9 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
              xmlns:local2="clr-namespace:PersonaEditorGUI.Classes"
-             xmlns:media="clr-namespace:PersonaEditorGUI.Classes.Media.Visual"
+             xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
              mc:Ignorable="d" Name="USC"
-             d:DesignHeight="300" d:DesignWidth="300" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+             d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VirtualizingPanel.IsVirtualizing="True">
+
+    <UserControl.Resources>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -23,6 +27,8 @@
             <ComboBox ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedOldFont, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Text="Old Font:"/>
             <ComboBox ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedNewFont, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <CheckBox Content="Image View" IsChecked="{Binding ViewImage}" x:Name="VIEW" x:FieldModifier="private"/>
         </StatusBar>
         <Separator Grid.Row="1"/>
 
@@ -96,7 +102,7 @@
                                                         <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding OldString, Mode=OneWay}"/>
                                                         <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                        <Image Grid.Column="0" Grid.Row="1" Margin="2">
+                                                        <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
                                                             <Image.Source>
                                                                 <DrawingImage>
                                                                     <DrawingImage.Drawing>
@@ -115,7 +121,7 @@
                                                             </Image.Source>
                                                         </Image>
 
-                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2">
+                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
                                                             <Image.Source>
                                                                 <DrawingImage>
                                                                     <DrawingImage.Drawing>

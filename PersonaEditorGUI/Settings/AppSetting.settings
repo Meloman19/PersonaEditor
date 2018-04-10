@@ -12,7 +12,7 @@
       <Value Profile="(Default)">P4_RUS</Value>
     </Setting>
     <Setting Name="PTPBackgroundDefault" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Default</Value>
+      <Value Profile="(Default)">Empty</Value>
     </Setting>
     <Setting Name="DirFont" Type="System.String" Scope="User">
       <Value Profile="(Default)">font</Value>
@@ -45,6 +45,9 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Single_Instance_Application" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PTPImageView" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
