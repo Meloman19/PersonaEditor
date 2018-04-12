@@ -56,13 +56,19 @@ namespace PersonaEditorLib
         {
             currentByte[_index] = bit;
             index++;
-
-
         }
 
         public byte[] GetArray()
         {
-            finale.Add(BitArray2Byte());
+            if (index == 0)
+            {
+                finale.Add(0);
+            }
+            else
+            {
+                finale.Add(BitArray2Byte());
+                finale.Add(0);
+            }
             return finale.ToArray();
         }
 
@@ -73,8 +79,6 @@ namespace PersonaEditorLib
                 result += currentByte.Get(index) ? m : (byte)0;
             return result;
         }
-
-
     }
 
     public class BinaryReaderBE : BinaryReader

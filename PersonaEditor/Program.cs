@@ -96,6 +96,20 @@ namespace PersonaEditor
 
         static void Main(string[] args)
         {
+            //    //  PersonaEditorLib.FileStructure.FNT.FNT fnt2 = new PersonaEditorLib.FileStructure.FNT.FNT("EQWEQWE.FNT");
+
+            //    PersonaEditorLib.FileStructure.FNT.FNT fnt = new PersonaEditorLib.FileStructure.FNT.FNT(args[0]);
+            //    //  Imaging.SavePNG(fnt.GetImage(), "P5.png");
+
+            //    // fnt.SetImage(Imaging.OpenPNG("P5.png"));
+            //    //fnt.Resize(4000);
+            //    //fnt.SetImage(Imaging.OpenPNG("FONT0.png"));            
+
+            //    fnt.Resize(int.Parse(args[1]));
+            //    fnt.SetImage(Imaging.OpenPNG(args[2]));
+            //    fnt.SetTable(XDocument.Load(args[3]));
+            //    File.WriteAllBytes("P5(N).FNT", fnt.Get());
+
             //Test(args);
             LoadSetting();
 
@@ -206,7 +220,11 @@ namespace PersonaEditor
         {
             if (objectFile.Object is IImage image)
             {
-                string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG");
+                if (parameters.Size >= 0)
+                    if (objectFile.Object is PersonaEditorLib.FileStructure.FNT.FNT fnt)
+                        fnt.Resize(parameters.Size);
+
+                string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG") : value;
                 if (File.Exists(path))
                     image.SetImage(Imaging.OpenPNG(path));
             }
@@ -225,7 +243,7 @@ namespace PersonaEditor
         {
             if (objectFile.Object is ITable table)
             {
-                string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".XML");
+                string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".XML") : value;
                 if (File.Exists(path))
                     table.SetTable(XDocument.Load(path));
             }

@@ -30,7 +30,6 @@ namespace PersonaEditorGUI.Tools
 
         PersonaEditorLib.PersonaEncoding.PersonaEncoding PersonaEncoding;
         PersonaEditorLib.PersonaEncoding.PersonaFont PersonaFont;
-        EventWrapper BackgroundEW;
 
         TextVisual Text;
         TextVisual Name;

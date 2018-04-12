@@ -233,6 +233,12 @@ namespace PersonaEditorGUI.Controls.Editors
             Notify("BackgroundRect");
         }
 
+        public void ViewChange(bool View)
+        {
+            OldText.IsEnable = View;
+            NewText.IsEnable = View;
+        }
+
         public PTPMsgStrEditVM(MSG.MSGstr str, string OldEncoding, string NewEncoding, int backgroundIndex)
         {
             BackgroundIndex = backgroundIndex;
@@ -374,6 +380,17 @@ namespace PersonaEditorGUI.Controls.Editors
 
             foreach (var a in Strings)
                 a.BackgroundUpdate();
+        }
+
+        public void ViewChange(bool IsEnable)
+        {
+            if (OldName != null && NewName != null)
+            {
+                OldName.IsEnable = IsEnable;
+                NewName.IsEnable = IsEnable;
+            }
+            foreach (var a in Strings)
+                a.ViewChange(IsEnable);
         }
 
         public void BackgroundChange(int BackgroundIndex)
@@ -532,8 +549,9 @@ namespace PersonaEditorGUI.Controls.Editors
                 if (View != value)
                 {
                     View = value;
-                    Settings.AppSetting.Default.PTPImageView = value;
+                    Settings.AppSetting.Default.PTPImageView = value;                    
                     Notify("ViewImage");
+                    ViewChange();
                 }
             }
         }
@@ -564,6 +582,12 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             foreach (var a in MSG)
                 a.UpdateNewEncoding(NewEncoding);
+        }
+
+        private void ViewChange()
+        {
+            foreach (var a in MSG)
+                a.ViewChange(View);
         }
 
         private void BackgroundUpdate()

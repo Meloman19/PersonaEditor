@@ -17,7 +17,9 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <StatusBar Grid.Row="0">
@@ -32,129 +34,151 @@
         </StatusBar>
         <Separator Grid.Row="1"/>
 
-        <ScrollViewer Name="ScrollView" Grid.Row="2" VerticalScrollBarVisibility="Auto">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                </Grid.RowDefinitions>
-                <ItemsControl Grid.Row="0" Name="IC_NAME" ItemsSource="{Binding Path=Names}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                </Grid.ColumnDefinitions>
+        <ItemsControl Grid.Row="2" Name="IC_NAME" ItemsSource="{Binding Path=Names}" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True" >
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
 
-                                <Grid Grid.Column="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition/>
-                                    </Grid.ColumnDefinitions>
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer Focusable="False">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
 
-                                    <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
-                                    <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
-                                    <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
-                                    <TextBox Grid.Column="3" Margin="2" Text="{Binding OldName, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap"/>
-                                </Grid>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="1" Margin="2" Text="{Binding NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
 
-                <ItemsControl Grid.Row="1" Name="IC_MSG" ItemsSource="{Binding Path=MSG}" >
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <Separator/>
-                                <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
+                            <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
+                            <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
+                            <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
+                            <TextBox Grid.Column="3" Margin="2" Text="{Binding OldName, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap"/>
+                        </Grid>
 
-                                <ItemsControl Name="MSG" ItemsSource="{Binding Strings}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel>
-                                                <Separator/>
+                        <TextBox Grid.Column="1" Margin="2" Text="{Binding NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto"></RowDefinition>
-                                                        <RowDefinition Height="Auto"></RowDefinition>
-                                                        <RowDefinition Height="Auto"></RowDefinition>
-                                                    </Grid.RowDefinitions>
+        <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
 
-                                                    <TextBlock TextWrapping="Wrap" Grid.Row="0" Text="{Binding Prefix, Mode=OneWay}" HorizontalAlignment="Center" />
+        <ItemsControl Grid.Row="3" Name="IC_MSG" ItemsSource="{Binding Path=MSG}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.IsVirtualizing="True" Margin="0,4,0,1" Grid.RowSpan="2">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>                    
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
 
-                                                    <Grid Grid.Row="1" Margin="5">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="1*"/>
-                                                            <ColumnDefinition Width="1*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto"/>
-                                                            <RowDefinition Height="Auto"/>
-                                                        </Grid.RowDefinitions>
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer CanContentScroll="True">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
 
-                                                        <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding OldString, Mode=OneWay}"/>
-                                                        <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <Separator/>
+                        <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
 
-                                                        <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
-                                                            <Image.Source>
-                                                                <DrawingImage>
-                                                                    <DrawingImage.Drawing>
-                                                                        <DrawingGroup>
-                                                                            <DrawingGroup.Children>
-                                                                                <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
-                                                                                <ImageDrawing ImageSource="{Binding OldNameSource}" Rect="{Binding OldNameRect}"/>
-                                                                                <ImageDrawing ImageSource="{Binding OldTextSource}" Rect="{Binding OldTextRect}"/>
-                                                                            </DrawingGroup.Children>
-                                                                            <DrawingGroup.ClipGeometry>
-                                                                                <RectangleGeometry Rect="{Binding BackgroundRect}"/>
-                                                                            </DrawingGroup.ClipGeometry>
-                                                                        </DrawingGroup>
-                                                                    </DrawingImage.Drawing>
-                                                                </DrawingImage>
-                                                            </Image.Source>
-                                                        </Image>
+                        <ItemsControl Name="MSG" ItemsSource="{Binding Strings}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Separator/>
 
-                                                        <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
-                                                            <Image.Source>
-                                                                <DrawingImage>
-                                                                    <DrawingImage.Drawing>
-                                                                        <DrawingGroup>
-                                                                            <DrawingGroup.Children>
-                                                                                <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
-                                                                                <ImageDrawing ImageSource="{Binding NewNameSource}" Rect="{Binding NewNameRect}"/>
-                                                                                <ImageDrawing ImageSource="{Binding NewTextSource}" Rect="{Binding NewTextRect}"/>
-                                                                            </DrawingGroup.Children>
-                                                                            <DrawingGroup.ClipGeometry>
-                                                                                <RectangleGeometry Rect="{Binding BackgroundRect}"/>
-                                                                            </DrawingGroup.ClipGeometry>
-                                                                        </DrawingGroup>
-                                                                    </DrawingImage.Drawing>
-                                                                </DrawingImage>
-                                                            </Image.Source>
-                                                        </Image>
-                                                    </Grid>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                            </Grid.RowDefinitions>
 
-                                                    <TextBlock TextWrapping="Wrap"  Grid.Row="2" Text="{Binding Postfix, Mode=OneWay}" HorizontalAlignment="Center"/>
-                                                </Grid>
+                                            <TextBlock TextWrapping="Wrap" Grid.Row="0" Text="{Binding Prefix, Mode=OneWay}" HorizontalAlignment="Center" />
 
-                                                <Separator/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                            <Grid Grid.Row="1" Margin="5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition Width="1*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
-        </ScrollViewer>
+                                                <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding OldString, Mode=OneWay}"/>
+                                                <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
+                                                    <Image.Source>
+                                                        <DrawingImage>
+                                                            <DrawingImage.Drawing>
+                                                                <DrawingGroup>
+                                                                    <DrawingGroup.Children>
+                                                                        <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
+                                                                        <ImageDrawing ImageSource="{Binding OldNameSource}" Rect="{Binding OldNameRect}"/>
+                                                                        <ImageDrawing ImageSource="{Binding OldTextSource}" Rect="{Binding OldTextRect}"/>
+                                                                    </DrawingGroup.Children>
+                                                                    <DrawingGroup.ClipGeometry>
+                                                                        <RectangleGeometry Rect="{Binding BackgroundRect}"/>
+                                                                    </DrawingGroup.ClipGeometry>
+                                                                </DrawingGroup>
+                                                            </DrawingImage.Drawing>
+                                                        </DrawingImage>
+                                                    </Image.Source>
+                                                </Image>
+
+                                                <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
+                                                    <Image.Source>
+                                                        <DrawingImage>
+                                                            <DrawingImage.Drawing>
+                                                                <DrawingGroup>
+                                                                    <DrawingGroup.Children>
+                                                                        <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
+                                                                        <ImageDrawing ImageSource="{Binding NewNameSource}" Rect="{Binding NewNameRect}"/>
+                                                                        <ImageDrawing ImageSource="{Binding NewTextSource}" Rect="{Binding NewTextRect}"/>
+                                                                    </DrawingGroup.Children>
+                                                                    <DrawingGroup.ClipGeometry>
+                                                                        <RectangleGeometry Rect="{Binding BackgroundRect}"/>
+                                                                    </DrawingGroup.ClipGeometry>
+                                                                </DrawingGroup>
+                                                            </DrawingImage.Drawing>
+                                                        </DrawingImage>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Grid>
+
+                                            <TextBlock TextWrapping="Wrap"  Grid.Row="2" Text="{Binding Postfix, Mode=OneWay}" HorizontalAlignment="Center"/>
+                                        </Grid>
+
+                                        <Separator/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </UserControl>

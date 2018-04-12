@@ -49,6 +49,11 @@ namespace PersonaEditorLib.FileStructure.FNT
         public ushort UnknownUShort { get; set; }
         public int LastPosition { get; set; }
 
+        public void Resize(int size)
+        {
+            Glyphs.Count = (ushort)size;
+        }
+
         public int Size()
         {
             return HeaderSize;

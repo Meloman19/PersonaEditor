@@ -15,6 +15,15 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public List<byte> Unknown { get; set; } = new List<byte>();
 
+        public void Resize(int size)
+        {
+            int temp = size % 4 == 0 ? size : size + (4 - (size % 4));
+            if (temp > Unknown.Count)
+                Unknown.AddRange(new byte[temp - Unknown.Count]);
+            else
+                Unknown.RemoveRange(temp, Unknown.Count - temp);
+        }
+
         public int Size()
         {
             return Unknown.Count + 4;
