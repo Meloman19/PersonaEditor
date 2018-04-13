@@ -50,5 +50,8 @@
     <Setting Name="PTPImageView" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="PTPNameBlockSize" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

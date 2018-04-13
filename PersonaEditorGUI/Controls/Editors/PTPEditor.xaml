@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
              xmlns:local2="clr-namespace:PersonaEditorGUI.Classes"
              xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
+             xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
              mc:Ignorable="d" Name="USC"
              d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VirtualizingPanel.IsVirtualizing="True">
 
@@ -17,9 +18,9 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="{Binding Source={x:Static settings:AppSetting.Default}, Path=PTPNameBlockSize, Mode=TwoWay}"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
         <StatusBar Grid.Row="0">
@@ -77,7 +78,7 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
+        <GridSplitter ResizeBehavior="BasedOnAlignment" Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
 
         <ItemsControl Grid.Row="3" Name="IC_MSG" ItemsSource="{Binding Path=MSG}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.IsVirtualizing="True" Margin="0,4,0,1" Grid.RowSpan="2">
             <ItemsControl.ItemsPanel>
@@ -99,13 +100,12 @@
                     <StackPanel>
                         <Separator/>
                         <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
-
+                        <Separator/>
+                        
                         <ItemsControl Name="MSG" ItemsSource="{Binding Strings}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <Separator/>
-
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"></RowDefinition>

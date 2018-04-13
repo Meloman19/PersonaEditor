@@ -214,5 +214,17 @@ namespace PersonaEditorGUI.Settings {
                 this["PTPImageView"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public global::System.Windows.GridLength PTPNameBlockSize {
+            get {
+                return ((global::System.Windows.GridLength)(this["PTPNameBlockSize"]));
+            }
+            set {
+                this["PTPNameBlockSize"] = value;
+            }
+        }
     }
 }

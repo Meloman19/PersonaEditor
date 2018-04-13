@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using PersonaEditorLib;
 using PersonaEditorLib.FileStructure.Text;
@@ -16,6 +17,11 @@ namespace PersonaEditorGUI.Classes.Visual
     class TextVisual : BindingObject
     {
         public event VisualChangedEventHandler VisualChanged;
+
+        CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        CancellationToken CancellationToken = new CancellationToken();
+
+        Func<ImageData> GetData;
 
         PersonaEditorLib.PersonaEncoding.PersonaFont Font;
 
@@ -94,7 +100,7 @@ namespace PersonaEditorGUI.Classes.Visual
                 if (_LineSpacing != value)
                 {
                     _LineSpacing = value;
-                    Data = CreateImageData(Text);
+                    UpdateText();
                 }
             }
         }
@@ -109,11 +115,11 @@ namespace PersonaEditorGUI.Classes.Visual
             {
                 isEnable = value;
                 if (value)
-                    Data = CreateImageData(Text);
+                    UpdateText();
             }
         }
 
-        ImageData CreateImageData(object Text)
+        ImageData CreateData()
         {
             if (Text is IList<TextBaseElement> list)
                 return ImageData.DrawText(list, Font, Static.FontMap.Shift, LineSpacing);
@@ -134,27 +140,46 @@ namespace PersonaEditorGUI.Classes.Visual
             Text = List.ToArray();
             if (Font != null)
                 this.Font = Font;
-            if (IsEnable)
-                Data = CreateImageData(Text);
+            UpdateText();
         }
 
         public void UpdateText(byte[] array)
         {
             Text = array;
+            UpdateText();
+        }
+
+        public async void UpdateText()
+        {
+            if (!CancellationTokenSource.IsCancellationRequested)
+                CancellationTokenSource.Cancel();
+
+            CancellationTokenSource.Dispose();
+            CancellationTokenSource = new CancellationTokenSource();
+
             if (IsEnable)
-                Data = CreateImageData(Text);
+                try
+                {
+                    Data = await Task.Run(GetData, CancellationTokenSource.Token);
+                }
+                catch (OperationCanceledException ex)
+                {
+                }
+                catch (Exception e)
+                {
+                }
         }
 
         public void UpdateFont(PersonaEditorLib.PersonaEncoding.PersonaFont Font)
         {
             this.Font = Font;
-            if (IsEnable)
-                Data = CreateImageData(Text);
+            UpdateText();
         }
 
         public TextVisual(PersonaEditorLib.PersonaEncoding.PersonaFont Font)
         {
             this.Font = Font;
+            GetData = new Func<ImageData>(CreateData);
         }
     }
 }
