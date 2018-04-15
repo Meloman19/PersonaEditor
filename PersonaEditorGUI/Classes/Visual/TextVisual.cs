@@ -19,7 +19,6 @@ namespace PersonaEditorGUI.Classes.Visual
         public event VisualChangedEventHandler VisualChanged;
 
         CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
-        CancellationToken CancellationToken = new CancellationToken();
 
         Func<ImageData> GetData;
 

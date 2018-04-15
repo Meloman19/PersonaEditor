@@ -289,7 +289,7 @@ namespace PersonaEditorGUI.Classes
             if (FBD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 string path = FBD.SelectedPath;
-                if (personaFile is IPersonaFile file)
+                if (personaFile.Object is IPersonaFile file)
                 {
                     var list = file.GetSubFiles();
                     foreach (var item in list)
@@ -325,10 +325,6 @@ namespace PersonaEditorGUI.Classes
         private void SubFile_SelectedItemChanged(UserTreeViewItem sender) => SelectedItemChanged?.Invoke(sender);
 
         private void SubFile_SelectedItemOpen(UserTreeViewItem sender) => SelectedItemOpen?.Invoke(sender);
-
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-        }
 
         public DataObject GetDragObject()
         {

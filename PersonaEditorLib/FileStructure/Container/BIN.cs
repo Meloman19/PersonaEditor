@@ -27,7 +27,7 @@ namespace PersonaEditorLib.FileStructure.Container
                 Old = false;
                 IsLittleEndian = false;
                 OpenNew(data);
-            }                
+            }
             else if (data[3] == 0 && data[4] != 0)
             {
                 Old = false;
@@ -57,7 +57,7 @@ namespace PersonaEditorLib.FileStructure.Container
                     SubFiles.Add(objectFile);
                 }
         }
-        
+
         private void OpenNew(byte[] data)
         {
             using (BinaryReader reader = Utilities.IO.OpenReadFile(new MemoryStream(data), IsLittleEndian))
@@ -76,7 +76,7 @@ namespace PersonaEditorLib.FileStructure.Container
                 }
             }
         }
-
+        
         public object this[int index]
         {
             get

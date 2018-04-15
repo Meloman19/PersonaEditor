@@ -14,6 +14,8 @@ namespace PersonaEditorGUI.Controls
 {
     class MultiFileEditVM : BindingObject
     {
+        // private FileStream FileStream;
+
         public TreeViewPEVM Tree { get; } = new TreeViewPEVM();
         public PreviewEditorTabControlVM Tab { get; } = new PreviewEditorTabControlVM();
 
@@ -43,6 +45,12 @@ namespace PersonaEditorGUI.Controls
                 FileInfo fileInfo = new FileInfo(path);
                 if (fileInfo.Length > 1000000000)
                     return;
+
+                //FileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+
+                //var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
+                //    PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)),
+                //    new StreamFile(FileStream, FileStream.Length, 0));
 
                 var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
                     File.ReadAllBytes(path),

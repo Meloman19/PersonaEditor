@@ -102,6 +102,12 @@ namespace PersonaEditorLib.Utilities
                     Obj = new FileStructure.Container.BVP(name, data);
                 else if (type == FileType.TBL)
                     Obj = new FileStructure.Container.TBL(data, name);
+                else if (type == FileType.FTD)
+                    Obj = new FileStructure.Text.FTD(data);
+                else if (type == FileType.DDS)
+                    Obj = new FileStructure.Graphic.DDS(data);
+                else if (type == FileType.SPD)
+                    Obj = new FileStructure.SPR.SPD(data);
                 else
                     Obj = new FileStructure.DAT(data);
 
@@ -115,8 +121,8 @@ namespace PersonaEditorLib.Utilities
 
         public static FileType GetFileType(string name)
         {
-            string ext = Path.GetExtension(name);
-            if (ext.ToLower() == ".bin" | ext.ToLower() == ".pak" | ext.ToLower() == ".pac" | ext.ToLower() == ".p00" | ext.ToLower() == ".arc")
+            string ext = Path.GetExtension(name).ToLower().TrimEnd(' ');
+            if (ext == ".bin" | ext== ".pak" | ext == ".pac" | ext == ".p00" | ext == ".arc" | ext == ".dds2")
                 return FileType.BIN;
             else if (ext.ToLower() == ".spr")
                 return FileType.SPR;
@@ -136,6 +142,12 @@ namespace PersonaEditorLib.Utilities
                 return FileType.BVP;
             else if (ext.ToLower() == ".tbl")
                 return FileType.TBL;
+            else if (ext.ToLower() == ".dds")
+                return FileType.DDS;
+            else if (ext.ToLower() == ".spd")
+                return FileType.SPD;
+            //else if (ext.ToLower() == ".ctd")
+            //    return FileType.FTD;
             else
                 return FileType.DAT;
         }

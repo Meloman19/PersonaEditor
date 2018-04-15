@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.ComponentModel;
 using PersonaEditorLib.PersonaEncoding;
 using System.Threading;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace PersonaEditorGUI
 {
@@ -133,7 +134,7 @@ namespace PersonaEditorGUI
         }
 
         #endregion Events
-
+        
         public ICommand clickTest { get; }
         private void TestClick()
         {

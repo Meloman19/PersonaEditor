@@ -16,7 +16,37 @@
         </StatusBar>
         <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" >
             <Border.Background>
-                <SolidColorBrush Color="{Binding Path=Background}"/>
+                <DrawingBrush Viewport="0,0,30,30" ViewportUnits="Absolute" TileMode="Tile">
+                    <DrawingBrush.Drawing>
+                        <DrawingGroup>
+                            <GeometryDrawing Brush="White">
+                                <GeometryDrawing.Geometry>
+                                    <RectangleGeometry Rect="0,0,15,15"/>
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+
+                            <GeometryDrawing Brush="LightGray">
+                                <GeometryDrawing.Geometry>
+                                    <RectangleGeometry Rect="0,15,15,15"/>
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+
+                            <GeometryDrawing Brush="LightGray">
+                                <GeometryDrawing.Geometry>
+                                    <RectangleGeometry Rect="15,0,15,15"/>
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+
+                            <GeometryDrawing Brush="White">
+                                <GeometryDrawing.Geometry>
+                                    <RectangleGeometry Rect="15,15,15,15"/>
+                                </GeometryDrawing.Geometry>
+                            </GeometryDrawing>
+                        </DrawingGroup>
+                    </DrawingBrush.Drawing>
+                </DrawingBrush>
+                <!--<ImageBrush ImageSource="{Binding Path=Background2}" TileMode="Tile" Viewport="0,0,40,40" ViewportUnits="Absolute" />-->
+                <!--<SolidColorBrush Color="{Binding Path=Background}"/>-->
             </Border.Background>
             <Image Source="{Binding SourceIMG}" Stretch="Uniform"/>
         </Border>

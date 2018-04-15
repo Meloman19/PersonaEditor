@@ -12,11 +12,18 @@ namespace PersonaEditorLib.FileStructure
     {
         public byte[] Data { get; set; } = new byte[0];
 
+        private StreamFile StreamFile;
+
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public DAT(byte[] data)
         {
             Data = data;
+        }
+
+        public DAT(StreamFile streamFile)
+        {
+            StreamFile = streamFile;
         }
 
         #region IPersonaFile

@@ -16,6 +16,12 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public TBL(byte[] data, string name)
         {
+
+            ReadOld(data, name);
+        }
+
+        private void ReadOld(byte[] data, string name)
+        {
             int index = 0;
             using (BinaryReader reader = Utilities.IO.OpenReadFile(new MemoryStream(data), IsLittleEndian))
                 do

@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.ComponentModel;
 using System.Windows.Documents;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 
 namespace PersonaEditorLib.Extension
 {
@@ -24,6 +25,12 @@ namespace PersonaEditorLib.Extension
 
             return returned;
         }
+
+        public static async Task<string> GetStringAsync(this IList<FileStructure.Text.TextBaseElement> ByteCollection, Encoding encoding, bool LineSplit = false)
+        {
+            return await Task.Run(() => ByteCollection.GetString(encoding, LineSplit));
+        }
+
         public static string GetString(this IList<FileStructure.Text.TextBaseElement> ByteCollection)
         {
             string returned = "";
@@ -274,5 +281,9 @@ namespace PersonaEditorLib.Extension
 
             return returned.ToArray();
         }
+    }
+
+    public static class ArrayExtensiong
+    {
     }
 }

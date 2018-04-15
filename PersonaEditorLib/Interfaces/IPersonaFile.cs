@@ -25,6 +25,9 @@ namespace PersonaEditorLib.Interfaces
         BVP,
         TBL,
         DAT,
+        FTD,
+        DDS,
+        SPD,
         StringList
     }
 
