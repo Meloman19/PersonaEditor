@@ -34,8 +34,8 @@ namespace PersonaEditorLib.FileStructure.Text
         {
             try
             {
-                name.Clear();
-                msg.Clear();
+                Name.Clear();
+                Msg.Clear();
 
                 stream.Position = 0x8;
                 byte[] temp = new byte[4];
@@ -49,8 +49,8 @@ namespace PersonaEditorLib.FileStructure.Text
             }
             catch (Exception e)
             {
-                name.Clear();
-                msg.Clear();
+                Name.Clear();
+                Msg.Clear();
 
                 Logging.Write("PTPfactory", e.ToString());
                 return false;
@@ -59,10 +59,10 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public bool Open(PTP PTP, Encoding New)
         {
-            name.Clear();
-            msg.Clear();
+            Name.Clear();
+            Msg.Clear();
             foreach (var a in PTP.names)
-                name.Add(new Names(a.Index, a.NewName.GetTextBaseList(New).GetByteArray().ToArray()));
+                Name.Add(new Names(a.Index, a.NewName.GetTextBaseList(New).GetByteArray().ToArray()));
 
             foreach (var a in PTP.msg)
             {
@@ -73,7 +73,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
                 byte[] MsgBytes = a.GetNew(New);
 
-                msg.Add(new MSGs(Index, Name, Type, CharacterIndex, MsgBytes.ToArray()));
+                Msg.Add(new MSGs(Index, Name, Type, CharacterIndex, MsgBytes.ToArray()));
             }
 
             return true;
@@ -117,7 +117,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         Bytes.Add(Byte);
                         Byte = BR.ReadByte();
                     }
-                    name.Add(new Names(i, Bytes.ToArray()));
+                    Name.Add(new Names(i, Bytes.ToArray()));
                 }
 
                 for (int i = 0; i < MSGPosition.Count; i++)
@@ -165,15 +165,15 @@ namespace PersonaEditorLib.FileStructure.Text
 
                     MSGs MSG = new MSGs(i, MSG_Name, Type, CharacterIndex, MSG_bytes);
 
-                    msg.Add(MSG);
+                    Msg.Add(MSG);
                 }
             }
             catch (Exception e)
             {
                 Logging.Write("PersonaEditorLib", "Error: Parse MSG1 error!");
                 Logging.Write("PersonaEditorLib", e);
-                name.Clear();
-                msg.Clear();
+                Name.Clear();
+                Msg.Clear();
             }
         }
 
@@ -213,8 +213,8 @@ namespace PersonaEditorLib.FileStructure.Text
             public byte[] MsgBytes { get; set; }
         }
 
-        public List<MSGs> msg { get; set; } = new List<MSGs>();
-        public List<Names> name { get; set; } = new List<Names>();
+        public List<MSGs> Msg { get; set; } = new List<MSGs>();
+        public List<Names> Name { get; set; } = new List<Names>();
 
         static class GetNewBMD
         {
@@ -502,10 +502,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public FileType Type => FileType.BMD;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return new List<ObjectFile>();
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {
@@ -513,8 +510,8 @@ namespace PersonaEditorLib.FileStructure.Text
             {
                 Dictionary<string, object> returned = new Dictionary<string, object>();
 
-                returned.Add("Names Count", name.Count);
-                returned.Add("MSG Count", msg.Count);
+                returned.Add("Names Count", Name.Count);
+                returned.Add("MSG Count", Msg.Count);
                 returned.Add("Type", Type);
 
                 return returned;
@@ -539,7 +536,7 @@ namespace PersonaEditorLib.FileStructure.Text
             using (MemoryStream MS = new MemoryStream())
             {
                 BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
-                GetNewBMD.Get(msg, name, writer);
+                GetNewBMD.Get(Msg, Name, writer);
                 returned = MS.ToArray();
             }
             return returned;

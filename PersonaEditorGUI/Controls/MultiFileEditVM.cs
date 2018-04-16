@@ -117,7 +117,7 @@ namespace PersonaEditorGUI.Controls
 
         private void Tree_SelectedItemData(UserTreeViewItem sender)
         {
-            if (sender.personaFile.Object is IImage image)
+            if (sender.PersonaFile.Object is IImage image)
                 Tab.SetPreview(image.GetImage());
             else
                 Tab.SetPreview(null);

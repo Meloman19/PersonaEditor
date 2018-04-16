@@ -10,19 +10,19 @@ namespace PersonaEditorLib.Utilities
 {
     public static class PersonaFile
     {
-        public static Dictionary<FileType, string> PersonaFileFilter = new Dictionary<FileType, string>()
+        public static Dictionary<FileType, string> PersonaSaveFileFilter = new Dictionary<FileType, string>()
         {
             { FileType.TMX, "|PNG file|*.PNG" },
             { FileType.BMD, "|Persona Text Project|*.PTP" },
+            { FileType.FNT, "|PNG file|*.PNG" },
+            { FileType.DDS, "|PNG file|*.PNG" }
+        };
+
+        public static Dictionary<FileType, string> PersonaOpenFileFilter = new Dictionary<FileType, string>()
+        {
+            { FileType.BMD, "|Persona Text Project|*.PTP" },
             { FileType.FNT, "|PNG file|*.PNG" }
         };
-
-        static Dictionary<FileType, ContextMenuItems[]> PersonaFileContextMenu = new Dictionary<FileType, ContextMenuItems[]>()
-        {
-            { FileType.BF, new ContextMenuItems[] {ContextMenuItems.Replace, ContextMenuItems.Separator, ContextMenuItems.SaveAs, ContextMenuItems.SaveAll} }
-
-        };
-
 
         public static List<Tuple<FileType, string>> FileInfo = new List<Tuple<FileType, string>>()
             {
@@ -186,11 +186,13 @@ namespace PersonaEditorLib.Utilities
                 case FileType.StringList:
                 case FileType.TBL:
                 case FileType.TMX:
+                case FileType.DDS:
                     returned.Add(ContextMenuItems.Replace);
                     break;
                 case FileType.BMD:
                 case FileType.PTP:
                 case FileType.SPR:
+                case FileType.SPD:
                     returned.Add(ContextMenuItems.Edit);
                     returned.Add(ContextMenuItems.Replace);
                     break;
@@ -206,6 +208,7 @@ namespace PersonaEditorLib.Utilities
                 case FileType.PM1:
                 case FileType.SPR:
                 case FileType.TBL:
+                case FileType.SPD:
                     returned.Add(ContextMenuItems.SaveAs);
                     returned.Add(ContextMenuItems.SaveAll);
                     break;
@@ -215,6 +218,7 @@ namespace PersonaEditorLib.Utilities
                 case FileType.PTP:
                 case FileType.StringList:
                 case FileType.TMX:
+                case FileType.DDS:
                     returned.Add(ContextMenuItems.SaveAs);
                     break;
             }

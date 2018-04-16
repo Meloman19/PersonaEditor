@@ -49,8 +49,6 @@ namespace PersonaEditorLib.FileStructure.Container
         int[][] Table;
         byte[] Unknown;
 
-        public List<ObjectFile> List { get; } = new List<ObjectFile>();
-
         public BF(string path)
         {
             using (FileStream FS = File.OpenRead(path))
@@ -76,7 +74,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public void SetName(string name)
         {
-            foreach (var a in List)
+            foreach (var a in SubFiles)
             {
                 FileType fileType = (a.Object as IPersonaFile).Type;
                 string ext = Path.GetExtension(name);
@@ -120,7 +118,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
                     item.Tag = element[0];
 
-                    List.Add(item);
+                    SubFiles.Add(item);
                 }
         }
 
@@ -129,19 +127,16 @@ namespace PersonaEditorLib.FileStructure.Container
         #region IPersonaFile
 
         public FileType Type => FileType.BF;
-
-        public List<ObjectFile> GetSubFiles()
-        {
-            return List;
-        }
-
+        
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
+        
         public Dictionary<string, object> GetProperties
         {
             get
             {
                 Dictionary<string, object> returned = new Dictionary<string, object>();
 
-                returned.Add("Entry Count", List.Count);
+                returned.Add("Entry Count", SubFiles.Count);
                 returned.Add("Type", Type);
 
                 return returned;
@@ -159,7 +154,7 @@ namespace PersonaEditorLib.FileStructure.Container
                 int returned = 0;
 
                 returned += 0x20 + Table.Length * 0x10;
-                List.ForEach(x => returned += (x.Object as IPersonaFile).Size);
+                SubFiles.ForEach(x => returned += (x.Object as IPersonaFile).Size);
 
                 return returned;
             }
@@ -173,7 +168,7 @@ namespace PersonaEditorLib.FileStructure.Container
             {
                 BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
 
-                if (GetTable(Table, List, 0x20))
+                if (GetTable(Table, SubFiles, 0x20))
                 {
                     var temp = Table.FirstOrDefault(x => x[0] == 0x4);
                     if (temp == null)
@@ -193,7 +188,7 @@ namespace PersonaEditorLib.FileStructure.Container
                 else
                     return new byte[0];
 
-                List.ForEach(x => writer.Write((x.Object as IPersonaFile).Get()));
+                SubFiles.ForEach(x => writer.Write((x.Object as IPersonaFile).Get()));
 
                 returned = MS.ToArray();
             }

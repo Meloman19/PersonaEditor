@@ -115,6 +115,12 @@ namespace PersonaEditor
 
             try
             {
+                if (AdditionalСommands.commands.ContainsKey(args[0]))
+                {
+                    AdditionalСommands.commands[args[0]].Invoke(args.Skip(1).ToArray());
+                    return;
+                }
+
                 DoSome(args);
             }
             catch (Exception e)
@@ -316,7 +322,7 @@ namespace PersonaEditor
         {
             if (objectFile.Object is IPersonaFile pFile)
             {
-                var sublist = pFile.GetSubFiles();
+                var sublist = pFile.SubFiles;
 
                 foreach (var a in sublist)
                 {
@@ -333,7 +339,7 @@ namespace PersonaEditor
 
             if (parameters.Sub && objectFile.Object is IPersonaFile pFile)
             {
-                var sublist = pFile.GetSubFiles();
+                var sublist = pFile.SubFiles;
                 foreach (var a in sublist)
                     SubFileAction(action, a, value, openedFileDir, parameters);
             }
@@ -367,7 +373,7 @@ namespace PersonaEditor
         {
             if (objectFile.Object is IPersonaFile pFile)
             {
-                var sublist = pFile.GetSubFiles();
+                var sublist = pFile.SubFiles;
 
                 foreach (var a in sublist)
                 {
@@ -382,7 +388,7 @@ namespace PersonaEditor
         {
             if (objectFile.Object is IPersonaFile pFile)
             {
-                var sublist = pFile.GetSubFiles();
+                var sublist = pFile.SubFiles;
 
                 foreach (var a in sublist)
                 {

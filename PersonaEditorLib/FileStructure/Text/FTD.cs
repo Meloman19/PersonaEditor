@@ -10,8 +10,6 @@ namespace PersonaEditorLib.FileStructure.Text
 {
     public class FTD : IPersonaFile
     {
-        List<ObjectFile> SubFiles = new List<ObjectFile>();
-
         byte[] Header;
 
         List<byte[]> Text = new List<byte[]>();
@@ -36,10 +34,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public FileType Type => FileType.FTD;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return SubFiles;
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {

@@ -31,8 +31,6 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public Encoding DestEncoding { get; set; } = Encoding.ASCII;
 
-        List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
-
         public StringList(string file, Encoding srcEncoding)
         {
             List<byte[]> List = SplitByNull(File.ReadAllBytes(file));
@@ -103,10 +101,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public FileType Type => FileType.StringList;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return SubFiles;
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {

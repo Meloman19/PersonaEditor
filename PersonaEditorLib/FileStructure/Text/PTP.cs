@@ -220,7 +220,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public PTP(BMD bmd)
         {
-            foreach (var NAME in bmd.name)
+            foreach (var NAME in bmd.Name)
             {
                 int Index = NAME.Index;
                 byte[] OldNameSource = NAME.NameBytes;
@@ -229,7 +229,7 @@ namespace PersonaEditorLib.FileStructure.Text
                 names.Add(new PTPName(Index, OldNameSource, NewName));
             }
 
-            foreach (var Message in bmd.msg)
+            foreach (var Message in bmd.Msg)
             {
                 int Index = Message.Index;
                 string Type = Message.Type.ToString();
@@ -719,10 +719,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public FileType Type => FileType.PTP;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return new List<ObjectFile>();
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {

@@ -12,8 +12,6 @@ namespace PersonaEditorLib.FileStructure.Container
     {
         List<byte[]> List = new List<byte[]>();
 
-        List<ObjectFile> list = new List<ObjectFile>();
-
         public TBL(byte[] data, string name)
         {
 
@@ -36,7 +34,7 @@ namespace PersonaEditorLib.FileStructure.Container
                     else
                         tempName += "." + fileType.ToString();
 
-                    list.Add(Utilities.PersonaFile.OpenFile(tempName, tempdata, fileType == FileType.Unknown ? FileType.DAT : fileType));
+                    SubFiles.Add(Utilities.PersonaFile.OpenFile(tempName, tempdata, fileType == FileType.Unknown ? FileType.DAT : fileType));
                     long temp = Utilities.Utilities.Alignment(reader.BaseStream.Position, 16);
                     reader.BaseStream.Position += temp;
                 } while (reader.BaseStream.Position < reader.BaseStream.Length);
@@ -72,10 +70,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public FileType Type => FileType.TBL;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return list;
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {
@@ -107,7 +102,7 @@ namespace PersonaEditorLib.FileStructure.Container
             using (MemoryStream MS = new MemoryStream())
             using (BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian))
             {
-                foreach (var element in list)
+                foreach (var element in SubFiles)
                 {
                     if (element.Object is IPersonaFile pFile)
                     {

@@ -60,25 +60,30 @@ namespace PersonaEditorGUI.Controls
                 return false;
             }
 
-            if (sender.personaFile.Object is IPersonaFile pf)
+            if (sender.PersonaFile.Object is IPersonaFile pf)
             {
                 TabItemType DataContextType = TabItemType.Null;
                 object DataContext;
-                string Title = sender.personaFile.Name;
+                string Title = sender.PersonaFile.Name;
 
                 if (pf.Type == FileType.SPR)
                 {
-                    DataContext = new Editors.SPREditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.SPR.SPR);
+                    DataContext = new Editors.SPREditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.SPR.SPR);
+                    DataContextType = TabItemType.SPR;
+                }
+                else if(pf.Type == FileType.SPD)
+                {
+                    DataContext = new Editors.SPREditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.SPR.SPD);
                     DataContextType = TabItemType.SPR;
                 }
                 else if (pf.Type == FileType.PTP)
                 {
-                    DataContext = new Editors.PTPEditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.Text.PTP);
+                    DataContext = new Editors.PTPEditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.Text.PTP);
                     DataContextType = TabItemType.PTP;
                 }
                 else if (pf.Type == FileType.BMD)
                 {
-                    DataContext = new Editors.BMDEditorVM(sender.personaFile);
+                    DataContext = new Editors.BMDEditorVM(sender.PersonaFile);
                     DataContextType = TabItemType.BMD;
                 }
                 //else if (pf.Type == FileType.FNT)

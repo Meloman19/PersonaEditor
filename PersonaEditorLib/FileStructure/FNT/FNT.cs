@@ -89,10 +89,7 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public FileType Type => FileType.FNT;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return new List<ObjectFile>();
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {

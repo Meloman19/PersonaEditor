@@ -87,10 +87,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
         public FileType Type => FileType.TMX;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return new List<ObjectFile>();
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {

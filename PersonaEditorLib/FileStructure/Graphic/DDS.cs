@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 
 namespace PersonaEditorLib.FileStructure.Graphic
 {
-    class DDSPixelFormat
+    public class DDSPixelFormat
     {
         public enum PixelFormatFlags
         {
@@ -85,7 +85,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
         }
     }
 
-    class DDSHeader
+    public class DDSHeader
     {
         public int Size { get; } = 124;
 
@@ -179,9 +179,11 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
     public class DDS : IPersonaFile, IImage
     {
-        const int MagicNumber = 0x20534444;
+        public const uint MagicNumber = 0x20534444;
 
-        DDSHeader Header;
+        const uint MagicNumber2 = 0xFF000202;
+
+        public DDSHeader Header { get; private set; }
 
         List<byte[]> data = new List<byte[]>();
         List<BitmapSource> image = new List<BitmapSource>();
@@ -202,35 +204,40 @@ namespace PersonaEditorLib.FileStructure.Graphic
             streamFile.Stream.Position = streamFile.Position;
             using (BinaryReader reader = new BinaryReader(streamFile.Stream, Encoding.ASCII, true))
             {
-                if (reader.ReadInt32() != MagicNumber)
+                uint ty = reader.ReadUInt32();
+                if (ty != MagicNumber)
                     throw new Exception("DDS: wrong Magic Number");
-
-                Header = new DDSHeader(reader);
-
-                int BytePerBlock = Header.DDSPixelFormat.FourCC == DDSPixelFormat.PixelFormatFourCC.DXT1 ? 8 : 16;
-
-                int temp = 0;
-
-                int width = Header.Width;
-                int height = Header.Height;
-                if (Header.MipMapCount > 0)
-                    for (int i = 0; i < Header.MipMapCount; i++)
-                    {
-                        int size = (width / 4 == 0 ? 1 : width / 4) *
-                            (height / 4 == 0 ? 1 : height / 4) * BytePerBlock;
-
-                        temp += size;
-                        data.Add(reader.ReadBytes(size));
-
-                        width = width / 2 == 0 ? 1 : width / 2;
-                        height = height / 2 == 0 ? 1 : height / 2;
-                    }
                 else
-                    data.Add(reader.ReadBytes(Header.PitchOrLinearSize));
+                    ReadT1(reader);
             }
         }
 
-        List<ObjectFile> SubFiles = new List<ObjectFile>();
+        public void ReadT1(BinaryReader reader)
+        {
+            Header = new DDSHeader(reader);
+
+            int BytePerBlock = Header.DDSPixelFormat.FourCC == DDSPixelFormat.PixelFormatFourCC.DXT1 ? 8 : 16;
+
+            int temp = 0;
+
+            int width = Header.Width;
+            int height = Header.Height;
+            int size = Header.Width * Header.Height * BytePerBlock;
+            if (Header.MipMapCount > 0)
+                for (int i = 0; i < Header.MipMapCount; i++)
+                {
+                    size = (width / 4 == 0 ? 1 : width / 4) *
+                        (height / 4 == 0 ? 1 : height / 4) * BytePerBlock;
+
+                    temp += size;
+                    data.Add(reader.ReadBytes(size));
+
+                    width = width / 2 == 0 ? 1 : width / 2;
+                    height = height / 2 == 0 ? 1 : height / 2;
+                }
+            else
+                data.Add(reader.ReadBytes(size));
+        }
 
         void CreateImages()
         {
@@ -284,10 +291,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
         public FileType Type => FileType.DDS;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return SubFiles;
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {
@@ -309,7 +313,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
         {
             get
             {
-                return Header.Size + data.Sum(x => x.Length);
+                return Header.Size + 4 + data.Sum(x => x.Length);
             }
         }
 

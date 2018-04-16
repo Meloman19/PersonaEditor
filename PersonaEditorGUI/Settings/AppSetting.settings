@@ -27,7 +27,7 @@
       <Value Profile="(Default)">Default</Value>
     </Setting>
     <Setting Name="PreviewSelectedColor" Type="System.Windows.Media.Color" Scope="User">
-      <Value Profile="(Default)">#FF000000</Value>
+      <Value Profile="(Default)">#00000000</Value>
     </Setting>
     <Setting Name="SaveAsPTP_CO2N" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

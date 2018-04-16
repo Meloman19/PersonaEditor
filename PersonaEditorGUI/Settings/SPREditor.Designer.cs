@@ -70,5 +70,17 @@ namespace PersonaEditorGUI.Settings {
                 this["BorderThickness"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("P5")]
+        public string DefaultEncoding {
+            get {
+                return ((string)(this["DefaultEncoding"]));
+            }
+            set {
+                this["DefaultEncoding"] = value;
+            }
+        }
     }
 }

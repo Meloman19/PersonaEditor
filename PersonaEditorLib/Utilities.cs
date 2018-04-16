@@ -138,8 +138,6 @@ namespace PersonaEditorLib.Utilities
             return Colors;
         }
 
-
-
         public static string[] GetAllFiles(DirectoryInfo rootdirinfo, List<string> root)
         {
             root.Add(rootdirinfo.Name);

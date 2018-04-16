@@ -15,8 +15,6 @@ namespace PersonaEditorLib.FileStructure.SPR
         List<int> KeyOffsetList = new List<int>();
         public SPRKeyList KeyList;
 
-        public List<ObjectFile> TextureList { get; private set; } = new List<ObjectFile>();
-
         public SPR(Stream stream)
         {
             BinaryReader reader = Utilities.IO.OpenReadFile(stream, IsLittleEndian);
@@ -52,7 +50,7 @@ namespace PersonaEditorLib.FileStructure.SPR
             foreach (var a in TextureOffsetList)
             {
                 var tmx = new Graphic.TMX(reader.BaseStream, a);
-                TextureList.Add(new ObjectFile(tmx.Name, tmx));
+                SubFiles.Add(new ObjectFile(tmx.Name, tmx));
             }
         }
 
@@ -60,9 +58,9 @@ namespace PersonaEditorLib.FileStructure.SPR
         {
             list[0] = start;
 
-            for (int i = 1; i < TextureList.Count; i++)
+            for (int i = 1; i < SubFiles.Count; i++)
             {
-                start += (TextureList[i - 1].Object as IFile).Size;
+                start += (SubFiles[i - 1].Object as IFile).Size;
                 int temp = Utilities.Utilities.Alignment(start, 16);
                 start += temp == 0 ? 16 : temp;
                 list[i] = start;
@@ -75,10 +73,7 @@ namespace PersonaEditorLib.FileStructure.SPR
 
         public FileType Type => FileType.SPR;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return TextureList;
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {
@@ -86,7 +81,7 @@ namespace PersonaEditorLib.FileStructure.SPR
             {
                 Dictionary<string, object> returned = new Dictionary<string, object>();
 
-                returned.Add("Texture Count", TextureList.Count);
+                returned.Add("Texture Count", SubFiles.Count);
                 returned.Add("Type", Type);
 
                 return returned;
@@ -111,12 +106,12 @@ namespace PersonaEditorLib.FileStructure.SPR
                 int temp = Utilities.Utilities.Alignment(returned, 16);
                 returned += temp == 0 ? 16 : temp;
 
-                returned += (TextureList[0].Object as IFile).Size;
-                for (int i = 1; i < TextureList.Count; i++)
+                returned += (SubFiles[0].Object as IFile).Size;
+                for (int i = 1; i < SubFiles.Count; i++)
                 {
                     temp = Utilities.Utilities.Alignment(returned, 16);
                     returned += temp == 0 ? 16 : temp;
-                    returned += (TextureList[i].Object as IFile).Size;
+                    returned += (SubFiles[i].Object as IFile).Size;
                 }
 
                 return returned;
@@ -149,12 +144,12 @@ namespace PersonaEditorLib.FileStructure.SPR
 
                 UpdateOffsets(TextureOffsetList, (int)writer.BaseStream.Position);
 
-                writer.Write((TextureList[0].Object as IFile).Get());
-                for (int i = 1; i < TextureList.Count; i++)
+                writer.Write((SubFiles[0].Object as IFile).Get());
+                for (int i = 1; i < SubFiles.Count; i++)
                 {
                     int temp2 = Utilities.Utilities.Alignment(writer.BaseStream.Length, 16);
                     writer.Write(new byte[temp2 == 0 ? 16 : temp2]);
-                    writer.Write((TextureList[i].Object as IFile).Get());
+                    writer.Write((SubFiles[i].Object as IFile).Get());
                 }
 
                 writer.BaseStream.Position = Header.Size;
