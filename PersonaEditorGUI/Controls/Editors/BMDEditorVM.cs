@@ -260,9 +260,9 @@ namespace PersonaEditorGUI.Controls.Editors
                     destFont = 0;
 
 
-                foreach (var a in bmd.name)
+                foreach (var a in bmd.Name)
                     NameList.Add(new BMDNameVM(a, sourceFont));
-                foreach (var a in bmd.msg)
+                foreach (var a in bmd.Msg)
                     MsgList.Add(new BMDMsgVM(a, sourceFont));
 
                 Name = objbmd.Name;

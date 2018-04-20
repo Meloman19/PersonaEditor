@@ -25,6 +25,9 @@ namespace PersonaEditorLib.Interfaces
         BVP,
         TBL,
         DAT,
+        FTD,
+        DDS,
+        SPD,
         StringList
     }
 
@@ -39,8 +42,8 @@ namespace PersonaEditorLib.Interfaces
 
     public interface IPersonaFile : IFile
     {
-        FileType Type { get; }
-        List<ObjectFile> GetSubFiles();
+        FileType Type { get; }        
+        List<ObjectFile> SubFiles { get; }
         Dictionary<string, object> GetProperties { get; }
     }
 }

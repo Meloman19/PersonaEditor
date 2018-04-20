@@ -5,15 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
              xmlns:control="clr-namespace:PersonaEditorGUI.Classes.Controls"
+             xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{Binding Source={x:Static settings:AppSetting.Default}, Path=PTPNameBlockSize, Mode=TwoWay}"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-
 
         <StatusBar Grid.Row="0">
             <TextBlock Text="Source Font: " VerticalAlignment="Center"/>
@@ -25,59 +28,82 @@
             <CheckBox Content="Enable Edit" IsChecked="{Binding IsEdit}" VerticalAlignment="Center"/>
         </StatusBar>
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+        <Separator Grid.Row="1"/>
 
-                <ItemsControl Grid.Row="0" ItemsSource="{Binding NameList}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                    <ColumnDefinition></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding NameList}" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer Focusable="False">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
 
-                                <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
-                                <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
-                                <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
-                                <TextBox IsReadOnly="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.IsSelectCharList}" Grid.Column="3" Margin="2" Text="{Binding Path=Name, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                        <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
+                        <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
+                        <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
+                        <TextBox IsReadOnly="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.IsSelectCharList}" Grid.Column="3" Margin="2" Text="{Binding Path=Name, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding MsgList}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
+        <GridSplitter ResizeBehavior="BasedOnAlignment" Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
 
-                                <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding MsgList}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.IsVirtualizing="True">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
 
-                                <ItemsControl ItemsSource="{Binding StringList}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel>
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer CanContentScroll="True">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
 
-                                                <!--<control:EditorRichTextBox AcceptsReturn="True" Margin="2" Document="{Binding Document}" IsDocumentEnabled="True"/>-->
-                                                <TextBox Text="{Binding Text, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="2" TextWrapping="Wrap"
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+
+                        <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
+
+                        <ItemsControl ItemsSource="{Binding StringList}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+
+                                        <!--<control:EditorRichTextBox AcceptsReturn="True" Margin="2" Document="{Binding Document}" IsDocumentEnabled="True"/>-->
+                                        <TextBox Text="{Binding Text, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="2" TextWrapping="Wrap"
                                                          IsReadOnly="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.IsSelectCharList}" />
 
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
-        </ScrollViewer>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </UserControl>

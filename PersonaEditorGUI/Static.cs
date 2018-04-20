@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace PersonaEditorGUI
 {
@@ -12,8 +14,8 @@ namespace PersonaEditorGUI
         public static class Paths
         {
             public static string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            public static string DirBackgrounds = Path.Combine(CurrentFolderEXE, "background");
-            public static string DirFont = Path.Combine(CurrentFolderEXE, "font");
+            public static string DirBackgrounds = Path.Combine(CurrentFolderEXE, Settings.AppSetting.Default.DirBackground);
+            public static string DirFont = Path.Combine(CurrentFolderEXE, Settings.AppSetting.Default.DirFont);
             public static string DirLang = Path.Combine(CurrentFolderEXE, "lang");
         }
 
@@ -32,5 +34,6 @@ namespace PersonaEditorGUI
 
         public static PersonaEditorLib.PersonaEncoding.PersonaEncodingManager EncodingManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaEncodingManager(Paths.DirFont);
         public static PersonaEditorLib.PersonaEncoding.PersonaFontManager FontManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaFontManager(Paths.DirFont);
+        public static Classes.Visual.BackgroundManager BackManager { get; } = new Classes.Visual.BackgroundManager(Paths.DirBackgrounds);
     }
 }

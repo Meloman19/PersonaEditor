@@ -7,11 +7,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace PersonaEditorGUI.Controls
 {
     public class ImagePreviewVM : BindingObject
     {
+        BitmapSource TransparentBackground = PersonaEditorLib.Utilities.WPF.CreateTransparentBackground(Colors.White, Colors.Gray, 50);
+        public BitmapSource Background2 => TransparentBackground;
+
         private ImageSource imageSource = null;
         public ImageSource SourceIMG
         {

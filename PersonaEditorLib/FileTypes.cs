@@ -56,13 +56,19 @@ namespace PersonaEditorLib
         {
             currentByte[_index] = bit;
             index++;
-
-
         }
 
         public byte[] GetArray()
         {
-            finale.Add(BitArray2Byte());
+            if (index == 0)
+            {
+                finale.Add(0);
+            }
+            else
+            {
+                finale.Add(BitArray2Byte());
+                finale.Add(0);
+            }
             return finale.ToArray();
         }
 
@@ -73,13 +79,13 @@ namespace PersonaEditorLib
                 result += currentByte.Get(index) ? m : (byte)0;
             return result;
         }
-
-
     }
 
     public class BinaryReaderBE : BinaryReader
     {
         public BinaryReaderBE(Stream stream) : base(stream) { }
+
+        public BinaryReaderBE(Stream stream, Encoding encoding, bool leaveOpen) : base(stream, encoding, leaveOpen) { }
 
         public override short ReadInt16()
         {
@@ -127,6 +133,8 @@ namespace PersonaEditorLib
     public class BinaryWriterBE : BinaryWriter
     {
         public BinaryWriterBE(Stream stream) : base(stream) { }
+
+        public BinaryWriterBE(Stream stream, Encoding encoding, bool leaveOpen) : base(stream, encoding, leaveOpen) { }
 
         public override void Write(short value)
         {

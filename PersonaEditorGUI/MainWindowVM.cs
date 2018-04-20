@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.ComponentModel;
 using PersonaEditorLib.PersonaEncoding;
 using System.Threading;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace PersonaEditorGUI
 {
@@ -95,6 +96,7 @@ namespace PersonaEditorGUI
             Settings.WindowSetting.Default.Save();
             Controls.SettingsWindow.SetSettings setSettings = new Controls.SettingsWindow.SetSettings() { DataContext = new Controls.SettingsWindow.SetSettingsVM() };
             setSettings.ShowDialog();
+            Static.BackManager.EmptyUpdate();
         }
 
         public ICommand clickVisualizerOpen { get; }
@@ -132,7 +134,7 @@ namespace PersonaEditorGUI
         }
 
         #endregion Events
-
+        
         public ICommand clickTest { get; }
         private void TestClick()
         {

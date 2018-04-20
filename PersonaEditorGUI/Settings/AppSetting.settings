@@ -27,7 +27,7 @@
       <Value Profile="(Default)">Default</Value>
     </Setting>
     <Setting Name="PreviewSelectedColor" Type="System.Windows.Media.Color" Scope="User">
-      <Value Profile="(Default)">#FF000000</Value>
+      <Value Profile="(Default)">#00000000</Value>
     </Setting>
     <Setting Name="SaveAsPTP_CO2N" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -46,6 +46,15 @@
     </Setting>
     <Setting Name="Single_Instance_Application" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PTPImageView" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PTPNameBlockSize" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="FTDEncoding" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Empty</Value>
     </Setting>
   </Settings>
 </SettingsFile>

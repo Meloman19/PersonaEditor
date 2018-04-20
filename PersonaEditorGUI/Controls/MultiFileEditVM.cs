@@ -14,6 +14,8 @@ namespace PersonaEditorGUI.Controls
 {
     class MultiFileEditVM : BindingObject
     {
+        // private FileStream FileStream;
+
         public TreeViewPEVM Tree { get; } = new TreeViewPEVM();
         public PreviewEditorTabControlVM Tab { get; } = new PreviewEditorTabControlVM();
 
@@ -34,6 +36,9 @@ namespace PersonaEditorGUI.Controls
         private string _OpenFileName = "";
         public string OpenFileName => _OpenFileName;
 
+        private string statusBar = "";
+        public string StatusBar => statusBar;
+
         #region Methods
 
         public void OpenFile(string path)
@@ -43,6 +48,12 @@ namespace PersonaEditorGUI.Controls
                 FileInfo fileInfo = new FileInfo(path);
                 if (fileInfo.Length > 1000000000)
                     return;
+
+                //FileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+
+                //var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
+                //    PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)),
+                //    new StreamFile(FileStream, FileStream.Length, 0));
 
                 var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
                     File.ReadAllBytes(path),
@@ -109,10 +120,18 @@ namespace PersonaEditorGUI.Controls
 
         private void Tree_SelectedItemData(UserTreeViewItem sender)
         {
-            if (sender.personaFile.Object is IImage image)
+            if (sender.PersonaFile.Object is IImage image)
                 Tab.SetPreview(image.GetImage());
             else
                 Tab.SetPreview(null);
+
+            statusBar = "";
+            if (sender.PersonaFile.Object is IFile file)
+            {
+                int size = file.Size();
+                statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
+                Notify("StatusBar");
+            }
         }
 
         #endregion Events

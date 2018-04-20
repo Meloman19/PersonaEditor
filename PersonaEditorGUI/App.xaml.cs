@@ -21,8 +21,13 @@ namespace PersonaEditorGUI
         public App()
         {
             InitializeComponent();
+            Settings.AppSetting.Default.PropertyChanged += Default_PropertyChanged;
             LoadLocalization();
             //SaveLocalization();
+        }
+
+        private void Default_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
         }
 
         private void LoadLocalization()

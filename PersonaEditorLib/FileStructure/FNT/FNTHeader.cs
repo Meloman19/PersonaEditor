@@ -49,6 +49,11 @@ namespace PersonaEditorLib.FileStructure.FNT
         public ushort UnknownUShort { get; set; }
         public int LastPosition { get; set; }
 
+        public void Resize(int size)
+        {
+            Glyphs.Count = (ushort)size;
+        }
+
         public int Size()
         {
             return HeaderSize;
@@ -62,7 +67,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             Glyphs.Get(writer);
             writer.Write(UnknownUShort);
             writer.Write(LastPosition);
-            writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, HeaderSize)]);
+            writer.BaseStream.Position = HeaderSize;
         }
     }
 }

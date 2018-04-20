@@ -17,7 +17,7 @@ namespace PersonaEditorGUI.Controls.Editors
     class SPRKeyVM : BindingObject
     {
         PersonaEditorLib.FileStructure.SPR.SPRKey Key;
-        EventWrapper EW;
+
         private bool _IsSelected = false;
 
         public string Name
@@ -98,14 +98,99 @@ namespace PersonaEditorGUI.Controls.Editors
         public SPRKeyVM(PersonaEditorLib.FileStructure.SPR.SPRKey key)
         {
             Key = key ?? throw new ArgumentNullException("key");
-            EW = new EventWrapper(key, this);
         }
     }
 
-    class TMXVM : BindingObject
+    class SPDKeyVM : BindingObject
     {
-        ObjectFile tmx;
-        EventWrapper EW;
+        PersonaEditorLib.FileStructure.SPR.SPDKey Key;
+
+        private bool _IsSelected = false;
+
+        public string Name
+        {
+            get { return Encoding.GetEncoding("shift-jis").GetString(Key.Comment.Where(x => x != 0x00).ToArray()); }
+        }
+        public int X1
+        {
+            get { return Key.X0; }
+            set
+            {
+                if (value != Key.X0)
+                {
+                    Key.X0 = value;
+                    Notify("X1");
+                    Notify("Rect");
+                }
+            }
+        }
+        public int X2
+        {
+            get { return Key.X0 + Key.Xdel; }
+            set
+            {
+                if (value != Key.X0 + Key.Xdel)
+                {
+                    Key.Xdel = value - Key.X0;
+                    Notify("X2");
+                    Notify("Rect");
+                }
+            }
+        }
+        public int Y1
+        {
+            get { return Key.Y0; }
+            set
+            {
+                if (value != Key.Y0)
+                {
+                    Key.Y0 = value;
+                    Notify("Y1");
+                    Notify("Rect");
+                }
+            }
+        }
+        public int Y2
+        {
+            get { return Key.Y0 + Key.Ydel; }
+            set
+            {
+                if (value != Key.Y0 + Key.Ydel)
+                {
+                    Key.Ydel = value - Key.Y0;
+                    Notify("Y2");
+                    Notify("Rect");
+                }
+            }
+        }
+
+        public Rect Rect
+        {
+            get { return new Rect(new Point(X1, Y1), new Point(X2, Y2)); }
+        }
+
+        public bool IsSelected
+        {
+            get { return _IsSelected; }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    Notify("IsSelected");
+                }
+            }
+        }
+
+        public SPDKeyVM(PersonaEditorLib.FileStructure.SPR.SPDKey key)
+        {
+            Key = key ?? throw new ArgumentNullException("key");
+        }
+    }
+
+    class TextureVM : BindingObject
+    {
+        ObjectFile texture;
 
         private BitmapSource _TextureImage = null;
         private Rect _Rect;
@@ -122,27 +207,45 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public TMXVM(ObjectFile tmx, IList<PersonaEditorLib.FileStructure.SPR.SPRKey> keylist, int textureindex)
+        public TextureVM(ObjectFile tmx, IList<PersonaEditorLib.FileStructure.SPR.SPRKey> keylist, int textureindex)
         {
-            this.tmx = tmx ?? throw new ArgumentNullException("tmx");
-            if (tmx.Object == null) throw new ArgumentNullException("tmx.Object");
+            texture = tmx ?? throw new ArgumentNullException("tmx");
+            if (texture.Object == null) throw new ArgumentNullException("tmx.Object");
             var list = (keylist ?? throw new ArgumentNullException("keylist")).Where(x => x.mTextureIndex == textureindex);
 
-
             TextureImage = (tmx.Object as PersonaEditorLib.FileStructure.Graphic.TMX).GetImage();
-            EW = new EventWrapper(tmx, this);
 
             foreach (var a in list)
-                KeyList.Add(new SPRKeyVM(a));            
+                KeyList.Add(new SPRKeyVM(a));
+        }
+
+        public TextureVM(ObjectFile dds, IList<PersonaEditorLib.FileStructure.SPR.SPDKey> keylist, int textureindex)
+        {
+            texture = dds ?? throw new ArgumentNullException("dds");
+            if (texture.Object == null) throw new ArgumentNullException("dds.Object");
+            var list = (keylist ?? throw new Exception("keylist")).Where(x => x.TextureIndex == textureindex + 1);
+
+            TextureImage = (dds.Object as PersonaEditorLib.FileStructure.Graphic.DDS).GetImage();
+
+            foreach (var a in list)
+                KeyList.Add(new SPDKeyVM(a));
         }
 
         #region PublicProperties
 
-        public ObservableCollection<SPRKeyVM> KeyList { get; } = new ObservableCollection<SPRKeyVM>();
+        public ObservableCollection<object> KeyList { get; } = new ObservableCollection<object>();
 
         public DrawingCollection Drawings { get; } = new DrawingCollection();
 
-        public string Name => (tmx.Object as PersonaEditorLib.FileStructure.Graphic.TMX).Name;
+        public string Name
+        {
+            get
+            {
+                if (texture.Object is PersonaEditorLib.FileStructure.Graphic.TMX tmx)
+                    return tmx.Name;
+                else return texture.Name;
+            }
+        }
 
         public BitmapSource TextureImage
         {
@@ -157,16 +260,20 @@ namespace PersonaEditorGUI.Controls.Editors
         }
 
         public Rect Rect => _Rect;
-        
+
         public object SelectedItem
         {
             set
             {
                 if (_SelectedItem is SPRKeyVM it)
                     it.IsSelected = false;
+                else if (_SelectedItem is SPDKeyVM itt)
+                    itt.IsSelected = false;
                 _SelectedItem = value;
                 if (_SelectedItem is SPRKeyVM it2)
                     it2.IsSelected = true;
+                else if (_SelectedItem is SPDKeyVM itt2)
+                    itt2.IsSelected = true;
             }
         }
 
@@ -175,14 +282,18 @@ namespace PersonaEditorGUI.Controls.Editors
 
     class SPREditorVM : BindingObject, IViewModel
     {
-        public ObservableCollection<TMXVM> TextureList { get; set; } = new ObservableCollection<TMXVM>();
+        public ObservableCollection<TextureVM> TextureList { get; set; } = new ObservableCollection<TextureVM>();
 
         public SPREditorVM(PersonaEditorLib.FileStructure.SPR.SPR spr)
         {
-            for (int i = 0; i < spr.TextureList.Count; i++)
-            {
-                TextureList.Add(new TMXVM(spr.TextureList[i], spr.KeyList.List, i));
-            }
+            for (int i = 0; i < spr.SubFiles.Count; i++)
+                TextureList.Add(new TextureVM(spr.SubFiles[i], spr.KeyList.List, i));
+        }
+
+        public SPREditorVM(PersonaEditorLib.FileStructure.SPR.SPD spd)
+        {
+            for (int i = 0; i < spd.SubFiles.Count; i++)
+                TextureList.Add(new TextureVM(spd.SubFiles[i], spd.KeyList, i));
         }
 
         public bool Close()

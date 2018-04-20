@@ -39,6 +39,7 @@ namespace PersonaEditor
         public Encoding Encode { get; } = Encoding.UTF8;
         public bool Sub { get; } = false;
         public bool LineByLine { get; } = false;
+        public int Size { get; } = -1;
 
         public Parameters()
         {
@@ -76,6 +77,8 @@ namespace PersonaEditor
                     Sub = true;
                 else if (a[0] == "/lbl")
                     LineByLine = true;
+                else if (a[0] == "/size")
+                    Size = int.Parse(a[1]);
             }
         }
     }

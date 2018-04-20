@@ -11,7 +11,7 @@ namespace PersonaEditorLib.Interfaces
 {   
     public interface IFile
     {
-        int Size { get; }
+        int Size();
         byte[] Get();
     }
 }

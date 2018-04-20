@@ -12,16 +12,20 @@ namespace PersonaEditorGUI.Controls.Editors
     class HEXEditorVM : BindingObject, IViewModel
     {
         PersonaEditorLib.FileStructure.DAT hex;
-        public MemoryStream WorkStream { get; set; }
+        MemoryStream MemoryStream;
+
+        public HexEditor.HexEditorUserControlVM HexEditorUserControlVM { get; } = new HexEditor.HexEditorUserControlVM();
 
         public HEXEditorVM(PersonaEditorLib.FileStructure.DAT hex)
         {
             this.hex = hex;
-            WorkStream = new MemoryStream(hex.Data);
+            MemoryStream = new MemoryStream(hex.Data);
+            HexEditorUserControlVM.SetStream(MemoryStream);
         }
 
         public bool Close()
         {
+            MemoryStream.Close();
             return true;
         }
     }

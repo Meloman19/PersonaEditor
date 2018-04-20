@@ -45,7 +45,7 @@ namespace PersonaEditorGUI.Controls
             item.SelectedItemOpen += Item_SelectedItemOpen;
             tree.Add(item);
 
-            if (personaFile.Object is IPersonaFile pfile && pfile.GetSubFiles().Count == 0)
+            if (personaFile.Object is IPersonaFile pfile && pfile.SubFiles.Count == 0)
                 Item_SelectedItemOpen(item);
         }
 
@@ -56,7 +56,7 @@ namespace PersonaEditorGUI.Controls
         public ObjectFile GetRoot()
         {
             if (tree.Count > 0)
-                return tree[0].personaFile;
+                return tree[0].PersonaFile;
             else
                 return null;
         }

@@ -19,6 +19,18 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         List<VerticalCut> WidthTable = new List<VerticalCut>();
 
+        public void Resize(int size)
+        {
+            if(size > WidthTable.Count)
+            {
+                WidthTable.AddRange(new VerticalCut[size - WidthTable.Count]);
+            }
+            else
+            {
+                WidthTable.RemoveRange(size, WidthTable.Count - size);
+            }
+        }
+
         public int Size()
         {
             return WidthTable.Count * 4 + 4;

@@ -1,5 +1,4 @@
-﻿using PersonaEditorGUI.Classes.Media.Visual;
-using PersonaEditorLib;
+﻿using PersonaEditorLib;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +12,7 @@ using System.ComponentModel;
 using System.Windows.Media;
 using PersonaEditorLib.FileStructure.Text;
 using PersonaEditorLib.Extension;
+using PersonaEditorGUI.Classes.Visual;
 
 namespace PersonaEditorGUI.Tools
 {
@@ -28,15 +28,36 @@ namespace PersonaEditorGUI.Tools
 
         #endregion PrivateField
 
-        readonly Backgrounds backgrounds = new Backgrounds(Static.Paths.DirBackgrounds);
-
         PersonaEditorLib.PersonaEncoding.PersonaEncoding PersonaEncoding;
         PersonaEditorLib.PersonaEncoding.PersonaFont PersonaFont;
-        EventWrapper BackgroundEW;
 
         TextVisual Text;
         TextVisual Name;
 
+        private Classes.Visual.Background selectBack = null;
+        private Classes.Visual.Background SelectBack
+        {
+            get { return selectBack; }
+            set
+            {
+                if (selectBack != value)
+                {
+                    if (selectBack != null)
+                        selectBack.BackgroundChanged -= SelectBack_BackgroundChanged;
+                    selectBack = value;
+                    if (selectBack != null)
+                        selectBack.BackgroundChanged += SelectBack_BackgroundChanged;
+                    SetBack();
+                }
+            }
+        }
+
+        private void SelectBack_BackgroundChanged(Classes.Visual.Background background)
+        {
+            SetBack();
+        }
+
+        private int backgroundSelect;
         private int _FontSelect;
 
         public ReadOnlyObservableCollection<string> FontList => Static.EncodingManager.EncodingList;
@@ -57,15 +78,25 @@ namespace PersonaEditorGUI.Tools
             }
         }
 
-        public ReadOnlyObservableCollection<string> BackgroundList => backgrounds.BackgroundList;
+        public ReadOnlyObservableCollection<string> BackgroundList => Static.BackManager.BackgroundList;
         public int BackgroundSelect
         {
-            get { return backgrounds.SelectedIndex; }
-            set { backgrounds.SetBackground(value); }
+            get { return backgroundSelect; }
+            set
+            {
+                if (SelectBack != Static.BackManager.GetBackground(value) && Static.BackManager.GetBackground(value) != null)
+                {
+                    SelectBack = Static.BackManager.GetBackground(value);
+                    backgroundSelect = value;
+                    Notify("BackgroundImage");
+                    Notify("BackgroundRect");
+                }
+                Notify("BackgroundSelect");
+            }
         }
 
-        public BitmapSource BackgroundImage => backgrounds.CurrentBackground.Image;
-        public Rect BackgroundRect => backgrounds.CurrentBackground.Rect;
+        public BitmapSource BackgroundImage => SelectBack.Image;
+        public Rect BackgroundRect => SelectBack.Rect;
 
         public ImageSource NameImage
         {
@@ -180,10 +211,10 @@ namespace PersonaEditorGUI.Tools
             Name.VisualChanged += Name_VisualChanged;
 
             FontSelect = 0;
+            BackgroundSelect = 0;
+            
 
-            BackgroundEW = new EventWrapper(backgrounds.CurrentBackground, this);
-
-            SetBack(backgrounds.CurrentBackground);
+            SetBack();
         }
 
         private void Name_VisualChanged(ImageSource imageSource, Rect rect)
@@ -198,49 +229,27 @@ namespace PersonaEditorGUI.Tools
             TextRect = rect;
         }
 
-        private void SetBack(BackgroundImage image)
+        private void SetBack()
         {
-            Name.Start = image.NameStart;
-            Text.Start = image.TextStart;
+            if (SelectBack != null)
+            {
+                Name.Start = SelectBack.NameStart;
+                Text.Start = SelectBack.TextStart;
 
-            Name.Color = image.ColorName;
-            Text.Color = image.ColorText;
+                Name.Color = SelectBack.ColorName;
+                Text.Color = SelectBack.ColorText;
 
-            Name.LineSpacing = image.LineSpacing;
-            Text.LineSpacing = image.LineSpacing;
+                Name.LineSpacing = SelectBack.LineSpacing;
+                Text.LineSpacing = SelectBack.LineSpacing;
 
-            Name.GlyphScale = image.GlyphScale;
-            Text.GlyphScale = image.GlyphScale;
+                Name.GlyphScale = SelectBack.GlyphScale;
+                Text.GlyphScale = SelectBack.GlyphScale;
+            }
         }
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is BackgroundImage image)
-            {
-                if (e.PropertyName == "Image")
-                    Notify("BackgroundImage");
-                else if (e.PropertyName == "Rect")
-                    Notify("BackgroundRect");
-                else if (e.PropertyName == "TextStart")
-                    Text.Start = image.TextStart;
-                else if (e.PropertyName == "ColorText")
-                    Text.Color = image.ColorText;
-                else if (e.PropertyName == "NameStart")
-                    Name.Start = image.NameStart;
-                else if (e.PropertyName == "ColorName")
-                    Name.Color = image.ColorName;
-                else if (e.PropertyName == "LineSpacing")
-                {
-                    Text.LineSpacing = image.LineSpacing;
-                    Name.LineSpacing = image.LineSpacing;
-                }
-                else if (e.PropertyName == "GlyphScale")
-                {
-                    Text.GlyphScale = image.GlyphScale;
-                    Name.GlyphScale = image.GlyphScale;
-                }
-            }
-            else if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
+            if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
             {
                 if (e.PropertyName == man.GetPersonaEncodingName(FontSelect))
                     Text2HEX();

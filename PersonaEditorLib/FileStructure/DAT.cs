@@ -12,11 +12,18 @@ namespace PersonaEditorLib.FileStructure
     {
         public byte[] Data { get; set; } = new byte[0];
 
+        private StreamFile StreamFile;
+
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public DAT(byte[] data)
         {
             Data = data;
+        }
+
+        public DAT(StreamFile streamFile)
+        {
+            StreamFile = streamFile;
         }
 
         #region IPersonaFile
@@ -34,7 +41,7 @@ namespace PersonaEditorLib.FileStructure
             {
                 Dictionary<string, object> returned = new Dictionary<string, object>();
 
-                returned.Add("Size", Size);
+                returned.Add("Size", Size());
                 returned.Add("Type", Type);
 
                 return returned;
@@ -45,15 +52,9 @@ namespace PersonaEditorLib.FileStructure
 
         #region IFile
 
-        public int Size
-        {
-            get { return Data.Length; }
-        }
+        public int Size() => Data.Length;
 
-        public byte[] Get()
-        {
-            return Data;
-        }
+        public byte[] Get() => Data;
 
         #endregion IFile
 

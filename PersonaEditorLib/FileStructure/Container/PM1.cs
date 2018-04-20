@@ -27,8 +27,6 @@ namespace PersonaEditorLib.FileStructure.Container
 
         int[][] Table;
 
-        public List<ObjectFile> List { get; } = new List<ObjectFile>();
-
         public List<ObjectFile> HidList { get; } = new List<ObjectFile>();
 
         public PM1(Stream stream)
@@ -123,7 +121,7 @@ namespace PersonaEditorLib.FileStructure.Container
                 reader.BaseStream.Position = RMD[i][4];
                 var returned = Utilities.PersonaFile.OpenFile(names[i], reader.ReadBytes(RMD[i][5]), FileType.DAT);
                 returned.Tag = new object[] { (int)TypeMap.RMD, RMD[i] };
-                List.Add(returned);
+                SubFiles.Add(returned);
             }
         }
 
@@ -132,7 +130,7 @@ namespace PersonaEditorLib.FileStructure.Container
             reader.BaseStream.Position = bmd[3];
             var returned = Utilities.PersonaFile.OpenFile(names[0], reader.ReadBytes(bmd[1]), FileType.BMD);
             returned.Tag = new object[] { bmd[0] };
-            List.Add(returned);
+            SubFiles.Add(returned);
         }
 
         private void ReadEPL(BinaryReader reader, string[] names, int[] eplhead, int[] epl)
@@ -149,7 +147,7 @@ namespace PersonaEditorLib.FileStructure.Container
             {
                 var returned = Utilities.PersonaFile.OpenFile(names[i], splited[i], FileType.DAT);
                 returned.Tag = new object[] { (int)TypeMap.EPL, eplpos[i] };
-                List.Add(returned);
+                SubFiles.Add(returned);
             }
         }
 
@@ -170,10 +168,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public FileType Type => FileType.PM1;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return List;
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {
@@ -181,7 +176,7 @@ namespace PersonaEditorLib.FileStructure.Container
             {
                 Dictionary<string, object> returned = new Dictionary<string, object>();
 
-                returned.Add("Entry Count", List.Count);
+                returned.Add("Entry Count", SubFiles.Count);
                 returned.Add("Type", Type);
 
                 return returned;
@@ -194,17 +189,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         #region IFile
 
-        public int Size
-        {
-            get
-            {
-                //  int returned = 0;
-
-                return Get().Length;
-
-                //  return returned;
-            }
-        }
+        public int Size() => Get().Length;
 
         public byte[] Get()
         {
@@ -212,15 +197,15 @@ namespace PersonaEditorLib.FileStructure.Container
             {
                 BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
 
-                var RMD = List.FindAll(x => (int)(x.Tag as object[])[0] == (int)TypeMap.RMD);
-                var BMD = List.Find(x => (int)(x.Tag as object[])[0] == (int)TypeMap.BMD);
-                var EPL = List.FindAll(x => (int)(x.Tag as object[])[0] == (int)TypeMap.EPL);
+                var RMD = SubFiles.FindAll(x => (int)(x.Tag as object[])[0] == (int)TypeMap.RMD);
+                var BMD = SubFiles.Find(x => (int)(x.Tag as object[])[0] == (int)TypeMap.BMD);
+                var EPL = SubFiles.FindAll(x => (int)(x.Tag as object[])[0] == (int)TypeMap.EPL);
 
                 MS.Position = 0x20 + 0x10 * (1 + (RMD.Count == 0 ? 0 : 2) + (BMD == null ? 0 : 1) + (EPL.Count == 0 ? 0 : 2) + HidList.GroupBy(x => (int)x.Tag).Count());
 
                 List<int[]> table = new List<int[]>();
 
-                var filelist = List.Select(x => x.Name).ToArray();
+                var filelist = SubFiles.Select(x => x.Name).ToArray();
                 table.Add(new int[]
                 {
                     (int)TypeMap.FileList,
@@ -328,7 +313,7 @@ namespace PersonaEditorLib.FileStructure.Container
                         writer.WriteInt32Array((int[])(a.Tag as object[])[1]);
                 }
 
-              //  table.AddRange(Table.Where(x => !table.Exists(y => y[0] == x[0])));
+                //  table.AddRange(Table.Where(x => !table.Exists(y => y[0] == x[0])));
                 table = table.OrderBy(x => x[0]).ToList();
 
                 MS.Position = 0x4;

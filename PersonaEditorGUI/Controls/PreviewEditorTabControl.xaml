@@ -18,7 +18,7 @@
     <TabControl Grid.Column="1" SelectedIndex="{Binding SelectedTabIndex}" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TabCollection}">
         <TabControl.ItemTemplate>
             <DataTemplate>
-                <Grid>
+                <Grid classes:Event.MouseUp="{Binding MouseUp}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition Width="Auto"/>
@@ -37,40 +37,49 @@
 
         <TabControl.ContentTemplate>
             <DataTemplate>
-                <ContentControl Content="{Binding DataContext}">
-                    <ContentControl.Resources>
-                        <DataTemplate DataType="{x:Type controls:ImagePreviewVM}">
-                            <Border BorderBrush="Black" BorderThickness="1">
-                                <controls:ImagePreview/>
-                            </Border>
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type editors:SPREditorVM}">
-                            <Border BorderBrush="Black" BorderThickness="1">
-                                <editors:SPREditor/>
-                            </Border>
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type editors:BMDEditorVM}">
-                            <Border BorderBrush="Black" BorderThickness="1">
-                                <editors:BMDEditor/>
-                            </Border>
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type editors:PTPEditorVM}">
-                            <Border BorderBrush="Black" BorderThickness="1">
-                                <editors:PTPEditor/>
-                            </Border>
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type editors:FNTEditorVM}">
-                            <Border BorderBrush="Black" BorderThickness="1">
-                                <editors:FNTEditor/>
-                            </Border>
-                        </DataTemplate>
-                        <DataTemplate DataType="{x:Type editors:HEXEditorVM}">
-                            <Border BorderBrush="Black" BorderThickness="1">
-                                <editors:HEXEditor/>
-                            </Border>
-                        </DataTemplate>
-                    </ContentControl.Resources>
-                </ContentControl>
+                <classes:CachedContentPresenter>
+                    <DataTemplate>
+                        <ContentControl Content="{Binding DataContext}">
+                            <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type controls:ImagePreviewVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <controls:ImagePreview/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editors:SPREditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:SPREditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editors:BMDEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:BMDEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editors:PTPEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:PTPEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editors:FNTEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:FNTEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editors:HEXEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:HEXEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editors:FTDEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:FTDEditor/>
+                                    </Border>
+                                </DataTemplate>
+                            </ContentControl.Resources>
+                        </ContentControl>
+                    </DataTemplate>
+                </classes:CachedContentPresenter>
             </DataTemplate>
         </TabControl.ContentTemplate>
     </TabControl>

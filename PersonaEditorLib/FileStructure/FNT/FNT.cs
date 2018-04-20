@@ -38,6 +38,15 @@ namespace PersonaEditorLib.FileStructure.FNT
                 Read(MS, 0);
         }
 
+        public void Resize(int size)
+        {
+            Header.Resize(size);
+            WidthTable.Resize(size);
+            Unknown.Resize(size);
+            Reserved.Resize(size);
+            Compressed.Resize(size);
+        }
+
         private void Read(Stream stream, long position)
         {
             Console.WriteLine("---------------------------------------------------");
@@ -75,15 +84,12 @@ namespace PersonaEditorLib.FileStructure.FNT
 
             return new BitmapPalette(palette);
         }
-        
+
         #region IPersonaFile
 
         public FileType Type => FileType.FNT;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return new List<ObjectFile>();
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {
@@ -104,10 +110,7 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         #region IFile
 
-        public int Size
-        {
-            get { return Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size(); }
-        }
+        public int Size() => Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size();
 
         public byte[] Get()
         {
@@ -126,7 +129,11 @@ namespace PersonaEditorLib.FileStructure.FNT
                 Reserved.Get(writer);
                 Compressed.Get(writer);
                 if (Last != null)
-                    Last.Get(writer);
+                {
+                    Header.LastPosition = Last.Get(writer);
+                    writer.BaseStream.Position = 0;
+                    Header.Get(writer);
+                }
 
                 returned = MS.ToArray();
             }
@@ -251,15 +258,23 @@ namespace PersonaEditorLib.FileStructure.FNT
             XElement WT = xDoc.Element("WidthTable");
 
             int index = 0;
-            foreach (var line in WT.Elements())
+
+            try
             {
-                int lineindex = Convert.ToInt32(line.Name.LocalName.Split('_')[1]);
-                foreach (var glyph in line.Elements())
+                foreach (var line in WT.Elements())
                 {
-                    int glyphindex = Convert.ToInt32(glyph.Name.LocalName.Split('_')[1]);
-                    index = (lineindex - 1) * 16 + (glyphindex - 1);
-                    WidthTable[index] = new VerticalCut(Convert.ToByte(glyph.Element("LeftCut").Value), Convert.ToByte(glyph.Element("RightCut").Value));
+                    int lineindex = Convert.ToInt32(line.Name.LocalName.Split('_')[1]);
+                    foreach (var glyph in line.Elements())
+                    {
+                        int glyphindex = Convert.ToInt32(glyph.Name.LocalName.Split('_')[1]);
+                        index = (lineindex - 1) * 16 + (glyphindex - 1);
+                        WidthTable[index] = new VerticalCut(Convert.ToByte(glyph.Element("LeftCut").Value), Convert.ToByte(glyph.Element("RightCut").Value));
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Logging.Write("PersonaEditorLib", "");
             }
 
             Logging.Write("PersonaEditorLib", "Width Table was writed. Get " + index + " glyphs");

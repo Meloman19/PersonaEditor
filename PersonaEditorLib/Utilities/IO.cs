@@ -31,14 +31,14 @@ namespace PersonaEditorLib.Utilities
             return OpenReadFile(File.OpenRead(path), IsLittleEndian);
         }
 
-        public static BinaryReader OpenReadFile(Stream stream, bool IsLittleEndian)
+        public static BinaryReader OpenReadFile(Stream stream, bool IsLittleEndian, bool leaveOpen = true)
         {
             BinaryReader returned;
 
             if (IsLittleEndian)
-                returned = new BinaryReader(stream);
+                returned = new BinaryReader(stream, Encoding.ASCII, true);
             else
-                returned = new BinaryReaderBE(stream);
+                returned = new BinaryReaderBE(stream, Encoding.ASCII, true);
 
             return returned;
         }

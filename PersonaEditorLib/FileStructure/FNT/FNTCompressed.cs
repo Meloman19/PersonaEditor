@@ -29,6 +29,13 @@ namespace PersonaEditorLib.FileStructure.FNT
         public int GlyphPosTableSize { get; set; }
         public int UncompressedFontSize { get; set; }
 
+        public void Resize(int size)
+        {
+            GlyphTableCount = size + 1;
+            GlyphPosTableSize = GlyphTableCount * 4;
+            UncompressedFontSize = size * BytesPerGlyph;
+        }
+
         public void Get(BinaryWriter writer)
         {
             writer.Write(HeaderSize);
@@ -101,6 +108,11 @@ namespace PersonaEditorLib.FileStructure.FNT
         public CompressedGlyphTable GlyphTable { get; set; }
         public byte[] CompressedData { get; set; }
 
+        public void Resize(int size)
+        {
+            Header.Resize(size);
+        }
+
         public List<byte[]> GetDecompressedData()
         {
             List<byte[]> returned = new List<byte[]>();
@@ -129,7 +141,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                     }
                 }
             }
-            
+
             return returned;
         }
 
@@ -142,6 +154,9 @@ namespace PersonaEditorLib.FileStructure.FNT
             List<bool> returned = new List<bool>();
 
             for (int i1 = list.Count - 1; i1 >= 0; i1--)
+            {
+                Console.Write("\r{0} glyph left             ", i1);
+
                 for (int i2 = list[i1].Length - 1; i2 >= 0; i2--)
                 {
                     int s4 = list[i1][i2];
@@ -150,7 +165,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                     while (Dictionary.Dictionary[i][2] != s4)
                     {
                         i++;
-                        if (Dictionary.Dictionary[i - 1][2] == 0)
+                        if (Dictionary.Dictionary[i][1] != 0)
                         {
                             if ((s4 >> 4) > ((s4 << 4) >> 4))
                             {
@@ -167,7 +182,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                     while (v0 != 0)
                         v0 = FindDictIndex(v0, DictPart, returned);
                 }
-
+            }
             for (int i = returned.Count - 1; i >= 0; i--)
                 BitW.Write(returned[i]);
 
@@ -175,6 +190,8 @@ namespace PersonaEditorLib.FileStructure.FNT
             CompressedData = BitW.GetArray();
             Header.CompressedBlockSize = Convert.ToInt32(CompressedData.Length);
             WriteGlyphPosition();
+
+            Console.WriteLine("\rComplete             ");
         }
 
         private int FindDictIndex(int v0, int DictPart, List<bool> list)
@@ -190,7 +207,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                 return 0;
             }
 
-            for (int i = DictPart + 1; i < Dictionary.Dictionary.Length; i++)
+            for (int i = DictPart; i < Dictionary.Dictionary.Length; i++)
             {
                 if (Dictionary.Dictionary[i][1] == v0)
                 {
@@ -210,7 +227,7 @@ namespace PersonaEditorLib.FileStructure.FNT
         {
             for (int i = 1; i < Dictionary.Dictionary.Length; i++)
             {
-                if (Dictionary.Dictionary[i][2] == 0)
+                if (Dictionary.Dictionary[i][1] != 0)
                 {
                     return i;
                 }
@@ -220,10 +237,9 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         private void WriteGlyphPosition()
         {
-            List<int> GlyphNewPosition = new List<int>();
+            List<int> GlyphNewPosition = new List<int>(Header.GlyphTableCount) { 0 };
 
             int temp = 0;
-
             int a = 0;
             int b = 0;
 
@@ -231,18 +247,16 @@ namespace PersonaEditorLib.FileStructure.FNT
             {
                 int s4 = by;
                 a++;
-                for (int i = 0; i < 8; i++)
+                for (int i = 1; i < 9; i++)
                 {
                     temp = Dictionary.Dictionary[temp][s4 % 2 + 1];
                     s4 = s4 >> 1;
 
                     if (Dictionary.Dictionary[temp][1] == 0)
                     {
-                        if (b % Header.BytesPerGlyph == 0)
-                        {
-                            GlyphNewPosition.Add(((a - 1) << 3) + i);
-                        }
                         b++;
+                        if (b % Header.BytesPerGlyph == 0)
+                            GlyphNewPosition.Add(((a - 1) << 3) + i);
                         temp = 0;
                     }
                 }

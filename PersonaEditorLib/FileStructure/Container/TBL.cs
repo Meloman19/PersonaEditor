@@ -12,15 +12,74 @@ namespace PersonaEditorLib.FileStructure.Container
     {
         List<byte[]> List = new List<byte[]>();
 
-        List<ObjectFile> list = new List<ObjectFile>();
-
         public TBL(byte[] data, string name)
         {
+            using (MemoryStream MS = new MemoryStream(data))
+                Read(new StreamFile(MS, MS.Length, 0), name);
+        }
+
+        public TBL(StreamFile streamFile, string name)
+        {
+            Read(streamFile, name);
+        }
+
+        private void GetType(StreamFile streamFile)
+        {
+            try
+            {
+                streamFile.Stream.Position = streamFile.Position;
+                using (BinaryReader reader = Utilities.IO.OpenReadFile(streamFile.Stream, true))
+                    do
+                    {
+                        int Size = reader.ReadInt32();
+
+                        if (streamFile.Position + streamFile.Size < Size + streamFile.Stream.Position)
+                            throw new Exception("TBL error");
+
+                        reader.BaseStream.Position += Size;
+                        reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
+                    } while (streamFile.Stream.Position < streamFile.Position + streamFile.Size);
+                IsLittleEndian = true;
+            }
+            catch
+            {
+                try
+                {
+                    streamFile.Stream.Position = streamFile.Position;
+                    using (BinaryReader reader = Utilities.IO.OpenReadFile(streamFile.Stream, false))
+                        do
+                        {
+                            int Size = reader.ReadInt32();
+
+                            if (streamFile.Position + streamFile.Size < Size + streamFile.Stream.Position)
+                                throw new Exception("TBL error");
+
+                            reader.BaseStream.Position += Size;
+                            reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
+                        } while (streamFile.Stream.Position < streamFile.Position + streamFile.Size);
+                    IsLittleEndian = false;
+                }
+                catch
+                {
+                    throw new Exception("TBL error");
+                }
+            }
+        }
+
+        private void Read(StreamFile streamFile, string name)
+        {
+            GetType(streamFile);
+
             int index = 0;
-            using (BinaryReader reader = Utilities.IO.OpenReadFile(new MemoryStream(data), IsLittleEndian))
+            streamFile.Stream.Position = streamFile.Position;
+            using (BinaryReader reader = Utilities.IO.OpenReadFile(streamFile.Stream, IsLittleEndian))
                 do
                 {
                     int Size = reader.ReadInt32();
+
+                    if (streamFile.Position + streamFile.Size < Size + streamFile.Stream.Position)
+                        throw new Exception("TBL error");
+
                     byte[] tempdata = reader.ReadBytes(Size);
                     FileType fileType = Utilities.PersonaFile.GetFileType(tempdata);
                     string ext = Path.GetExtension(name);
@@ -30,10 +89,9 @@ namespace PersonaEditorLib.FileStructure.Container
                     else
                         tempName += "." + fileType.ToString();
 
-                    list.Add(Utilities.PersonaFile.OpenFile(tempName, tempdata, fileType == FileType.Unknown ? FileType.DAT : fileType));
-                    long temp = Utilities.Utilities.Alignment(reader.BaseStream.Position, 16);
-                    reader.BaseStream.Position += temp;
-                } while (reader.BaseStream.Position < reader.BaseStream.Length);
+                    SubFiles.Add(Utilities.PersonaFile.OpenFile(tempName, tempdata, fileType == FileType.Unknown ? FileType.DAT : fileType));
+                    reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
+                } while (streamFile.Stream.Position < streamFile.Position + streamFile.Size);
         }
 
         public int Count
@@ -66,10 +124,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public FileType Type => FileType.TBL;
 
-        public List<ObjectFile> GetSubFiles()
-        {
-            return list;
-        }
+        public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
         public Dictionary<string, object> GetProperties
         {
@@ -88,24 +143,18 @@ namespace PersonaEditorLib.FileStructure.Container
 
         #region IFile
 
-        public int Size
-        {
-            get
-            {
-                return Get().Length;
-            }
-        }
+        public int Size() => Get().Length;
 
         public byte[] Get()
         {
             using (MemoryStream MS = new MemoryStream())
             using (BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian))
             {
-                foreach (var element in list)
+                foreach (var element in SubFiles)
                 {
                     if (element.Object is IPersonaFile pFile)
                     {
-                        writer.Write(pFile.Size);
+                        writer.Write(pFile.Size());
                         writer.Write(pFile.Get());
                         writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Position, 16)]);
                     }

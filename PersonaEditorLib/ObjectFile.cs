@@ -13,7 +13,6 @@ namespace PersonaEditorLib
         EventWrapper eventWrapper;
 
         private object _obj = null;
-        private bool _isEdit = false;
 
         public object Object
         {

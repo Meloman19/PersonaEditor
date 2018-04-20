@@ -121,7 +121,7 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#FF000000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("#00000000")]
         public global::System.Windows.Media.Color PreviewSelectedColor {
             get {
                 return ((global::System.Windows.Media.Color)(this["PreviewSelectedColor"]));
@@ -200,6 +200,42 @@ namespace PersonaEditorGUI.Settings {
             }
             set {
                 this["Single_Instance_Application"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PTPImageView {
+            get {
+                return ((bool)(this["PTPImageView"]));
+            }
+            set {
+                this["PTPImageView"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public global::System.Windows.GridLength PTPNameBlockSize {
+            get {
+                return ((global::System.Windows.GridLength)(this["PTPNameBlockSize"]));
+            }
+            set {
+                this["PTPNameBlockSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
+        public string FTDEncoding {
+            get {
+                return ((string)(this["FTDEncoding"]));
+            }
+            set {
+                this["FTDEncoding"] = value;
             }
         }
     }

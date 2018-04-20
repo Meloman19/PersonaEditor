@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using PersonaEditorLib;
 using PersonaEditorLib.FileStructure.Text;
@@ -9,18 +10,23 @@ using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows;
 
-namespace PersonaEditorGUI.Classes.Media.Visual
+namespace PersonaEditorGUI.Classes.Visual
 {
     public delegate void VisualChangedEventHandler(ImageSource imageSource, Rect rect);
 
-    public class TextVisual : BindingObject
+    class TextVisual : BindingObject
     {
         public event VisualChangedEventHandler VisualChanged;
+
+        CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+
+        Func<ImageData> GetData;
 
         PersonaEditorLib.PersonaEncoding.PersonaFont Font;
 
         #region PrivateField
 
+        private bool isEnable = true;
         private object Text;
 
         private ImageSource _Image;
@@ -37,7 +43,9 @@ namespace PersonaEditorGUI.Classes.Media.Visual
             {
                 _Data = value;
                 _Image = _Data.GetImageSource(PersonaEditorLib.Utilities.Utilities.CreatePallete(Color, _Data.PixelFormat));
+                TextDrawing.ImageSource = _Image;
                 _Rect = GetSize(Start, _Data.PixelWidth, _Data.PixelHeight);
+                TextDrawing.Rect = _Rect;
                 VisualChanged?.Invoke(_Image, _Rect);
             }
         }
@@ -93,7 +101,7 @@ namespace PersonaEditorGUI.Classes.Media.Visual
                 if (_LineSpacing != value)
                 {
                     _LineSpacing = value;
-                    Data = CreateImageData(Text);
+                    UpdateText();
                 }
             }
         }
@@ -101,7 +109,20 @@ namespace PersonaEditorGUI.Classes.Media.Visual
         public Rect Rect => _Rect;
         public ImageSource Image => _Image;
 
-        ImageData CreateImageData(object Text)
+        public ImageDrawing TextDrawing { get; } = new ImageDrawing();
+
+        public bool IsEnable
+        {
+            get { return isEnable; }
+            set
+            {
+                isEnable = value;
+                if (value)
+                    UpdateText();
+            }
+        }
+
+        ImageData CreateData()
         {
             if (Text is IList<TextBaseElement> list)
                 return ImageData.DrawText(list, Font, Static.FontMap.Shift, LineSpacing);
@@ -122,24 +143,51 @@ namespace PersonaEditorGUI.Classes.Media.Visual
             Text = List.ToArray();
             if (Font != null)
                 this.Font = Font;
-            Data = CreateImageData(Text);
+            UpdateText();
         }
 
         public void UpdateText(byte[] array)
         {
             Text = array;
-            Data = CreateImageData(Text);
+            UpdateText();
+        }
+
+        public async void UpdateText()
+        {
+            if (!CancellationTokenSource.IsCancellationRequested)
+                CancellationTokenSource.Cancel();
+
+            CancellationTokenSource.Dispose();
+            CancellationTokenSource = new CancellationTokenSource();
+
+            if (IsEnable)
+                try
+                {
+                    Data = await Task.Run(GetData, CancellationTokenSource.Token);
+                }
+                catch (OperationCanceledException ex)
+                {
+                }
+                catch (Exception e)
+                {
+                }
         }
 
         public void UpdateFont(PersonaEditorLib.PersonaEncoding.PersonaFont Font)
         {
             this.Font = Font;
-            Data = CreateImageData(Text);
+            UpdateText();
         }
-        
+
+        public TextVisual()
+        {
+            GetData = new Func<ImageData>(CreateData);
+        }
+
         public TextVisual(PersonaEditorLib.PersonaEncoding.PersonaFont Font)
         {
             this.Font = Font;
+            GetData = new Func<ImageData>(CreateData);
         }
     }
 }

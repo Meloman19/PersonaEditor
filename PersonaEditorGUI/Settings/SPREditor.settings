@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="BackgroundColor" Type="System.Windows.Media.Color" Scope="User">
-      <Value Profile="(Default)">#FF909090</Value>
+      <Value Profile="(Default)">#00000000</Value>
     </Setting>
     <Setting Name="LineColor" Type="System.Windows.Media.Color" Scope="User">
       <Value Profile="(Default)">#FF000000</Value>
@@ -13,6 +13,9 @@
     </Setting>
     <Setting Name="BorderThickness" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="DefaultEncoding" Type="System.String" Scope="User">
+      <Value Profile="(Default)">P5</Value>
     </Setting>
   </Settings>
 </SettingsFile>

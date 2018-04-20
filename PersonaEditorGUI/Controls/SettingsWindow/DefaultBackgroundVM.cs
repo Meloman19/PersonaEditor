@@ -168,7 +168,7 @@ namespace PersonaEditorGUI.Controls.SettingsWindow
 
         public DefaultBackgroundVM()
         {
-            SetColor = new RelayCommandWeak(x => SetColot_Click(x));
+            SetColor = new RelayCommand(SetColot_Click);
         }
 
         public ICommand SetColor { get; private set; }

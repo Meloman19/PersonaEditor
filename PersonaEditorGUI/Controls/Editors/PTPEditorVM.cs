@@ -12,21 +12,26 @@ using System.Windows.Data;
 using System.Globalization;
 using PersonaEditorLib.Extension;
 using System.Windows.Media.Imaging;
-using PersonaEditorGUI.Classes.Media.Visual;
+using PersonaEditorGUI.Classes.Visual;
 using System.Windows;
 using System.Windows.Media;
 using PersonaEditorLib.Interfaces;
+using System.Windows.Input;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
     class PTPNameEditVM : BindingObject
     {
-        PTPName name;
-        private string _OldName = "";
-        private string OldEncoding;
+        private PTPName name;
+
+        private Encoding OldEncoding;
+        private Encoding NewEncoding;
+
+        public TextVisual OldNameVisual { get; } = new TextVisual();
+        public TextVisual NewNameVisual { get; } = new TextVisual();
 
         public int Index => name.Index;
-        public string OldName => _OldName;
+        public string OldName => name.OldName.GetTextBaseList().GetString(OldEncoding);
         public string NewName
         {
             get { return name.NewName; }
@@ -35,424 +40,223 @@ namespace PersonaEditorGUI.Controls.Editors
                 if (name.NewName != value)
                 {
                     name.NewName = value;
+                    NewNameVisual.UpdateText(value.GetTextBaseList(NewEncoding));
                     Notify("NewName");
                 }
             }
         }
 
-        public void UpdateOldEncoding(string OldEncoding)
+        public void UpdateOldEncoding(string oldEncoding)
         {
-            this.OldEncoding = OldEncoding;
-            _OldName = name.OldName.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(OldEncoding));
+            OldEncoding = Static.EncodingManager.GetPersonaEncoding(oldEncoding);
+            OldNameVisual.UpdateFont(Static.FontManager.GetPersonaFont(oldEncoding));
             Notify("OldName");
         }
 
-        public PTPNameEditVM(PTPName name, string OldEncoding)
+        public void UpdateNewEncoding(string newEncoding)
+        {
+            NewEncoding = Static.EncodingManager.GetPersonaEncoding(newEncoding);
+            NewNameVisual.UpdateFont(Static.FontManager.GetPersonaFont(newEncoding));
+        }
+
+        public void UpdateBackground(int background)
+        {
+            if (Static.BackManager.GetBackground(background) is Background back)
+            {
+                OldNameVisual.Start = back.NameStart;
+                NewNameVisual.Start = back.NameStart;
+
+                OldNameVisual.Color = back.ColorName;
+                NewNameVisual.Color = back.ColorName;
+
+                OldNameVisual.LineSpacing = back.LineSpacing;
+                NewNameVisual.LineSpacing = back.LineSpacing;
+
+                OldNameVisual.GlyphScale = back.GlyphScale;
+                NewNameVisual.GlyphScale = back.GlyphScale;
+            }
+        }
+
+        public void UpdateView(bool view)
+        {
+            OldNameVisual.IsEnable = view;
+            NewNameVisual.IsEnable = view;
+        }
+
+        public PTPNameEditVM(PTPName name, int oldEncoding, int newEncoding, int background)
         {
             this.name = name;
-            this.OldEncoding = OldEncoding;
-            _OldName = name.OldName.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(OldEncoding));
+            UpdateOldEncoding(Static.EncodingManager.GetPersonaEncodingName(oldEncoding));
+            UpdateNewEncoding(Static.EncodingManager.GetPersonaEncodingName(newEncoding));
+            UpdateBackground(background);
+
+            OldNameVisual.UpdateText(name.OldName);
+            NewNameVisual.UpdateText(name.NewName.GetTextBaseList(NewEncoding));
         }
     }
 
     class PTPMsgStrEditVM : BindingObject
     {
-        TextVisual OldText;
-        TextVisual NewText;
-
-        BackgroundImage BackgroundImg;
-        EventWrapper BackgroundEW;
-
-        private string OldEncoding;
-        private string NewEncoding;
-
-        MSG.MSGstr str;
+        MSGstr str;
         EventWrapper strEW;
 
-        public string Prefix
-        {
-            get { return MSGListToSystem(str.Prefix); }
-        }
-        public string Postfix
-        {
-            get { return MSGListToSystem(str.Postfix); }
-        }
-        public string OldString
-        {
-            get { return str.OldString.GetString(Static.EncodingManager.GetPersonaEncoding(OldEncoding), true); }
-        }
+        private Encoding OldEncoding;
+        private Encoding NewEncoding;
+
+        TextVisual OldText = new TextVisual();
+        TextVisual NewText = new TextVisual();
+
+        public string Prefix => str.Prefix.MSGListToSystem();
+        public string Postfix => str.Postfix.MSGListToSystem();
+        public string OldString => str.OldString.GetString((OldEncoding), true);
         public string NewString
         {
             get { return str.NewString; }
-            set { str.NewString = value; }
-        }
-
-        public BitmapSource BackgroundImage => BackgroundImg.Image;
-        public Rect BackgroundRect => BackgroundImg.Rect;
-
-        private ImageSource oldTextSource = null;
-        private Rect oldTextRect;
-        public ImageSource OldTextSource
-        {
-            get { return oldTextSource; }
             set
             {
-                if (oldTextSource != value)
-                {
-                    oldTextSource = value;
-                    Notify("OldTextSource");
-                }
-            }
-        }
-        public Rect OldTextRect
-        {
-            get { return oldTextRect; }
-            set
-            {
-                if (oldTextRect != value)
-                {
-                    oldTextRect = value;
-                    Notify("OldTextRect");
-                }
+                str.NewString = value;
+                NewText.UpdateText(str.NewString.GetTextBaseList(NewEncoding));
             }
         }
 
-        private ImageSource oldNameSource = null;
-        private Rect oldNameRect;
-        public ImageSource OldNameSource
+        public DrawingImage OldTextImage { get; } = new DrawingImage();
+        public DrawingImage NewTextImage { get; } = new DrawingImage();
+
+        public ICommand MovePrefixDown { get; }
+        public ICommand MovePrefixUp { get; }
+        public ICommand MovePostfixDown { get; }
+        public ICommand MovePostfixUp { get; }
+
+        public void UpdateOldEncoding(string oldEncoding)
         {
-            get { return oldNameSource; }
-            set
-            {
-                if (oldNameSource != value)
-                {
-                    oldNameSource = value;
-                    Notify("OldNameSource");
-                }
-            }
+            OldEncoding = Static.EncodingManager.GetPersonaEncoding(oldEncoding);
+            OldText.UpdateFont(Static.FontManager.GetPersonaFont(oldEncoding));
+            Notify("OldString");
         }
-        public Rect OldNameRect
+
+        public void UpdateNewEncoding(string newEncoding)
         {
-            get { return oldNameRect; }
-            set
+            NewEncoding = Static.EncodingManager.GetPersonaEncoding(newEncoding);
+            NewText.UpdateText(str.NewString.GetTextBaseList(NewEncoding), Static.FontManager.GetPersonaFont(newEncoding));
+        }
+
+        public void UpdateBackground(int backgroundIndex)
+        {
+            if (Static.BackManager.GetBackground(backgroundIndex) is Background back)
             {
-                if (oldNameRect != value)
-                {
-                    oldNameRect = value;
-                    Notify("OldNameRect");
-                }
+                OldText.Start = back.TextStart;
+                NewText.Start = back.TextStart;
+
+                OldText.Color = back.ColorText;
+                NewText.Color = back.ColorText;
+
+                OldText.LineSpacing = back.LineSpacing;
+                NewText.LineSpacing = back.LineSpacing;
+
+                OldText.GlyphScale = back.GlyphScale;
+                NewText.GlyphScale = back.GlyphScale;
             }
         }
 
-        private ImageSource newTextSource = null;
-        private Rect newTextRect;
-        public ImageSource NewTextSource
+        public void UpdateView(bool view)
         {
-            get { return newTextSource; }
-            set
-            {
-                if (newTextSource != value)
-                {
-                    newTextSource = value;
-                    Notify("NewTextSource");
-                }
-            }
-        }
-        public Rect NewTextRect
-        {
-            get { return newTextRect; }
-            set
-            {
-                if (newTextRect != value)
-                {
-                    newTextRect = value;
-                    Notify("NewTextRect");
-                }
-            }
+            OldText.IsEnable = view;
+            NewText.IsEnable = view;
         }
 
-        private ImageSource newNameSource = null;
-        private Rect newNameRect;
-        public ImageSource NewNameSource
+        public PTPMsgStrEditVM(MSGstr str, Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple, string oldEncoding, string newEncoding, int backgroundIndex)
         {
-            get { return newNameSource; }
-            set
-            {
-                if (newNameSource != value)
-                {
-                    newNameSource = value;
-                    Notify("NewNameSource");
-                }
-            }
-        }
-        public Rect NewNameRect
-        {
-            get { return newNameRect; }
-            set
-            {
-                if (newNameRect != value)
-                {
-                    newNameRect = value;
-                    Notify("NewNameRect");
-                }
-            }
+            this.str = str;
+            strEW = new EventWrapper(str, this);
+
+            OldEncoding = Static.EncodingManager.GetPersonaEncoding(oldEncoding);
+            NewEncoding = Static.EncodingManager.GetPersonaEncoding(newEncoding);
+            OldText = new TextVisual(Static.FontManager.GetPersonaFont(oldEncoding)) { Tag = "Old" };
+            NewText = new TextVisual(Static.FontManager.GetPersonaFont(newEncoding)) { Tag = "New" };
+            OldText.IsEnable = Settings.AppSetting.Default.PTPImageView;
+            NewText.IsEnable = Settings.AppSetting.Default.PTPImageView;
+
+            UpdateBackground(backgroundIndex);
+
+            OldText.UpdateText(str.OldString);
+            NewText.UpdateText(str.NewString.GetTextBaseList(NewEncoding));
+
+            DrawingGroup oldDrawingGroup = new DrawingGroup();
+            oldDrawingGroup.Children.Add(tuple.Item3);
+            if (tuple.Item1 != null)
+                oldDrawingGroup.Children.Add(tuple.Item1);
+            oldDrawingGroup.Children.Add(OldText.TextDrawing);
+            oldDrawingGroup.ClipGeometry = tuple.Item4;
+            OldTextImage.Drawing = oldDrawingGroup;
+
+            DrawingGroup newDrawingGroup = new DrawingGroup();
+            newDrawingGroup.Children.Add(tuple.Item3);
+            if (tuple.Item2 != null)
+                newDrawingGroup.Children.Add(tuple.Item2);
+            newDrawingGroup.Children.Add(NewText.TextDrawing);
+            newDrawingGroup.ClipGeometry = tuple.Item4;
+            NewTextImage.Drawing = newDrawingGroup;
+
+            MovePrefixDown = new RelayCommand(str.MovePrefixDown);
+            MovePrefixUp = new RelayCommand(str.MovePrefixUp);
+            MovePostfixDown = new RelayCommand(str.MovePostfixDown);
+            MovePostfixUp = new RelayCommand(str.MovePostfixUp);
         }
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is MSG.MSGstr Msg)
-            {
-                if (e.PropertyName == "NewString")
-                    NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
-            }
-            else if (sender is BackgroundImage image)
-            {
-                if (e.PropertyName == "TextStart")
-                {
-                    OldText.Start = image.TextStart;
-                    NewText.Start = image.TextStart;
-                }
-                else if (e.PropertyName == "ColorText")
-                {
-                    OldText.Color = image.ColorText;
-                    NewText.Color = image.ColorText;
-                }
-                else if (e.PropertyName == "LineSpacing")
-                {
-                    OldText.LineSpacing = image.LineSpacing;
-                    NewText.LineSpacing = image.LineSpacing;
-                }
-                else if (e.PropertyName == "GlyphScale")
-                {
-                    OldText.GlyphScale = image.GlyphScale;
-                    NewText.GlyphScale = image.GlyphScale;
-                }
-            }
-        }
-
-        public void UpdateOldEncoding(string OldEncoding)
-        {
-            this.OldEncoding = OldEncoding;
-            OldText.UpdateFont(Static.FontManager.GetPersonaFont(OldEncoding));
-            Notify("OldString");
-        }
-
-        public void UpdateNewEncoding(string NewEncoding)
-        {
-            this.NewEncoding = NewEncoding;
-            NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)), Static.FontManager.GetPersonaFont(NewEncoding));
-        }
-
-        public void UpdateBackground()
-        {
-            Notify("BackgroundImage");
-            Notify("BackgroundRect");
-        }
-
-        public PTPMsgStrEditVM(MSG.MSGstr str, string OldEncoding, string NewEncoding, BackgroundImage backgroundImage)
-        {
-            this.str = str;
-            this.OldEncoding = OldEncoding;
-            this.NewEncoding = NewEncoding;
-
-            strEW = new EventWrapper(str, this);
-
-            BackgroundImg = backgroundImage;
-            BackgroundEW = new EventWrapper(backgroundImage, this);
-
-            OldText = new TextVisual(Static.FontManager.GetPersonaFont(OldEncoding)) { Tag = "Old" };
-            NewText = new TextVisual(Static.FontManager.GetPersonaFont(NewEncoding)) { Tag = "New" };
-            OldText.VisualChanged += OldText_VisualChanged;
-            NewText.VisualChanged += NewText_VisualChanged;
-
-            SetBack(backgroundImage);
-
-            OldText.UpdateText(str.OldString);
-            NewText.UpdateText(str.NewString.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
-        }
-
-        public void OldName_VisualChanged(ImageSource imageSource, Rect rect)
-        {
-            OldNameSource = imageSource;
-            OldNameRect = rect;
-        }
-
-        public void NewName_VisualChanged(ImageSource imageSource, Rect rect)
-        {
-            NewNameSource = imageSource;
-            NewNameRect = rect;
-        }
-
-        private void OldText_VisualChanged(ImageSource imageSource, Rect rect)
-        {
-            OldTextSource = imageSource;
-            OldTextRect = rect;
-        }
-
-        private void NewText_VisualChanged(ImageSource imageSource, Rect rect)
-        {
-            NewTextSource = imageSource;
-            NewTextRect = rect;
-        }
-
-        string MSGListToSystem(IList<TextBaseElement> list)
-        {
-            string returned = "";
-            foreach (var Bytes in list)
-            {
-                byte[] temp = Bytes.Array.ToArray();
-                if (temp.Length > 0)
-                {
-                    returned += "{" + System.Convert.ToString(temp[0], 16).PadLeft(2, '0').ToUpper();
-                    for (int i = 1; i < temp.Length; i++)
-                    {
-                        returned += "\u00A0" + System.Convert.ToString(temp[i], 16).PadLeft(2, '0').ToUpper();
-                    }
-                    returned += "} ";
-                }
-            }
-            return returned;
-        }
-
-        private void SetBack(BackgroundImage image)
-        {
-            OldText.Start = image.TextStart;
-            NewText.Start = image.TextStart;
-
-            OldText.Color = image.ColorText;
-            NewText.Color = image.ColorText;
-
-            OldText.LineSpacing = image.LineSpacing;
-            NewText.LineSpacing = image.LineSpacing;
-
-            OldText.GlyphScale = image.GlyphScale;
-            NewText.GlyphScale = image.GlyphScale;
+            Notify(e.PropertyName);
         }
     }
 
     class PTPMsgVM : BindingObject
     {
         MSG msg;
-        PTPName name;
-        private string NewEncoding;
-
-        EventWrapper BackgroundEW;
-        EventWrapper PTPNameEW;
-
-        TextVisual OldName;
-        TextVisual NewName;
+        private int BackgroundIndex;
 
         public string Name => msg.Name;
 
         public ObservableCollection<PTPMsgStrEditVM> Strings { get; } = new ObservableCollection<PTPMsgStrEditVM>();
 
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (sender is PTPName name)
-            {
-                if (e.PropertyName == "NewName")
-                    NewName.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
-                else if (e.PropertyName == "OldName")
-                    OldName.UpdateText(name.OldName);
-            }
-            else if (sender is BackgroundImage image && OldName != null && NewName != null)
-            {
-                if (e.PropertyName == "NameStart")
-                {
-                    OldName.Start = image.NameStart;
-                    NewName.Start = image.NameStart;
-                }
-                else if (e.PropertyName == "ColorName")
-                {
-                    OldName.Color = image.ColorName;
-                    NewName.Color = image.ColorName;
-                }
-                else if (e.PropertyName == "LineSpacing")
-                {
-                    OldName.LineSpacing = image.LineSpacing;
-                    NewName.LineSpacing = image.LineSpacing;
-                }
-                else if (e.PropertyName == "GlyphScale")
-                {
-                    OldName.GlyphScale = image.GlyphScale;
-                    NewName.GlyphScale = image.GlyphScale;
-                }
-            }
-        }
-
         public void UpdateOldEncoding(string OldEncoding)
         {
-            OldName?.UpdateFont(Static.FontManager.GetPersonaFont(OldEncoding));
             foreach (var a in Strings)
                 a.UpdateOldEncoding(OldEncoding);
         }
 
         public void UpdateNewEncoding(string NewEncoding)
         {
-            this.NewEncoding = NewEncoding;
-            if (name != null)
-                NewName?.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
-            NewName?.UpdateFont(Static.FontManager.GetPersonaFont(NewEncoding));
             foreach (var a in Strings)
                 a.UpdateNewEncoding(NewEncoding);
         }
 
         public void UpdateBackground()
         {
-            foreach (var a in Strings)
-                a.UpdateBackground();
+            //foreach (var a in Strings)
+            //    a.UpdateBackground();
         }
 
-        public PTPMsgVM(MSG msg, PTPName name, string OldEncoding, string NewEncoding, BackgroundImage backgroundImage)
+        public void UpdateView(bool isEnable)
         {
-            this.msg = msg;
-            this.name = name;
-            this.NewEncoding = NewEncoding;
+            foreach (var a in Strings)
+                a.UpdateView(isEnable);
+        }
 
-            BackgroundEW = new EventWrapper(backgroundImage, this);
+        public void UpdateBackground(int BackgroundIndex)
+        {
+            this.BackgroundIndex = BackgroundIndex;
+
+            foreach (var a in Strings)
+                a.UpdateBackground(BackgroundIndex);
+        }
+
+        public PTPMsgVM(MSG msg, Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple, string OldEncoding, string NewEncoding, int backgroundIndex)
+        {
+            BackgroundIndex = backgroundIndex;
+            this.msg = msg;
 
             foreach (var a in msg.Strings)
-                Strings.Add(new PTPMsgStrEditVM(a, OldEncoding, NewEncoding, backgroundImage));
-
-            if (name != null)
-            {
-                OldName = new TextVisual(Static.FontManager.GetPersonaFont(OldEncoding)) { Tag = "Old" };
-                NewName = new TextVisual(Static.FontManager.GetPersonaFont(NewEncoding)) { Tag = "New" };
-                SetBack(backgroundImage);
-                OldName.VisualChanged += OldName_VisualChanged;
-                NewName.VisualChanged += NewName_VisualChanged;
-
-                OldName.UpdateText(name.OldName);
-                NewName.UpdateText(name.NewName.GetTextBaseList(Static.EncodingManager.GetPersonaEncoding(NewEncoding)));
-                PTPNameEW = new EventWrapper(name, this);
-            }
-        }
-
-        private void OldName_VisualChanged(ImageSource imageSource, Rect rect)
-        {
-            foreach (var a in Strings)
-                a.OldName_VisualChanged(imageSource, rect);
-        }
-
-        private void NewName_VisualChanged(ImageSource imageSource, Rect rect)
-        {
-            foreach (var a in Strings)
-                a.NewName_VisualChanged(imageSource, rect);
-        }
-
-        private void SetBack(BackgroundImage image)
-        {
-            OldName.Start = image.NameStart;
-            NewName.Start = image.NameStart;
-
-            OldName.Color = image.ColorName;
-            NewName.Color = image.ColorName;
-
-            OldName.LineSpacing = image.LineSpacing;
-            NewName.LineSpacing = image.LineSpacing;
-
-            OldName.GlyphScale = image.GlyphScale;
-            NewName.GlyphScale = image.GlyphScale;
+                Strings.Add(new PTPMsgStrEditVM(a, tuple, OldEncoding, NewEncoding, BackgroundIndex));
         }
     }
 
@@ -460,25 +264,63 @@ namespace PersonaEditorGUI.Controls.Editors
     {
         #region Private
 
-        EventWrapper BackgroundEW;
         EventWrapper EncodingManagerEW;
-        Backgrounds BackImage { get; } = new Backgrounds(Settings.AppSetting.Default.DirBackground);
 
         #endregion Private
 
-        public ReadOnlyObservableCollection<string> BackgroundList => BackImage.BackgroundList;
-        public int SelectedIndex
+        private int Background;
+
+        private Background selectBack = null;
+        private Background SelectBack
         {
-            get { return BackImage.SelectedIndex; }
+            get { return selectBack; }
             set
             {
-                BackImage.SelectedIndex = value;
-                Settings.AppSetting.Default.PTPBackgroundDefault = BackImage.SelectedItem;
+                if (selectBack != value)
+                {
+                    if (selectBack != null)
+                        selectBack.BackgroundChanged -= SelectBack_BackgroundChanged;
+                    selectBack = value;
+                    if (selectBack != null)
+                        selectBack.BackgroundChanged += SelectBack_BackgroundChanged;
+                }
+            }
+        }
+
+        public ImageDrawing BackgroundDrawing { get; } = new ImageDrawing();
+        public RectangleGeometry ClipGeometry { get; } = new RectangleGeometry();
+
+        private void SelectBack_BackgroundChanged(Background background)
+        {
+            UpdateBackground(SelectedBackgroundIndex);
+            BackgroundDrawing.ImageSource = SelectBack.Image;
+            BackgroundDrawing.Rect = SelectBack.Rect;
+            ClipGeometry.Rect = SelectBack.Rect;
+        }
+
+        public ReadOnlyObservableCollection<string> BackgroundList => Static.BackManager.BackgroundList;
+        public int SelectedBackgroundIndex
+        {
+            get { return Background; }
+            set
+            {
+                if (SelectBack != Static.BackManager.GetBackground(value) && Static.BackManager.GetBackground(value) != null)
+                {
+                    SelectBack = Static.BackManager.GetBackground(value);
+                    Background = value;
+                    Settings.AppSetting.Default.PTPBackgroundDefault = Static.BackManager.GetBackgroundName(value);
+                    UpdateBackground(value);
+                    BackgroundDrawing.ImageSource = SelectBack.Image;
+                    BackgroundDrawing.Rect = SelectBack.Rect;
+                    ClipGeometry.Rect = SelectBack.Rect;
+                }
+                Notify("SelectedBackgroundIndex");
             }
         }
 
         private int OldEncoding;
         private int NewEncoding;
+        private bool View;
 
         public ReadOnlyObservableCollection<string> FontList => Static.EncodingManager.EncodingList;
 
@@ -506,17 +348,27 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
+        public bool ViewImage
+        {
+            get { return View; }
+            set
+            {
+                if (View != value)
+                {
+                    View = value;
+                    Settings.AppSetting.Default.PTPImageView = value;
+                    Notify("ViewImage");
+                    UpdateView();
+                }
+            }
+        }
+
         public ObservableCollection<PTPNameEditVM> Names { get; } = new ObservableCollection<PTPNameEditVM>();
         public ObservableCollection<PTPMsgVM> MSG { get; } = new ObservableCollection<PTPMsgVM>();
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is BackgroundImage image)
-            {
-                if (e.PropertyName == "Image" | e.PropertyName == "Rect")
-                    UpdateBackground();
-            }
-            else if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
+            if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
             {
                 if (e.PropertyName == man.GetPersonaEncodingName(OldEncoding))
                     UpdateOldEncoding(Settings.AppSetting.Default.PTPOldDefault);
@@ -525,30 +377,44 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public void UpdateOldEncoding(string OldEncoding)
+        private void UpdateOldEncoding(string oldEncoding)
         {
             foreach (var a in Names)
-                a.UpdateOldEncoding(OldEncoding);
+                a.UpdateOldEncoding(oldEncoding);
+
             foreach (var a in MSG)
-                a.UpdateOldEncoding(OldEncoding);
+                a.UpdateOldEncoding(oldEncoding);
         }
 
-        public void UpdateNewEncoding(string NewEncoding)
+        private void UpdateNewEncoding(string newEncoding)
         {
+            foreach (var a in Names)
+                a.UpdateNewEncoding(newEncoding);
+
             foreach (var a in MSG)
-                a.UpdateNewEncoding(NewEncoding);
+                a.UpdateNewEncoding(newEncoding);
         }
 
-        public void UpdateBackground()
+        private void UpdateBackground(int backgroundIndex)
         {
+            foreach (var a in Names)
+                a.UpdateBackground(backgroundIndex);
+
             foreach (var a in MSG)
-                a.UpdateBackground();
+                a.UpdateBackground(backgroundIndex);
+        }
+
+        private void UpdateView()
+        {
+            foreach (var a in Names)
+                a.UpdateView(View);
+
+            foreach (var a in MSG)
+                a.UpdateView(View);
         }
 
         public PTPEditorVM(PTP ptp)
         {
-            BackImage.SelectedItem = Settings.AppSetting.Default.PTPBackgroundDefault;
-
             int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.PTPOldDefault);
             if (sourceInd >= 0)
                 OldEncoding = sourceInd;
@@ -561,18 +427,36 @@ namespace PersonaEditorGUI.Controls.Editors
             else
                 NewEncoding = 0;
 
-            BackgroundEW = new EventWrapper(BackImage.CurrentBackground, this);
+            sourceInd = Static.BackManager.GetBackgroundIndex(Settings.AppSetting.Default.PTPBackgroundDefault);
+            if (sourceInd >= 0)
+                SelectedBackgroundIndex = sourceInd;
+            else
+                SelectedBackgroundIndex = 0;
+
+            View = Settings.AppSetting.Default.PTPImageView;
             EncodingManagerEW = new EventWrapper(Static.EncodingManager, this);
 
             foreach (var a in ptp.names)
-                Names.Add(new PTPNameEditVM(a, Settings.AppSetting.Default.PTPOldDefault));
+                Names.Add(new PTPNameEditVM(a, OldEncoding, NewEncoding, SelectedBackgroundIndex));
+
+
 
             foreach (var a in ptp.msg)
-                MSG.Add(new PTPMsgVM(a, ptp.names.FirstOrDefault(x => x.Index == a.CharacterIndex), Settings.AppSetting.Default.PTPOldDefault, Settings.AppSetting.Default.PTPNewDefault, BackImage.CurrentBackground));
+            {
+                var name = Names.FirstOrDefault(x => x.Index == a.CharacterIndex);
+                Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple;
+                if (name == null)
+                    tuple = new Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry>(null, null, BackgroundDrawing, ClipGeometry);
+                else
+                    tuple = new Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry>(name.OldNameVisual.TextDrawing, name.NewNameVisual.TextDrawing, BackgroundDrawing, ClipGeometry);
+
+                MSG.Add(new PTPMsgVM(a, tuple, Settings.AppSetting.Default.PTPOldDefault, Settings.AppSetting.Default.PTPNewDefault, SelectedBackgroundIndex));
+            }
         }
 
         public bool Close()
         {
+            SelectBack = null;
             return true;
         }
     }

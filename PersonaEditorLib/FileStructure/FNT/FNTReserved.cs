@@ -13,6 +13,14 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public List<int> Reserved = new List<int>();
 
+        public void Resize(int size)
+        {
+            if (size > Reserved.Count)
+                Reserved.AddRange(new int[size - Reserved.Count]);
+            else
+                Reserved.RemoveRange(size, Reserved.Count - size);
+        }
+
         public int Size
         {
             get { return Reserved.Count * 4; }

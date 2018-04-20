@@ -25,7 +25,7 @@ namespace PersonaEditorGUI.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#FF909090")]
+        [global::System.Configuration.DefaultSettingValueAttribute("#00000000")]
         public global::System.Windows.Media.Color BackgroundColor {
             get {
                 return ((global::System.Windows.Media.Color)(this["BackgroundColor"]));
@@ -68,6 +68,18 @@ namespace PersonaEditorGUI.Settings {
             }
             set {
                 this["BorderThickness"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("P5")]
+        public string DefaultEncoding {
+            get {
+                return ((string)(this["DefaultEncoding"]));
+            }
+            set {
+                this["DefaultEncoding"] = value;
             }
         }
     }
