@@ -31,6 +31,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition Height="60"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <controls:TreeViewPE Grid.Row="0" DataContext="{Binding Tree}"/>
@@ -39,6 +40,11 @@
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource main_DropFile}" TextAlignment="Center"/>
                     </Grid>
                 </Border>
+                <StatusBar Grid.Row="2">
+                    <StatusBarItem>
+                        <TextBlock Text="{Binding StatusBar}"/>
+                    </StatusBarItem>
+                </StatusBar>
             </Grid>
 
             <GridSplitter ResizeBehavior="PreviousAndCurrent" ShowsPreview="True" Grid.Column="1" Width="4"/>

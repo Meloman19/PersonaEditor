@@ -13,6 +13,7 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -24,8 +25,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.0</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationVersion>1.1.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -122,14 +122,13 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Classes\CachedContentPresenter.cs" />
     <Compile Include="Classes\Controls\RelativePanel.cs" />
     <Compile Include="Classes\Controls\TreeViewExtended.cs" />
-    <Compile Include="Classes\Extention.cs" />
-    <Compile Include="Classes\LocalizationManager.cs" />
+    <Compile Include="Classes\Controls\ImageVisualizer.cs" />
+    <Compile Include="Classes\ReadOnlyPropertyObserver.cs" />
     <Compile Include="Classes\Visual\TextVisual.cs" />
     <Compile Include="Classes\Event.cs" />
-    <Compile Include="Classes\ReadOnlyBinding.cs" />
-    <Compile Include="Classes\ResourceItem.cs" />
     <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Classes\Visual\Background.cs" />
     <Compile Include="Classes\Visual\BackgroundManager.cs" />
@@ -147,6 +146,19 @@
       <DependentUpon>NumericColorRGBA.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Converters\NullVisibilityConverter.cs" />
+    <Compile Include="Controls\Editors\FTDEditor.xaml.cs">
+      <DependentUpon>FTDEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Editors\FTDEditorVM.cs" />
+    <Compile Include="Controls\HexEditor\HexEditorUserControlVM.cs" />
+    <Compile Include="Controls\HexEditor\HexEditorUserControl.xaml.cs">
+      <DependentUpon>HexEditorUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\HexEditor\HexView.xaml.cs">
+      <DependentUpon>HexView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\HexEditor\HexViewVM.cs" />
+    <Compile Include="Controls\HexEditor\ScrollBarVM.cs" />
     <Compile Include="Controls\Primitive\NumericIncDec.xaml.cs">
       <DependentUpon>NumericIncDec.xaml</DependentUpon>
     </Compile>
@@ -188,12 +200,11 @@
     <Compile Include="Controls\Primitive\EditableTextBlock.xaml.cs">
       <DependentUpon>EditableTextBlock.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\SingleFileEdit.xaml.cs">
-      <DependentUpon>SingleFileEdit.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SingleFileEditVM.cs" />
     <Compile Include="Controls\ToolBox\OpenPTP.xaml.cs">
       <DependentUpon>OpenPTP.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ToolBox\Resize.xaml.cs">
+      <DependentUpon>Resize.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ToolBox\SaveAsPTP.xaml.cs">
       <DependentUpon>SaveAsPTP.xaml</DependentUpon>
@@ -274,6 +285,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Controls\Editors\FTDEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\HexEditor\HexEditorUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\HexEditor\HexView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Primitive\NumericIncDec.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -302,10 +325,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\MainDockPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Controls\MultiFileEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -322,11 +341,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\SingleFileEdit.xaml">
+    <Page Include="Controls\ToolBox\OpenPTP.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\ToolBox\OpenPTP.xaml">
+    <Page Include="Controls\ToolBox\Resize.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -345,9 +364,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controls\MainDockPanel.xaml.cs">
-      <DependentUpon>MainDockPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -434,9 +450,7 @@
   <ItemGroup>
     <Resource Include="Resource\settings-work-tool.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controls\HexEdit\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Resource\Localization.resx">
       <Generator>ResXFileCodeGenerator</Generator>

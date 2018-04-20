@@ -13,7 +13,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                 Unknown.Add(reader.ReadByte());
         }
 
-        public List<byte> Unknown { get; set; } = new List<byte>();
+        public List<byte> Unknown { get; } = new List<byte>();
 
         public void Resize(int size)
         {

@@ -41,7 +41,7 @@ namespace PersonaEditorLib.FileStructure
             {
                 Dictionary<string, object> returned = new Dictionary<string, object>();
 
-                returned.Add("Size", Size);
+                returned.Add("Size", Size());
                 returned.Add("Type", Type);
 
                 return returned;
@@ -52,15 +52,9 @@ namespace PersonaEditorLib.FileStructure
 
         #region IFile
 
-        public int Size
-        {
-            get { return Data.Length; }
-        }
+        public int Size() => Data.Length;
 
-        public byte[] Get()
-        {
-            return Data;
-        }
+        public byte[] Get() => Data;
 
         #endregion IFile
 

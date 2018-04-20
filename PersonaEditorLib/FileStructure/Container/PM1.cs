@@ -189,17 +189,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         #region IFile
 
-        public int Size
-        {
-            get
-            {
-                //  int returned = 0;
-
-                return Get().Length;
-
-                //  return returned;
-            }
-        }
+        public int Size() => Get().Length;
 
         public byte[] Get()
         {

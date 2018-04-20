@@ -18,7 +18,8 @@ namespace PersonaEditorGUI.Controls
         PTP,
         BMD,
         FNT,
-        HEX
+        HEX,
+        FTD
     }
 
     class ClosableTabItemVM : BindingObject
@@ -27,6 +28,14 @@ namespace PersonaEditorGUI.Controls
         private void CloseFile()
         {
             Close();
+        }
+
+        public MouseButtonEventHandler MouseUp => MouseButtonUp;
+
+        private void MouseButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Middle)
+                Close();
         }
 
         private TabItemType dataContextType = TabItemType.Null;

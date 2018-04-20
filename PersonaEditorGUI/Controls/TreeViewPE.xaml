@@ -12,9 +12,10 @@
              d:DesignHeight="300" d:DesignWidth="300">
 
     <UserControl.Resources>
+        <BitmapImage x:Key="MyImageSource" UriSource="../Resource/settings-work-tool.png" />
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
     </UserControl.Resources>
-    
+
     <TreeView ItemsSource="{Binding Tree}">
         <TreeView.ItemTemplate>
             <HierarchicalDataTemplate ItemsSource="{Binding Path=SubItems}">
@@ -37,5 +38,6 @@
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
             </Style>
         </TreeView.ItemContainerStyle>
+
     </TreeView>
 </UserControl>

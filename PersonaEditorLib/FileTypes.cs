@@ -85,6 +85,8 @@ namespace PersonaEditorLib
     {
         public BinaryReaderBE(Stream stream) : base(stream) { }
 
+        public BinaryReaderBE(Stream stream, Encoding encoding, bool leaveOpen) : base(stream, encoding, leaveOpen) { }
+
         public override short ReadInt16()
         {
             var data = base.ReadBytes(2);
@@ -131,6 +133,8 @@ namespace PersonaEditorLib
     public class BinaryWriterBE : BinaryWriter
     {
         public BinaryWriterBE(Stream stream) : base(stream) { }
+
+        public BinaryWriterBE(Stream stream, Encoding encoding, bool leaveOpen) : base(stream, encoding, leaveOpen) { }
 
         public override void Write(short value)
         {

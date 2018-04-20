@@ -60,7 +60,7 @@ namespace PersonaEditorLib.FileStructure.SPR
 
             for (int i = 1; i < SubFiles.Count; i++)
             {
-                start += (SubFiles[i - 1].Object as IFile).Size;
+                start += (SubFiles[i - 1].Object as IFile).Size();
                 int temp = Utilities.Utilities.Alignment(start, 16);
                 start += temp == 0 ? 16 : temp;
                 list[i] = start;
@@ -92,30 +92,27 @@ namespace PersonaEditorLib.FileStructure.SPR
 
         #region IFile
 
-        public int Size
+        public int Size()
         {
-            get
+            int returned = 0;
+
+            returned += Header.Size;
+            returned += TextureOffsetList.Count * 8;
+            returned += KeyOffsetList.Count * 8;
+            returned += KeyList.Size;
+
+            int temp = Utilities.Utilities.Alignment(returned, 16);
+            returned += temp == 0 ? 16 : temp;
+
+            returned += (SubFiles[0].Object as IFile).Size();
+            for (int i = 1; i < SubFiles.Count; i++)
             {
-                int returned = 0;
-
-                returned += Header.Size;
-                returned += TextureOffsetList.Count * 8;
-                returned += KeyOffsetList.Count * 8;
-                returned += KeyList.Size;
-
-                int temp = Utilities.Utilities.Alignment(returned, 16);
+                temp = Utilities.Utilities.Alignment(returned, 16);
                 returned += temp == 0 ? 16 : temp;
-
-                returned += (SubFiles[0].Object as IFile).Size;
-                for (int i = 1; i < SubFiles.Count; i++)
-                {
-                    temp = Utilities.Utilities.Alignment(returned, 16);
-                    returned += temp == 0 ? 16 : temp;
-                    returned += (SubFiles[i].Object as IFile).Size;
-                }
-
-                return returned;
+                returned += (SubFiles[i].Object as IFile).Size();
             }
+
+            return returned;
         }
 
         public byte[] Get()

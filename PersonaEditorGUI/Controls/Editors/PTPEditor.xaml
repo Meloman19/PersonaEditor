@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
+             xmlns:controls="clr-namespace:PersonaEditorGUI.Classes.Controls"
              xmlns:local2="clr-namespace:PersonaEditorGUI.Classes"
              xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
              xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
@@ -24,7 +25,7 @@
         </Grid.RowDefinitions>
 
         <StatusBar Grid.Row="0">
-            <ComboBox ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <ComboBox ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding SelectedBackgroundIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <TextBlock Text="Old Font:"/>
             <ComboBox ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedOldFont, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -33,9 +34,10 @@
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <CheckBox Content="Image View" IsChecked="{Binding ViewImage}" x:Name="VIEW" x:FieldModifier="private"/>
         </StatusBar>
+
         <Separator Grid.Row="1"/>
 
-        <ItemsControl Grid.Row="2" Name="IC_NAME" ItemsSource="{Binding Path=Names}" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True" >
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Path=Names}" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel/>
@@ -80,9 +82,9 @@
 
         <GridSplitter ResizeBehavior="BasedOnAlignment" Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
 
-        <ItemsControl Grid.Row="3" Name="IC_MSG" ItemsSource="{Binding Path=MSG}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.IsVirtualizing="True" Margin="0,4,0,1" Grid.RowSpan="2">
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding Path=MSG}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.VirtualizationMode="Recycling"  VirtualizingPanel.IsVirtualizing="True" Margin="0,4,0,1">
             <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>                    
+                <ItemsPanelTemplate>
                     <VirtualizingStackPanel/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
@@ -99,10 +101,12 @@
                 <DataTemplate>
                     <StackPanel>
                         <Separator/>
-                        <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
-                        <Separator/>
                         
-                        <ItemsControl Name="MSG" ItemsSource="{Binding Strings}">
+                        <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
+                        
+                        <Separator/>
+
+                        <ItemsControl ItemsSource="{Binding Strings}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
@@ -113,7 +117,16 @@
                                                 <RowDefinition Height="Auto"></RowDefinition>
                                             </Grid.RowDefinitions>
 
-                                            <TextBlock TextWrapping="Wrap" Grid.Row="0" Text="{Binding Prefix, Mode=OneWay}" HorizontalAlignment="Center" />
+                                            <Grid Grid.Row="0" Background="Transparent">
+                                                <Grid.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Try move Text's element to Prefix" Command="{Binding MovePrefixUp}"/>
+                                                        <MenuItem Header="Move Prefix's element to Text" Command="{Binding MovePrefixDown}"/>
+                                                    </ContextMenu>
+                                                </Grid.ContextMenu>
+
+                                                <TextBlock TextWrapping="Wrap" Text="{Binding Prefix, Mode=OneWay}" HorizontalAlignment="Center"/>
+                                            </Grid>
 
                                             <Grid Grid.Row="1" Margin="5">
                                                 <Grid.ColumnDefinitions>
@@ -123,59 +136,35 @@
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
 
                                                 <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding OldString, Mode=OneWay}"/>
                                                 <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
-                                                    <Image.Source>
-                                                        <DrawingImage>
-                                                            <DrawingImage.Drawing>
-                                                                <DrawingGroup>
-                                                                    <DrawingGroup.Children>
-                                                                        <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
-                                                                        <ImageDrawing ImageSource="{Binding OldNameSource}" Rect="{Binding OldNameRect}"/>
-                                                                        <ImageDrawing ImageSource="{Binding OldTextSource}" Rect="{Binding OldTextRect}"/>
-                                                                    </DrawingGroup.Children>
-                                                                    <DrawingGroup.ClipGeometry>
-                                                                        <RectangleGeometry Rect="{Binding BackgroundRect}"/>
-                                                                    </DrawingGroup.ClipGeometry>
-                                                                </DrawingGroup>
-                                                            </DrawingImage.Drawing>
-                                                        </DrawingImage>
-                                                    </Image.Source>
-                                                </Image>
+                                                <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}"
+                                                       Source="{Binding OldTextImage}"/>
 
-                                                <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
-                                                    <Image.Source>
-                                                        <DrawingImage>
-                                                            <DrawingImage.Drawing>
-                                                                <DrawingGroup>
-                                                                    <DrawingGroup.Children>
-                                                                        <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
-                                                                        <ImageDrawing ImageSource="{Binding NewNameSource}" Rect="{Binding NewNameRect}"/>
-                                                                        <ImageDrawing ImageSource="{Binding NewTextSource}" Rect="{Binding NewTextRect}"/>
-                                                                    </DrawingGroup.Children>
-                                                                    <DrawingGroup.ClipGeometry>
-                                                                        <RectangleGeometry Rect="{Binding BackgroundRect}"/>
-                                                                    </DrawingGroup.ClipGeometry>
-                                                                </DrawingGroup>
-                                                            </DrawingImage.Drawing>
-                                                        </DrawingImage>
-                                                    </Image.Source>
-                                                </Image>
+                                                <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}"
+                                                       Source="{Binding NewTextImage}"/>
                                             </Grid>
 
-                                            <TextBlock TextWrapping="Wrap"  Grid.Row="2" Text="{Binding Postfix, Mode=OneWay}" HorizontalAlignment="Center"/>
-                                        </Grid>
+                                            <Grid Grid.Row="2" Background="Transparent">
+                                                <Grid.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Move Postfix's element to Text" Command="{Binding MovePostfixUp}"/>
+                                                        <MenuItem Header="Try move Text's element to Postfix" Command="{Binding MovePostfixDown}"/>
+                                                    </ContextMenu>
+                                                </Grid.ContextMenu>
 
+                                                <TextBlock TextWrapping="Wrap" Text="{Binding Postfix, Mode=OneWay}" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
                                         <Separator/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

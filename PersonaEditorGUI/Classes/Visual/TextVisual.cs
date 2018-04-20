@@ -43,7 +43,9 @@ namespace PersonaEditorGUI.Classes.Visual
             {
                 _Data = value;
                 _Image = _Data.GetImageSource(PersonaEditorLib.Utilities.Utilities.CreatePallete(Color, _Data.PixelFormat));
+                TextDrawing.ImageSource = _Image;
                 _Rect = GetSize(Start, _Data.PixelWidth, _Data.PixelHeight);
+                TextDrawing.Rect = _Rect;
                 VisualChanged?.Invoke(_Image, _Rect);
             }
         }
@@ -106,6 +108,8 @@ namespace PersonaEditorGUI.Classes.Visual
 
         public Rect Rect => _Rect;
         public ImageSource Image => _Image;
+
+        public ImageDrawing TextDrawing { get; } = new ImageDrawing();
 
         public bool IsEnable
         {
@@ -173,6 +177,11 @@ namespace PersonaEditorGUI.Classes.Visual
         {
             this.Font = Font;
             UpdateText();
+        }
+
+        public TextVisual()
+        {
+            GetData = new Func<ImageData>(CreateData);
         }
 
         public TextVisual(PersonaEditorLib.PersonaEncoding.PersonaFont Font)

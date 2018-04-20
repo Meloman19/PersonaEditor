@@ -108,12 +108,9 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
         #region IFile
 
-        public int Size
+        public int Size()
         {
-            get
-            {
-                return Header.Size + Palette.Size + Data.Length;
-            }
+            return Header.Size + Palette.Size + Data.Length;
         }
 
         public byte[] Get()

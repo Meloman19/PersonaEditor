@@ -53,5 +53,8 @@
     <Setting Name="PTPNameBlockSize" Type="System.Windows.GridLength" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
+    <Setting Name="FTDEncoding" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Empty</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

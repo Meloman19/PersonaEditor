@@ -101,7 +101,14 @@ namespace PersonaEditorLib.Utilities
                 else if (type == FileType.BVP)
                     Obj = new FileStructure.Container.BVP(name, data);
                 else if (type == FileType.TBL)
-                    Obj = new FileStructure.Container.TBL(data, name);
+                    try
+                    {
+                        Obj = new FileStructure.Container.TBL(data, name);
+                    }
+                    catch
+                    {
+                        Obj = new FileStructure.Container.BIN(data);
+                    }
                 else if (type == FileType.FTD)
                     Obj = new FileStructure.Text.FTD(data);
                 else if (type == FileType.DDS)
@@ -122,32 +129,32 @@ namespace PersonaEditorLib.Utilities
         public static FileType GetFileType(string name)
         {
             string ext = Path.GetExtension(name).ToLower().TrimEnd(' ');
-            if (ext == ".bin" | ext== ".pak" | ext == ".pac" | ext == ".p00" | ext == ".arc" | ext == ".dds2")
+            if (ext == ".bin" | ext == ".pak" | ext == ".pac" | ext == ".p00" | ext == ".arc" | ext == ".dds2")
                 return FileType.BIN;
-            else if (ext.ToLower() == ".spr")
+            else if (ext == ".spr")
                 return FileType.SPR;
-            else if (ext.ToLower() == ".tmx")
+            else if (ext == ".tmx")
                 return FileType.TMX;
-            else if (ext.ToLower() == ".bf")
+            else if (ext == ".bf")
                 return FileType.BF;
-            else if (ext.ToLower() == ".pm1")
+            else if (ext == ".pm1")
                 return FileType.PM1;
-            else if (ext.ToLower() == ".bmd" | ext.ToLower() == ".msg")
+            else if (ext == ".bmd" | ext == ".msg")
                 return FileType.BMD;
-            else if (ext.ToLower() == ".ptp")
+            else if (ext == ".ptp")
                 return FileType.PTP;
-            else if (ext.ToLower() == ".fnt")
+            else if (ext == ".fnt")
                 return FileType.FNT;
-            else if (ext.ToLower() == ".bvp")
+            else if (ext == ".bvp")
                 return FileType.BVP;
-            else if (ext.ToLower() == ".tbl")
+            else if (ext == ".tbl")
                 return FileType.TBL;
-            else if (ext.ToLower() == ".dds")
+            else if (ext == ".dds")
                 return FileType.DDS;
-            else if (ext.ToLower() == ".spd")
+            else if (ext == ".spd")
                 return FileType.SPD;
-            //else if (ext.ToLower() == ".ctd")
-            //    return FileType.FTD;
+            else if (ext == ".ctd" | ext == ".ftd" | ext == ".ttd")
+                return FileType.FTD;
             else
                 return FileType.DAT;
         }
@@ -181,7 +188,6 @@ namespace PersonaEditorLib.Utilities
                 case FileType.BIN:
                 case FileType.BVP:
                 case FileType.PM1:
-                case FileType.DAT:
                 case FileType.FNT:
                 case FileType.StringList:
                 case FileType.TBL:
@@ -193,6 +199,8 @@ namespace PersonaEditorLib.Utilities
                 case FileType.PTP:
                 case FileType.SPR:
                 case FileType.SPD:
+                case FileType.FTD:
+                case FileType.DAT:
                     returned.Add(ContextMenuItems.Edit);
                     returned.Add(ContextMenuItems.Replace);
                     break;
@@ -219,6 +227,7 @@ namespace PersonaEditorLib.Utilities
                 case FileType.StringList:
                 case FileType.TMX:
                 case FileType.DDS:
+                case FileType.FTD:
                     returned.Add(ContextMenuItems.SaveAs);
                     break;
             }

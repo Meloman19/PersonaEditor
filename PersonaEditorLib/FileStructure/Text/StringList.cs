@@ -109,7 +109,7 @@ namespace PersonaEditorLib.FileStructure.Text
             {
                 Dictionary<string, object> returned = new Dictionary<string, object>();
 
-                returned.Add("Size", Size);
+                returned.Add("Size", Size());
                 returned.Add("Type", Type);
 
                 return returned;
@@ -120,7 +120,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
         #region IFile
 
-        public int Size => List.Sum(x => x.Length);
+        public int Size() => List.Sum(x => x.Length);
 
         public byte[] Get()
         {

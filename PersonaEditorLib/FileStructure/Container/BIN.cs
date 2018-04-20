@@ -63,6 +63,9 @@ namespace PersonaEditorLib.FileStructure.Container
             using (BinaryReader reader = Utilities.IO.OpenReadFile(new MemoryStream(data), IsLittleEndian))
             {
                 int count = reader.ReadInt32();
+                if (count == 0)
+                    throw new System.Exception("BIN: count is zero");
+
                 for (int i = 0; i < count; i++)
                 {
                     string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x20)).Trim('\0');
@@ -74,9 +77,12 @@ namespace PersonaEditorLib.FileStructure.Container
                         objectFile = Utilities.PersonaFile.OpenFile(Name, Data, FileType.DAT);
                     SubFiles.Add(objectFile);
                 }
+
+                if (reader.BaseStream.Position != reader.BaseStream.Length)
+                    throw new System.Exception("BIN: read error");
             }
         }
-        
+
         public object this[int index]
         {
             get
@@ -125,17 +131,35 @@ namespace PersonaEditorLib.FileStructure.Container
 
         #region IFile
 
-        public int Size
+        public int Size()
         {
-            get
+            int returned = 0;
+
+            if (Old)
             {
-                int returned = 0;
-
-                foreach (IFile a in SubFiles)
-                    returned += a.Size;
-
-                return returned;
+                foreach (var a in SubFiles)
+                    if (a.Object is IFile file)
+                    {
+                        returned += 0x100;
+                        returned += file.Size();
+                        returned += Utilities.Utilities.Alignment(returned, 0x40);
+                    }
+                returned += 0x100;
             }
+            else
+            {
+                returned += 4;
+                foreach (var a in SubFiles)
+                    if (a.Object is IFile file)
+                    {
+                        returned += 0x20 + 4;
+                        int size = file.Size();
+                        int align = Utilities.Utilities.Alignment(size, 0x20);
+                        returned += size + align;
+                    }
+            }
+
+            return returned;
         }
 
         public byte[] Get()
@@ -161,7 +185,7 @@ namespace PersonaEditorLib.FileStructure.Container
                         Encoding.ASCII.GetBytes(a.Name, 0, a.Name.Length, name, 0);
                         writer.Write(name);
                         byte[] data = pfile.Get();
-                        int size = pfile.Size;
+                        int size = pfile.Size();
                         if (data.Length != size)
                         {
 
@@ -190,7 +214,7 @@ namespace PersonaEditorLib.FileStructure.Container
                         {
                             writer.Write(Encoding.ASCII.GetBytes(a.Name));
                             writer.Write(new byte[Utilities.Utilities.Alignment(a.Name.Length, 0x20)]);
-                            int size = file.Size;
+                            int size = file.Size();
                             int align = Utilities.Utilities.Alignment(size, 0x20);
                             writer.Write(size + align);
                             writer.Write(file.Get());

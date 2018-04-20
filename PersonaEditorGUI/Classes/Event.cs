@@ -12,6 +12,31 @@ namespace PersonaEditorGUI.Classes
 {
     public class Event
     {
+        #region MouseWheel
+
+        private static DependencyProperty MouseWheelPropertyEW =
+            DependencyProperty.RegisterAttached("MouseWheelEW",
+                typeof(UIElementEventWrapper),
+                typeof(Event),
+                new PropertyMetadata(null, CallBackEW));
+
+        public static DependencyProperty MouseWheelProperty =
+            DependencyProperty.RegisterAttached("MouseWheel",
+                typeof(MouseWheelEventHandler),
+                typeof(Event),
+                new PropertyMetadata(null, CallBack_UIElement));
+
+        public static void SetMouseWheel(Control element, MouseWheelEventHandler value)
+        {
+            element.SetValue(MouseWheelProperty, value);
+        }
+        public static MouseWheelEventHandler GetMouseWheel(Control element)
+        {
+            return (MouseWheelEventHandler)element.GetValue(MouseWheelProperty);
+        }
+
+        #endregion MouseWheel
+
         #region MouseDoubleClick
 
         private static DependencyProperty MouseDoubleClickPropertyEW =
@@ -36,6 +61,31 @@ namespace PersonaEditorGUI.Classes
         }
 
         #endregion MouseDoubleClick
+
+        #region MouseUp
+
+        private static DependencyProperty MouseUpPropertyEW =
+            DependencyProperty.RegisterAttached("MouseUpEW",
+                typeof(UIElementEventWrapper),
+                typeof(Event),
+                new PropertyMetadata(null, CallBackEW));
+
+        public static DependencyProperty MouseUpProperty =
+            DependencyProperty.RegisterAttached("MouseUp",
+                typeof(MouseButtonEventHandler),
+                typeof(Event),
+                new PropertyMetadata(null, CallBack_UIElement));
+
+        public static void SetMouseUp(UIElement element, MouseButtonEventHandler value)
+        {
+            element.SetValue(MouseUpProperty, value);
+        }
+        public static MouseButtonEventHandler GetMouseUp(UIElement element)
+        {
+            return (MouseButtonEventHandler)element.GetValue(MouseUpProperty);
+        }
+
+        #endregion MouseUp
 
         #region MouseEnter
 
@@ -287,6 +337,31 @@ namespace PersonaEditorGUI.Classes
 
         #endregion Unloaded
 
+        #region SizeChanged
+
+        private static DependencyProperty SizeChangedPropertyEW =
+            DependencyProperty.RegisterAttached("SizeChangedEW",
+                typeof(FrameworkElementEventWrapper),
+                typeof(Event),
+                new PropertyMetadata(null, CallBackEW));
+
+        public static DependencyProperty SizeChangedProperty =
+            DependencyProperty.RegisterAttached("SizeChanged",
+                typeof(SizeChangedEventHandler),
+                typeof(Event),
+                new PropertyMetadata(null, CallBack_FrameworkElement));
+
+        public static void SetSizeChanged(FrameworkElement element, SizeChangedEventHandler value)
+        {
+            element.SetValue(SizeChangedProperty, value);
+        }
+        public static SizeChangedEventHandler GetSizeChanged(FrameworkElement element)
+        {
+            return (SizeChangedEventHandler)element.GetValue(SizeChangedProperty);
+        }
+
+        #endregion SizeChaged
+
         private static void CallBackEW(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue is UIElementEventWrapper uiWrapper)
@@ -325,10 +400,17 @@ namespace PersonaEditorGUI.Classes
             FrameworkElement frameworkElement = d as FrameworkElement;
 
             if (e.NewValue is RoutedEventHandler routedHandler)
+            {
                 if (Name == "Loaded")
                     d.SetValue(LoadedPropertyEW, new FrameworkElementEventWrapper(frameworkElement, EventType.Loaded, routedHandler));
                 else if (Name == "Unloaded")
                     d.SetValue(UnloadedPropertyEW, new FrameworkElementEventWrapper(frameworkElement, EventType.Unloaded, routedHandler));
+            }
+            else if (e.NewValue is SizeChangedEventHandler sizeChangedEventHandler)
+            {
+                if (Name == "SizeChanged")
+                    d.SetValue(SizeChangedPropertyEW, new FrameworkElementEventWrapper(frameworkElement, EventType.SizeChanged, sizeChangedEventHandler));
+            }
         }
 
         private static void CallBack_UIElement(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -359,6 +441,16 @@ namespace PersonaEditorGUI.Classes
                 if (Name == "Drop")
                     d.SetValue(DropPropertyEW, new UIElementEventWrapper(uiElement, EventType.Drop, dragHandler));
             }
+            else if (e.NewValue is MouseWheelEventHandler mouseWheelHandler)
+            {
+                if (Name == "MouseWheel")
+                    d.SetValue(MouseWheelPropertyEW, new UIElementEventWrapper(uiElement, EventType.MouseWheel, mouseWheelHandler));
+            }
+            else if (e.NewValue is MouseButtonEventHandler mouseButtonHandler)
+            {
+                if (Name == "MouseUp")
+                    d.SetValue(MouseUpPropertyEW, new UIElementEventWrapper(uiElement, EventType.MouseUp, mouseButtonHandler));
+            }
         }
     }
 
@@ -374,7 +466,10 @@ namespace PersonaEditorGUI.Classes
         Drop,
         Closing,
         Loaded,
-        Unloaded
+        Unloaded,
+        SizeChanged,
+        MouseWheel,
+        MouseUp
     }
 
     class ControlEventWrapper
@@ -475,6 +570,43 @@ namespace PersonaEditorGUI.Classes
             }
         }
 
+        public UIElementEventWrapper(UIElement source, EventType eventType, MouseWheelEventHandler handler)
+        {
+            eventSource = source;
+            eventDestination = new WeakReference(handler);
+
+            if (eventType == EventType.MouseWheel)
+                eventSource.MouseWheel += OnMouseWheelEvent;
+            else
+            {
+                eventSource = null;
+                eventDestination = null;
+            }
+        }
+
+        public UIElementEventWrapper(UIElement source, EventType eventType, MouseButtonEventHandler handler)
+        {
+            eventSource = source;
+            eventDestination = new WeakReference(handler);
+
+            if (eventType == EventType.MouseUp)
+                eventSource.MouseUp += OnButtonEvent;
+            else
+            {
+                eventSource = null;
+                eventDestination = null;
+            }
+        }
+
+        private void OnMouseWheelEvent(object sender, MouseWheelEventArgs e)
+        {
+            MouseWheelEventHandler handler = (MouseWheelEventHandler)eventDestination.Target;
+            if (handler != null)
+                handler.Invoke(sender, e);
+            else
+                Deregister();
+        }
+
         private void OnDropEvent(object sender, DragEventArgs e)
         {
             DragEventHandler handler = (DragEventHandler)eventDestination.Target;
@@ -518,8 +650,12 @@ namespace PersonaEditorGUI.Classes
 
         public void Deregister()
         {
+            eventSource.MouseWheel -= OnMouseWheelEvent;
+
             eventSource.MouseEnter -= OnEvent;
             eventSource.MouseLeave -= OnEvent;
+
+            eventSource.MouseUp -= OnButtonEvent;
 
             eventSource.KeyDown -= OnKeyEvent;
             eventSource.KeyUp -= OnKeyEvent;
@@ -583,11 +719,36 @@ namespace PersonaEditorGUI.Classes
                 eventSource.Loaded += OnFEEvent;
             else if (eventType == EventType.Unloaded)
                 eventSource.Unloaded += OnFEEvent;
+            else if (eventType == EventType.SizeChanged)
+                eventSource.SizeChanged += OnSizeChangedEvent;
             else
             {
                 eventSource = null;
                 eventDestination = null;
             }
+        }
+
+        public FrameworkElementEventWrapper(FrameworkElement source, EventType eventType, SizeChangedEventHandler handler)
+        {
+            eventSource = source;
+            eventDestination = new WeakReference(handler);
+
+            if (eventType == EventType.SizeChanged)
+                eventSource.SizeChanged += OnSizeChangedEvent;
+            else
+            {
+                eventSource = null;
+                eventDestination = null;
+            }
+        }
+
+        private void OnSizeChangedEvent(object sender, SizeChangedEventArgs e)
+        {
+            SizeChangedEventHandler handler = (SizeChangedEventHandler)eventDestination.Target;
+            if (handler != null)
+                handler.Invoke(sender, e);
+            else
+                Deregister();
         }
 
         private void OnFEEvent(object sender, RoutedEventArgs e)
@@ -603,6 +764,7 @@ namespace PersonaEditorGUI.Classes
         {
             eventSource.Loaded -= OnFEEvent;
             eventSource.Unloaded -= OnFEEvent;
+            eventSource.SizeChanged -= OnSizeChangedEvent;
             eventSource = null;
             eventDestination = null;
         }

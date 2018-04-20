@@ -76,7 +76,44 @@
 
                 <Border DataContext="{Binding Path=TextureList/}" Grid.Row="1" BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Border.Background>
-                        <SolidColorBrush Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=OneWay}"/>
+                        <DrawingBrush Viewport="0,0,50,50" ViewportUnits="Absolute" TileMode="Tile">
+                            <DrawingBrush.Drawing>
+                                <DrawingGroup>
+                                    <GeometryDrawing Brush="White">
+                                        <GeometryDrawing.Geometry>
+                                            <RectangleGeometry Rect="0,0,15,15"/>
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+
+                                    <GeometryDrawing Brush="LightGray">
+                                        <GeometryDrawing.Geometry>
+                                            <RectangleGeometry Rect="0,15,15,15"/>
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+
+                                    <GeometryDrawing Brush="LightGray">
+                                        <GeometryDrawing.Geometry>
+                                            <RectangleGeometry Rect="15,0,15,15"/>
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+
+                                    <GeometryDrawing Brush="White">
+                                        <GeometryDrawing.Geometry>
+                                            <RectangleGeometry Rect="15,15,15,15"/>
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+
+                                    <GeometryDrawing>
+                                        <GeometryDrawing.Brush>
+                                            <SolidColorBrush Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=OneWay}"/>
+                                        </GeometryDrawing.Brush>
+                                        <GeometryDrawing.Geometry>
+                                            <RectangleGeometry Rect="0,0,30,30"/>
+                                        </GeometryDrawing.Geometry>
+                                    </GeometryDrawing>
+                                </DrawingGroup>
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
                     </Border.Background>
 
                     <ItemsControl Grid.Column="2" ItemsSource="{Binding Path=KeyList}">

@@ -105,14 +105,14 @@ namespace PersonaEditorLib.FileStructure.Text
             return returned;
         }
 
-        public static void ParseStrings(this IList<MSG.MSGstr> Strings, byte[] SourceBytes)
+        public static void ParseStrings(this IList<MSGstr> Strings, byte[] SourceBytes)
         {
             Strings.Clear();
 
             int Index = 0;
             foreach (var Bytes in SplitSourceBytes(SourceBytes))
             {
-                MSG.MSGstr MSG = new MSG.MSGstr(Index, "");
+                MSGstr MSG = new MSGstr(Index, "");
 
                 List<TextBaseElement> temp = Bytes.GetTextBaseList();
 
@@ -254,6 +254,25 @@ namespace PersonaEditorLib.FileStructure.Text
                 String.Clear();
             }
 
+            return returned;
+        }
+
+        public static string MSGListToSystem(this IList<TextBaseElement> list)
+        {
+            string returned = "";
+            foreach (var Bytes in list)
+            {
+                byte[] temp = Bytes.Array.ToArray();
+                if (temp.Length > 0)
+                {
+                    returned += "{" + System.Convert.ToString(temp[0], 16).PadLeft(2, '0').ToUpper();
+                    for (int i = 1; i < temp.Length; i++)
+                    {
+                        returned += "\u00A0" + System.Convert.ToString(temp[i], 16).PadLeft(2, '0').ToUpper();
+                    }
+                    returned += "} ";
+                }
+            }
             return returned;
         }
     }

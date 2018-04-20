@@ -226,5 +226,17 @@ namespace PersonaEditorGUI.Settings {
                 this["PTPNameBlockSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Empty")]
+        public string FTDEncoding {
+            get {
+                return ((string)(this["FTDEncoding"]));
+            }
+            set {
+                this["FTDEncoding"] = value;
+            }
+        }
     }
 }

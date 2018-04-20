@@ -110,10 +110,7 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         #region IFile
 
-        public int Size
-        {
-            get { return Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size(); }
-        }
+        public int Size() => Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size();
 
         public byte[] Get()
         {
@@ -263,7 +260,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             int index = 0;
 
             try
-            {                
+            {
                 foreach (var line in WT.Elements())
                 {
                     int lineindex = Convert.ToInt32(line.Name.LocalName.Split('_')[1]);
@@ -275,7 +272,7 @@ namespace PersonaEditorLib.FileStructure.FNT
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logging.Write("PersonaEditorLib", "");
             }

@@ -32,7 +32,7 @@ namespace PersonaEditorLib.FileStructure.Container
                 var item = list.Find(x => (int)x.Tag == a[0]);
                 if (item?.Object is IPersonaFile pFile)
                 {
-                    int tempsize = pFile.Size;
+                    int tempsize = pFile.Size();
                     if (tempsize % a[1] == 0)
                         count = Convert.ToInt32(tempsize / a[1]);
                     else
@@ -127,9 +127,9 @@ namespace PersonaEditorLib.FileStructure.Container
         #region IPersonaFile
 
         public FileType Type => FileType.BF;
-        
+
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
-        
+
         public Dictionary<string, object> GetProperties
         {
             get
@@ -147,17 +147,14 @@ namespace PersonaEditorLib.FileStructure.Container
 
         #region IFile
 
-        public int Size
+        public int Size()
         {
-            get
-            {
-                int returned = 0;
+            int returned = 0;
 
-                returned += 0x20 + Table.Length * 0x10;
-                SubFiles.ForEach(x => returned += (x.Object as IPersonaFile).Size);
+            returned += 0x20 + Table.Length * 0x10;
+            SubFiles.ForEach(x => returned += (x.Object as IPersonaFile).Size());
 
-                return returned;
-            }
+            return returned;
         }
 
         public byte[] Get()
@@ -175,7 +172,7 @@ namespace PersonaEditorLib.FileStructure.Container
                         return new byte[0];
 
                     writer.Write(0);
-                    writer.Write(Size - temp[1] * temp[2]);
+                    writer.Write(Size() - temp[1] * temp[2]);
                     writer.Write(Encoding.ASCII.GetBytes("FLW0"));
                     writer.Write(0);
                     writer.Write(Table.Length);

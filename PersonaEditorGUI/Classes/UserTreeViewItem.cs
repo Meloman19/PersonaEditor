@@ -145,7 +145,7 @@ namespace PersonaEditorGUI.Classes
         }
 
         #endregion Events
-
+        
         public UserTreeViewItem(ObjectFile personaFile)
         {
             SubItems = new ReadOnlyObservableCollection<UserTreeViewItem>(_SubItems);

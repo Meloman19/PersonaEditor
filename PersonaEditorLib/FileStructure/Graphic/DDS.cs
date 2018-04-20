@@ -14,6 +14,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
 {
     public class DDSPixelFormat
     {
+        [FlagsAttribute]
         public enum PixelFormatFlags
         {
             DDPF_ALPHAPIXELS = 0x1,
@@ -24,6 +25,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
             DDPF_LUMINANCE = 0x20000
         }
 
+        [FlagsAttribute]
         public enum PixelFormatFourCC
         {
             DXT1 = 0x31545844,
@@ -31,7 +33,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
             DXT5 = 0x35545844
         }
 
-        public List<PixelFormatFlags> Flags { get; set; } = new List<PixelFormatFlags>();
+        public List<PixelFormatFlags> Flags { get; } = new List<PixelFormatFlags>();
         public PixelFormatFourCC FourCC { get; set; }
         public int RGBBitCount { get; set; }
         public int RBitMask { get; set; }
@@ -89,6 +91,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
     {
         public int Size { get; } = 124;
 
+        [FlagsAttribute]
         public enum HeaderFlags
         {
             DDSD_CAPS = 0x1,
@@ -101,6 +104,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
             DDSD_DEPTH = 0x800000
         }
 
+        [FlagsAttribute]
         public enum HeaderCaps
         {
             DDSCAPS_COMPLEX = 0x8,
@@ -108,6 +112,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
             DDSCAPS_TEXTURE = 0x1000
         }
 
+        [FlagsAttribute]
         public enum HeaderCaps2
         {
             DDSCAPS2_CUBEMAP = 0x200,
@@ -181,7 +186,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
     {
         public const uint MagicNumber = 0x20534444;
 
-        const uint MagicNumber2 = 0xFF000202;
+        public const uint MagicNumber2 = 0xFF000202;
 
         public DDSHeader Header { get; private set; }
 
@@ -239,6 +244,11 @@ namespace PersonaEditorLib.FileStructure.Graphic
                 data.Add(reader.ReadBytes(size));
         }
 
+        public void ReadT2(BinaryReader reader)
+        {
+
+        }
+
         void CreateImages()
         {
             image.Clear();
@@ -274,7 +284,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
             byte[] uncompressed_data = null;
 
             using (MemoryStream MS = new MemoryStream())
-            using (BinaryWriter writer = new BinaryWriter(MS))
+            using (BinaryWriter writer = new BinaryWriter(MS, Encoding.ASCII, true))
             {
                 foreach (var a in pixels)
                     writer.Write(a);
@@ -309,13 +319,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
         #region IFile
 
-        public int Size
-        {
-            get
-            {
-                return Header.Size + 4 + data.Sum(x => x.Length);
-            }
-        }
+        public int Size() => Header.Size + 4 + data.Sum(x => x.Length);
 
         public byte[] Get()
         {

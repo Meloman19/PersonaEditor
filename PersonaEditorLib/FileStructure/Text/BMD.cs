@@ -213,8 +213,8 @@ namespace PersonaEditorLib.FileStructure.Text
             public byte[] MsgBytes { get; set; }
         }
 
-        public List<MSGs> Msg { get; set; } = new List<MSGs>();
-        public List<Names> Name { get; set; } = new List<Names>();
+        public List<MSGs> Msg { get; } = new List<MSGs>();
+        public List<Names> Name { get; } = new List<Names>();
 
         static class GetNewBMD
         {
@@ -522,12 +522,9 @@ namespace PersonaEditorLib.FileStructure.Text
 
         #region IFile
 
-        public int Size
+        public int Size()
         {
-            get
-            {
-                return Get().Length;
-            }
+            return Get().Length;
         }
 
         public byte[] Get()

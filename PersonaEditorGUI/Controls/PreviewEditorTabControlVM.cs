@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace PersonaEditorGUI.Controls
@@ -40,7 +41,7 @@ namespace PersonaEditorGUI.Controls
             if (data is UserTreeViewItem objF)
                 Open(objF);
         }
-
+        
         public bool CloseAll()
         {
             bool returned = true;
@@ -71,7 +72,7 @@ namespace PersonaEditorGUI.Controls
                     DataContext = new Editors.SPREditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.SPR.SPR);
                     DataContextType = TabItemType.SPR;
                 }
-                else if(pf.Type == FileType.SPD)
+                else if (pf.Type == FileType.SPD)
                 {
                     DataContext = new Editors.SPREditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.SPR.SPD);
                     DataContextType = TabItemType.SPR;
@@ -86,16 +87,21 @@ namespace PersonaEditorGUI.Controls
                     DataContext = new Editors.BMDEditorVM(sender.PersonaFile);
                     DataContextType = TabItemType.BMD;
                 }
+                else if (pf.Type == FileType.FTD)
+                {
+                    DataContext = new Editors.FTDEditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.Text.FTD);
+                    DataContextType = TabItemType.FTD;
+                }
                 //else if (pf.Type == FileType.FNT)
                 //{
                 //    DataContext = new Editors.FNTEditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.FNT.FNT);
                 //    DataContextType = TabItemType.FNT;
                 //}
-                //else if (pf.Type == FileType.DAT)
-                //{
-                //    DataContext = new Editors.HEXEditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.DAT);
-                //    DataContextType = TabItemType.HEX;
-                //}
+                else if (pf.Type == FileType.DAT)
+                {
+                    DataContext = new Editors.HEXEditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.DAT);
+                    DataContextType = TabItemType.HEX;
+                }
                 else
                 {
                     return false;

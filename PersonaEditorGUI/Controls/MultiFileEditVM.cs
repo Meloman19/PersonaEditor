@@ -36,6 +36,9 @@ namespace PersonaEditorGUI.Controls
         private string _OpenFileName = "";
         public string OpenFileName => _OpenFileName;
 
+        private string statusBar = "";
+        public string StatusBar => statusBar;
+
         #region Methods
 
         public void OpenFile(string path)
@@ -121,6 +124,14 @@ namespace PersonaEditorGUI.Controls
                 Tab.SetPreview(image.GetImage());
             else
                 Tab.SetPreview(null);
+
+            statusBar = "";
+            if (sender.PersonaFile.Object is IFile file)
+            {
+                int size = file.Size();
+                statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
+                Notify("StatusBar");
+            }
         }
 
         #endregion Events

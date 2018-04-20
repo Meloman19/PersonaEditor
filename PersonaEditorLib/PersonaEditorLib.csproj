@@ -60,7 +60,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -99,6 +99,7 @@
     <Compile Include="Extension\IEnumerableExtension.cs" />
     <Compile Include="FileStructure\Graphic\DDS.cs" />
     <Compile Include="FileStructure\SPR\SPD.cs" />
+    <Compile Include="FileStructure\SPR\SPDKey.cs" />
     <Compile Include="FileStructure\Text\FTD.cs" />
     <Compile Include="FileStructure\Text\LineMap.cs" />
     <Compile Include="ImageHelper.cs" />
@@ -155,8 +156,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FileStructure\PM1\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,76 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using PersonaEditorLib.Interfaces;
-using PersonaEditorLib.Extension;
 
 namespace PersonaEditorLib.FileStructure.SPR
 {
-    public class SPDKey : BindingObject
-    {
-        public int ListIndex { get; private set; }
-        public int TextureIndex { get; private set; }
-        public int[] Unk0x08 { get; private set; } // x 6
-        public int X0 { get; set; }
-        public int Y0 { get; set; }
-        public int Xdel { get; set; }
-        public int Ydel { get; set; }
-        public int[] Unk0x30 { get; private set; } // x 2
-        public int[] Unk0x40 { get; private set; } // x 12
-        public byte[] Comment { get; private set; }
-
-        public SPDKey(BinaryReader reader)
-        {
-            ListIndex = reader.ReadInt32();
-            TextureIndex = reader.ReadInt32();
-            Unk0x08 = reader.ReadInt32Array(6);
-            X0 = reader.ReadInt32();
-            Y0 = reader.ReadInt32();
-            Xdel = reader.ReadInt32();
-            Ydel = reader.ReadInt32();
-            Unk0x30 = reader.ReadInt32Array(2);
-
-            if (reader.ReadInt32() != Xdel)
-                throw new Exception("SPDKey: Xdel wrong");
-            if (reader.ReadInt32() != Ydel)
-                throw new Exception("SPDKey: Ydel wrong");
-
-            Unk0x40 = reader.ReadInt32Array(12);
-            Comment = reader.ReadBytes(0x30);
-        }
-
-        public int Size
-        {
-            get { return 0xa0; }
-        }
-
-        public void Get(BinaryWriter writer)
-        {
-            writer.Write(ListIndex);
-            writer.Write(TextureIndex);
-            writer.WriteInt32Array(Unk0x08);
-            writer.Write(X0);
-            writer.Write(Y0);
-            writer.Write(Xdel);
-            writer.Write(Ydel);
-            writer.WriteInt32Array(Unk0x30);
-            writer.Write(Xdel);
-            writer.Write(Ydel);
-            writer.WriteInt32Array(Unk0x40);
-            writer.Write(Comment);
-        }
-    }
-
-    public class SPDTextureKey
-    {
-        public string Name { get; set; }
-    }
-
     public class SPD : IPersonaFile
     {
         public const int MagicNumber = 0x30525053;
@@ -161,19 +96,16 @@ namespace PersonaEditorLib.FileStructure.SPR
 
         #region IFile
 
-        public int Size
+        public int Size()
         {
-            get
-            {
-                int returned = 0;
+            int returned = 0;
 
-                returned += 0x20; // Add Header
-                returned += SubFiles.Count * 0x30; // Add Textures Header
-                returned += KeyList.Count * 0xa0; // Add Keys
-                SubFiles.ForEach(x => returned += (x.Object as Graphic.DDS).Size); // Add Textures
+            returned += 0x20; // Add Header
+            returned += SubFiles.Count * 0x30; // Add Textures Header
+            returned += KeyList.Count * 0xa0; // Add Keys
+            SubFiles.ForEach(x => returned += (x.Object as Graphic.DDS).Size()); // Add Textures
 
-                return returned;
-            }
+            return returned;
         }
 
         public byte[] Get()
@@ -185,7 +117,7 @@ namespace PersonaEditorLib.FileStructure.SPR
             {
                 writer.Write(MagicNumber);
                 writer.Write(0x2);
-                writer.Write(Size);
+                writer.Write(Size());
                 writer.Write(0);
                 writer.Write(0x20);
                 writer.Write((ushort)SubFiles.Count);
@@ -211,7 +143,7 @@ namespace PersonaEditorLib.FileStructure.SPR
                         writer.Write(i + 1);
                         writer.Write(0);
                         writer.Write(pos[i]);
-                        writer.Write(dds.Size);
+                        writer.Write(dds.Size());
                         writer.Write(dds.Header.Width);
                         writer.Write(dds.Header.Height);
                         writer.Write(0);

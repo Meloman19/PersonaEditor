@@ -12,7 +12,7 @@ namespace PersonaEditorLib.FileStructure.Container
     public class BVP : IPersonaFile
     {
         List<int> FlagList = new List<int>();
-        
+
         public BVP(string path)
         {
             Name = Path.GetFileName(path);
@@ -94,13 +94,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         #region IFile
 
-        public int Size
-        {
-            get
-            {
-                return Get().Length;
-            }
-        }
+        public int Size() => Get().Length;
 
         public byte[] Get()
         {
@@ -114,7 +108,7 @@ namespace PersonaEditorLib.FileStructure.Container
                 for (int i = 0; i < SubFiles.Count; i++)
                 {
                     var temp = SubFiles[i].Object as IFile;
-                    Entry.Add(new int[] { FlagList[i], (int)writer.BaseStream.Position, temp.Size });
+                    Entry.Add(new int[] { FlagList[i], (int)writer.BaseStream.Position, temp.Size() });
 
                     writer.Write(temp.Get());
                     writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Position, 16)]);

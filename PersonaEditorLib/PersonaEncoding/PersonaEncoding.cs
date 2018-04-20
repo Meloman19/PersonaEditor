@@ -13,7 +13,7 @@ namespace PersonaEditorLib.PersonaEncoding
     public class PersonaEncoding : Encoding
     {
         public static PersonaEncoding Empty { get; } = new PersonaEncoding();
-        
+
         public string Tag { get; set; } = "Empty";
 
         public string FilePath { get; } = "";
@@ -142,7 +142,7 @@ namespace PersonaEditorLib.PersonaEncoding
 
             for (int i = index; i < index + count; i++)
             {
-                if (0x80 <= bytes[i] & bytes[i] < 0xF0)
+                if ((0x80 <= bytes[i] & bytes[i] < 0xF0) && i + 1 < index + count)
                     i++;
 
                 charnum++;
@@ -161,9 +161,14 @@ namespace PersonaEditorLib.PersonaEncoding
                     chars[charIndex + charnum] = GetChar(bytes[i]);
                 else if (0x80 <= bytes[i] & bytes[i] < 0xF0)
                 {
-                    int link = (bytes[i] - 0x81) * 0x80 + bytes[i + 1] + 0x20;
-                    chars[charIndex + charnum] = GetChar(link);
-                    i++;
+                    if (i + 1 >= byteIndex + byteCount)
+                        chars[charIndex + charnum] = '\uFFFD';
+                    else
+                    {
+                        int link = (bytes[i] - 0x81) * 0x80 + bytes[i + 1] + 0x20;
+                        chars[charIndex + charnum] = GetChar(link);
+                        i++;
+                    }
                 }
                 charnum++;
             }
