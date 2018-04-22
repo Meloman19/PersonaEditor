@@ -145,7 +145,7 @@ namespace PersonaEditorGUI.Classes
         }
 
         #endregion Events
-        
+
         public UserTreeViewItem(ObjectFile personaFile)
         {
             SubItems = new ReadOnlyObservableCollection<UserTreeViewItem>(_SubItems);
@@ -273,13 +273,13 @@ namespace PersonaEditorGUI.Classes
                 {
                     var item = PersonaEditorLib.Utilities.PersonaFile.OpenFile("", File.ReadAllBytes(OFD.FileName), fileType);
 
-                    if (item != null)
-                        PersonaFile.Object = item;
+                    if (item.Object != null)
+                        PersonaFile.Object = item.Object;
                 }
             }
             //PersonaEditorLib.Utilities.PersonaFile.OpenPersonaFileDialog(personaFile, Static.EncodingManager);
 
-            //Update(_personaFile.Object as IPersonaFile);
+            Update(_personaFile.Object as IPersonaFile);
         }
 
         private Action actionSaveAll;

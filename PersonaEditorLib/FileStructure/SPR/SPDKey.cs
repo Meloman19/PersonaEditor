@@ -17,6 +17,8 @@ namespace PersonaEditorLib.FileStructure.SPR
         public int[] Unk0x40 { get; private set; } // x 12
         public byte[] Comment { get; private set; }
 
+        private bool sizeEqual = false;
+
         public SPDKey(BinaryReader reader)
         {
             ListIndex = reader.ReadInt32();
@@ -27,6 +29,8 @@ namespace PersonaEditorLib.FileStructure.SPR
             Xdel = reader.ReadInt32();
             Ydel = reader.ReadInt32();
             Unk0x30 = reader.ReadInt32Array(4);
+
+            sizeEqual = Unk0x30[2] == Xdel && Unk0x30[3] == Ydel;
 
             //if (reader.ReadInt32() != Xdel)
             //    throw new Exception("SPDKey: Xdel wrong");
@@ -51,6 +55,13 @@ namespace PersonaEditorLib.FileStructure.SPR
             writer.Write(Y0);
             writer.Write(Xdel);
             writer.Write(Ydel);
+
+            if (sizeEqual)
+            {
+                Unk0x30[2] = Xdel;
+                Unk0x30[3] = Ydel;
+            }
+
             writer.WriteInt32Array(Unk0x30);
             //writer.Write(Xdel);
             //writer.Write(Ydel);
