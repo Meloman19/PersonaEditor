@@ -318,11 +318,11 @@ namespace PersonaEditorLib.FileStructure.Text
                     {
                         int size = reader.ReadInt32();
                         byte[] OldName = reader.ReadBytes(size);
-                        stream.Position += Utilities.Utilities.Alignment(stream.Position, 4);
+                        stream.Position += Utilities.UtilitiesTool.Alignment(stream.Position, 4);
 
                         size = reader.ReadInt32();
                         string NewName = Encoding.UTF8.GetString(reader.ReadBytes(size));
-                        stream.Position += Utilities.Utilities.Alignment(stream.Position, 4);
+                        stream.Position += Utilities.UtilitiesTool.Alignment(stream.Position, 4);
 
                         names.Add(new PTPName(i, OldName, NewName));
                     }
@@ -342,19 +342,19 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             int size = reader.ReadInt32();
                             byte[] Prefix = reader.ReadBytes(size);
-                            stream.Position += Utilities.Utilities.Alignment(stream.Position, 4);
+                            stream.Position += Utilities.UtilitiesTool.Alignment(stream.Position, 4);
 
                             size = reader.ReadInt32();
                             byte[] OldString = reader.ReadBytes(size);
-                            stream.Position += Utilities.Utilities.Alignment(stream.Position, 4);
+                            stream.Position += Utilities.UtilitiesTool.Alignment(stream.Position, 4);
 
                             size = reader.ReadInt32();
                             byte[] Postfix = reader.ReadBytes(size);
-                            stream.Position += Utilities.Utilities.Alignment(stream.Position, 4);
+                            stream.Position += Utilities.UtilitiesTool.Alignment(stream.Position, 4);
 
                             size = reader.ReadInt32();
                             string NewString = Encoding.UTF8.GetString(reader.ReadBytes(size));
-                            stream.Position += Utilities.Utilities.Alignment(stream.Position, 16);
+                            stream.Position += Utilities.UtilitiesTool.Alignment(stream.Position, 16);
 
                             mSG.Strings.Add(new MSGstr(k, NewString, Prefix, OldString, Postfix) { CharacterIndex = CharacterIndex });
                         }
@@ -399,11 +399,11 @@ namespace PersonaEditorLib.FileStructure.Text
             {
                 int size = reader.ReadInt32();
                 byte[] OldName = reader.ReadBytes(size);
-                reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 4);
+                reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 4);
 
                 size = reader.ReadInt32();
                 string NewName = Encoding.UTF8.GetString(reader.ReadBytes(size));
-                reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 4);
+                reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 4);
 
                 names.Add(new PTPName(i, OldName, NewName));
             }
@@ -423,19 +423,19 @@ namespace PersonaEditorLib.FileStructure.Text
                 {
                     int size = reader.ReadInt32();
                     byte[] Prefix = reader.ReadBytes(size);
-                    reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 4);
+                    reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 4);
 
                     size = reader.ReadInt32();
                     byte[] OldString = reader.ReadBytes(size);
-                    reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 4);
+                    reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 4);
 
                     size = reader.ReadInt32();
                     byte[] Postfix = reader.ReadBytes(size);
-                    reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 4);
+                    reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 4);
 
                     size = reader.ReadInt32();
                     string NewString = Encoding.UTF8.GetString(reader.ReadBytes(size));
-                    reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 16);
+                    reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 16);
 
                     mSG.Strings.Add(new MSGstr(k, NewString, Prefix, OldString, Postfix) { CharacterIndex = CharacterIndex });
                 }
@@ -774,17 +774,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 
@@ -806,7 +796,7 @@ namespace PersonaEditorLib.FileStructure.Text
                     long NamesLinkPos = MS.Position;
                     writer.Write(0);
                     writer.Write(names.Count);
-                    writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 0x10)]);
+                    writer.Write(new byte[Utilities.UtilitiesTool.Alignment(MS.Position, 0x10)]);
 
                     long MSGPos = MS.Position;
                     foreach (var a in msg)
@@ -823,25 +813,25 @@ namespace PersonaEditorLib.FileStructure.Text
                             buffer = b.Prefix.GetByteArray();
                             writer.Write(buffer.Length);
                             writer.Write(buffer);
-                            writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 4)]);
+                            writer.Write(new byte[Utilities.UtilitiesTool.Alignment(MS.Position, 4)]);
 
                             buffer = b.OldString.GetByteArray();
                             writer.Write(buffer.Length);
                             writer.Write(buffer);
-                            writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 4)]);
+                            writer.Write(new byte[Utilities.UtilitiesTool.Alignment(MS.Position, 4)]);
 
                             buffer = b.Postfix.GetByteArray();
                             writer.Write(buffer.Length);
                             writer.Write(buffer);
-                            writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 4)]);
+                            writer.Write(new byte[Utilities.UtilitiesTool.Alignment(MS.Position, 4)]);
 
                             buffer = Encoding.UTF8.GetBytes(b.NewString);
                             writer.Write(buffer.Length);
                             writer.Write(buffer);
-                            writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 16)]);
+                            writer.Write(new byte[Utilities.UtilitiesTool.Alignment(MS.Position, 16)]);
                         }
 
-                        writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 0x10)]);
+                        writer.Write(new byte[Utilities.UtilitiesTool.Alignment(MS.Position, 0x10)]);
                     }
 
                     long NamesPos = MS.Position;
@@ -850,12 +840,12 @@ namespace PersonaEditorLib.FileStructure.Text
                         buffer = a.OldName;
                         writer.Write(buffer.Length);
                         writer.Write(buffer);
-                        writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 4)]);
+                        writer.Write(new byte[Utilities.UtilitiesTool.Alignment(MS.Position, 4)]);
 
                         buffer = Encoding.UTF8.GetBytes(a.NewName);
                         writer.Write(buffer.Length);
                         writer.Write(buffer);
-                        writer.Write(new byte[Utilities.Utilities.Alignment(MS.Position, 4)]);
+                        writer.Write(new byte[Utilities.UtilitiesTool.Alignment(MS.Position, 4)]);
                     }
 
                     MS.Position = MSGLinkPos;

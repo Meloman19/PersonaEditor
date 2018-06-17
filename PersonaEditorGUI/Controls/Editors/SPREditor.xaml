@@ -46,6 +46,14 @@
                     </DataGrid.Columns>
                 </DataGrid>
 
+                <StatusBar Grid.Row="3">
+                    <TextBlock Text="Cursor Position:"/>
+
+                    <TextBlock Text="X="/>
+                    <TextBlock Name="XCoo" Text="0"/>
+                    <TextBlock Text="Y="/>
+                    <TextBlock Name="YCoo" Text="0"/>
+                </StatusBar>
             </Grid>
 
             <GridSplitter Grid.Column="1" Width="6" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
@@ -116,7 +124,7 @@
                         </DrawingBrush>
                     </Border.Background>
 
-                    <ItemsControl Grid.Column="2" ItemsSource="{Binding Path=KeyList}">
+                    <ItemsControl Grid.Column="2" ItemsSource="{Binding Path=KeyList}" MouseMove="ItemsControl_MouseMove">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <classes:RelativePanel Rect="{Binding Path=Rect}" ClipToBounds="True">

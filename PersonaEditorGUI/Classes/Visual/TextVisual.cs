@@ -42,7 +42,7 @@ namespace PersonaEditorGUI.Classes.Visual
             set
             {
                 _Data = value;
-                _Image = _Data.GetImageSource(PersonaEditorLib.Utilities.Utilities.CreatePallete(Color, _Data.PixelFormat));
+                _Image = _Data.GetImageSource(PersonaEditorLib.Utilities.UtilitiesTool.CreatePallete(Color, _Data.PixelFormat));
                 TextDrawing.ImageSource = _Image;
                 _Rect = GetSize(Start, _Data.PixelWidth, _Data.PixelHeight);
                 TextDrawing.Rect = _Rect;
@@ -75,7 +75,7 @@ namespace PersonaEditorGUI.Classes.Visual
                 if (_Color != value)
                 {
                     _Color = value;
-                    _Image = _Data.GetImageSource(PersonaEditorLib.Utilities.Utilities.CreatePallete(Color, _Data.PixelFormat));
+                    _Image = _Data.GetImageSource(PersonaEditorLib.Utilities.UtilitiesTool.CreatePallete(Color, _Data.PixelFormat));
                     VisualChanged?.Invoke(_Image, _Rect);
                 }
             }

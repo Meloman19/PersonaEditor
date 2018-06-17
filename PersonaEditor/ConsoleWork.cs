@@ -23,6 +23,7 @@ namespace PersonaEditor
         Image,
         Table,
         PTP,
+        BMD,
         Text,
         All
     }
@@ -40,6 +41,7 @@ namespace PersonaEditor
         public bool Sub { get; } = false;
         public bool LineByLine { get; } = false;
         public int Size { get; } = -1;
+        public bool AsBMD { get; } = false;
 
         public Parameters()
         {
@@ -79,6 +81,8 @@ namespace PersonaEditor
                     LineByLine = true;
                 else if (a[0] == "/size")
                     Size = int.Parse(a[1]);
+                else if (a[0] == "/bmd")
+                    AsBMD = true;
             }
         }
     }
@@ -173,7 +177,7 @@ namespace PersonaEditor
             if (File.Exists(split[0][0]))
             {
                 OpenedFile = Path.GetFullPath(args[0]);
-                OpenedFileDir = Path.GetDirectoryName(args[0]);
+                OpenedFileDir = Path.GetDirectoryName(OpenedFile);
 
                 if (split[0].Length > 1)
                     OpenedArgument = split[0][1];

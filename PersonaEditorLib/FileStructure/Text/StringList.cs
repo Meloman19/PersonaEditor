@@ -7,12 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using PersonaEditorLib.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace PersonaEditorLib.FileStructure.Text
 {
     public class StringList : IPersonaFile
     {
-        private class Element
+        public class Element
         {
             public int Length { get; set; } = 0;
             public string OldString { get; set; } = "";
@@ -25,7 +26,7 @@ namespace PersonaEditorLib.FileStructure.Text
             }
         }
 
-        List<Element> List = new List<Element>();
+        public List<Element> List { get; } = new List<Element>();
 
         public List<Tuple<string, int>> list = new List<Tuple<string, int>>();
 
@@ -97,24 +98,18 @@ namespace PersonaEditorLib.FileStructure.Text
             }
         }
 
+        public string[] ExportText()
+        {
+            return List.Select(x => x.OldString).ToArray();
+        }
+
         #region IPersonaFile
 
         public FileType Type => FileType.StringList;
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Size", Size());
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 

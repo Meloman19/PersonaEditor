@@ -15,13 +15,51 @@ namespace PersonaEditorLib.Utilities
             { FileType.TMX, "|PNG file|*.PNG" },
             { FileType.BMD, "|Persona Text Project|*.PTP" },
             { FileType.FNT, "|PNG file|*.PNG" },
-            { FileType.DDS, "|PNG file|*.PNG" }
+            { FileType.DDS, "|PNG file|*.PNG" },
+            { FileType.PTP, "|BMD Text File|*.BMD" }
         };
 
         public static Dictionary<FileType, string> PersonaOpenFileFilter = new Dictionary<FileType, string>()
         {
+            { FileType.TMX, "|PNG file|*.PNG" },
             { FileType.BMD, "|Persona Text Project|*.PTP" },
-            { FileType.FNT, "|PNG file|*.PNG" }
+            { FileType.FNT, "|PNG file|*.PNG" },
+            { FileType.DDS, "|PNG file|*.PNG" }
+        };
+
+        public static Dictionary<string, FileType> PersonaFileType = new Dictionary<string, FileType>()
+        {
+            //Containers
+            { ".bin", FileType.BIN },
+            { ".pak", FileType.BIN },
+            { ".pac", FileType.BIN },
+            { ".p00", FileType.BIN },
+            { ".p01", FileType.BIN },
+            { ".arc", FileType.BIN },
+            { ".dds2", FileType.BIN },
+
+            { ".bf", FileType.BF },
+            { ".pm1", FileType.PM1 },
+            { ".bvp", FileType.BVP },
+            { ".tbl", FileType.TBL },
+
+            { ".ctd", FileType.FTD },
+            { ".ftd", FileType.FTD },
+            { ".ttd", FileType.FTD },
+
+            //Graphic containers
+            { ".spr", FileType.SPR },
+            { ".spd", FileType.SPD },
+
+            //Graphic
+            { ".fnt", FileType.FNT },
+            { ".tmx", FileType.TMX },
+            { ".dds", FileType.DDS },
+
+            //Text
+            { ".bmd", FileType.BMD },
+            { ".msg", FileType.BMD },
+            { ".ptp", FileType.PTP }
         };
 
         public static List<Tuple<FileType, string>> FileInfo = new List<Tuple<FileType, string>>()
@@ -112,7 +150,14 @@ namespace PersonaEditorLib.Utilities
                 else if (type == FileType.FTD)
                     Obj = new FileStructure.Text.FTD(data);
                 else if (type == FileType.DDS)
-                    Obj = new FileStructure.Graphic.DDS(data);
+                    try
+                    {
+                        Obj = new FileStructure.Graphic.DDS(data);
+                    }
+                    catch
+                    {
+                        Obj = new FileStructure.Graphic.DDSAtlus(data);
+                    }
                 else if (type == FileType.SPD)
                     Obj = new FileStructure.SPR.SPD(data);
                 else
@@ -120,7 +165,7 @@ namespace PersonaEditorLib.Utilities
 
                 return new ObjectFile(name, Obj);
             }
-            catch
+            catch (Exception ex)
             {
                 return new ObjectFile(name, null);
             }
@@ -129,32 +174,8 @@ namespace PersonaEditorLib.Utilities
         public static FileType GetFileType(string name)
         {
             string ext = Path.GetExtension(name).ToLower().TrimEnd(' ');
-            if (ext == ".bin" | ext == ".pak" | ext == ".pac" | ext == ".p00" | ext == ".arc" | ext == ".dds2")
-                return FileType.BIN;
-            else if (ext == ".spr")
-                return FileType.SPR;
-            else if (ext == ".tmx")
-                return FileType.TMX;
-            else if (ext == ".bf")
-                return FileType.BF;
-            else if (ext == ".pm1")
-                return FileType.PM1;
-            else if (ext == ".bmd" | ext == ".msg")
-                return FileType.BMD;
-            else if (ext == ".ptp")
-                return FileType.PTP;
-            else if (ext == ".fnt")
-                return FileType.FNT;
-            else if (ext == ".bvp")
-                return FileType.BVP;
-            else if (ext == ".tbl")
-                return FileType.TBL;
-            else if (ext == ".dds")
-                return FileType.DDS;
-            else if (ext == ".spd")
-                return FileType.SPD;
-            else if (ext == ".ctd" | ext == ".ftd" | ext == ".ttd")
-                return FileType.FTD;
+            if (PersonaFileType.ContainsKey(ext))
+                return PersonaFileType[ext];
             else
                 return FileType.DAT;
         }

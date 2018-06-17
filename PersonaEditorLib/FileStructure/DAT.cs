@@ -1,6 +1,7 @@
 ﻿using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace PersonaEditorLib.FileStructure
     {
         public byte[] Data { get; set; } = new byte[0];
 
-        private StreamFile StreamFile;
+        private StreamPart StreamFile;
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
@@ -21,7 +22,7 @@ namespace PersonaEditorLib.FileStructure
             Data = data;
         }
 
-        public DAT(StreamFile streamFile)
+        public DAT(StreamPart streamFile)
         {
             StreamFile = streamFile;
         }
@@ -35,18 +36,7 @@ namespace PersonaEditorLib.FileStructure
             return SubFiles;
         }
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Size", Size());
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 

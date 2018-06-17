@@ -48,14 +48,14 @@ namespace PersonaEditorLib.Utilities
             return OpenWriteFile(File.Create(path), IsLittleEndian);
         }
 
-        public static BinaryWriter OpenWriteFile(Stream stream, bool IsLittleEndian)
+        public static BinaryWriter OpenWriteFile(Stream stream, bool IsLittleEndian, bool leaveOpen = true)
         {
             BinaryWriter returned;
 
             if (IsLittleEndian)
-                returned = new BinaryWriter(stream);
+                returned = new BinaryWriter(stream, Encoding.ASCII, leaveOpen);
             else
-                returned = new BinaryWriterBE(stream);
+                returned = new BinaryWriterBE(stream, Encoding.ASCII, leaveOpen);
 
             return returned;
         }

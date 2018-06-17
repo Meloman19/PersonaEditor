@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -170,18 +171,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Entry Count", SubFiles.Count);
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         public bool IsLittleEndian { get; set; } = true;
 
@@ -246,12 +236,12 @@ namespace PersonaEditorLib.FileStructure.Container
                     table.Add(new int[]
                     {
                         (int)TypeMap.BMD,
-                        bmd.Length + Utilities.Utilities.Alignment(bmd.Length, 0x10),
+                        bmd.Length + Utilities.UtilitiesTool.Alignment(bmd.Length, 0x10),
                         1,
                         (int)MS.Position
                     });
                     writer.Write(bmd);
-                    writer.Write(new byte[Utilities.Utilities.Alignment(bmd.Length, 0x10)]);
+                    writer.Write(new byte[Utilities.UtilitiesTool.Alignment(bmd.Length, 0x10)]);
                 }
 
                 long EPLHeadPos = 0;
@@ -281,22 +271,22 @@ namespace PersonaEditorLib.FileStructure.Container
                 foreach (var a in EPL)
                 {
                     byte[] epl = (a.Object as IPersonaFile).Get();
-                    table.Find(x => x[0] == (int)TypeMap.EPL)[1] += epl.Length + Utilities.Utilities.Alignment(epl.Length, 0x10);
+                    table.Find(x => x[0] == (int)TypeMap.EPL)[1] += epl.Length + Utilities.UtilitiesTool.Alignment(epl.Length, 0x10);
                     int[] eplhead = (int[])(a.Tag as object[])[1];
                     eplhead[1] = (int)MS.Position;
                     writer.Write(epl);
-                    MS.Position += Utilities.Utilities.Alignment(epl.Length, 0x10);
+                    MS.Position += Utilities.UtilitiesTool.Alignment(epl.Length, 0x10);
                 }
 
                 foreach (var a in RMD)
                 {
                     byte[] rmd = (a.Object as IPersonaFile).Get();
-                    table.Find(x => x[0] == (int)TypeMap.RMD)[1] += rmd.Length + Utilities.Utilities.Alignment(rmd.Length, 0x10);
+                    table.Find(x => x[0] == (int)TypeMap.RMD)[1] += rmd.Length + Utilities.UtilitiesTool.Alignment(rmd.Length, 0x10);
                     int[] rmdhead = (int[])(a.Tag as object[])[1];
                     rmdhead[4] = (int)MS.Position;
                     rmdhead[5] = rmd.Length;
                     writer.Write(rmd);
-                    MS.Position += Utilities.Utilities.Alignment(rmd.Length, 0x10);
+                    MS.Position += Utilities.UtilitiesTool.Alignment(rmd.Length, 0x10);
                 }
 
                 if (EPLHeadPos != 0)

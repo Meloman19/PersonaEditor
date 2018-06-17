@@ -15,7 +15,7 @@
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
     </UserControl.Resources>
 
-    <TabControl Grid.Column="1" SelectedIndex="{Binding SelectedTabIndex}" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TabCollection}">
+    <TabControl Grid.Column="0" SelectedIndex="{Binding SelectedTabIndex}" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TabCollection}">
         <TabControl.ItemTemplate>
             <DataTemplate>
                 <Grid classes:Event.MouseUp="{Binding MouseUp}">
@@ -42,9 +42,75 @@
                         <ContentControl Content="{Binding DataContext}">
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type controls:ImagePreviewVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <controls:ImagePreview/>
-                                    </Border>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <!--<ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" MinWidth="100"/>-->
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border BorderBrush="Black" BorderThickness="1">
+                                            <controls:ImagePreview/>
+                                        </Border>
+
+                                        <!--<GridSplitter ResizeBehavior="PreviousAndNext"  Grid.Column="1" Width="5" ShowsPreview="True"/>
+
+                                        <DataGrid Grid.Column="2" ItemsSource="{Binding PropertiesView}" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False">
+
+                                            <DataGrid.Resources>
+                                                <DataTemplate x:Key="ReadonlyCellTemplate">
+                                                    <TextBlock Text="{Binding StringValue}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ReadOnly}" Value="True">
+                                                                        <Setter Property="Foreground" Value="DarkGray"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </DataTemplate>
+
+                                                <DataTemplate x:Key="EditableCellTemplate">
+                                                    <TextBox Text="{Binding StringValue}"/>
+                                                </DataTemplate>
+
+                                                <DataTemplate x:Key="ComboBoxCellTemplate">
+                                                    <ComboBox ItemsSource="{Binding ComboValue}" SelectedIndex="{Binding ComboIndex}"/>
+                                                </DataTemplate>
+                                            </DataGrid.Resources>
+
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Property" Binding="{Binding Name}" IsReadOnly="True"/>
+                                                <DataGridTemplateColumn Header="Value">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <ContentPresenter x:Name="Presenter" Content="{Binding}" ContentTemplate="{StaticResource ReadonlyCellTemplate}" />
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding Type}" Value="ComboBox">
+                                                                    <Setter TargetName="Presenter" Property="ContentTemplate" Value="{StaticResource ComboBoxCellTemplate}"/>
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                   
+                                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                                        <DataTemplate>
+                                                            <ContentPresenter x:Name="Presenter" Content="{Binding}" ContentTemplate="{StaticResource ReadonlyCellTemplate}" />
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding ReadOnly}" Value="False">
+                                                                    <Setter TargetName="Presenter" Property="ContentTemplate" Value="{StaticResource EditableCellTemplate}" />
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>-->
+                                    </Grid>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type editors:SPREditorVM}">
                                     <Border BorderBrush="Black" BorderThickness="1">

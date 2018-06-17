@@ -20,6 +20,30 @@ namespace PersonaEditorGUI
 
         public App()
         {
+            //    string result = "{";
+            //    for (int a = 0; a < 256; a++)
+            //    {
+            //        byte a5 = (byte)((double)a * 15d / 255d + 0.5d);
+
+            //        result += a5.ToString().PadRight(2, ' ');
+            //        result += ",";
+            //        if ((a + 1) % 16 == 0)
+            //            result += Environment.NewLine;
+            //    }
+            //    result += "}";
+            //    File.WriteAllLines("D:\\4bit.txt", new string[] { result });
+
+            //var img = PersonaEditorLib.Extension.Imaging.OpenPNG("D:\\ps3_tittle_01.PNG");
+            //PersonaEditorLib.Media.Imaging.ImageBaseConverter imageBaseConverter = new PersonaEditorLib.Media.Imaging.ImageBaseConverter(img);
+            //if (imageBaseConverter.TryConvert(PersonaEditorLib.Media.Imaging.PixelBaseFormat.DXT5))
+            //{
+            //    PersonaEditorLib.Extension.Imaging.SavePNG(imageBaseConverter.GetBitmapSource(), "D:\\ps3_tittle_01 2.PNG");
+            //}
+            //else
+            //{
+
+            //}
+
             InitializeComponent();
             Settings.AppSetting.Default.PropertyChanged += Default_PropertyChanged;
             LoadLocalization();

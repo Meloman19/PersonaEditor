@@ -21,6 +21,7 @@ namespace PersonaEditorGUI
     {
         Tools.Visualizer visualizer;
         Tools.SetChar setchar;
+        Tools.FileBrowser fileBrowser;
 
         public MultiFileEditVM MultiFile { get; } = new MultiFileEditVM();
 
@@ -46,6 +47,8 @@ namespace PersonaEditorGUI
                     visualizer.Close();
                 if (setchar != null)
                     setchar.Close();
+                if (fileBrowser != null)
+                    fileBrowser.Close();
 
                 Settings.AppSetting.Default.Save();
                 Settings.BackgroundDefault.Default.Save();
@@ -57,7 +60,7 @@ namespace PersonaEditorGUI
         }
 
         public ICommand clickOpenFile { get; }
-        private void OpenFile()
+        private void OpenFile() 
         {
             OpenFileDialog OFD = new OpenFileDialog();
             if (OFD.ShowDialog() == true)
@@ -127,6 +130,28 @@ namespace PersonaEditorGUI
             setchar.Show();
         }
 
+        public ICommand clickFileBrowserOpen { get; }
+        private void FileBrowserOpen()
+        {
+            if (fileBrowser != null)
+                if (fileBrowser.IsLoaded)
+                {
+                    fileBrowser.Activate();
+                    return;
+                }
+
+            Tools.FileBrowserVM fileBrowserVM = new Tools.FileBrowserVM();
+            fileBrowserVM.OpenFile += FileBrowserVM_OpenFile;
+            fileBrowser = new Tools.FileBrowser() { DataContext = fileBrowserVM };
+            
+            fileBrowser.Show();
+        }
+
+        private void FileBrowserVM_OpenFile(string path)
+        {
+            MultiFile.OpenFile(path);
+        }
+
         public ICommand clickAboutOpen { get; }
         private void AboutOpen()
         {
@@ -134,7 +159,7 @@ namespace PersonaEditorGUI
         }
 
         #endregion Events
-        
+
         public ICommand clickTest { get; }
         private void TestClick()
         {
@@ -160,6 +185,8 @@ namespace PersonaEditorGUI
             clickSettingOpen = new RelayCommand(SettingOpen);
             clickVisualizerOpen = new RelayCommand(ToolVisualizerOpen);
             clickSetCharOpen = new RelayCommand(ToolSetCharOpen);
+            clickFileBrowserOpen = new RelayCommand(FileBrowserOpen);
+
             clickAboutOpen = new RelayCommand(AboutOpen);
 
             clickTest = new RelayCommand(TestClick);

@@ -32,11 +32,6 @@ namespace PersonaEditorLib.FileStructure.SPR
 
             sizeEqual = Unk0x30[2] == Xdel && Unk0x30[3] == Ydel;
 
-            //if (reader.ReadInt32() != Xdel)
-            //    throw new Exception("SPDKey: Xdel wrong");
-            //if (reader.ReadInt32() != Ydel)
-            //    throw new Exception("SPDKey: Ydel wrong");
-
             Unk0x40 = reader.ReadInt32Array(12);
             Comment = reader.ReadBytes(0x30);
         }

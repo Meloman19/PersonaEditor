@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace PersonaEditorGUI.Controls.Editors
@@ -21,7 +22,8 @@ namespace PersonaEditorGUI.Controls.Editors
         private string _Entry = "";
         public string Entry => _Entry;
 
-        public string EntryString => encoding == null ? "" : encoding.GetString(entry);
+        private string _EntryString = "";
+        public string EntryString => _EntryString;
 
         private ContextMenu contextMenu = null;
         public ContextMenu ContextMenu => contextMenu;
@@ -29,6 +31,7 @@ namespace PersonaEditorGUI.Controls.Editors
         public void SetEncoding(Encoding encoding)
         {
             this.encoding = encoding;
+            _EntryString = encoding.GetString(entry);
             Notify("EntryString");
         }
 
@@ -44,6 +47,7 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             this.entry = entry;
             encoding = Static.EncodingManager.GetPersonaEncoding(Settings.AppSetting.Default.FTDEncoding);
+            _EntryString = encoding.GetString(entry);
             Create();
             CreateContextMenu();
         }
@@ -90,7 +94,7 @@ namespace PersonaEditorGUI.Controls.Editors
             try
             {
                 byte[] array = PersonaEditorLib.Utilities.String.SplitString(text, ' ');
-                for(int i = 0;i< entry.Length; i++)
+                for (int i = 0; i < entry.Length; i++)
                 {
                     if (i < array.Length)
                         entry[i] = array[i];
@@ -121,7 +125,8 @@ namespace PersonaEditorGUI.Controls.Editors
         private string _Entry = "";
         public string Entry => _Entry;
 
-        public string EntryString => _Entry == "SubItems" ? "" : encoding == null ? "" : encoding.GetString(entry[0]);
+        private string _EntryString = "";
+        public string EntryString => _EntryString;
 
         private ContextMenu contextMenu = null;
         public ContextMenu ContextMenu => contextMenu;
@@ -130,6 +135,7 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             this.entry = entry;
             encoding = Static.EncodingManager.GetPersonaEncoding(Settings.AppSetting.Default.FTDEncoding);
+
 
             if (entry.Length == 1)
                 Create();
@@ -146,6 +152,8 @@ namespace PersonaEditorGUI.Controls.Editors
         public void SetEncoding(Encoding encoding)
         {
             this.encoding = encoding;
+            if (entry.Length == 1)
+                _EntryString = encoding.GetString(entry[0]);
             Notify("EntryString");
             foreach (var a in SubItems)
                 a.SetEncoding(encoding);
@@ -154,6 +162,7 @@ namespace PersonaEditorGUI.Controls.Editors
         private void Create()
         {
             _Entry = "";
+            _EntryString = encoding.GetString(entry[0]);
             for (int i = 0; i < entry[0].Length; i++)
             {
                 _Entry += String.Format("{0:X2}", entry[0][i]);
@@ -217,8 +226,7 @@ namespace PersonaEditorGUI.Controls.Editors
             string text = Regex.Replace(Clipboard.GetText(), "\r\n|\r|\n", "");
             try
             {
-                byte[] array = PersonaEditorLib.Utilities.String.SplitString(text, ' ');
-                entry[0] = array;
+                entry[0] = PersonaEditorLib.Utilities.String.SplitString(text, ' ');
                 Create();
                 Notify("Entry");
                 Notify("EntryString");
@@ -235,6 +243,9 @@ namespace PersonaEditorGUI.Controls.Editors
     class FTDEditorVM : BindingObject, IViewModel
     {
         PersonaEditorLib.FileStructure.Text.FTD ftd;
+
+        public ICommand CopyAll { get; }
+        public ICommand PasteAll { get; }
 
         public ObservableCollection<FTDEntryVM> Entries { get; } = new ObservableCollection<FTDEntryVM>();
 
@@ -257,11 +268,48 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public FTDEditorVM(PersonaEditorLib.FileStructure.Text.FTD ftd)
         {
+            CopyAll = new RelayCommand(copyAll);
+            PasteAll = new RelayCommand(pasteAll);
+
             EncodingList = Static.EncodingManager.EncodingList;
             selectEncodingIndex = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.FTDEncoding);
             this.ftd = ftd;
+            Init();
+        }
+
+        private void Init()
+        {
+            Entries.Clear();
             foreach (var a in ftd.Entries)
                 Entries.Add(new FTDEntryVM(a));
+        }
+
+        private void copyAll()
+        {
+            List<string> returned = new List<string>();
+            foreach (var a in Entries)
+            {
+                if (a.SubItems.Count != 0)
+                    foreach (var b in a.SubItems)
+                        returned.Add(b.EntryString.TrimEnd('\0'));
+                else
+                    returned.Add(a.EntryString.TrimEnd('\0'));
+            }
+            returned.RemoveAll(x => x == "");
+
+            Clipboard.SetText(String.Join(System.Environment.NewLine, returned));
+        }
+
+        private void pasteAll()
+        {
+            if (!Clipboard.ContainsText())
+                return;
+
+            string imported = Clipboard.GetText();
+            var text = Regex.Split(imported, "\r\n|\r|\n").Select(x => x.Split('\t')).ToList();
+
+            ftd.ImportText(text, Static.EncodingManager.GetPersonaEncoding(selectEncodingIndex));
+            Init();
         }
 
         public bool Close()

@@ -49,6 +49,7 @@ namespace PersonaEditorGUI.Classes
 
         private static void DataTemplate_Changed(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
+            
             //clear cache before update Presentation
             var ccp = (CachedContentPresenter)sender;
             ccp._PresenterCache = new ConditionalWeakTable<object, ContentPresenter>();

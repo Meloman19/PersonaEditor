@@ -142,5 +142,10 @@ namespace PersonaEditorGUI.Controls
             tabCollection.Add(new ClosableTabItemVM() { TabTitle = tabtitle, IsClosable = false, DataContext = previewVM, DataContextType = TabItemType.ImagePreview });
             TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(tabCollection);
         }
+
+        public void SetPropertiesTable(ReadOnlyObservableCollection<PropertyClass> PropertiesView)
+        {
+            previewVM.SetPropertiesTable(PropertiesView);
+        }
     }
 }

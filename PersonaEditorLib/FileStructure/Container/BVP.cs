@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PersonaEditorLib.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace PersonaEditorLib.FileStructure.Container
 {
@@ -77,18 +78,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Entry Count", SubFiles.Count);
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 
@@ -111,7 +101,7 @@ namespace PersonaEditorLib.FileStructure.Container
                     Entry.Add(new int[] { FlagList[i], (int)writer.BaseStream.Position, temp.Size() });
 
                     writer.Write(temp.Get());
-                    writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Position, 16)]);
+                    writer.Write(new byte[Utilities.UtilitiesTool.Alignment(writer.BaseStream.Position, 16)]);
                 }
 
                 writer.BaseStream.Position = 0;

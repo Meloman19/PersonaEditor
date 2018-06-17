@@ -27,6 +27,8 @@ namespace PersonaEditorGUI.Classes
             return true;
         }
 
+
+
         #region Property
 
         ObservableCollection<UserTreeViewItem> _SubItems = new ObservableCollection<UserTreeViewItem>();
@@ -93,10 +95,12 @@ namespace PersonaEditorGUI.Classes
         private bool _AllowDrop = true;
         public bool AllowDrop => _AllowDrop;
 
+        private bool isSelected = false;
         public bool IsSelected
         {
             set
             {
+                isSelected = value;
                 if (value)
                 {
                     SelectedItemChanged?.Invoke(this);
@@ -104,6 +108,9 @@ namespace PersonaEditorGUI.Classes
                 }
             }
         }
+
+        public ReadOnlyObservableCollection<PropertyClass> PropertiesView { get; private set; }
+
 
         #endregion Property
 
@@ -149,11 +156,6 @@ namespace PersonaEditorGUI.Classes
         public UserTreeViewItem(ObjectFile personaFile)
         {
             SubItems = new ReadOnlyObservableCollection<UserTreeViewItem>(_SubItems);
-            actionSaveAs = new Action(SaveAs_Click);
-            actionReplace = new Action(Replace_Click);
-            actionSaveAll = new Action(SaveAll_Click);
-            actionEdit = new Action(Edit_Click);
-
             _personaFile = personaFile;
 
             if (!(personaFile.Object is IPersonaFile))
@@ -175,28 +177,28 @@ namespace PersonaEditorGUI.Classes
                 {
                     MenuItem menuItem = new MenuItem();
                     menuItem.Header = Application.Current.Resources.MergedDictionaries.GetString("tree_SaveAs");
-                    menuItem.Command = new RelayCommandWeak(actionSaveAs);
+                    menuItem.Command = new RelayCommand(SaveAs_Click);
                     ContextMenu.Add(menuItem);
                 }
                 else if (a == ContextMenuItems.SaveAll)
                 {
                     MenuItem menuItem = new MenuItem();
                     menuItem.Header = Application.Current.Resources.MergedDictionaries.GetString("tree_SaveAll");
-                    menuItem.Command = new RelayCommandWeak(actionSaveAll);
+                    menuItem.Command = new RelayCommand(SaveAll_Click);
                     ContextMenu.Add(menuItem);
                 }
                 else if (a == ContextMenuItems.Replace)
                 {
                     MenuItem menuItem = new MenuItem();
                     menuItem.Header = Application.Current.Resources.MergedDictionaries.GetString("tree_Replace");
-                    menuItem.Command = new RelayCommandWeak(actionReplace);
+                    menuItem.Command = new RelayCommand(Replace_Click);
                     ContextMenu.Add(menuItem);
                 }
                 else if (a == ContextMenuItems.Edit)
                 {
                     MenuItem menuItem = new MenuItem();
                     menuItem.Header = Application.Current.Resources.MergedDictionaries.GetString("tree_Edit");
-                    menuItem.Command = new RelayCommand(actionEdit);
+                    menuItem.Command = new RelayCommand(Edit_Click);
                     ContextMenu.Add(menuItem);
                 }
                 else if (a == ContextMenuItems.Separator)
@@ -204,7 +206,6 @@ namespace PersonaEditorGUI.Classes
             }
         }
 
-        private Action actionSaveAs;
         private void SaveAs_Click()
         {
             SaveFileDialog SFD = new SaveFileDialog();
@@ -232,6 +233,13 @@ namespace PersonaEditorGUI.Classes
                                 PersonaEditorLib.Utilities.PersonaFile.SavePTPFile(PersonaFile, SFD.FileName, temp);
                             }
                         }
+                        else if (pFile.Type == FileType.PTP)
+                        {
+                            Encoding encoding = Static.EncodingManager.GetPersonaEncoding(Settings.AppSetting.Default.PTPNewDefault);
+                            PersonaEditorLib.FileStructure.Text.BMD bmd = new PersonaEditorLib.FileStructure.Text.BMD();
+                            bmd.Open(PersonaFile.Object as PersonaEditorLib.FileStructure.Text.PTP, encoding);
+                            File.WriteAllBytes(SFD.FileName, bmd.Get());
+                        }
                         else
                             throw new Exception("SavePersonaFileDialog");
                     }
@@ -243,7 +251,21 @@ namespace PersonaEditorGUI.Classes
             }
         }
 
-        private Action actionReplace;
+        private void SaveAll_Click()
+        {
+            System.Windows.Forms.FolderBrowserDialog FBD = new System.Windows.Forms.FolderBrowserDialog();
+            if (FBD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string path = FBD.SelectedPath;
+                if (PersonaFile.Object is IPersonaFile file)
+                {
+                    var list = file.SubFiles;
+                    foreach (var item in list)
+                        File.WriteAllBytes(Path.Combine(path, item.Name), (item.Object as IFile).Get());
+                }
+            }
+        }
+
         private void Replace_Click()
         {
             FileType fileType = (PersonaFile.Object as IPersonaFile).Type;
@@ -258,7 +280,7 @@ namespace PersonaEditorGUI.Classes
             {
                 if (OFD.FilterIndex > 1)
                 {
-                    if (fileType == FileType.TMX | fileType == FileType.FNT)
+                    if (fileType == FileType.TMX | fileType == FileType.FNT | fileType == FileType.DDS)
                         PersonaEditorLib.Utilities.PersonaFile.OpenImageFile(PersonaFile, OFD.FileName);
                     else if (fileType == FileType.BMD)
                     {
@@ -280,25 +302,10 @@ namespace PersonaEditorGUI.Classes
             //PersonaEditorLib.Utilities.PersonaFile.OpenPersonaFileDialog(personaFile, Static.EncodingManager);
 
             Update(_personaFile.Object as IPersonaFile);
+            if (isSelected)
+                SubFile_SelectedItemChanged(this);
         }
 
-        private Action actionSaveAll;
-        private void SaveAll_Click()
-        {
-            System.Windows.Forms.FolderBrowserDialog FBD = new System.Windows.Forms.FolderBrowserDialog();
-            if (FBD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                string path = FBD.SelectedPath;
-                if (PersonaFile.Object is IPersonaFile file)
-                {
-                    var list = file.SubFiles;
-                    foreach (var item in list)
-                        File.WriteAllBytes(Path.Combine(path, item.Name), (item.Object as IFile).Get());
-                }
-            }
-        }
-
-        private Action actionEdit;
         private void Edit_Click()
         {
             SelectedItemOpen?.Invoke(this);
@@ -310,6 +317,7 @@ namespace PersonaEditorGUI.Classes
         {
             UpdateContextMenu(PersonaEditorLib.Utilities.PersonaFile.GetContextMenuItems(item.Type));
 
+            PropertiesView = item.GetProperties;
             _SubItems.Clear();
 
             var list = item.SubFiles;

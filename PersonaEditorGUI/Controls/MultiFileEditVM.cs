@@ -132,6 +132,8 @@ namespace PersonaEditorGUI.Controls
                 statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
                 Notify("StatusBar");
             }
+
+            Tab.SetPropertiesTable(sender.PropertiesView);
         }
 
         #endregion Events

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -80,22 +81,33 @@ namespace PersonaEditorLib.Utilities
         }
     }
 
-    public static class Utilities
+    public static class UtilitiesTool
     {
-        public static void ReadFlags<T>(IList<T> list, int flags, Type type)
+        public static T fromBytes<T>(byte[] arr) where T : struct
         {
-            foreach (var a in Enum.GetValues(type))
-                if ((flags & (int)a) != 0)
-                    list.Add((T)a);
+            T str = new T();
+
+            int size = Marshal.SizeOf(str);
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+
+            Marshal.Copy(arr, 0, ptr, size);
+
+            str = (T)Marshal.PtrToStructure(ptr, str.GetType());
+            Marshal.FreeHGlobal(ptr);
+
+            return str;
         }
 
-        public static int WriteFlags<T>(IList<T> list)
+        public static byte[] getBytes<T>(T str) where T : struct
         {
-            int returned = 0;
-            foreach (var a in Enum.GetValues(typeof(T)))
-                if (list.Contains((T)a))
-                    returned += (int)a;
-            return returned;
+            int size = Marshal.SizeOf(str);
+            byte[] arr = new byte[size];
+
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(str, ptr, true);
+            Marshal.Copy(ptr, arr, 0, size);
+            Marshal.FreeHGlobal(ptr);
+            return arr;
         }
 
         public static int Alignment(int Size, int Align)
@@ -108,34 +120,6 @@ namespace PersonaEditorLib.Utilities
             int temp = (int)Size % Align;
             temp = Align - temp;
             return temp % Align;
-        }
-
-        public static byte[] DataReverse(byte[] Data)
-        {
-            byte[] returned = new byte[Data.Length];
-            for (int i = 0; i < Data.Length; i++)
-                returned[i] = ReverseByte(Data[i]);
-            return returned;
-        }
-
-        public static byte ReverseByte(byte toReverse)
-        {
-            int temp = (toReverse >> 4) + ((toReverse - (toReverse >> 4 << 4)) << 4);
-            return Convert.ToByte(temp);
-        }
-
-        public static List<Color> ReadPalette(BinaryReader reader, int Count)
-        {
-            List<Color> Colors = new List<Color>();
-            for (int i = 0; i < Count; i++)
-                Colors.Add(new Color()
-                {
-                    R = reader.ReadByte(),
-                    G = reader.ReadByte(),
-                    B = reader.ReadByte(),
-                    A = reader.ReadByte()
-                });
-            return Colors;
         }
 
         public static string[] GetAllFiles(DirectoryInfo rootdirinfo, List<string> root)

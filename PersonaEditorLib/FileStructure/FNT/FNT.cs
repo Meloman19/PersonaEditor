@@ -1,7 +1,11 @@
-﻿using PersonaEditorLib.Extension;
+﻿// Persona 3/4/5 font decompressor/compressor
+// Based on RikuKH3's decompressor algorithm
+
+using PersonaEditorLib.Extension;
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,12 +53,6 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         private void Read(Stream stream, long position)
         {
-            Console.WriteLine("---------------------------------------------------");
-            Console.WriteLine("-----Font decompressor/compressor by Meloman19-----");
-            Console.WriteLine("-------------------Persona 3/4/5-------------------");
-            Console.WriteLine("----------Based on RikuKH3's decompressor----------");
-            Console.WriteLine("---------------------------------------------------");
-
             stream.Position = position;
             BinaryReader reader = new BinaryReader(stream);
 
@@ -91,20 +89,7 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Glyph Count", Header.Glyphs.Count);
-                returned.Add("Color Count", Header.Glyphs.NumberOfColor);
-                returned.Add("Unpack Font Size", Compressed.Header.UncompressedFontSize);
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 
@@ -274,7 +259,7 @@ namespace PersonaEditorLib.FileStructure.FNT
             }
             catch (Exception e)
             {
-                Logging.Write("PersonaEditorLib", "");
+                Logging.Write("PersonaEditorLib", e.Message);
             }
 
             Logging.Write("PersonaEditorLib", "Width Table was writed. Get " + index + " glyphs");
