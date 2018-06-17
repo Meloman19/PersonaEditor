@@ -193,10 +193,6 @@ namespace PersonaEditorLib.FileStructure.Graphic
             else
                 size = width * height * BitPerBlock / 8;
 
-            if(Header.SizeWOHeader != Header.SizeTexture)
-            {
-
-            }
 
             if (Header.Tile)
             {
@@ -297,8 +293,8 @@ namespace PersonaEditorLib.FileStructure.Graphic
                 dataList[i] = image;
             }
 
-            Header.SizeWOHeader = dataList.Sum(x => x.LengthData);
-            Header.SizeTexture = Header.SizeWOHeader;
+            Header.SizeTexture = dataList.Sum(x => x.LengthData);
+            Header.SizeWOHeader = Header.SizeTexture + (LastBlock == null ? 0 : LastBlock.Length);
         }
 
         #endregion IImage

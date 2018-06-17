@@ -450,7 +450,7 @@ namespace PersonaEditorLib.FileStructure.Text
                         {
                             reloc |= 8;
                         }
-
+                                                
                         returned.Add((byte)reloc);
                         i += amount;
                         sum += amount * 4;
