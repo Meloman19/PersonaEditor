@@ -219,11 +219,11 @@ namespace PersonaEditorGUI.Controls.Editors
                 KeyList.Add(new SPRKeyVM(a));
         }
 
-        public TextureVM(ObjectFile dds, IList<PersonaEditorLib.FileStructure.SPR.SPDKey> keylist, int textureindex)
+        public TextureVM(ObjectFile dds, IList<PersonaEditorLib.FileStructure.SPR.SPDKey> keylist, int index)
         {
             texture = dds ?? throw new ArgumentNullException("dds");
             if (texture.Object == null) throw new ArgumentNullException("dds.Object");
-            var list = (keylist ?? throw new Exception("keylist")).Where(x => x.TextureIndex == textureindex + 1);
+            var list = (keylist ?? throw new Exception("keylist")).Where(x => x.TextureIndex == index);
 
             TextureImage = (dds.Object as PersonaEditorLib.FileStructure.Graphic.DDS).GetImage();
 
@@ -242,7 +242,7 @@ namespace PersonaEditorGUI.Controls.Editors
             get
             {
                 if (texture.Object is PersonaEditorLib.FileStructure.Graphic.TMX tmx)
-                    return tmx.Name;
+                    return tmx.Comment;
                 else return texture.Name;
             }
         }
@@ -293,7 +293,7 @@ namespace PersonaEditorGUI.Controls.Editors
         public SPREditorVM(PersonaEditorLib.FileStructure.SPR.SPD spd)
         {
             for (int i = 0; i < spd.SubFiles.Count; i++)
-                TextureList.Add(new TextureVM(spd.SubFiles[i], spd.KeyList, i));
+                TextureList.Add(new TextureVM(spd.SubFiles[i], spd.KeyList, i+1));
         }
 
         public bool Close()

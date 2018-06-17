@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PersonaEditorLib
+namespace PersonaEditorGUI.Classes.Delegates
 {
-    class ImageHelper
-    {
-    }
+    public delegate void OpenFilePathEventHandler(string path);
 }

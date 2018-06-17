@@ -100,6 +100,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -123,9 +124,11 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\CachedContentPresenter.cs" />
+    <Compile Include="Classes\CommandSetter.cs" />
     <Compile Include="Classes\Controls\RelativePanel.cs" />
     <Compile Include="Classes\Controls\TreeViewExtended.cs" />
     <Compile Include="Classes\Controls\ImageVisualizer.cs" />
+    <Compile Include="Classes\Delegates\FileDelegates.cs" />
     <Compile Include="Classes\ReadOnlyPropertyObserver.cs" />
     <Compile Include="Classes\Visual\TextVisual.cs" />
     <Compile Include="Classes\Event.cs" />
@@ -256,6 +259,13 @@
     <Compile Include="Static.cs" />
     <Compile Include="Test.xaml.cs">
       <DependentUpon>Test.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\FileBrowser.xaml.cs">
+      <DependentUpon>FileBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\FileBrowserVM.cs" />
+    <Compile Include="Tools\ImageConverter.xaml.cs">
+      <DependentUpon>ImageConverter.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\SetChar.xaml.cs">
       <DependentUpon>SetChar.xaml</DependentUpon>
@@ -405,6 +415,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Tools\FileBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\ImageConverter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tools\SetChar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -450,7 +468,9 @@
   <ItemGroup>
     <Resource Include="Resource\settings-work-tool.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resource\hard-disk.png" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resource\Localization.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -471,6 +491,18 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\icons\icons8-папка-96.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\icons\icons8-файл-80.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\icons\icons8-картина-80.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\icons\icons8-документ-80.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

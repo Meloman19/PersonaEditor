@@ -1,6 +1,7 @@
 ﻿using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,15 +16,15 @@ namespace PersonaEditorLib.FileStructure.Container
         public TBL(byte[] data, string name)
         {
             using (MemoryStream MS = new MemoryStream(data))
-                Read(new StreamFile(MS, MS.Length, 0), name);
+                Read(new StreamPart(MS, MS.Length, 0), name);
         }
 
-        public TBL(StreamFile streamFile, string name)
+        public TBL(StreamPart streamFile, string name)
         {
             Read(streamFile, name);
         }
 
-        private void GetType(StreamFile streamFile)
+        private void GetType(StreamPart streamFile)
         {
             try
             {
@@ -37,7 +38,7 @@ namespace PersonaEditorLib.FileStructure.Container
                             throw new Exception("TBL error");
 
                         reader.BaseStream.Position += Size;
-                        reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
+                        reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
                     } while (streamFile.Stream.Position < streamFile.Position + streamFile.Size);
                 IsLittleEndian = true;
             }
@@ -55,7 +56,7 @@ namespace PersonaEditorLib.FileStructure.Container
                                 throw new Exception("TBL error");
 
                             reader.BaseStream.Position += Size;
-                            reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
+                            reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
                         } while (streamFile.Stream.Position < streamFile.Position + streamFile.Size);
                     IsLittleEndian = false;
                 }
@@ -66,7 +67,7 @@ namespace PersonaEditorLib.FileStructure.Container
             }
         }
 
-        private void Read(StreamFile streamFile, string name)
+        private void Read(StreamPart streamFile, string name)
         {
             GetType(streamFile);
 
@@ -90,7 +91,7 @@ namespace PersonaEditorLib.FileStructure.Container
                         tempName += "." + fileType.ToString();
 
                     SubFiles.Add(Utilities.PersonaFile.OpenFile(tempName, tempdata, fileType == FileType.Unknown ? FileType.DAT : fileType));
-                    reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
+                    reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
                 } while (streamFile.Stream.Position < streamFile.Position + streamFile.Size);
         }
 
@@ -126,18 +127,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Entry Count", List.Count);
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 
@@ -156,7 +146,7 @@ namespace PersonaEditorLib.FileStructure.Container
                     {
                         writer.Write(pFile.Size());
                         writer.Write(pFile.Get());
-                        writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Position, 16)]);
+                        writer.Write(new byte[Utilities.UtilitiesTool.Alignment(writer.BaseStream.Position, 16)]);
                     }
                 }
                 return MS.ToArray();

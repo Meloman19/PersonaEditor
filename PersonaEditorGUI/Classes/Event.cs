@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.ComponentModel;
 
+
 namespace PersonaEditorGUI.Classes
 {
     public class Event

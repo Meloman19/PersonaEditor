@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using PersonaEditorLib.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace PersonaEditorLib.FileStructure.SPR
 {
@@ -15,10 +16,10 @@ namespace PersonaEditorLib.FileStructure.SPR
         public SPD(byte[] data)
         {
             using (MemoryStream MS = new MemoryStream(data))
-                Read(new StreamFile(MS, MS.Length, 0));
+                Read(new StreamPart(MS, MS.Length, 0));
         }
 
-        private void Read(StreamFile streamFile)
+        private void Read(StreamPart streamFile)
         {
             streamFile.Stream.Position = streamFile.Position;
 
@@ -45,7 +46,7 @@ namespace PersonaEditorLib.FileStructure.SPR
 
         }
 
-        private void ReadTexture(StreamFile streamFile, int pos, int count)
+        private void ReadTexture(StreamPart streamFile, int pos, int count)
         {
             streamFile.Stream.Position = streamFile.Position + pos;
 
@@ -60,12 +61,13 @@ namespace PersonaEditorLib.FileStructure.SPR
 
                     long tempPos = streamFile.Stream.Position;
                     streamFile.Stream.Position = texPos;
-                    SubFiles.Add(Utilities.PersonaFile.OpenFile(name + ".dds", reader.ReadBytes(texSize), Interfaces.FileType.DDS));
+                    var text = Utilities.PersonaFile.OpenFile(name + ".dds", reader.ReadBytes(texSize), FileType.DDS);
+                    SubFiles.Add(text);
                     streamFile.Stream.Position = tempPos;
                 }
         }
 
-        private void ReadKey(StreamFile streamFile, int pos, int count)
+        private void ReadKey(StreamPart streamFile, int pos, int count)
         {
             streamFile.Stream.Position = streamFile.Position + pos;
 
@@ -80,17 +82,7 @@ namespace PersonaEditorLib.FileStructure.SPR
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 
@@ -140,12 +132,12 @@ namespace PersonaEditorLib.FileStructure.SPR
                 for (int i = 0; i < SubFiles.Count; i++)
                     if (SubFiles[i].Object is Graphic.DDS dds)
                     {
-                        writer.Write(i + 1);
+                        writer.Write(i);
                         writer.Write(0);
                         writer.Write(pos[i]);
                         writer.Write(dds.Size());
-                        writer.Write(dds.Header.Width);
-                        writer.Write(dds.Header.Height);
+                        writer.Write(dds.Width);
+                        writer.Write(dds.Height);
                         writer.Write(0);
                         writer.Write(0);
                         byte[] temp = new byte[0x10];

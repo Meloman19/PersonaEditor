@@ -24,7 +24,7 @@ namespace PersonaEditorLib.FileStructure.FNT
 
         public int Get(BinaryWriter writer)
         {
-            writer.Write(new byte[Utilities.Utilities.Alignment(writer.BaseStream.Length, 16)]);
+            writer.Write(new byte[Utilities.UtilitiesTool.Alignment(writer.BaseStream.Length, 16)]);
             long returned = writer.BaseStream.Position;
             foreach (var a in List)
                 writer.Write(a);

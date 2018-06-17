@@ -40,6 +40,7 @@
             <MenuItem Header="{DynamicResource main_Tools}">
                 <MenuItem Header="{DynamicResource main_Visualizer}" Command="{Binding Path=clickVisualizerOpen}"/>
                 <MenuItem Header="{DynamicResource main_CharSet}" Command="{Binding Path=clickSetCharOpen}"/>
+                <MenuItem Header="{DynamicResource main_FileBrowser}" Command="{Binding Path=clickFileBrowserOpen}"/>
                 <Separator/>
                 <MenuItem Header="{DynamicResource main_Settings}" Command="{Binding Path=clickSettingOpen}"/>
             </MenuItem>

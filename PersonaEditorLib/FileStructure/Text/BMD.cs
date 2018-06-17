@@ -3,6 +3,7 @@ using PersonaEditorLib.FileStructure.Text;
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -124,7 +125,7 @@ namespace PersonaEditorLib.FileStructure.Text
                 {
                     BR.BaseStream.Position = MSG_PointBlock_Pos + MSGPosition[i][1];
                     buffer = BR.ReadBytes(24);
-                    string MSG_Name = System.Text.Encoding.Default.GetString(buffer).Trim('\0');
+                    string MSG_Name = Encoding.Default.GetString(buffer).TrimEnd('\0');
                     if (string.IsNullOrEmpty(MSG_Name))
                         MSG_Name = "<EMPTY>";
 
@@ -216,7 +217,7 @@ namespace PersonaEditorLib.FileStructure.Text
         public List<MSGs> Msg { get; } = new List<MSGs>();
         public List<Names> Name { get; } = new List<Names>();
 
-        static class GetNewBMD
+        public static class GetNewBMD
         {
             public static void Get(IList<MSGs> msg, IList<Names> name, BinaryWriter BW)
             {
@@ -268,8 +269,10 @@ namespace PersonaEditorLib.FileStructure.Text
                     // List<PTP.MSG.MSGstr> MSGStrings = new List<PTP.MSG.MSGstr>();
                     // MSGStrings.ParseString(MSG.MsgBytes);
 
-                    List<int> MSG_o = new List<int>();
-                    MSG_o.Add((int)BW.BaseStream.Position);
+                    List<int> MSG_o = new List<int>
+                    {
+                        (int)BW.BaseStream.Position
+                    };
 
                     BW.WriteString(MSG.Name, 24);
 
@@ -376,6 +379,7 @@ namespace PersonaEditorLib.FileStructure.Text
                 }
 
                 int LastBlockPos = (int)BW.BaseStream.Position;
+
                 byte[] LastBlockBytes = getLastBlock(LastBlock);
                 BW.Write(LastBlockBytes);
 
@@ -441,6 +445,7 @@ namespace PersonaEditorLib.FileStructure.Text
                     {
                         reloc = 7;
                         reloc |= ((amount - 2) / 2) << 4;
+
                         if (amount % 2 == 1)
                         {
                             reloc |= 8;
@@ -504,19 +509,7 @@ namespace PersonaEditorLib.FileStructure.Text
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Names Count", Name.Count);
-                returned.Add("MSG Count", Msg.Count);
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 

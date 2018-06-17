@@ -32,7 +32,6 @@ namespace PersonaEditorLib.FileStructure.Text
             List<TextBaseElement> returned = new List<TextBaseElement>();
 
             bool isText = true;
-            string type = "Text";
             List<byte> temp = new List<byte>();
 
             for (int i = 0; i < array.Length; i++)
@@ -57,12 +56,10 @@ namespace PersonaEditorLib.FileStructure.Text
                             temp.Clear();
                         }
 
-                        type = "System";
                         isText = false;
                         temp.Add(array[i]);
 
                         returned.Add(new TextBaseElement(isText, temp.ToArray()));
-                        type = "Text";
                         isText = true;
                         temp.Clear();
                     }
@@ -71,13 +68,11 @@ namespace PersonaEditorLib.FileStructure.Text
                         if (temp.Count != 0)
                         {
                             returned.Add(new TextBaseElement(isText, temp.ToArray()));
-                            type = "Text";
+                            //type = "Text";
                             isText = true;
                             temp.Clear();
                         }
 
-
-                        type = "System";
                         isText = false;
                         temp.Add(array[i]);
                         int count = (array[i] - 0xF0) * 2 - 1;
@@ -88,7 +83,6 @@ namespace PersonaEditorLib.FileStructure.Text
                         }
 
                         returned.Add(new TextBaseElement(isText, temp.ToArray()));
-                        type = "Text";
                         isText = true;
                         temp.Clear();
                     }

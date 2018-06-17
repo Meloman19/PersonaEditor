@@ -16,7 +16,7 @@ namespace PersonaEditor
     {
         public static class Static
         {
-            private static string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            private static readonly string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             private static string DirFont = Path.Combine(CurrentFolderEXE, "font");
             private static PersonaEditorLib.PersonaEncoding.PersonaEncodingManager PersonaEncodingManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaEncodingManager(DirFont);
             private static PersonaEditorLib.PersonaEncoding.PersonaFontManager PersonaFontManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaFontManager(DirFont);
@@ -115,7 +115,7 @@ namespace PersonaEditor
 
             try
             {
-                if (AdditionalСommands.commands.ContainsKey(args[0]))
+                if (AdditionalСommands.commands.ContainsKey(args[0].ToLower()))
                 {
                     AdditionalСommands.commands[args[0]].Invoke(args.Skip(1).ToArray());
                     return;
@@ -208,7 +208,7 @@ namespace PersonaEditor
                                 action = ImportText;
                         }
                         else if (command.Command == CommandType.Save)
-                            SaveFile(file, argwrk.OpenedFileDir, command.Value);
+                            SaveFile(file, command.Value, argwrk.OpenedFileDir, command.Parameters);
 
                         if (action != null)
                             SubFileAction(action, file, command.Value, argwrk.OpenedFileDir, command.Parameters);
@@ -286,6 +286,13 @@ namespace PersonaEditor
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 string[] exp = ptp.ExportTXT(parameters.Map, objectFile.Name, parameters.RemoveSplit, Static.OldEncoding(), Static.NewEncoding());
+
+                File.AppendAllLines(path, exp);
+            }
+            else if (objectFile.Object is PersonaEditorLib.FileStructure.Text.StringList strlst)
+            {
+                string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
+                string[] exp = strlst.ExportText();
 
                 File.AppendAllLines(path, exp);
             }
@@ -405,12 +412,24 @@ namespace PersonaEditor
             }
         }
 
-        static void SaveFile(ObjectFile objectFile, string openedFileDir, string savePath)
+        static void SaveFile(ObjectFile objectFile, string savePath, string openedFileDir, Parameters parameters)
         {
             if (objectFile.Object is PersonaEditorLib.FileStructure.Text.PTP ptp)
             {
-                string path = savePath == "" ? Path.Combine(openedFileDir, objectFile.Name) : savePath;
-                File.WriteAllBytes(path, ptp.Get());
+                if (parameters.AsBMD)
+                {
+                    string path = savePath == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".BMD") : savePath;
+                    Encoding encoding = Static.NewEncoding();
+                    PersonaEditorLib.FileStructure.Text.BMD bmd = new PersonaEditorLib.FileStructure.Text.BMD();
+                    bmd.Open(objectFile.Object as PersonaEditorLib.FileStructure.Text.PTP, encoding);
+                    var temp = bmd.Get();
+                    File.WriteAllBytes(path, bmd.Get());
+                }
+                else
+                {
+                    string path = savePath == "" ? Path.Combine(openedFileDir, objectFile.Name) : savePath;
+                    File.WriteAllBytes(path, ptp.Get());
+                }
             }
             else if (objectFile.Object is IFile pFile)
             {

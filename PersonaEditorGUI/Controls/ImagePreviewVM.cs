@@ -16,6 +16,8 @@ namespace PersonaEditorGUI.Controls
         BitmapSource TransparentBackground = PersonaEditorLib.Utilities.WPF.CreateTransparentBackground(Colors.White, Colors.Gray, 50);
         public BitmapSource Background2 => TransparentBackground;
 
+        public ReadOnlyObservableCollection<PropertyClass> PropertiesView { get; private set; }
+
         private ImageSource imageSource = null;
         public ImageSource SourceIMG
         {
@@ -57,6 +59,12 @@ namespace PersonaEditorGUI.Controls
         {
             background = Settings.AppSetting.Default.PreviewSelectedColor;
             SelectBack = new RelayCommand(SelectBackground);
+        }
+        
+        public void SetPropertiesTable(ReadOnlyObservableCollection<PropertyClass> PropertiesView)
+        {
+            this.PropertiesView = PropertiesView;
+            Notify("PropertiesView");
         }
     }
 }

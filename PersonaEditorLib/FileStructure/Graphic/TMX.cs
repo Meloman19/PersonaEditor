@@ -1,8 +1,14 @@
 ﻿using PersonaEditorLib.Interfaces;
+using PersonaEditorLib.Media.Imaging;
+using PersonaEditorLib.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -10,78 +16,134 @@ using System.Windows.Media.Imaging;
 
 namespace PersonaEditorLib.FileStructure.Graphic
 {
-    public enum PS2PixelFormat
-    {
-        PSMTC32 = 0x00,
-        PSMTC24 = 0x01,
-        PSMTC16 = 0x02,
-        PSMTC16S = 0x0A,
-        PSMT8 = 0x13,
-        PSMT4 = 0x14,
-        PSMT8H = 0x1B,
-        PSMT4HL = 0x24,
-        PSMT4HH = 0x2C,
-        PSMZ32 = 0x30,
-        PSMZ24 = 0x31,
-        PSMZ16 = 0x32,
-        PSMZ16S = 0x3A
-    }
-
     public class TMX : BindingObject, IPersonaFile, IImage
     {
-        TMXHeader Header;
-        TMXPalette Palette;
-        byte[] Data;
+        #region Constants
+        public const int ID = 0x2;
+        public const uint MagicNumber = 0x30584D54;
+        #endregion Constants
 
-        public TMX(Stream stream, long position)
+        #region Private Fields
+        BitmapSource bitmapSource = null;
+        ImageBase ImageBase = null;
+
+        private byte[] comment;
+        ObservableCollection<PropertyClass> properties = new ObservableCollection<PropertyClass>();
+        #endregion Private Fields
+
+        #region Public Properties
+
+        public bool IsLittleEndian { get; set; } = true;
+
+        public uint TextureID { get; private set; }
+        public uint ClutID { get; private set; }
+        public string Comment => Encoding.ASCII.GetString(comment).TrimEnd('\0');
+        public PixelBaseFormat ImageFormat { get; private set; }
+        public PixelBaseFormat PaletteFormat { get; private set; }
+        public IQuantization Quantizer { get; set; } = new Media.Imaging.Quantization.WuQuantizer();
+        public int Width => ImageBase?.Width ?? bitmapSource.PixelWidth;
+        public int Height => ImageBase?.Height ?? bitmapSource.PixelHeight;
+
+        #endregion Public Properties
+
+        public TMX(StreamPart streamPart)
         {
-            stream.Position = position;
-
-            BinaryReader reader = Utilities.IO.OpenReadFile(stream, IsLittleEndian);
-
-            Open(reader);
+            GetProperties = new ReadOnlyObservableCollection<PropertyClass>(properties);
+            Read(streamPart);
+            SetPropTable();
         }
 
         public TMX(byte[] data)
         {
+            GetProperties = new ReadOnlyObservableCollection<PropertyClass>(properties);
             using (MemoryStream MS = new MemoryStream(data))
+                Read(new StreamPart(MS, data.LongLength, 0));
+            SetPropTable();
+        }
+
+        private void Read(StreamPart streamPart)
+        {
+            streamPart.Stream.Position = streamPart.Position;
+            using (BinaryReader reader = IO.OpenReadFile(streamPart.Stream, IsLittleEndian))
             {
-                BinaryReader reader = Utilities.IO.OpenReadFile(MS, IsLittleEndian);
-                Open(reader);
+                int tempsize = 0;
+
+                byte[] paletteData = null;
+                byte[] imageData;
+
+                var Header = ReadHeader(reader.ReadBytes(0x40));
+                ImageFormat = PixelFormatHelper.ConvertFromPS2(Header.PixelFormat);
+                PaletteFormat = PixelFormatHelper.ConvertFromPS2(Header.PaletteFormat);
+                TextureID = Header.TextureID;
+                ClutID = Header.ClutID;
+                comment = Header.Comment;
+
+                tempsize += 0x40;
+
+                if (ImageFormat == PixelBaseFormat.Indexed8)
+                {
+                    paletteData = TMXHelper.TilePalette(reader.ReadBytes(256 * 4));
+                    tempsize += 256 * 4;
+                }
+                else if (ImageFormat == PixelBaseFormat.Indexed4PS2)
+                {
+                    paletteData = reader.ReadBytes(16 * 4);
+                    tempsize += 16 * 4;
+                }
+
+                int datasize = Header.Height * ImageHelper.GetStride(ImageFormat, Header.Width);
+                imageData = reader.ReadBytes(datasize);
+
+                tempsize += datasize;
+
+                if (Header.FileSize != tempsize)
+                    throw new Exception("TMX: filesize not equal");
+
+                ImageBase = new ImageBase(Header.Width, Header.Height, ImageFormat, imageData, PaletteFormat, paletteData);
             }
         }
 
-        public TMX(string path, bool IsLittleEndian) : this(File.OpenRead(path), 0) { }
-
-        private void Open(BinaryReader reader)
+        private TMXHeader ReadHeader(byte[] data)
         {
-            Header = new TMXHeader(reader);
-            Palette = new TMXPalette(reader, Header.PixelFormat);
-
-            int Length = (Header.Width * Header.Height * Palette.Format.BitsPerPixel) / 8;
-            Data = reader.ReadBytes(Length);
-
-            Notify("Image");
+            var Header = UtilitiesTool.fromBytes<TMXHeader>(data);
+            if (Header.ID != ID) throw new Exception("TMX: (0x00) wrong ID");
+            if (Header.MagicNumber != MagicNumber) throw new Exception("TMX: (0x08) wrong MagicNumber");
+            if (Header.Padding != 0) throw new Exception("TMX: (0x0C) wrong padding");
+            if (Header.PaletteCount != 1) throw new Exception("TMX: (0x10) number of palette not 1");
+            if (Header.MipMapCount != 0) throw new Exception("TMX: (0x17) mipMapCount more than 0");
+            if (Header.MipMapK != 0) throw new Exception("TMX: (0x18) mipMapK more than 0");
+            if (Header.MipMapL != 0) throw new Exception("TMX: (0x19) mipMapL more than 0");
+            if (Header.WrapMode != 0xFF00) throw new Exception("TMX: (0x1A) error (wrapMode?)");
+            return Header;
         }
 
-        public string TMXname
+        private byte[] CreateHeader()
         {
-            get { return Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()); }
+            TMXHeader Header = new TMXHeader();
+
+            Header.ID = ID;
+            Header.FileSize = Size();
+            Header.MagicNumber = MagicNumber;
+            Header.PaletteCount = 1;
+            Header.PaletteFormat = PixelFormatHelper.ConvertToPS2(PaletteFormat);
+            Header.Width = (ushort)ImageBase.Width;
+            Header.Height = (ushort)ImageBase.Height;
+            Header.PixelFormat = PixelFormatHelper.ConvertToPS2(ImageFormat);
+            Header.WrapMode = 0xFF00;
+            Header.TextureID = TextureID;
+            Header.ClutID = ClutID;
+            Header.Comment = comment;
+
+            return UtilitiesTool.getBytes(Header);
         }
 
-        public void Set(byte[] data, bool IsLittleEndian)
+        private void SetPropTable()
         {
-            using (MemoryStream MS = new MemoryStream(data))
-            {
-                BinaryReader reader = Utilities.IO.OpenReadFile(MS, IsLittleEndian);
-
-                Open(reader);
-            }
+            properties.Clear();
+            properties.Add(new PropertyClass("Width", ImageBase.Width.ToString(), true));
+            properties.Add(new PropertyClass("Height", ImageBase.Height.ToString(), true));
+            properties.Add(new PropertyClass("Pixel Format", Enum.GetNames(typeof(PixelFormatPS2Enum)).ToArray(), 0));
         }
-
-        public bool IsLittleEndian { get; set; } = true;
-
-        public string Name => Encoding.ASCII.GetString(Header.UserComment.Where(x => x != 0).ToArray()) + ".tmx";
 
         #region IPersonaFile
 
@@ -89,20 +151,7 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Width", Header.Width);
-                returned.Add("Height", Header.Height);
-                returned.Add("Pixel Format", Palette.Format);
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties { get; }
 
         #endregion IPersonaFile
 
@@ -110,7 +159,12 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
         public int Size()
         {
-            return Header.Size + Palette.Size + Data.Length;
+            int returned = 0;
+            returned += 0x40;
+            returned += ImageFormat.IsIndexed() ?
+                (int)Math.Pow(2, PixelFormatHelper.BitsPerPixel(ImageFormat)) * PixelFormatHelper.BitsPerPixel(PaletteFormat) / 8 : 0;
+            returned += ImageHelper.GetStride(ImageFormat, Width) * Height;
+            return returned;
         }
 
         public byte[] Get()
@@ -119,11 +173,18 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
             using (MemoryStream MS = new MemoryStream())
             {
-                BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
+                BinaryWriter writer = IO.OpenWriteFile(MS, IsLittleEndian);
 
-                Header.Get(writer);
-                Palette.Get(writer);
-                writer.Write(Data);
+                writer.Write(CreateHeader());
+
+                if (ImageFormat.IsIndexed())
+                    if (PixelFormatHelper.BitsPerPixel(ImageFormat) == 8)
+                        writer.Write(TMXHelper.TilePalette(ImageBase.GetPaletteData(PaletteFormat)));
+                    else
+                        writer.Write(ImageBase.GetPaletteData(PaletteFormat));
+
+                writer.Write(ImageBase.GetImageData());
+
 
                 returned = MS.ToArray();
             }
@@ -137,12 +198,23 @@ namespace PersonaEditorLib.FileStructure.Graphic
 
         public BitmapSource GetImage()
         {
-            byte[] data = Palette.Format == PixelFormats.Indexed4 ? Utilities.Utilities.DataReverse(Data) : Data;
-            return BitmapSource.Create(Header.Width, Header.Height, 96, 96, Palette.Format, Palette.Pallete, data, (Palette.Format.BitsPerPixel * Header.Width + 7) / 8);
+            if (bitmapSource == null)
+                bitmapSource = ImageBase.GetBitmapSource();
+
+            return bitmapSource;
         }
 
         public void SetImage(BitmapSource bitmapSource)
         {
+            this.bitmapSource = null;
+            var imageConverter = new ImageBaseConverter(bitmapSource)
+            {
+                Quantizer = this.Quantizer
+            };
+            if (imageConverter.TryConvert(ImageFormat))
+            {
+                ImageBase = imageConverter;
+            }
         }
 
         #endregion IImage

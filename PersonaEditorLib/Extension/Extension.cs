@@ -55,6 +55,14 @@ namespace PersonaEditorLib.Extension
             Array.Copy(data, index, result, 0, length);
             return result;
         }
+
+        public static T[] SubArrat<T>(IList<T> data, int index, int length)
+        {
+            T[] result = new T[length];
+            for (int i = 0; i < length; i++)
+                result[i] = data[i + index];
+            return result;
+        }
     }
 
     public static class Util

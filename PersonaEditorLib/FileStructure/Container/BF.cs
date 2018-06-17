@@ -2,6 +2,7 @@
 using PersonaEditorLib.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,11 +14,7 @@ namespace PersonaEditorLib.FileStructure.Container
     {
         private static Dictionary<int, FileType> MAP = new Dictionary<int, FileType>()
         {
-            {0x0, FileType.DAT },
-            {0x1, FileType.DAT },
-            {0x2, FileType.DAT },
-            {0x3, FileType.BMD },
-            {0x4, FileType.DAT }
+            {0x3, FileType.BMD }
         };
 
         private static bool GetTable(int[][] table, List<ObjectFile> list, int tableoffset)
@@ -46,7 +43,34 @@ namespace PersonaEditorLib.FileStructure.Container
             return true;
         }
 
+        private static int[][] GetTable(IList<ObjectFile> subFiles, int offset, int[] size)
+        {
+            List<int[]> returned = new List<int[]>();
+
+            int startOffset = offset + subFiles.Count * 0x10;
+
+            for (int i = 0; i < subFiles.Count; i++)
+            {
+                int[] temp = new int[4];
+                temp[0] = i;
+                temp[1] = size[i];
+
+                int tempsize = (subFiles[i].Object as IPersonaFile).Size();
+                if (tempsize % size[i] == 0)
+                    temp[2] = Convert.ToInt32(tempsize / size[i]);
+                else
+                    throw new Exception("BF: Wrong subfile");
+
+                temp[3] = startOffset;
+                returned.Add(temp);
+                startOffset += tempsize;
+            }
+
+            return returned.ToArray();
+        }
+
         int[][] Table;
+        int[] Sizes;
         byte[] Unknown;
 
         public BF(string path)
@@ -93,14 +117,20 @@ namespace PersonaEditorLib.FileStructure.Container
             else
                 IsLittleEndian = true;
 
-            stream.Position = 0x10;
             BinaryReader reader = Utilities.IO.OpenReadFile(stream, IsLittleEndian);
 
+            stream.Position = 0x4;
+            int fileSize = reader.ReadInt32();
+            stream.Position = 0x10;
             int tablecount = reader.ReadInt32();
             Unknown = reader.ReadBytes(12);
 
             stream.Position = 0x20;
             Table = reader.ReadInt32ArrayArray(tablecount, 4);
+
+            Sizes = new int[Table.Length];
+            for (int i = 0; i < Table.Length; i++)
+                Sizes[i] = Table[i][1];
 
             foreach (var element in Table)
                 if (element[1] * element[2] > 0)
@@ -108,10 +138,19 @@ namespace PersonaEditorLib.FileStructure.Container
                     reader.BaseStream.Position = element[3];
 
                     string tempN;
-                    FileType type = MAP[element[0]];
+
+                    FileType type = FileType.DAT;
+                    if (MAP.ContainsKey(element[0]))
+                        type = MAP[element[0]];
+
                     tempN = "." + type.ToString();
 
+                    if (fileSize <= element[3])
+                        continue;
+
                     byte[] data = reader.ReadBytes(element[1] * element[2]);
+
+
                     var item = Utilities.PersonaFile.OpenFile(tempN, data, type);
                     if (item.Object == null)
                         item = Utilities.PersonaFile.OpenFile(tempN, data, FileType.DAT);
@@ -130,18 +169,7 @@ namespace PersonaEditorLib.FileStructure.Container
 
         public List<ObjectFile> SubFiles { get; } = new List<ObjectFile>();
 
-        public Dictionary<string, object> GetProperties
-        {
-            get
-            {
-                Dictionary<string, object> returned = new Dictionary<string, object>();
-
-                returned.Add("Entry Count", SubFiles.Count);
-                returned.Add("Type", Type);
-
-                return returned;
-            }
-        }
+        public ReadOnlyObservableCollection<PropertyClass> GetProperties => null;
 
         #endregion IPersonaFile
 
@@ -151,7 +179,7 @@ namespace PersonaEditorLib.FileStructure.Container
         {
             int returned = 0;
 
-            returned += 0x20 + Table.Length * 0x10;
+            returned += 0x20 + 0x10 * SubFiles.Count;
             SubFiles.ForEach(x => returned += (x.Object as IPersonaFile).Size());
 
             return returned;
@@ -165,25 +193,15 @@ namespace PersonaEditorLib.FileStructure.Container
             {
                 BinaryWriter writer = Utilities.IO.OpenWriteFile(MS, IsLittleEndian);
 
-                if (GetTable(Table, SubFiles, 0x20))
-                {
-                    var temp = Table.FirstOrDefault(x => x[0] == 0x4);
-                    if (temp == null)
-                        return new byte[0];
+                writer.Write(0);
+                writer.Write(Size());
+                writer.Write(Encoding.ASCII.GetBytes("FLW0"));
+                writer.Write(0);
+                writer.Write(SubFiles.Count);
+                writer.Write(Unknown);
 
-                    writer.Write(0);
-                    writer.Write(Size() - temp[1] * temp[2]);
-                    writer.Write(Encoding.ASCII.GetBytes("FLW0"));
-                    writer.Write(0);
-                    writer.Write(Table.Length);
-                    writer.Write(Unknown);
-
-                    foreach (var a in Table)
-                        foreach (var b in a)
-                            writer.Write(b);
-                }
-                else
-                    return new byte[0];
+                foreach (var line in GetTable(SubFiles, 0x20, Sizes))
+                    writer.WriteInt32Array(line);
 
                 SubFiles.ForEach(x => writer.Write((x.Object as IPersonaFile).Get()));
 

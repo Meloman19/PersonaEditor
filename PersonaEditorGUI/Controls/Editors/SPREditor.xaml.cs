@@ -21,7 +21,7 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             InitializeComponent();
         }
-        
+
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem item)
@@ -31,6 +31,19 @@ namespace PersonaEditorGUI.Controls.Editors
                     if (tool.ShowDialog() == true)
                         item.Tag = tool.Color;
                 }
+        }
+
+        private void ItemsControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            var sen = sender as FrameworkElement;
+            Rect temp = (sen.DataContext as TextureVM).Rect;
+
+            var a = e.GetPosition(sender as IInputElement);
+
+            var newX = Math.Round((a.X / sen.ActualWidth) * temp.Width);
+            XCoo.Text = newX.ToString();
+            var newY = Math.Round((a.Y / sen.ActualHeight) * temp.Height);
+            YCoo.Text = newY.ToString();
         }
     }
 }

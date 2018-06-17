@@ -114,7 +114,7 @@ namespace PersonaEditorLib.PersonaEncoding
                 writer.Write(DataList.Count);
                 writer.Write(CutList.Count);
 
-                writer.BaseStream.Position += Utilities.Utilities.Alignment(writer.BaseStream.Position, 0x10);
+                writer.BaseStream.Position += Utilities.UtilitiesTool.Alignment(writer.BaseStream.Position, 0x10);
                 foreach (var a in Palette.Colors)
                 {
                     writer.Write(a.R);
@@ -123,18 +123,18 @@ namespace PersonaEditorLib.PersonaEncoding
                     writer.Write(a.A);
                 }
 
-                writer.BaseStream.Position += Utilities.Utilities.Alignment(writer.BaseStream.Position, 0x10);
+                writer.BaseStream.Position += Utilities.UtilitiesTool.Alignment(writer.BaseStream.Position, 0x10);
                 foreach (var a in DataList)
                     writer.Write(a.Value);
 
-                writer.BaseStream.Position += Utilities.Utilities.Alignment(writer.BaseStream.Position, 0x10);
+                writer.BaseStream.Position += Utilities.UtilitiesTool.Alignment(writer.BaseStream.Position, 0x10);
                 foreach (var a in CutList)
                 {
                     writer.Write(a.Value.Left);
                     writer.Write(a.Value.Right);
                 }
 
-                writer.BaseStream.Position += Utilities.Utilities.Alignment(writer.BaseStream.Position, 0x10);
+                writer.BaseStream.Position += Utilities.UtilitiesTool.Alignment(writer.BaseStream.Position, 0x10);
             }
         }
 
@@ -157,15 +157,15 @@ namespace PersonaEditorLib.PersonaEncoding
 
                 }
 
-                reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 0x10);
-                Palette = new BitmapPalette(Utilities.Utilities.ReadPalette(reader, colorcount));
+                reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 0x10);
+                Palette = new BitmapPalette(Utilities.ImageHelper.ReadPalette(reader, colorcount));
 
                 int glyphsize = (PixelFormat.BitsPerPixel * Width * Height) / 8;
-                reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 0x10);
+                reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 0x10);
                 for (int i = 32; i < 32 + datacount; i++)
                     DataList.Add(i, reader.ReadBytes(glyphsize));
 
-                reader.BaseStream.Position += Utilities.Utilities.Alignment(reader.BaseStream.Position, 0x10);
+                reader.BaseStream.Position += Utilities.UtilitiesTool.Alignment(reader.BaseStream.Position, 0x10);
                 for (int i = 32; i < 32 + cutcount; i++)
                     CutList.Add(i, new VerticalCut(reader.ReadBytes(2)));
             }
