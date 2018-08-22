@@ -8,17 +8,37 @@
              xmlns:editors="clr-namespace:PersonaEditorGUI.Controls.Editors"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
+             xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
+             xmlns:convert ="clr-namespace:PersonaEditorGUI.ArgConverters"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True" classes:Event.Drop="{Binding Drop}">
+             d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
+
 
     <UserControl.Resources>
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <convert:DropConverter x:Key="DropConv"/>
+        <convert:MouseButtonConverter x:Key="MouseConv"/>
     </UserControl.Resources>
-
+    
+    <wpf:Interaction.Triggers>
+        <wpf:EventTrigger EventName="Drop">
+            <wpf:EventTrigger.Actions>
+                <wpf:ActionInvokeCommand Command="{Binding Drop}" CommandArgConverter="{StaticResource DropConv}"/>
+            </wpf:EventTrigger.Actions>
+        </wpf:EventTrigger>
+    </wpf:Interaction.Triggers>
+    
     <TabControl Grid.Column="0" SelectedIndex="{Binding SelectedTabIndex}" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TabCollection}">
         <TabControl.ItemTemplate>
             <DataTemplate>
-                <Grid classes:Event.MouseUp="{Binding MouseUp}">
+                <Grid>
+                    <wpf:Interaction.Triggers>
+                        <wpf:EventTrigger EventName="MouseUp">
+                            <wpf:EventTrigger.Actions>
+                                <wpf:ActionInvokeCommand Command="{Binding MouseUp}" CommandArgConverter="{StaticResource MouseConv}"/>
+                            </wpf:EventTrigger.Actions>
+                        </wpf:EventTrigger>
+                    </wpf:Interaction.Triggers>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition Width="Auto"/>
@@ -113,6 +133,11 @@
                                     </Grid>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type editors:SPREditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:SPREditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editors:SPDEditorVM}">
                                     <Border BorderBrush="Black" BorderThickness="1">
                                         <editors:SPREditor/>
                                     </Border>

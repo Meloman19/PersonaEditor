@@ -1,22 +1,14 @@
-﻿using PersonaEditorLib;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using PersonaEditorLib.FileStructure.Text;
-using System.IO;
-using System.Windows.Data;
-using System.Globalization;
-using PersonaEditorLib.Extension;
-using System.Windows.Media.Imaging;
 using PersonaEditorGUI.Classes.Visual;
-using System.Windows;
 using System.Windows.Media;
-using PersonaEditorLib.Interfaces;
 using System.Windows.Input;
+using AuxiliaryLibraries.WPF;
+using PersonaEditor;
+using AuxiliaryLibraries.GameFormat.Text;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
@@ -98,7 +90,6 @@ namespace PersonaEditorGUI.Controls.Editors
     class PTPMsgStrEditVM : BindingObject
     {
         MSGstr str;
-        EventWrapper strEW;
 
         private Encoding OldEncoding;
         private Encoding NewEncoding;
@@ -122,10 +113,47 @@ namespace PersonaEditorGUI.Controls.Editors
         public DrawingImage OldTextImage { get; } = new DrawingImage();
         public DrawingImage NewTextImage { get; } = new DrawingImage();
 
+        #region Command
+
         public ICommand MovePrefixDown { get; }
         public ICommand MovePrefixUp { get; }
         public ICommand MovePostfixDown { get; }
         public ICommand MovePostfixUp { get; }
+
+        private void movePrefixDown()
+        {
+            if (str.MovePrefixDown())
+            {
+                Notify("Prefix");
+                Notify("OldString");
+            }
+        }
+        private void movePrefixUp()
+        {
+            if (str.MovePrefixUp())
+            {
+                Notify("Prefix");
+                Notify("OldString");
+            }
+        }
+        private void movePostfixDown()
+        {
+            if (str.MovePostfixDown())
+            {
+                Notify("Postfix");
+                Notify("OldString");
+            }
+        }
+        private void movePostfixUp()
+        {
+            if (str.MovePostfixUp())
+            {
+                Notify("Postfix");
+                Notify("OldString");
+            }
+        }
+
+        #endregion
 
         public void UpdateOldEncoding(string oldEncoding)
         {
@@ -167,8 +195,7 @@ namespace PersonaEditorGUI.Controls.Editors
         public PTPMsgStrEditVM(MSGstr str, Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple, string oldEncoding, string newEncoding, int backgroundIndex)
         {
             this.str = str;
-            strEW = new EventWrapper(str, this);
-
+            
             OldEncoding = Static.EncodingManager.GetPersonaEncoding(oldEncoding);
             NewEncoding = Static.EncodingManager.GetPersonaEncoding(newEncoding);
             OldText = new TextVisual(Static.FontManager.GetPersonaFont(oldEncoding)) { Tag = "Old" };
@@ -197,15 +224,10 @@ namespace PersonaEditorGUI.Controls.Editors
             newDrawingGroup.ClipGeometry = tuple.Item4;
             NewTextImage.Drawing = newDrawingGroup;
 
-            MovePrefixDown = new RelayCommand(str.MovePrefixDown);
-            MovePrefixUp = new RelayCommand(str.MovePrefixUp);
-            MovePostfixDown = new RelayCommand(str.MovePostfixDown);
-            MovePostfixUp = new RelayCommand(str.MovePostfixUp);
-        }
-
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            Notify(e.PropertyName);
+            MovePrefixDown = new RelayCommand(movePrefixDown);
+            MovePrefixUp = new RelayCommand(movePrefixUp);
+            MovePostfixDown = new RelayCommand(movePostfixDown);
+            MovePostfixUp = new RelayCommand(movePostfixUp);
         }
     }
 
@@ -264,7 +286,7 @@ namespace PersonaEditorGUI.Controls.Editors
     {
         #region Private
 
-        EventWrapper EncodingManagerEW;
+        EventWrapperINPC EncodingManagerEW;
 
         #endregion Private
 
@@ -368,7 +390,7 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
+            if (sender is PersonaEncodingManager man)
             {
                 if (e.PropertyName == man.GetPersonaEncodingName(OldEncoding))
                     UpdateOldEncoding(Settings.AppSetting.Default.PTPOldDefault);
@@ -434,7 +456,7 @@ namespace PersonaEditorGUI.Controls.Editors
                 SelectedBackgroundIndex = 0;
 
             View = Settings.AppSetting.Default.PTPImageView;
-            EncodingManagerEW = new EventWrapper(Static.EncodingManager, this);
+            EncodingManagerEW = new EventWrapperINPC(Static.EncodingManager, this);
 
             foreach (var a in ptp.names)
                 Names.Add(new PTPNameEditVM(a, OldEncoding, NewEncoding, SelectedBackgroundIndex));

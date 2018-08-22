@@ -3,9 +3,7 @@ using System.Threading;
 using System.IO;
 using System.IO.Pipes;
 using System;
-using PersonaEditorLib;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -145,7 +143,7 @@ namespace PersonaEditorGUI
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            Logging.Write("", e.Exception);
+            //Logging.Write("", e.Exception);
             NamedPipeManager?.Stop();
         }
 

@@ -7,4 +7,6 @@ using System.Threading.Tasks;
 namespace PersonaEditorGUI.Classes.Delegates
 {
     public delegate void OpenFilePathEventHandler(string path);
+
+    public delegate void TreeViewItemEventHandler(TreeViewItemVM sender, UserTreeViewItemEventEnum action);
 }

@@ -1,11 +1,5 @@
-﻿using PersonaEditorLib;
-using System;
-using System.Collections.Generic;
+﻿using AuxiliaryLibraries.WPF;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace PersonaEditorGUI.Controls.HexEditor
@@ -28,18 +22,20 @@ namespace PersonaEditorGUI.Controls.HexEditor
             HexViewVM.SetStream(stream);
         }
 
-        public MouseWheelEventHandler MouseWheel => mouseWheel;
+        public ICommand MouseWheel { get; }
 
-        private void mouseWheel(object sender, MouseWheelEventArgs e)
+        private void mouseWheel(object arg)
         {
-            if (e.Delta > 0)
+            int delta = (int)arg;
+            if (delta > 0)
                 ScrollBarVM.SetValue(false);
-            else if (e.Delta < 0)
+            else if (delta < 0)
                 ScrollBarVM.SetValue(true);
         }
 
         public HexEditorUserControlVM()
         {
+            MouseWheel = new RelayCommand(mouseWheel);
             ScrollBarVM.ValueChanged += ScrollBarVM_ValueChanged;
         }
 

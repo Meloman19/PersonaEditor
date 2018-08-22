@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>PersonaEditorGUI</RootNamespace>
     <AssemblyName>PersonaEditorGUI</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -28,6 +28,9 @@
     <ApplicationVersion>1.1.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TrimUnusedDependencies>true</TrimUnusedDependencies>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -38,57 +41,20 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TrimUnusedDependencies>true</TrimUnusedDependencies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\Release\PersonaEditor\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TrimUnusedDependencies>true</TrimUnusedDependencies>
     <DocumentationFile>
     </DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release FULL|AnyCPU'">
-    <OutputPath>bin\Release FULL\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release FULL|x86'">
-    <OutputPath>..\..\PersonaEditor Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>PersonaEditorGUI.App</StartupObject>
@@ -97,6 +63,17 @@
     <ApplicationIcon>Resource\PersonaEditor.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AuxiliaryLibraries, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Release\AuxiliaryLibraries\netstandard2.0\AuxiliaryLibraries.dll</HintPath>
+    </Reference>
+    <Reference Include="AuxiliaryLibraries.GameFormat">
+      <HintPath>..\..\..\Release\AuxiliaryLibraries\netstandard2.0\AuxiliaryLibraries.GameFormat.dll</HintPath>
+    </Reference>
+    <Reference Include="AuxiliaryLibraries.WPF, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Release\AuxiliaryLibraries\AuxiliaryLibraries.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -123,15 +100,19 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ArgConverters\DropConverter.cs" />
+    <Compile Include="ArgConverters\MouseButtonConverter.cs" />
+    <Compile Include="ArgConverters\MouseWheelConverter.cs" />
+    <Compile Include="ArgConverters\PressEnterConverter.cs" />
+    <Compile Include="ArgConverters\SecondArgTranslator.cs" />
     <Compile Include="Classes\CachedContentPresenter.cs" />
-    <Compile Include="Classes\CommandSetter.cs" />
-    <Compile Include="Classes\Controls\RelativePanel.cs" />
     <Compile Include="Classes\Controls\TreeViewExtended.cs" />
     <Compile Include="Classes\Controls\ImageVisualizer.cs" />
     <Compile Include="Classes\Delegates\FileDelegates.cs" />
+    <Compile Include="Classes\PersonaFileHelper.cs" />
     <Compile Include="Classes\ReadOnlyPropertyObserver.cs" />
+    <Compile Include="Classes\UserTreeViewItemEventEnum.cs" />
     <Compile Include="Classes\Visual\TextVisual.cs" />
-    <Compile Include="Classes\Event.cs" />
     <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Classes\Visual\Background.cs" />
     <Compile Include="Classes\Visual\BackgroundManager.cs" />
@@ -153,6 +134,7 @@
       <DependentUpon>FTDEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Editors\FTDEditorVM.cs" />
+    <Compile Include="Controls\Editors\SPDEditorVM.cs" />
     <Compile Include="Controls\HexEditor\HexEditorUserControlVM.cs" />
     <Compile Include="Controls\HexEditor\HexEditorUserControl.xaml.cs">
       <DependentUpon>HexEditorUserControl.xaml</DependentUpon>
@@ -218,6 +200,7 @@
     </Compile>
     <Compile Include="Classes\UserTreeViewItem.cs" />
     <Compile Include="Controls\TreeViewPEVM.cs" />
+    <Compile Include="IViewModel.cs" />
     <Compile Include="MainWindowVM.cs" />
     <Compile Include="Resource\Localization.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -436,6 +419,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Settings\AppSetting.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>AppSetting.Designer.cs</LastGenOutput>
@@ -455,12 +439,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj">
-      <Project>{717ef6cb-2a9b-4565-88ed-3fd096dd2bbe}</Project>
-      <Name>PersonaEditorLib</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\Background.png" />
@@ -504,5 +482,18 @@
   <ItemGroup>
     <Resource Include="Resource\icons\icons8-документ-80.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PersonaEditor\PersonaEditor.csproj">
+      <Project>{77bd32f6-f52e-4a72-a919-b96255a4d23e}</Project>
+      <Name>PersonaEditor</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets" Condition="Exists('..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets'))" />
+  </Target>
 </Project>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AuxiliaryLibraries.GameFormat.Text;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -106,7 +107,7 @@ namespace PersonaEditorGUI.Classes.Controls
         {
             if (data is byte[] dataByte)
                 name.UpdateText(dataByte);
-            else if (data is IList<PersonaEditorLib.FileStructure.Text.TextBaseElement> dataList)
+            else if (data is IList<TextBaseElement> dataList)
                 name.UpdateText(dataList);
         }
 
@@ -114,7 +115,7 @@ namespace PersonaEditorGUI.Classes.Controls
         {
             if (data is byte[] dataByte)
                 text.UpdateText(dataByte);
-            else if (data is IList<PersonaEditorLib.FileStructure.Text.TextBaseElement> dataList)
+            else if (data is IList<TextBaseElement> dataList)
                 text.UpdateText(dataList);
         }
 

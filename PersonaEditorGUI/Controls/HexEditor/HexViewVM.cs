@@ -1,12 +1,10 @@
-﻿using PersonaEditorLib;
+﻿using AuxiliaryLibraries.Extension;
+using AuxiliaryLibraries.WPF;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media;
 
 namespace PersonaEditorGUI.Controls.HexEditor
@@ -84,7 +82,7 @@ namespace PersonaEditorGUI.Controls.HexEditor
                 else if (bytes.Length > 4)
                     pos = new int[] { 0, 4 };
 
-                var a = PersonaEditorLib.Utilities.Array.SplitArray(bytes, pos);
+                var a = bytes.SplitArray(pos);
                 for (int i = 0; i < a.Count; i++)
                     UInts[i].SetBytes(a[i]);
 

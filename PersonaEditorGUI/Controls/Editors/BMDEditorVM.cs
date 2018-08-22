@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PersonaEditorLib.FileStructure.Text;
-using PersonaEditorLib;
-using PersonaEditorLib.Extension;
 using System.ComponentModel;
 using System.Windows;
-using PersonaEditorLib.Interfaces;
-using System.Windows.Documents;
-using System.Windows.Controls;
 using PersonaEditorGUI.Classes;
+using AuxiliaryLibraries.WPF;
+using PersonaEditor;
+using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.GameFormat.Text;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
@@ -133,7 +127,7 @@ namespace PersonaEditorGUI.Controls.Editors
 
     class BMDEditorVM : BindingObject, IViewModel
     {
-        EventWrapper EncodingEW;
+        EventWrapperINPC EncodingEW;
 
         private bool _IsEdit = false;
         public bool IsEdit
@@ -234,18 +228,18 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
+            if (sender is PersonaEncodingManager man)
             {
                 if (IsSelectCharList && e.PropertyName == man.GetPersonaEncodingName(sourceFont))
                     Update();
             }
         }
 
-        public BMDEditorVM(ObjectFile objbmd)
+        public BMDEditorVM(ObjectContainer objbmd)
         {
             if (objbmd.Object is BMD bmd)
             {
-                EncodingEW = new EventWrapper(Static.EncodingManager, this);
+                EncodingEW = new EventWrapperINPC(Static.EncodingManager, this);
 
                 int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.BMDFontDefault);
                 if (sourceInd >= 0)

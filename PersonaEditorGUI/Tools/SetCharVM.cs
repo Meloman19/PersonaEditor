@@ -1,13 +1,11 @@
-﻿using PersonaEditorLib;
-using System;
-using System.Collections.Generic;
+﻿using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.WPF;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
 namespace PersonaEditorGUI.Tools
@@ -65,6 +63,7 @@ namespace PersonaEditorGUI.Tools
 
         public SetCharVM()
         {
+            Closing = new RelayCommand(Window_Closing);
             GlyphList.ListChanged += GlyphList_ListChanged;
         }
 
@@ -84,10 +83,12 @@ namespace PersonaEditorGUI.Tools
             if (font != null)
                 foreach (var a in font.DataList)
                 {
+                    var pallete = new BitmapPalette(font.Palette.Select(x => System.Windows.Media.Color.FromArgb(x.A, x.R, x.G, x.B)).ToArray());
+                    var form = PersonaEditor.AuxWPFBinding.AuxToWPF(font.PixelFormat);
                     var temp = new FnMpImg()
                     {
                         Index = a.Key,
-                        Image = BitmapSource.Create(font.Width, font.Height, 96, 96, font.PixelFormat, font.Palette, a.Value, (font.PixelFormat.BitsPerPixel * font.Width + 7) / 8)
+                        Image = BitmapSource.Create(font.Width, font.Height, 96, 96, form, pallete, a.Value, (font.PixelFormat.BitsPerPixel * font.Width + 7) / 8)
                     };
                     GlyphList.Add(temp);
                 }
@@ -111,7 +112,7 @@ namespace PersonaEditorGUI.Tools
                     var enc = Static.EncodingManager.GetPersonaEncoding(Static.FontManager.GetPersonaFontName(_FontSelect));
                     if (enc.Tag == "Empty")
                     {
-                        PersonaEditorLib.PersonaEncoding.PersonaEncoding personaEncoding = new PersonaEditorLib.PersonaEncoding.PersonaEncoding();
+                        PersonaEncoding personaEncoding = new PersonaEncoding();
                         foreach (var a in GlyphList)
                             if (a.Char.Length > 0)
                                 personaEncoding.Add(a.Index, a.Char[0]);
@@ -136,12 +137,12 @@ namespace PersonaEditorGUI.Tools
             else return true;
         }
 
-        public CancelEventHandler Closing => Window_Closing;
+        public ICommand Closing { get; }
 
-        void Window_Closing(object sender, CancelEventArgs e)
+        void Window_Closing(object arg)
         {
             if (!Save())
-                e.Cancel = true;
+                (arg as CancelEventArgs).Cancel = true;
         }
     }
 }

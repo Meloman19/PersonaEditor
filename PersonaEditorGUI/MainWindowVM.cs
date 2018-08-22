@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PersonaEditorLib;
-using Microsoft.Win32;
-using System.Collections.ObjectModel;
+﻿using Microsoft.Win32;
 using System.IO;
-using PersonaEditorGUI.Classes;
 using PersonaEditorGUI.Controls;
 using System.Windows.Input;
 using System.ComponentModel;
-using PersonaEditorLib.PersonaEncoding;
-using System.Threading;
-using System.Runtime.Serialization.Formatters.Binary;
+using AuxiliaryLibraries.WPF;
 
 namespace PersonaEditorGUI
 {
@@ -38,8 +28,8 @@ namespace PersonaEditorGUI
 
         #region Events
 
-        public CancelEventHandler WindowClosing => Window_Closing;
-        private void Window_Closing(object sender, CancelEventArgs e)
+        public ICommand WindowClosing { get; }
+        private void Window_Closing(object arg)
         {
             if (MultiFile.CloseFile())
             {
@@ -56,11 +46,11 @@ namespace PersonaEditorGUI
                 Settings.WindowSetting.Default.Save();
             }
             else
-                e.Cancel = true;
+                (arg as CancelEventArgs).Cancel = true;
         }
 
         public ICommand clickOpenFile { get; }
-        private void OpenFile() 
+        private void OpenFile()
         {
             OpenFileDialog OFD = new OpenFileDialog();
             if (OFD.ShowDialog() == true)
@@ -143,7 +133,7 @@ namespace PersonaEditorGUI
             Tools.FileBrowserVM fileBrowserVM = new Tools.FileBrowserVM();
             fileBrowserVM.OpenFile += FileBrowserVM_OpenFile;
             fileBrowser = new Tools.FileBrowser() { DataContext = fileBrowserVM };
-            
+
             fileBrowser.Show();
         }
 
@@ -180,6 +170,7 @@ namespace PersonaEditorGUI
 
         public MainWindowVM()
         {
+            WindowClosing = new RelayCommand(Window_Closing);
             clickOpenFile = new RelayCommand(OpenFile);
             clickSaveAsFile = new RelayCommand(SaveAsFile);
             clickSettingOpen = new RelayCommand(SettingOpen);

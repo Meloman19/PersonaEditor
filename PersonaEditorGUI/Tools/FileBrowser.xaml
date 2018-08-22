@@ -4,10 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
+        xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
         xmlns:local="clr-namespace:PersonaEditorGUI.Tools"
+        xmlns:convert="clr-namespace:PersonaEditorGUI.ArgConverters"
         mc:Ignorable="d"
         Title="FileBrowser" Height="450" Width="800">
+    <Window.Resources>
+        <convert:PressEnterConverter x:Key="PressEnterConv"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -37,9 +41,14 @@
         
         <DataGrid Grid.Row="1" ItemsSource="{Binding FileBrowserGridLines}" AutoGenerateColumns="False" Background="#FFF0F0F0" SelectionMode="Single"
                   VerticalScrollBarVisibility="Visible" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False"
-                  VirtualizingPanel.IsVirtualizing="True" classes:Event.PreviewKeyDown="{Binding PressEnter}"
-                  SelectedIndex="{Binding SelectedIndex}" SelectionUnit="FullRow" >
-
+                  VirtualizingPanel.IsVirtualizing="True" SelectedIndex="{Binding SelectedIndex}" SelectionUnit="FullRow" >
+            <wpf:Interaction.Triggers>
+                <wpf:EventTrigger EventName="PreviewKeyDown">
+                    <wpf:EventTrigger.Actions>
+                        <wpf:ActionInvokeCommand Command="{Binding PressEnter}" CommandArgConverter="{StaticResource PressEnterConv}"/>
+                    </wpf:EventTrigger.Actions>
+                </wpf:EventTrigger>
+            </wpf:Interaction.Triggers>
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>

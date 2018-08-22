@@ -4,9 +4,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.HexEditor"
-             xmlns:classes ="clr-namespace:PersonaEditorGUI.Classes"
+             xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
+             xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
+             xmlns:convert="clr-namespace:PersonaEditorGUI.ArgConverters"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" classes:Event.MouseWheel="{Binding MouseWheel}" Background="Transparent">
+             d:DesignHeight="450" d:DesignWidth="800" Background="Transparent">
+    <UserControl.Resources>
+        <convert:MouseWheelConverter x:Key="MouseWheelConv"/>
+    </UserControl.Resources>
+
+    <wpf:Interaction.Triggers>
+        <wpf:EventTrigger EventName="MouseWheel">
+            <wpf:EventTrigger.Actions>
+                <wpf:ActionInvokeCommand Command="{Binding MouseWheel}" CommandArgConverter="{StaticResource MouseWheelConv}"/>
+            </wpf:EventTrigger.Actions>
+        </wpf:EventTrigger>
+    </wpf:Interaction.Triggers>
+
     <Grid 
         classes:ReadOnlyPropertyObserver.ActualHeightObserver="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}"
         classes:ReadOnlyPropertyObserver.ActualHeightSender="{Binding ActualHeight, Mode=OneWayToSource}">

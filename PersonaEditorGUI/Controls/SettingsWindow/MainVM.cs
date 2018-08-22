@@ -1,13 +1,7 @@
-﻿using PersonaEditorGUI.Settings;
-using PersonaEditorLib;
-using PersonaEditorLib.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using AuxiliaryLibraries.WPF;
+using PersonaEditorGUI.Settings;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PersonaEditorGUI.Controls.SettingsWindow
 {

@@ -16,7 +16,7 @@
         <StatusBar Grid.Row="0">
             <ComboBox ItemsSource="{Binding EncodingList}" SelectedIndex="{Binding SelectEncodingIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Content="Copy All" Command="{Binding CopyAll}"/>
-            <Button Content="Import" Command="{Binding PasteAll}"/>
+            <Button Content="Import" Command="{Binding Import}"/>
         </StatusBar>
         
         <TreeView Grid.Row="1" ItemsSource="{Binding Entries}">

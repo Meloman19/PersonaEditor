@@ -1,11 +1,10 @@
-﻿using PersonaEditorLib.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using PersonaEditorLib.Extension;
+using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.Extension;
 
 namespace PersonaEditor
 {
@@ -39,7 +38,6 @@ namespace PersonaEditor
         public bool SkipEmpty { get; } = false;
         public Encoding Encode { get; } = Encoding.UTF8;
         public bool Sub { get; } = false;
-        public bool LineByLine { get; } = false;
         public int Size { get; } = -1;
         public bool AsBMD { get; } = false;
 
@@ -77,8 +75,6 @@ namespace PersonaEditor
                 }
                 else if (a[0] == "/sub")
                     Sub = true;
-                else if (a[0] == "/lbl")
-                    LineByLine = true;
                 else if (a[0] == "/size")
                     Size = int.Parse(a[1]);
                 else if (a[0] == "/bmd")
@@ -91,7 +87,7 @@ namespace PersonaEditor
     {
         public CommandType Command { get; } = CommandType.Empty;
         public CommandSubType Type { get; } = CommandSubType.Empty;
-        public FileType FileType { get; } = FileType.Unknown;
+        public FormatEnum FileType { get; } = FormatEnum.Unknown;
 
         public string Value { get; } = "";
         public Parameters Parameters { get; } = new Parameters();
@@ -135,28 +131,28 @@ namespace PersonaEditor
                 Parameters = new Parameters();
         }
 
-        static FileType GetFileType(string type)
+        static FormatEnum GetFileType(string type)
         {
             if (type == "bin")
-                return FileType.BIN;
+                return FormatEnum.BIN;
             else if (type == "spr")
-                return FileType.SPR;
+                return FormatEnum.SPR;
             else if (type == "tmx")
-                return FileType.TMX;
+                return FormatEnum.TMX;
             else if (type == "bf")
-                return FileType.BF;
+                return FormatEnum.BF;
             else if (type == "pm1")
-                return FileType.PM1;
+                return FormatEnum.PM1;
             else if (type == "bmd")
-                return FileType.BMD;
+                return FormatEnum.BMD;
             else if (type == "fnt")
-                return FileType.FNT;
+                return FormatEnum.FNT;
             else if (type == "bvp")
-                return FileType.BVP;
+                return FormatEnum.BVP;
             else if (type == "hex")
-                return FileType.DAT;
+                return FormatEnum.DAT;
             else
-                return FileType.Unknown;
+                return FormatEnum.Unknown;
         }
     }
 

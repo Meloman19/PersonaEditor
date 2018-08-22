@@ -1,14 +1,9 @@
-﻿using PersonaEditorLib;
-using PersonaEditorGUI.Classes.Delegates;
-using System;
+﻿using PersonaEditorGUI.Classes.Delegates;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using PersonaEditorLib.Interfaces;
+using AuxiliaryLibraries.WPF;
+using AuxiliaryLibraries.GameFormat;
 
 namespace PersonaEditorGUI.Tools
 {
@@ -45,13 +40,13 @@ namespace PersonaEditorGUI.Tools
             FullPath = fileInfo.FullName;
             IsFile = true;
 
-            if (PersonaEditorLib.Utilities.PersonaFile.PersonaFileType.ContainsKey(fileInfo.Extension.ToLower()))
+            if (GameFormatHelper.FileTypeDic.ContainsKey(fileInfo.Extension.ToLower()))
             {
-                FileType fileType = PersonaEditorLib.Utilities.PersonaFile.PersonaFileType[fileInfo.Extension.ToLower()];
+                FormatEnum fileType = GameFormatHelper.FileTypeDic[fileInfo.Extension.ToLower()];
 
-                if (fileType == FileType.DDS | fileType == FileType.TMX | fileType == FileType.FNT)
+                if (fileType == FormatEnum.DDS | fileType == FormatEnum.TMX | fileType == FormatEnum.FNT)
                     Type = "Graphic";
-                else if (fileType == FileType.BMD | fileType == FileType.PTP)
+                else if (fileType == FormatEnum.BMD | fileType == FormatEnum.PTP)
                     Type = "Text";
             }
         }
@@ -83,10 +78,10 @@ namespace PersonaEditorGUI.Tools
     {
         public event OpenFilePathEventHandler OpenFile;
 
-        public KeyEventHandler PressEnter => pressEnter;
-        private void pressEnter(object sender, KeyEventArgs e)
+        public ICommand PressEnter { get; }
+        private void pressEnter(object arg)
         {
-            if (e.Key == Key.Enter)
+            if ((bool)arg)
                 mouseDoubleClick(FileBrowserGridLines[_SelectedIndex]);
         }
 
@@ -115,9 +110,10 @@ namespace PersonaEditorGUI.Tools
                 OpenDirectory(selected.FullPath);
         }
 
-
         public FileBrowserVM()
         {
+            PressEnter = new RelayCommand(pressEnter);
+
             FileBrowserGridLines = new ReadOnlyObservableCollection<FileBrowserGridLine>(fileBrowserGridLines);
             DriveBrowser = new ReadOnlyObservableCollection<FileBrowserDrive>(driveBrowser);
 

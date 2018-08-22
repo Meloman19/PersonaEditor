@@ -1,18 +1,14 @@
-﻿using PersonaEditorLib;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Media;
-using PersonaEditorLib.FileStructure.Text;
-using PersonaEditorLib.Extension;
 using PersonaEditorGUI.Classes.Visual;
+using AuxiliaryLibraries.WPF;
+using PersonaEditor;
+using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.GameFormat.Text;
 
 namespace PersonaEditorGUI.Tools
 {
@@ -28,14 +24,14 @@ namespace PersonaEditorGUI.Tools
 
         #endregion PrivateField
 
-        PersonaEditorLib.PersonaEncoding.PersonaEncoding PersonaEncoding;
-        PersonaEditorLib.PersonaEncoding.PersonaFont PersonaFont;
+        PersonaEncoding PersonaEncoding;
+        PersonaFont PersonaFont;
 
         TextVisual Text;
         TextVisual Name;
 
-        private Classes.Visual.Background selectBack = null;
-        private Classes.Visual.Background SelectBack
+        private Background selectBack = null;
+        private Background SelectBack
         {
             get { return selectBack; }
             set
@@ -249,7 +245,7 @@ namespace PersonaEditorGUI.Tools
 
         public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is PersonaEditorLib.PersonaEncoding.PersonaEncodingManager man)
+            if (sender is PersonaEncodingManager man)
             {
                 if (e.PropertyName == man.GetPersonaEncodingName(FontSelect))
                     Text2HEX();

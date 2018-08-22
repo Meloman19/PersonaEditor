@@ -1,38 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.WPF;
 using PersonaEditorGUI.Classes;
-using PersonaEditorLib;
-using PersonaEditorLib.Interfaces;
+using PersonaEditorGUI.Classes.Delegates;
 
 namespace PersonaEditorGUI.Controls
 {
-    public delegate void TreeViewItemEventHandler(UserTreeViewItem sender);
     class TreeViewPEVM : BindingObject
     {
-        public event TreeViewItemEventHandler SelectedItemChanged;
-        public event TreeViewItemEventHandler SelectedItemOpen;
+        public event TreeViewItemEventHandler ItemAction;
 
-        private ObservableCollection<UserTreeViewItem> tree = new ObservableCollection<UserTreeViewItem>();
+        private ObservableCollection<TreeViewItemVM> tree = new ObservableCollection<TreeViewItemVM>();
 
-        public ReadOnlyObservableCollection<UserTreeViewItem> Tree { get; }
-
-        public MouseEventHandler Leave => MouseLeave;
-        private void MouseLeave(object sender, MouseEventArgs e)
-        {
-        }
+        public ReadOnlyObservableCollection<TreeViewItemVM> Tree { get; }
 
         private object _sel = 10;
         public object Sel => _sel;
 
-        public void SetRoot(ObjectFile personaFile)
+        public void SetRoot(ObjectContainer personaFile)
         {
             if (tree.Count > 0)
                 if (!tree[0].Close())
@@ -40,20 +26,17 @@ namespace PersonaEditorGUI.Controls
 
             tree.Clear();
 
-            UserTreeViewItem item = new UserTreeViewItem(personaFile);
-            item.SelectedItemChanged += Item_SelectedItem;
-            item.SelectedItemOpen += Item_SelectedItemOpen;
+            TreeViewItemVM item = new TreeViewItemVM(personaFile);
+            item.ItemAction += Item_Action;
             tree.Add(item);
 
-            if (personaFile.Object is IPersonaFile pfile && pfile.SubFiles.Count == 0)
-                Item_SelectedItemOpen(item);
+            if (personaFile.Object is IGameFile pfile && pfile.SubFiles.Count == 0)
+                ItemAction(item, UserTreeViewItemEventEnum.Open);
         }
 
-        private void Item_SelectedItem(UserTreeViewItem sender) => SelectedItemChanged?.Invoke(sender);
+        private void Item_Action(TreeViewItemVM sender, UserTreeViewItemEventEnum action) => ItemAction?.Invoke(sender, action);
 
-        private void Item_SelectedItemOpen(UserTreeViewItem sender) => SelectedItemOpen?.Invoke(sender);
-
-        public ObjectFile GetRoot()
+        public ObjectContainer GetRoot()
         {
             if (tree.Count > 0)
                 return tree[0].PersonaFile;
@@ -61,20 +44,20 @@ namespace PersonaEditorGUI.Controls
                 return null;
         }
 
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (sender is UserTreeViewItem item)
-            {
-                if (e.PropertyName == "IsSelected")
-                    SelectedItemChanged?.Invoke(item);
-                else if (e.PropertyName == "Open")
-                    SelectedItemOpen?.Invoke(item);
-            }
-        }
+        //public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        //{
+        //    if (sender is UserTreeViewItem item)
+        //    {
+        //        if (e.PropertyName == "IsSelected")
+        //            ItemAction?.Invoke(item, UserTreeViewItemEventEnum.Selected);
+        //        else if (e.PropertyName == "Open")
+        //            ItemAction?.Invoke(item, UserTreeViewItemEventEnum.Open);
+        //    }
+        //}
 
         public TreeViewPEVM()
         {
-            Tree = new ReadOnlyObservableCollection<UserTreeViewItem>(tree);
+            Tree = new ReadOnlyObservableCollection<TreeViewItemVM>(tree);
         }
     }
 }

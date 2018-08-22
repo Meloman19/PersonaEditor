@@ -8,18 +8,33 @@
              xmlns:clcontrol="clr-namespace:PersonaEditorGUI.Classes.Controls"
              xmlns:prim="clr-namespace:PersonaEditorGUI.Controls.Primitive"
              xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
+             xmlns:converter="clr-namespace:PersonaEditorGUI.ArgConverters"
+             xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
     <UserControl.Resources>
         <BitmapImage x:Key="MyImageSource" UriSource="../Resource/settings-work-tool.png" />
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <converter:SecondArgTranslator x:Key="SecondArg"/>
     </UserControl.Resources>
 
     <TreeView ItemsSource="{Binding Tree}">
         <TreeView.ItemTemplate>
             <HierarchicalDataTemplate ItemsSource="{Binding Path=SubItems}">
-                <prim:EditableTextBlock IsEnabled="{Binding IsEnable}" Text="{Binding Path=Header}" Edit="{Binding Path=Edit}" AllowDrop="True" classes:Event.MouseLeave="{Binding Path=Leave}" classes:Event.Drop="{Binding Path=Drop}">
+                <prim:EditableTextBlock IsEnabled="{Binding IsEnable}" Text="{Binding Path=Header}" Edit="{Binding Path=Edit}" AllowDrop="True" >
+                    <wpf:Interaction.Triggers>
+                        <wpf:EventTrigger EventName="MouseDoubleClick">
+                            <wpf:EventTrigger.Actions>
+                                <wpf:ActionInvokeCommand Command="{Binding DoubleClick}"/>
+                            </wpf:EventTrigger.Actions>
+                        </wpf:EventTrigger>
+                        <wpf:EventTrigger EventName="MouseLeave">
+                            <wpf:EventTrigger.Actions>
+                                <wpf:ActionInvokeCommand Command="{Binding Leave}" CommandArgConverter="{StaticResource SecondArg}"/>
+                            </wpf:EventTrigger.Actions>
+                        </wpf:EventTrigger>
+                    </wpf:Interaction.Triggers>
                     <prim:EditableTextBlock.ContextMenu>
                         <ContextMenu ItemsSource="{Binding Path=ContextMenu}"/>
                     </prim:EditableTextBlock.ContextMenu>
@@ -34,7 +49,6 @@
 
         <TreeView.ItemContainerStyle>
             <Style TargetType="TreeViewItem">
-                <Setter Property="classes:Event.MouseDoubleClick" Value="{Binding Path=DoubleClick}"/>
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
             </Style>
         </TreeView.ItemContainerStyle>
