@@ -2,13 +2,10 @@
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
-using PersonaEditorLib.Extension;
 using System.Linq;
-using System.Windows.Media.Imaging;
 using System.Xml.Linq;
-using PersonaEditorLib;
-using System.Text.RegularExpressions;
-using PersonaEditorLib.Interfaces;
+using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.GameFormat.Text;
 
 namespace PersonaEditor
 {
@@ -18,31 +15,31 @@ namespace PersonaEditor
         {
             private static readonly string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             private static string DirFont = Path.Combine(CurrentFolderEXE, "font");
-            private static PersonaEditorLib.PersonaEncoding.PersonaEncodingManager PersonaEncodingManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaEncodingManager(DirFont);
-            private static PersonaEditorLib.PersonaEncoding.PersonaFontManager PersonaFontManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaFontManager(DirFont);
+            private static PersonaEncodingManager PersonaEncodingManager { get; } = new PersonaEncodingManager(DirFont);
+            private static PersonaFontManager PersonaFontManager { get; } = new PersonaFontManager(DirFont);
 
-            private static PersonaEditorLib.PersonaEncoding.PersonaEncoding oldEncoding = null;
-            private static PersonaEditorLib.PersonaEncoding.PersonaEncoding newEncoding = null;
-            private static PersonaEditorLib.PersonaEncoding.PersonaFont newFont = null;
+            private static PersonaEncoding oldEncoding = null;
+            private static PersonaEncoding newEncoding = null;
+            private static PersonaFont newFont = null;
 
             public static string OldFontName { get; set; } = "P4";
             public static string NewFontName { get; set; } = "P4";
 
-            public static PersonaEditorLib.PersonaEncoding.PersonaEncoding OldEncoding()
+            public static PersonaEncoding OldEncoding()
             {
                 if (oldEncoding == null)
                     oldEncoding = Static.PersonaEncodingManager.GetPersonaEncoding(Static.OldFontName);
                 return oldEncoding;
             }
 
-            public static PersonaEditorLib.PersonaEncoding.PersonaEncoding NewEncoding()
+            public static PersonaEncoding NewEncoding()
             {
                 if (newEncoding == null)
                     newEncoding = Static.PersonaEncodingManager.GetPersonaEncoding(Static.NewFontName);
                 return newEncoding;
             }
 
-            public static PersonaEditorLib.PersonaEncoding.PersonaFont NewFont()
+            public static PersonaFont NewFont()
             {
                 if (newFont == null)
                     newFont = PersonaFontManager.GetPersonaFont(NewFontName);
@@ -96,31 +93,11 @@ namespace PersonaEditor
 
         static void Main(string[] args)
         {
-            //    //  PersonaEditorLib.FileStructure.FNT.FNT fnt2 = new PersonaEditorLib.FileStructure.FNT.FNT("EQWEQWE.FNT");
-
-            //    PersonaEditorLib.FileStructure.FNT.FNT fnt = new PersonaEditorLib.FileStructure.FNT.FNT(args[0]);
-            //    //  Imaging.SavePNG(fnt.GetImage(), "P5.png");
-
-            //    // fnt.SetImage(Imaging.OpenPNG("P5.png"));
-            //    //fnt.Resize(4000);
-            //    //fnt.SetImage(Imaging.OpenPNG("FONT0.png"));            
-
-            //    fnt.Resize(int.Parse(args[1]));
-            //    fnt.SetImage(Imaging.OpenPNG(args[2]));
-            //    fnt.SetTable(XDocument.Load(args[3]));
-            //    File.WriteAllBytes("P5(N).FNT", fnt.Get());
-
-            //Test(args);
             LoadSetting();
+            Test(args);
 
             try
             {
-                if (AdditionalСommands.commands.ContainsKey(args[0].ToLower()))
-                {
-                    AdditionalСommands.commands[args[0]].Invoke(args.Skip(1).ToArray());
-                    return;
-                }
-
                 DoSome(args);
             }
             catch (Exception e)
@@ -134,31 +111,6 @@ namespace PersonaEditor
 
         static void Test(string[] args)
         {
-            SubDir(args[0], TestAction);
-        }
-
-        static void TestAction(string path)
-        {
-            using (FileStream FS = new FileStream(path, FileMode.Open, FileAccess.Read))
-            {
-                FS.Position = 20;
-                byte temp = (byte)FS.ReadByte();
-                if (temp != 3)
-                {
-
-                }
-            }
-        }
-
-        static void SubDir(string path, Action<string> action)
-        {
-            DirectoryInfo DI = new DirectoryInfo(path);
-            foreach (var file in DI.GetFiles())
-                if (file.Extension.ToLower() == ".pm1")
-                    action.Invoke(file.FullName);
-
-            foreach (var dir in DI.GetDirectories())
-                SubDir(dir.FullName, action);
         }
 
         static void DoSome(string[] args)
@@ -166,19 +118,19 @@ namespace PersonaEditor
             ArgumentsWork argwrk = new ArgumentsWork(args);
             if (argwrk.OpenedFile != "")
             {
-                ObjectFile file = null;
+                ObjectContainer file = null;
                 if (argwrk.OpenedArgument.ToLower() == "/stringlist")
                 {
-                    file = new ObjectFile(Path.GetFileName(argwrk.OpenedFile), new PersonaEditorLib.FileStructure.Text.StringList(argwrk.OpenedFile, Static.OldEncoding()) { DestEncoding = Static.NewEncoding() });
+                    file = new ObjectContainer(Path.GetFileName(argwrk.OpenedFile), new StringList(argwrk.OpenedFile, Static.OldEncoding()) { DestEncoding = Static.NewEncoding() });
                 }
                 else
-                    file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile),
-                       PersonaEditorLib.Utilities.PersonaFile.GetFileType(argwrk.OpenedFile));
+                    file = GameFormatHelper.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile),
+                      GameFormatHelper.GetFormat(argwrk.OpenedFile));
 
                 if (file.Object != null)
                     foreach (var command in argwrk.ArgumentList)
                     {
-                        Action<ObjectFile, string, string, Parameters> action = null;
+                        Action<ObjectContainer, string, string, Parameters> action = null;
                         if (command.Command == CommandType.Export)
                         {
                             if (command.Type == CommandSubType.Image)
@@ -216,27 +168,27 @@ namespace PersonaEditor
             }
         }
 
-        static void ExportImage(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportImage(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
             string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG");
-            PersonaEditorLib.Utilities.PersonaFile.SaveImageFile(objectFile, path);
+            PersonaEditorTools.SaveImageFile(objectFile, path);
         }
 
-        static void ImportImage(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ImportImage(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
             if (objectFile.Object is IImage image)
             {
                 if (parameters.Size >= 0)
-                    if (objectFile.Object is PersonaEditorLib.FileStructure.FNT.FNT fnt)
+                    if (objectFile.Object is AuxiliaryLibraries.GameFormat.Other.FNT.FNT fnt)
                         fnt.Resize(parameters.Size);
 
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG") : value;
                 if (File.Exists(path))
-                    image.SetImage(Imaging.OpenPNG(path));
+                    image.SetBitmap(PersonaEditorTools.OpenPNG(path).GetBitmap());
             }
         }
 
-        static void ExportTable(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportTable(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
             if (objectFile.Object is ITable table)
             {
@@ -245,7 +197,7 @@ namespace PersonaEditor
             }
         }
 
-        static void ImportTable(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ImportTable(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
             if (objectFile.Object is ITable table)
             {
@@ -255,41 +207,41 @@ namespace PersonaEditor
             }
         }
 
-        static void ExportPTP(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportPTP(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is PersonaEditorLib.FileStructure.Text.BMD bmd)
+            if (objectFile.Object is BMD bmd)
             {
                 string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name.Replace('/', '+')) + ".PTP");
-                PersonaEditorLib.FileStructure.Text.PTP PTP = new PersonaEditorLib.FileStructure.Text.PTP(bmd);
+                PTP PTP = new PTP(bmd);
                 if (parameters.CopyOld2New)
                     PTP.CopyOld2New(Static.OldEncoding());
-                File.WriteAllBytes(path, PTP.Get());
+                File.WriteAllBytes(path, PTP.GetData());
             }
         }
 
-        static void ImportPTP(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ImportPTP(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is PersonaEditorLib.FileStructure.Text.BMD bmd)
+            if (objectFile.Object is BMD bmd)
             {
                 string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name.Replace('/', '+')) + ".PTP");
                 if (File.Exists(path))
                 {
-                    PersonaEditorLib.FileStructure.Text.PTP PTP = new PersonaEditorLib.FileStructure.Text.PTP(File.ReadAllBytes(path));
+                    PTP PTP = new PTP(File.ReadAllBytes(path));
                     bmd.Open(PTP, Static.NewEncoding());
                 }
             }
         }
 
-        static void ExportText(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportText(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is PersonaEditorLib.FileStructure.Text.PTP ptp)
+            if (objectFile.Object is PTP ptp)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
-                string[] exp = ptp.ExportTXT(parameters.Map, objectFile.Name, parameters.RemoveSplit, Static.OldEncoding(), Static.NewEncoding());
+                string[] exp = ptp.ExportTXT(objectFile.Name, parameters.RemoveSplit, Static.OldEncoding());
 
                 File.AppendAllLines(path, exp);
             }
-            else if (objectFile.Object is PersonaEditorLib.FileStructure.Text.StringList strlst)
+            else if (objectFile.Object is StringList strlst)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 string[] exp = strlst.ExportText();
@@ -298,53 +250,62 @@ namespace PersonaEditor
             }
         }
 
-        static void ImportText(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ImportText(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is PersonaEditorLib.FileStructure.Text.PTP ptp)
+            if (objectFile.Object is PTP ptp)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
-                string[] importedtext;
+
                 if (File.Exists(path))
                 {
-                    importedtext = File.ReadAllLines(path, parameters.Encode);
-                    if (parameters.LineByLine)
-                        ptp.ImportTXT_LBL(importedtext, parameters.Map, parameters.Width, parameters.SkipEmpty, Static.OldEncoding(), Static.NewEncoding(), Static.NewFont());
-                    else
-                        ptp.ImportTXT(importedtext, objectFile.Name, parameters.Map, parameters.Width, parameters.SkipEmpty, Static.OldEncoding(), Static.NewEncoding(), Static.NewFont());
+                    List<string[]> import = File.ReadAllLines(path, parameters.Encode).Select(x => x.Split('\t')).ToList();
+                    LineMap MAP = new LineMap(parameters.Map);
+                    if (MAP.CanGetText)
+                    {
+                        string[][] importedText = import.
+                            FindAll(x => x[MAP[LineMap.Type.FileName]].Equals(Path.GetFileName(path), StringComparison.CurrentCultureIgnoreCase) && x.Length > MAP.MinLength && !x[MAP[LineMap.Type.NewText]].Equals("")).
+                            Select(x => new string[] { x[MAP[LineMap.Type.MSGindex]], x[MAP[LineMap.Type.StringIndex]], x[MAP[LineMap.Type.NewText]] }).ToArray();
+                        ptp.ImportText(importedText);
+                    }
+                    if (MAP.CanGetName)
+                    {
+                        Dictionary<string, string> NameDic = import.Where(x => x.Length >= MAP.MinLength).ToDictionary(x => x[MAP[LineMap.Type.OldName]], x => x[MAP[LineMap.Type.NewName]]);
+                        ptp.ImportNames(NameDic, Static.NewEncoding());
+                    }
                 }
             }
-            else if (objectFile.Object is PersonaEditorLib.FileStructure.Text.StringList strlst)
+            else if (objectFile.Object is StringList strlst)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
-                string[] importedtext;
                 if (File.Exists(path))
                 {
-                    importedtext = File.ReadAllLines(path, parameters.Encode);
-                    strlst.ImportText(importedtext, parameters.Map, parameters.SkipEmpty);
+                    string[][] importedtext = File.ReadAllLines(path, parameters.Encode).Select(x => x.Split('\t')).
+                        Where(x => x.Length > 1 && x[1] != "").ToArray();
+                    strlst.ImportText(importedtext);
                 }
             }
         }
 
-        static void ExportByType(ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportByType(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is IPersonaFile pFile)
+            if (objectFile.Object is IGameFile pFile)
             {
                 var sublist = pFile.SubFiles;
 
                 foreach (var a in sublist)
                 {
                     string path = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
-                    if (a.Object is IPersonaFile pfile && pFile.Type == GetFileType(value))
-                        File.WriteAllBytes(path, pfile.Get());
+                    if (pFile.Type == GetFileType(value))
+                        File.WriteAllBytes(path, pFile.GetData());
                 }
             }
         }
 
-        static void SubFileAction(Action<ObjectFile, string, string, Parameters> action, ObjectFile objectFile, string value, string openedFileDir, Parameters parameters)
+        static void SubFileAction(Action<ObjectContainer, string, string, Parameters> action, ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
             action.Invoke(objectFile, value, openedFileDir, parameters);
 
-            if (parameters.Sub && objectFile.Object is IPersonaFile pFile)
+            if (parameters.Sub && objectFile.Object is IGameFile pFile)
             {
                 var sublist = pFile.SubFiles;
                 foreach (var a in sublist)
@@ -352,59 +313,42 @@ namespace PersonaEditor
             }
         }
 
-        static FileType GetFileType(string type)
+        static FormatEnum GetFileType(string type)
         {
-            if (type == "BIN")
-                return FileType.BIN;
-            else if (type == "SPR")
-                return FileType.SPR;
-            else if (type == "TMX")
-                return FileType.TMX;
-            else if (type == "BF")
-                return FileType.BF;
-            else if (type == "PM1")
-                return FileType.PM1;
-            else if (type == "BMD")
-                return FileType.BMD;
-            else if (type == "FNT")
-                return FileType.FNT;
-            else if (type == "BVP")
-                return FileType.BVP;
-            else if (type == "HEX")
-                return FileType.DAT;
+            if (Enum.TryParse(type, out FormatEnum formatEnum))
+                return formatEnum;
             else
-                return FileType.Unknown;
+                return FormatEnum.Unknown;
         }
 
-        static void ExportAll(ObjectFile objectFile, string openedFileDir)
+        static void ExportAll(ObjectContainer objectFile, string openedFileDir)
         {
-            if (objectFile.Object is IPersonaFile pFile)
+            if (objectFile.Object is IGameFile pFile)
             {
                 var sublist = pFile.SubFiles;
 
                 foreach (var a in sublist)
                 {
                     string newpath = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
-                    if (a.Object is IPersonaFile pfile)
-                        File.WriteAllBytes(newpath, pfile.Get());
+                    File.WriteAllBytes(newpath, pFile.GetData());
                 }
             }
         }
 
-        static void ImportAll(ObjectFile objectFile, string openedFileDir)
+        static void ImportAll(ObjectContainer objectFile, string openedFileDir)
         {
-            if (objectFile.Object is IPersonaFile pFile)
+            if (objectFile.Object is IGameFile pFile)
             {
                 var sublist = pFile.SubFiles;
 
                 foreach (var a in sublist)
                 {
                     string newpath = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
-                    FileType fileType = ((IPersonaFile)a.Object).Type;
+                    FormatEnum fileType = ((IGameFile)a.Object).Type;
 
                     if (File.Exists(newpath))
                     {
-                        var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(objectFile.Name, File.ReadAllBytes(newpath), fileType);
+                        var file = GameFormatHelper.OpenFile(objectFile.Name, File.ReadAllBytes(newpath), fileType);
                         if (file.Object != null)
                             a.Object = file.Object;
                     }
@@ -412,29 +356,28 @@ namespace PersonaEditor
             }
         }
 
-        static void SaveFile(ObjectFile objectFile, string savePath, string openedFileDir, Parameters parameters)
+        static void SaveFile(ObjectContainer objectFile, string savePath, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is PersonaEditorLib.FileStructure.Text.PTP ptp)
+            if (objectFile.Object is PTP ptp)
             {
                 if (parameters.AsBMD)
                 {
                     string path = savePath == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".BMD") : savePath;
                     Encoding encoding = Static.NewEncoding();
-                    PersonaEditorLib.FileStructure.Text.BMD bmd = new PersonaEditorLib.FileStructure.Text.BMD();
-                    bmd.Open(objectFile.Object as PersonaEditorLib.FileStructure.Text.PTP, encoding);
-                    var temp = bmd.Get();
-                    File.WriteAllBytes(path, bmd.Get());
+                    BMD bmd = new BMD();
+                    bmd.Open(objectFile.Object as PTP, encoding);
+                    File.WriteAllBytes(path, bmd.GetData());
                 }
                 else
                 {
                     string path = savePath == "" ? Path.Combine(openedFileDir, objectFile.Name) : savePath;
-                    File.WriteAllBytes(path, ptp.Get());
+                    File.WriteAllBytes(path, ptp.GetData());
                 }
             }
-            else if (objectFile.Object is IFile pFile)
+            else if (objectFile.Object is IGameFile pFile)
             {
                 string path = savePath == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + "(NEW)" + Path.GetExtension(objectFile.Name)) : savePath;
-                File.WriteAllBytes(path, pFile.Get());
+                File.WriteAllBytes(path, pFile.GetData());
             }
         }
     }

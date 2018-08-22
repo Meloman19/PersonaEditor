@@ -1,11 +1,5 @@
-﻿using PersonaEditorGUI.Classes;
-using PersonaEditorLib;
-using PersonaEditorLib.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AuxiliaryLibraries.WPF;
+using PersonaEditorGUI.Classes;
 using System.Windows.Input;
 
 namespace PersonaEditorGUI.Controls
@@ -30,11 +24,11 @@ namespace PersonaEditorGUI.Controls
             Close();
         }
 
-        public MouseButtonEventHandler MouseUp => MouseButtonUp;
+        public ICommand MouseUp { get; }
 
-        private void MouseButtonUp(object sender, MouseButtonEventArgs e)
+        private void MouseButtonUp(object arg)
         {
-            if (e.ChangedButton == MouseButton.Middle)
+            if ((arg as MouseButtonEventArgs).ChangedButton == MouseButton.Middle)
                 Close();
         }
 
@@ -68,7 +62,7 @@ namespace PersonaEditorGUI.Controls
             }
         }
         public bool IsClosable { get; set; } = true;
-        public UserTreeViewItem PersonaFile { get; set; } = null;
+        public TreeViewItemVM PersonaFile { get; set; } = null;
 
         public bool Close()
         {
@@ -90,6 +84,7 @@ namespace PersonaEditorGUI.Controls
 
         public ClosableTabItemVM()
         {
+            MouseUp = new RelayCommand(MouseButtonUp);
             FileClose = new RelayCommand(CloseFile);
         }
     }

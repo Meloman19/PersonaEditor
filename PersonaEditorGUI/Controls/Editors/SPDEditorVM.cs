@@ -1,78 +1,77 @@
-﻿using System;
+﻿using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.GameFormat.Sprite;
+using AuxiliaryLibraries.GameFormat.SpriteContainer;
+using AuxiliaryLibraries.WPF;
+using PersonaEditor;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows;
-using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat;
-using AuxiliaryLibraries.GameFormat.SpriteContainer;
-using AuxiliaryLibraries.GameFormat.Sprite;
-using PersonaEditor;
 
 namespace PersonaEditorGUI.Controls.Editors
 {
-    class SPRKeyVM : BindingObject
+    class SPDKeyVM : BindingObject
     {
-        SPRKey Key;
+        SPDKey Key;
 
         private bool _IsSelected = false;
 
-        public string Name
-        {
-            get { return Key.mComment; }
-        }
+        public string Name => Encoding.GetEncoding("shift-jis").GetString(Key.Comment.Where(x => x != 0x00).ToArray());
+
         public int X1
         {
-            get { return Key.X1; }
+            get { return Key.X0; }
             set
             {
-                if (value != Key.X1)
+                if (value != Key.X0)
                 {
-                    Key.X1 = value;
-                    Notify("X1");
+                    Key.X0 = value;
+                    Notify("X1"); Notify("X2");
                     Notify("Rect");
                 }
             }
         }
         public int X2
         {
-            get { return Key.X2; }
+            get { return Key.X0 + Key.Xdel; }
             set
             {
-                if (value != Key.X2)
+                if (value != Key.X0 + Key.Xdel)
                 {
-                    Key.X2 = value;
-                    Notify("X2");
+                    Key.Xdel = value - Key.X0;
+                    Notify("X1"); Notify("X2");
                     Notify("Rect");
                 }
             }
         }
         public int Y1
         {
-            get { return Key.Y1; }
+            get { return Key.Y0; }
             set
             {
-                if (value != Key.Y1)
+                if (value != Key.Y0)
                 {
-                    Key.Y1 = value;
-                    Notify("Y1");
+                    Key.Y0 = value;
+                    Notify("Y1"); Notify("Y2");
                     Notify("Rect");
                 }
             }
         }
         public int Y2
         {
-            get { return Key.Y2; }
+            get { return Key.Y0 + Key.Ydel; }
             set
             {
-                if (value != Key.Y2)
+                if (value != Key.Y0 + Key.Ydel)
                 {
-                    Key.Y2 = value;
-                    Notify("Y2");
+                    Key.Ydel = value - Key.Y0;
+                    Notify("Y1"); Notify("Y2");
                     Notify("Rect");
                 }
             }
@@ -96,13 +95,13 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public SPRKeyVM(SPRKey key)
+        public SPDKeyVM(SPDKey key)
         {
             Key = key ?? throw new ArgumentNullException("key");
         }
     }
 
-    class SPRTextureVM : BindingObject
+    class SPDTextureVM : BindingObject
     {
         ObjectContainer texture;
 
@@ -121,16 +120,16 @@ namespace PersonaEditorGUI.Controls.Editors
             }
         }
 
-        public SPRTextureVM(ObjectContainer tmx, IList<SPRKey> keylist, int textureindex)
+        public SPDTextureVM(ObjectContainer dds, IList<SPDKey> keylist, int index)
         {
-            texture = tmx ?? throw new ArgumentNullException("tmx");
-            if (texture.Object == null) throw new ArgumentNullException("tmx.Object");
-            var list = (keylist ?? throw new ArgumentNullException("keylist")).Where(x => x.mTextureIndex == textureindex);
+            texture = dds ?? throw new ArgumentNullException("dds");
+            if (texture.Object == null) throw new ArgumentNullException("dds.Object");
+            var list = (keylist ?? throw new Exception("keylist")).Where(x => x.TextureIndex == index);
 
-            TextureImage = (tmx.Object as TMX).GetBitmap().GetBitmapSource();
+            TextureImage = (dds.Object as DDS).GetBitmap().GetBitmapSource();
 
             foreach (var a in list)
-                KeyList.Add(new SPRKeyVM(a));
+                KeyList.Add(new SPDKeyVM(a));
         }
 
         #region PublicProperties
@@ -139,15 +138,7 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public DrawingCollection Drawings { get; } = new DrawingCollection();
 
-        public string Name
-        {
-            get
-            {
-                if (texture.Object is TMX tmx)
-                    return tmx.Comment;
-                else return texture.Name;
-            }
-        }
+        public string Name => texture.Name;
 
         public BitmapSource TextureImage
         {
@@ -167,25 +158,25 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             set
             {
-                if (_SelectedItem is SPRKeyVM it)
-                    it.IsSelected = false;
+                if (_SelectedItem is SPDKeyVM itt)
+                    itt.IsSelected = false;
                 _SelectedItem = value;
-                if (_SelectedItem is SPRKeyVM it2)
-                    it2.IsSelected = true;
+                if (_SelectedItem is SPDKeyVM itt2)
+                    itt2.IsSelected = true;
             }
         }
 
         #endregion PublicProperties
     }
 
-    class SPREditorVM : BindingObject, IViewModel
+    class SPDEditorVM : BindingObject, IViewModel
     {
         public ObservableCollection<object> TextureList { get; set; } = new ObservableCollection<object>();
 
-        public SPREditorVM(SPR spr)
+        public SPDEditorVM(SPD spd)
         {
-            for (int i = 0; i < spr.SubFiles.Count; i++)
-                TextureList.Add(new SPRTextureVM(spr.SubFiles[i], spr.KeyList.List, i));
+            for (int i = 0; i < spd.SubFiles.Count; i++)
+                TextureList.Add(new SPDTextureVM(spd.SubFiles[i], spd.KeyList, i));
         }
 
         public bool Close()

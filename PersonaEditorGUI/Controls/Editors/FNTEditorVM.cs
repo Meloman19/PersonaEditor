@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PersonaEditorLib;
-using PersonaEditorLib.FileStructure.FNT;
-using PersonaEditorLib.Interfaces;
+﻿using AuxiliaryLibraries.GameFormat.Other.FNT;
+using AuxiliaryLibraries.WPF;
 
 namespace PersonaEditorGUI.Controls.Editors
 {

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using PersonaEditorLib;
-using PersonaEditorLib.FileStructure.Text;
-using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows;
+using AuxiliaryLibraries.WPF;
+using AuxiliaryLibraries.GameFormat.Text;
+using AuxiliaryLibraries;
+using AuxiliaryLibraries.GameFormat;
+using PersonaEditor;
 
 namespace PersonaEditorGUI.Classes.Visual
 {
@@ -16,13 +17,48 @@ namespace PersonaEditorGUI.Classes.Visual
 
     class TextVisual : BindingObject
     {
+        public static System.Drawing.Color[] CreatePallete(Color color, AuxiliaryLibraries.Media.PixelFormat pixelformat)
+        {
+            int colorcount = 0;
+            byte step = 0;
+            if (pixelformat == AuxiliaryLibraries.Media.PixelFormats.Indexed4)
+            {
+                colorcount = 16;
+                step = 0x10;
+            }
+            else if (pixelformat == AuxiliaryLibraries.Media.PixelFormats.Indexed8)
+            {
+                colorcount = 256;
+                step = 1;
+            }
+
+
+            List<System.Drawing.Color> ColorBMP = new List<System.Drawing.Color>();
+            ColorBMP.Add(System.Drawing.Color.FromArgb(0, 0, 0, 0));
+            for (int i = 1; i < colorcount; i++)
+                ColorBMP.Add(System.Drawing.Color.FromArgb(
+                    ByteTruncate(i * step),
+                    color.R,
+                    color.G,
+                    color.B));
+
+            return ColorBMP.ToArray();
+        }
+
+        public static byte ByteTruncate(int value)
+        {
+            if (value < 0) { return 0; }
+            else if (value > 255) { return 255; }
+            else { return (byte)value; }
+        }
+
         public event VisualChangedEventHandler VisualChanged;
 
         CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         Func<ImageData> GetData;
 
-        PersonaEditorLib.PersonaEncoding.PersonaFont Font;
+        PersonaFont Font;
 
         #region PrivateField
 
@@ -42,7 +78,7 @@ namespace PersonaEditorGUI.Classes.Visual
             set
             {
                 _Data = value;
-                _Image = _Data.GetImageSource(PersonaEditorLib.Utilities.UtilitiesTool.CreatePallete(Color, _Data.PixelFormat));
+                _Image = _Data.GetImageSource(CreatePallete(Color, _Data.PixelFormat)).GetBitmapSource();
                 TextDrawing.ImageSource = _Image;
                 _Rect = GetSize(Start, _Data.PixelWidth, _Data.PixelHeight);
                 TextDrawing.Rect = _Rect;
@@ -75,7 +111,7 @@ namespace PersonaEditorGUI.Classes.Visual
                 if (_Color != value)
                 {
                     _Color = value;
-                    _Image = _Data.GetImageSource(PersonaEditorLib.Utilities.UtilitiesTool.CreatePallete(Color, _Data.PixelFormat));
+                    _Image = _Data.GetImageSource(CreatePallete(Color, _Data.PixelFormat))?.GetBitmapSource();
                     VisualChanged?.Invoke(_Image, _Rect);
                 }
             }
@@ -138,7 +174,7 @@ namespace PersonaEditorGUI.Classes.Visual
             return new Rect(start, new Size(Width, Height));
         }
 
-        public void UpdateText(IList<TextBaseElement> List, PersonaEditorLib.PersonaEncoding.PersonaFont Font = null)
+        public void UpdateText(IList<TextBaseElement> List, PersonaFont Font = null)
         {
             Text = List.ToArray();
             if (Font != null)
@@ -173,7 +209,7 @@ namespace PersonaEditorGUI.Classes.Visual
                 }
         }
 
-        public void UpdateFont(PersonaEditorLib.PersonaEncoding.PersonaFont Font)
+        public void UpdateFont(PersonaFont Font)
         {
             this.Font = Font;
             UpdateText();
@@ -184,7 +220,7 @@ namespace PersonaEditorGUI.Classes.Visual
             GetData = new Func<ImageData>(CreateData);
         }
 
-        public TextVisual(PersonaEditorLib.PersonaEncoding.PersonaFont Font)
+        public TextVisual(PersonaFont Font)
         {
             this.Font = Font;
             GetData = new Func<ImageData>(CreateData);

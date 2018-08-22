@@ -1,13 +1,13 @@
-﻿using PersonaEditorGUI.Classes;
-using PersonaEditorLib;
-using PersonaEditorLib.Interfaces;
+﻿using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.GameFormat.Other;
+using AuxiliaryLibraries.GameFormat.SpriteContainer;
+using AuxiliaryLibraries.GameFormat.Text;
+using AuxiliaryLibraries.WPF;
+using PersonaEditorGUI.Classes;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -34,14 +34,14 @@ namespace PersonaEditorGUI.Controls
             }
         }
 
-        public DragEventHandler Drop => SingleFileEdit_Drop;
-        private void SingleFileEdit_Drop(object sender, DragEventArgs e)
+        public ICommand Drop { get; }
+        private void SingleFileEdit_Drop(object arg)
         {
-            var data = e.Data.GetData(typeof(UserTreeViewItem));
-            if (data is UserTreeViewItem objF)
+            var data = (arg as DragEventArgs).Data.GetData(typeof(TreeViewItemVM));
+            if (data is TreeViewItemVM objF)
                 Open(objF);
         }
-        
+
         public bool CloseAll()
         {
             bool returned = true;
@@ -53,7 +53,7 @@ namespace PersonaEditorGUI.Controls
             return returned;
         }
 
-        public bool Open(UserTreeViewItem sender)
+        public bool Open(TreeViewItemVM sender)
         {
             if (!sender.CanEdit())
             {
@@ -61,35 +61,35 @@ namespace PersonaEditorGUI.Controls
                 return false;
             }
 
-            if (sender.PersonaFile.Object is IPersonaFile pf)
+            if (sender.PersonaFile.Object is IGameFile pf)
             {
                 TabItemType DataContextType = TabItemType.Null;
                 object DataContext;
                 string Title = sender.PersonaFile.Name;
 
-                if (pf.Type == FileType.SPR)
+                if (pf.Type == FormatEnum.SPR)
                 {
-                    DataContext = new Editors.SPREditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.SPR.SPR);
+                    DataContext = new Editors.SPREditorVM(sender.PersonaFile.Object as SPR);
                     DataContextType = TabItemType.SPR;
                 }
-                else if (pf.Type == FileType.SPD)
+                else if (pf.Type == FormatEnum.SPD)
                 {
-                    DataContext = new Editors.SPREditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.SPR.SPD);
+                    DataContext = new Editors.SPDEditorVM(sender.PersonaFile.Object as SPD);
                     DataContextType = TabItemType.SPR;
                 }
-                else if (pf.Type == FileType.PTP)
+                else if (pf.Type == FormatEnum.PTP)
                 {
-                    DataContext = new Editors.PTPEditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.Text.PTP);
+                    DataContext = new Editors.PTPEditorVM(sender.PersonaFile.Object as PTP);
                     DataContextType = TabItemType.PTP;
                 }
-                else if (pf.Type == FileType.BMD)
+                else if (pf.Type == FormatEnum.BMD)
                 {
                     DataContext = new Editors.BMDEditorVM(sender.PersonaFile);
                     DataContextType = TabItemType.BMD;
                 }
-                else if (pf.Type == FileType.FTD)
+                else if (pf.Type == FormatEnum.FTD)
                 {
-                    DataContext = new Editors.FTDEditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.Text.FTD);
+                    DataContext = new Editors.FTDEditorVM(sender.PersonaFile.Object as FTD);
                     DataContextType = TabItemType.FTD;
                 }
                 //else if (pf.Type == FileType.FNT)
@@ -97,9 +97,9 @@ namespace PersonaEditorGUI.Controls
                 //    DataContext = new Editors.FNTEditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.FNT.FNT);
                 //    DataContextType = TabItemType.FNT;
                 //}
-                else if (pf.Type == FileType.DAT)
+                else if (pf.Type == FormatEnum.DAT)
                 {
-                    DataContext = new Editors.HEXEditorVM(sender.PersonaFile.Object as PersonaEditorLib.FileStructure.DAT);
+                    DataContext = new Editors.HEXEditorVM(sender.PersonaFile.Object as DAT);
                     DataContextType = TabItemType.HEX;
                 }
                 else
@@ -138,14 +138,9 @@ namespace PersonaEditorGUI.Controls
         {
             string tabtitle = "";
             tabtitle = Application.Current.Resources.MergedDictionaries.GetString("main_Preview");
-
+            Drop = new RelayCommand(SingleFileEdit_Drop);
             tabCollection.Add(new ClosableTabItemVM() { TabTitle = tabtitle, IsClosable = false, DataContext = previewVM, DataContextType = TabItemType.ImagePreview });
             TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(tabCollection);
-        }
-
-        public void SetPropertiesTable(ReadOnlyObservableCollection<PropertyClass> PropertiesView)
-        {
-            previewVM.SetPropertiesTable(PropertiesView);
         }
     }
 }

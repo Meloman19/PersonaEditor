@@ -1,12 +1,11 @@
-﻿using PersonaEditorLib;
-using PersonaEditorLib.Interfaces;
+﻿using AuxiliaryLibraries.GameFormat.Text;
+using AuxiliaryLibraries.Tool;
+using AuxiliaryLibraries.WPF;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -31,7 +30,7 @@ namespace PersonaEditorGUI.Controls.Editors
         public void SetEncoding(Encoding encoding)
         {
             this.encoding = encoding;
-            _EntryString = encoding.GetString(entry);
+            SetString();
             Notify("EntryString");
         }
 
@@ -47,9 +46,14 @@ namespace PersonaEditorGUI.Controls.Editors
         {
             this.entry = entry;
             encoding = Static.EncodingManager.GetPersonaEncoding(Settings.AppSetting.Default.FTDEncoding);
-            _EntryString = encoding.GetString(entry);
+            SetString();
             Create();
             CreateContextMenu();
+        }
+
+        private void SetString()
+        {
+            _EntryString = encoding.GetString(entry);
         }
 
         private void Create()
@@ -62,7 +66,7 @@ namespace PersonaEditorGUI.Controls.Editors
                 {
                     while ((i + 1) % 16 != 0)
                     {
-                        _Entry += " 00";
+                        _Entry += " ..";
                         i++;
                     }
                     continue;
@@ -93,7 +97,7 @@ namespace PersonaEditorGUI.Controls.Editors
             string text = Regex.Replace(Clipboard.GetText(), "\r\n|\r|\n", "");
             try
             {
-                byte[] array = PersonaEditorLib.Utilities.String.SplitString(text, ' ');
+                byte[] array = StringTool.SplitString(text, ' ');
                 for (int i = 0; i < entry.Length; i++)
                 {
                     if (i < array.Length)
@@ -168,11 +172,11 @@ namespace PersonaEditorGUI.Controls.Editors
                 _Entry += String.Format("{0:X2}", entry[0][i]);
                 if (i + 1 == entry[0].Length)
                 {
-                    // while ((i + 1) % 16 != 0)
-                    // {
-                    //     _Entry += " 00";
-                    //     i++;
-                    // }
+                    while ((i + 1) % 16 != 0)
+                    {
+                        _Entry += " ..";
+                        i++;
+                    }
                     continue;
                 }
                 _Entry += " ";
@@ -226,7 +230,7 @@ namespace PersonaEditorGUI.Controls.Editors
             string text = Regex.Replace(Clipboard.GetText(), "\r\n|\r|\n", "");
             try
             {
-                entry[0] = PersonaEditorLib.Utilities.String.SplitString(text, ' ');
+                entry[0] = StringTool.SplitString(text, ' ');
                 Create();
                 Notify("Entry");
                 Notify("EntryString");
@@ -242,10 +246,10 @@ namespace PersonaEditorGUI.Controls.Editors
 
     class FTDEditorVM : BindingObject, IViewModel
     {
-        PersonaEditorLib.FileStructure.Text.FTD ftd;
+        FTD ftd;
 
         public ICommand CopyAll { get; }
-        public ICommand PasteAll { get; }
+        public ICommand Import { get; }
 
         public ObservableCollection<FTDEntryVM> Entries { get; } = new ObservableCollection<FTDEntryVM>();
 
@@ -266,10 +270,10 @@ namespace PersonaEditorGUI.Controls.Editors
 
         public FontFamily FontFamily { get; } = new FontFamily(System.Drawing.FontFamily.GenericMonospace.Name);
 
-        public FTDEditorVM(PersonaEditorLib.FileStructure.Text.FTD ftd)
+        public FTDEditorVM(FTD ftd)
         {
             CopyAll = new RelayCommand(copyAll);
-            PasteAll = new RelayCommand(pasteAll);
+            Import = new RelayCommand(import);
 
             EncodingList = Static.EncodingManager.EncodingList;
             selectEncodingIndex = Static.EncodingManager.GetPersonaEncodingIndex(Settings.AppSetting.Default.FTDEncoding);
@@ -286,7 +290,21 @@ namespace PersonaEditorGUI.Controls.Editors
 
         private void copyAll()
         {
+            var enc = Static.EncodingManager.GetPersonaEncoding(Settings.AppSetting.Default.FTDEncoding);
             List<string> returned = new List<string>();
+
+            //foreach (var a in ftd.Entries[0])
+            //{
+            //    byte[] buffer = new byte[32];
+            //    for (int i = 0; i < 20; i++)
+            //    {
+            //        Buffer.BlockCopy(a, i * 48, buffer, 0, 32);
+            //        returned.Add(enc.GetString(buffer).TrimEnd('\0'));
+            //    }
+            //}
+
+            //returned = returned.Distinct().ToList();
+
             foreach (var a in Entries)
             {
                 if (a.SubItems.Count != 0)
@@ -300,16 +318,18 @@ namespace PersonaEditorGUI.Controls.Editors
             Clipboard.SetText(String.Join(System.Environment.NewLine, returned));
         }
 
-        private void pasteAll()
+        private void import()
         {
-            if (!Clipboard.ContainsText())
-                return;
+        //    var oldEncoding = Static.EncodingManager.GetPersonaEncoding("P5_ENG");
+        //    var newEncoding = Static.EncodingManager.GetPersonaEncoding("P5_RUS");
 
-            string imported = Clipboard.GetText();
-            var text = Regex.Split(imported, "\r\n|\r|\n").Select(x => x.Split('\t')).ToList();
+        //    string importText = @"d:\PS3\AutoPack\Text\fldResident_fldPanelMsgDng.txt";
+        //    List<string[]> import = File.ReadAllLines(importText).Select(x => x.Split('\t')).Where(x => x.Length > 1 && x[1] != "").ToList();
 
-            ftd.ImportText(text, Static.EncodingManager.GetPersonaEncoding(selectEncodingIndex));
-            Init();
+        //    byte[] buffer = new byte[32];
+
+        //    for (int i = 0; i < 20; i++)
+        //        ftd.ImportText(import, oldEncoding, newEncoding, i * 48, 932 - i * 48);
         }
 
         public bool Close()

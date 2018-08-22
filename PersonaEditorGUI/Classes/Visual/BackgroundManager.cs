@@ -1,12 +1,7 @@
-﻿using PersonaEditorLib;
-using System;
+﻿using AuxiliaryLibraries.WPF;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PersonaEditorGUI.Classes.Visual
 {
@@ -40,7 +35,7 @@ namespace PersonaEditorGUI.Classes.Visual
                     }
             }
 
-            new EventWrapper(Settings.BackgroundDefault.Default, this);
+            new EventWrapperINPC(Settings.BackgroundDefault.Default, this);
         }
 
         public Background GetBackground(int index)

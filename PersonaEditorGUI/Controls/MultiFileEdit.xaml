@@ -8,11 +8,14 @@
              xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
              xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
              xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
+             xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
+             xmlns:convert ="clr-namespace:PersonaEditorGUI.ArgConverters"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="900">
 
     <UserControl.Resources>
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <convert:DropConverter x:Key="DropConv"/>
     </UserControl.Resources>
 
     <Grid>
@@ -36,7 +39,14 @@
 
                 <controls:TreeViewPE Grid.Row="0" DataContext="{Binding Tree}"/>
                 <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
-                    <Grid AllowDrop="True" classes:Event.Drop="{Binding Drop}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
+                    <Grid AllowDrop="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
+                        <wpf:Interaction.Triggers>
+                            <wpf:EventTrigger EventName="Drop">
+                                <wpf:EventTrigger.Actions>
+                                    <wpf:ActionInvokeCommand Command="{Binding Drop}" CommandArgConverter="{StaticResource DropConv}"/>
+                                </wpf:EventTrigger.Actions>
+                            </wpf:EventTrigger>
+                        </wpf:Interaction.Triggers>
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource main_DropFile}" TextAlignment="Center"/>
                     </Grid>
                 </Border>

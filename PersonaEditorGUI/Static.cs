@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PersonaEditor;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,8 +33,10 @@ namespace PersonaEditorGUI
             };
         }
 
-        public static PersonaEditorLib.PersonaEncoding.PersonaEncodingManager EncodingManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaEncodingManager(Paths.DirFont);
-        public static PersonaEditorLib.PersonaEncoding.PersonaFontManager FontManager { get; } = new PersonaEditorLib.PersonaEncoding.PersonaFontManager(Paths.DirFont);
+        public static PersonaEncodingManager EncodingManager { get; } = new PersonaEncodingManager(Paths.DirFont);
+        public static PersonaFontManager FontManager { get; } = new PersonaFontManager(Paths.DirFont);
         public static Classes.Visual.BackgroundManager BackManager { get; } = new Classes.Visual.BackgroundManager(Paths.DirBackgrounds);
+
+        public static string OpenedFile = "";
     }
 }

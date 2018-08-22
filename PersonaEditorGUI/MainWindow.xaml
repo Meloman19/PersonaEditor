@@ -3,12 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:PersonaEditorGUI"
         xmlns:converters="clr-namespace:PersonaEditorGUI.Classes.Converters"
         xmlns:controls="clr-namespace:PersonaEditorGUI.Controls"
         xmlns:settings="clr-namespace:PersonaEditorGUI.Settings"
         xmlns:classes="clr-namespace:PersonaEditorGUI.Classes"
+        xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
         xmlns:v="clr-namespace:System;assembly=mscorlib"
+        xmlns:convert ="clr-namespace:PersonaEditorGUI.ArgConverters"
         mc:Ignorable="d"
         Title="Persona Editor GUI" 
         Left="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosX, Mode=TwoWay}"
@@ -16,14 +19,22 @@
         WindowState="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWState, Mode=TwoWay}"
         Height="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWHeight, Mode=TwoWay}"
         Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWWidth, Mode=TwoWay}"
-        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-        classes:Event.Closing="{Binding Path=WindowClosing}">
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Window.Resources>
         <v:Int32 x:Key="MyInt">10</v:Int32>
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <BitmapImage x:Key="Setting" UriSource="Resource/settings-work-tool.png"/>
+        <convert:SecondArgTranslator x:Key="Translator"/>
     </Window.Resources>
+    
+    <wpf:Interaction.Triggers>
+        <wpf:EventTrigger EventName="Closing">
+            <wpf:EventTrigger.Actions>
+                <wpf:ActionInvokeCommand Command="{Binding Closing}" CommandArgConverter="{StaticResource Translator}"/>
+            </wpf:EventTrigger.Actions>
+        </wpf:EventTrigger>
+    </wpf:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -48,7 +59,7 @@
             <MenuItem Header="{DynamicResource main_About}" Command="{Binding Path=clickAboutOpen}"/>
         </Menu>
         <Separator Grid.Row="1"/>
-        
+
         <controls:MultiFileEdit DataContext="{Binding MultiFile}" Grid.Row="2"/>
     </Grid>
 </Window>

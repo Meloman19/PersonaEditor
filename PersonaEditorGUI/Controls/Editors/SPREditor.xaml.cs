@@ -36,7 +36,13 @@ namespace PersonaEditorGUI.Controls.Editors
         private void ItemsControl_MouseMove(object sender, MouseEventArgs e)
         {
             var sen = sender as FrameworkElement;
-            Rect temp = (sen.DataContext as TextureVM).Rect;
+            Rect temp;
+            if (sen.DataContext is SPRTextureVM spr)
+                temp = spr.Rect;
+            if (sen.DataContext is SPDTextureVM spd)
+                temp = spd.Rect;
+            else
+                return;
 
             var a = e.GetPosition(sender as IInputElement);
 

@@ -1,21 +1,16 @@
-﻿using Microsoft.Win32;
+﻿using AuxiliaryLibraries.GameFormat;
+using AuxiliaryLibraries.WPF;
+using PersonaEditor;
 using PersonaEditorGUI.Classes;
-using PersonaEditorLib;
-using PersonaEditorLib.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace PersonaEditorGUI.Controls
 {
     class MultiFileEditVM : BindingObject
     {
-        // private FileStream FileStream;
-
         public TreeViewPEVM Tree { get; } = new TreeViewPEVM();
         public PreviewEditorTabControlVM Tab { get; } = new PreviewEditorTabControlVM();
 
@@ -33,8 +28,7 @@ namespace PersonaEditorGUI.Controls
             }
         }
 
-        private string _OpenFileName = "";
-        public string OpenFileName => _OpenFileName;
+        public string OpenFileName => Static.OpenedFile;
 
         private string statusBar = "";
         public string StatusBar => statusBar;
@@ -55,14 +49,14 @@ namespace PersonaEditorGUI.Controls
                 //    PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)),
                 //    new StreamFile(FileStream, FileStream.Length, 0));
 
-                var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
+                var file = GameFormatHelper.OpenFile(Path.GetFileName(path),
                     File.ReadAllBytes(path),
-                    PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)));
+                    GameFormatHelper.GetFormat(Path.GetFileName(path)));
 
                 if (file.Object != null)
                 {
                     Tree.SetRoot(file);
-                    _OpenFileName = Path.GetFullPath(path);
+                    Static.OpenedFile = Path.GetFullPath(path);
                 }
             }
         }
@@ -73,8 +67,8 @@ namespace PersonaEditorGUI.Controls
             {
                 var root = Tree.GetRoot();
                 if (root != null)
-                    if (root.Object is IPersonaFile pFile)
-                        File.WriteAllBytes(path, pFile.Get());
+                    if (root.Object is IGameFile pFile)
+                        File.WriteAllBytes(path, pFile.GetData());
             }
         }
 
@@ -104,44 +98,51 @@ namespace PersonaEditorGUI.Controls
 
         #region Events
 
-        public DragEventHandler Drop => DropItem;
-        private void DropItem(object sender, DragEventArgs e)
+        public ICommand Drop { get; }
+        private void DropItem(object arg)
         {
-            string[] temp = e.Data.GetData(DataFormats.FileDrop) as string[];
+            string[] temp = (arg as DragEventArgs).Data.GetData(DataFormats.FileDrop) as string[];
             if (temp.Length > 0)
                 OpenFile(temp[0]);
         }
 
-        private void Tree_SelectedItemDataOpen(UserTreeViewItem sender)
+        private void Tree_ItemSelected(TreeViewItemVM sender)
+        {
+            Tab.SetPreview(sender.BitmapSource);
+
+            statusBar = "";
+            if (sender.PersonaFile.Object is IGameFile file)
+            {
+                int size = file.GetSize();
+                statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
+                Notify("StatusBar");
+            }
+        }
+
+        private void Tree_ItemOpen(TreeViewItemVM sender)
         {
             MainWindowType = "Single";
             Tab.Open(sender);
         }
 
-        private void Tree_SelectedItemData(UserTreeViewItem sender)
+        private void Tree_ItemSaveAs(TreeViewItemVM sender)
         {
-            if (sender.PersonaFile.Object is IImage image)
-                Tab.SetPreview(image.GetImage());
-            else
-                Tab.SetPreview(null);
-
-            statusBar = "";
-            if (sender.PersonaFile.Object is IFile file)
-            {
-                int size = file.Size();
-                statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
-                Notify("StatusBar");
-            }
-
-            Tab.SetPropertiesTable(sender.PropertiesView);
         }
 
         #endregion Events
 
         public MultiFileEditVM()
         {
-            Tree.SelectedItemChanged += Tree_SelectedItemData;
-            Tree.SelectedItemOpen += Tree_SelectedItemDataOpen;
+            Drop = new RelayCommand(DropItem);
+            Tree.ItemAction += Tree_ItemAction;
+        }
+
+        private void Tree_ItemAction(TreeViewItemVM sender, UserTreeViewItemEventEnum action)
+        {
+            if (action == UserTreeViewItemEventEnum.Selected)
+                Tree_ItemSelected(sender);
+            else if (action == UserTreeViewItemEventEnum.Open)
+                Tree_ItemOpen(sender);
         }
     }
 }

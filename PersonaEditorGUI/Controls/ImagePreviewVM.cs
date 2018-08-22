@@ -1,23 +1,11 @@
-﻿using PersonaEditorLib;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AuxiliaryLibraries.WPF;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace PersonaEditorGUI.Controls
 {
     public class ImagePreviewVM : BindingObject
     {
-        BitmapSource TransparentBackground = PersonaEditorLib.Utilities.WPF.CreateTransparentBackground(Colors.White, Colors.Gray, 50);
-        public BitmapSource Background2 => TransparentBackground;
-
-        public ReadOnlyObservableCollection<PropertyClass> PropertiesView { get; private set; }
-
         private ImageSource imageSource = null;
         public ImageSource SourceIMG
         {
@@ -59,12 +47,6 @@ namespace PersonaEditorGUI.Controls
         {
             background = Settings.AppSetting.Default.PreviewSelectedColor;
             SelectBack = new RelayCommand(SelectBackground);
-        }
-        
-        public void SetPropertiesTable(ReadOnlyObservableCollection<PropertyClass> PropertiesView)
-        {
-            this.PropertiesView = PropertiesView;
-            Notify("PropertiesView");
-        }
+        }        
     }
 }
