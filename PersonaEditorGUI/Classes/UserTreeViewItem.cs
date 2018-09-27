@@ -1,6 +1,7 @@
 ﻿using AuxiliaryLibraries.GameFormat;
 using AuxiliaryLibraries.GameFormat.Text;
 using AuxiliaryLibraries.WPF;
+using AuxiliaryLibraries.WPF.Wrapper;
 using Microsoft.Win32;
 using PersonaEditor;
 using PersonaEditorGUI.Classes.Delegates;

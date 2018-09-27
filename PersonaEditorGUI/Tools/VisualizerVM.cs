@@ -9,6 +9,7 @@ using AuxiliaryLibraries.WPF;
 using PersonaEditor;
 using AuxiliaryLibraries.GameFormat;
 using AuxiliaryLibraries.GameFormat.Text;
+using PersonaEditorGUI.Classes;
 
 namespace PersonaEditorGUI.Tools
 {

@@ -74,6 +74,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Release\AuxiliaryLibraries\AuxiliaryLibraries.WPF.dll</HintPath>
     </Reference>
+    <Reference Include="AuxiliaryLibraries.WPF.Wrapper">
+      <HintPath>..\..\..\Release\AuxiliaryLibraries\AuxiliaryLibraries.WPF.Wrapper.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -100,18 +103,19 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ArgConverters\DropConverter.cs" />
     <Compile Include="ArgConverters\MouseButtonConverter.cs" />
     <Compile Include="ArgConverters\MouseWheelConverter.cs" />
     <Compile Include="ArgConverters\PressEnterConverter.cs" />
     <Compile Include="ArgConverters\SecondArgTranslator.cs" />
     <Compile Include="Classes\CachedContentPresenter.cs" />
-    <Compile Include="Classes\Controls\TreeViewExtended.cs" />
     <Compile Include="Classes\Controls\ImageVisualizer.cs" />
     <Compile Include="Classes\Delegates\FileDelegates.cs" />
+    <Compile Include="Classes\PersonaEncodingManager.cs" />
     <Compile Include="Classes\PersonaFileHelper.cs" />
+    <Compile Include="Classes\PersonaFontManager.cs" />
     <Compile Include="Classes\ReadOnlyPropertyObserver.cs" />
     <Compile Include="Classes\UserTreeViewItemEventEnum.cs" />
+    <Compile Include="Classes\Visual\FNTGlyph.cs" />
     <Compile Include="Classes\Visual\TextVisual.cs" />
     <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Classes\Visual\Background.cs" />
@@ -123,13 +127,11 @@
     <Compile Include="Controls\ColorPicker\ColorPickerTool.xaml.cs">
       <DependentUpon>ColorPickerTool.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ColorPicker\Controls\CanvasRGB.xaml.cs">
-      <DependentUpon>CanvasRGB.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ColorPicker\Controls\NumericColorRGBA.xaml.cs">
-      <DependentUpon>NumericColorRGBA.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Classes\Converters\NullVisibilityConverter.cs" />
+    <Compile Include="Controls\Editors\FNTEditor.xaml.cs">
+      <DependentUpon>FNTEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Editors\FNTEditorVM.cs" />
     <Compile Include="Controls\Editors\FTDEditor.xaml.cs">
       <DependentUpon>FTDEditor.xaml</DependentUpon>
     </Compile>
@@ -144,20 +146,14 @@
     </Compile>
     <Compile Include="Controls\HexEditor\HexViewVM.cs" />
     <Compile Include="Controls\HexEditor\ScrollBarVM.cs" />
+    <Compile Include="Controls\Primitive\LabelHEX.cs" />
     <Compile Include="Controls\Primitive\NumericIncDec.xaml.cs">
       <DependentUpon>NumericIncDec.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ColorPicker\Controls\SliderRGB.xaml.cs">
-      <DependentUpon>SliderRGB.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Editors\BMDEditor.xaml.cs">
       <DependentUpon>BMDEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Editors\BMDEditorVM.cs" />
-    <Compile Include="Controls\Editors\FNTEditor.xaml.cs">
-      <DependentUpon>FNTEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Editors\FNTEditorVM.cs" />
     <Compile Include="Controls\Editors\HEXEditor.xaml.cs">
       <DependentUpon>HEXEditor.xaml</DependentUpon>
     </Compile>
@@ -270,13 +266,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\ColorPicker\Controls\CanvasRGB.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Controls\Editors\FNTEditor.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\ColorPicker\Controls\NumericColorRGBA.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\Editors\FTDEditor.xaml">
       <SubType>Designer</SubType>
@@ -294,15 +286,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\ColorPicker\Controls\SliderRGB.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Controls\Editors\BMDEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\Editors\FNTEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -4,9 +4,63 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-            
+             xmlns:wpfcontrol="clr-namespace:AuxiliaryLibraries.WPF.Controls;assembly=AuxiliaryLibraries.WPF"
+             mc:Ignorable="d" d:DesignHeight="432" d:DesignWidth="788">
+
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <ListBox ItemsSource="{Binding GlyphCuts}"
+                 SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" 
+                 SelectionMode="Single"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Image Width="70" Height="70" Source="{Binding Path=Image}" Margin="1"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+
+        <Grid Grid.Column="2" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Image Grid.Column="1" Grid.Row="1" x:FieldModifier="private" x:Name="Glyph">
+                <Image.Source>
+                    <DrawingImage Drawing="{Binding Glyph}"/>
+                </Image.Source>
+            </Image>
+
+            <StackPanel Grid.Row="2" Width="{Binding ElementName=Glyph, Path=ActualWidth}">
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Label Content="Left Cut "/>
+                    <Label Content="{Binding LeftCut}"/>
+                </StackPanel>
+                <Slider Minimum="0" Maximum="{Binding Max}" SmallChange="1"
+                        Value="{Binding LeftCut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="SkyBlue"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Label Content="Right Cut "/>
+                    <Label Content="{Binding RightCut}"/>
+                </StackPanel>
+                <Slider Minimum="0" Maximum="{Binding Max}" SmallChange="1"
+                        Value="{Binding RightCut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="IndianRed"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

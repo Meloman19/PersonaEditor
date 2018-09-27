@@ -1,4 +1,5 @@
 ﻿using PersonaEditor;
+using PersonaEditorGUI.Classes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ using System.Windows.Media.Imaging;
 
 namespace PersonaEditorGUI
 {
-    static class Static
+    internal static class Static
     {
         public static class Paths
         {

@@ -16,7 +16,7 @@
 
     <UserControl.Resources>
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
-        <convert:DropConverter x:Key="DropConv"/>
+        <convert:SecondArgTranslator x:Key="DropConv"/>
         <convert:MouseButtonConverter x:Key="MouseConv"/>
     </UserControl.Resources>
     
@@ -151,12 +151,7 @@
                                     <Border BorderBrush="Black" BorderThickness="1">
                                         <editors:PTPEditor/>
                                     </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editors:FNTEditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:FNTEditor/>
-                                    </Border>
-                                </DataTemplate>
+                                </DataTemplate>                               
                                 <DataTemplate DataType="{x:Type editors:HEXEditorVM}">
                                     <Border BorderBrush="Black" BorderThickness="1">
                                         <editors:HEXEditor/>
@@ -165,6 +160,11 @@
                                 <DataTemplate DataType="{x:Type editors:FTDEditorVM}">
                                     <Border BorderBrush="Black" BorderThickness="1">
                                         <editors:FTDEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editors:FNTEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:FNTEditor/>
                                     </Border>
                                 </DataTemplate>
                             </ContentControl.Resources>

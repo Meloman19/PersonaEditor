@@ -84,7 +84,7 @@ namespace PersonaEditorGUI.Tools
                 foreach (var a in font.DataList)
                 {
                     var pallete = new BitmapPalette(font.Palette.Select(x => System.Windows.Media.Color.FromArgb(x.A, x.R, x.G, x.B)).ToArray());
-                    var form = PersonaEditor.AuxWPFBinding.AuxToWPF(font.PixelFormat);
+                    var form = AuxiliaryLibraries.WPF.Wrapper.Imaging.AuxToWPF(font.PixelFormat);
                     var temp = new FnMpImg()
                     {
                         Index = a.Key,

@@ -10,6 +10,7 @@ using AuxiliaryLibraries.GameFormat.Text;
 using AuxiliaryLibraries;
 using AuxiliaryLibraries.GameFormat;
 using PersonaEditor;
+using AuxiliaryLibraries.WPF.Wrapper;
 
 namespace PersonaEditorGUI.Classes.Visual
 {

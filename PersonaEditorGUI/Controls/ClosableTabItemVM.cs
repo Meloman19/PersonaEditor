@@ -28,7 +28,7 @@ namespace PersonaEditorGUI.Controls
 
         private void MouseButtonUp(object arg)
         {
-            if ((arg as MouseButtonEventArgs).ChangedButton == MouseButton.Middle)
+            if ((MouseButton)arg == MouseButton.Middle)
                 Close();
         }
 

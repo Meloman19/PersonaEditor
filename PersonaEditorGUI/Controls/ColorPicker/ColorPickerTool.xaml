@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.ColorPicker"
-             xmlns:controls="clr-namespace:PersonaEditorGUI.Controls.ColorPicker.Controls"
+             xmlns:controls="clr-namespace:AuxiliaryLibraries.WPF.Controls;assembly=AuxiliaryLibraries.WPF"
              mc:Ignorable="d"
              Title="Select Color" Height="300" Width="500"  WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 
@@ -23,7 +23,7 @@
         <controls:CanvasRGB x:Name="CanvasRGBUC" Grid.RowSpan="2" Grid.Row="0" Margin="10" Color="{Binding ElementName=SliderRGBUC, Path=Color}"/>
         <controls:SliderRGB x:Name="SliderRGBUC" Grid.Row="2" VerticalAlignment="Center"/>
 
-        <controls:NumericColorRGBA x:Name="NumericRGBA" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+        <controls:NumericRGBA x:Name="NumericRGBA" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
                                    Color="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Color}"/>
 
         <Border Grid.Row="1" Grid.Column="1" BorderBrush="LightGray" BorderThickness="3" Margin="2" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Center">

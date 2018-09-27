@@ -6,47 +6,13 @@ using System.Linq;
 using System.Xml.Linq;
 using AuxiliaryLibraries.GameFormat;
 using AuxiliaryLibraries.GameFormat.Text;
+using AuxiliaryLibraries.WPF.Wrapper;
+using PersonaEditor.ArgumentHandler;
 
 namespace PersonaEditor
 {
     class Program
     {
-        public static class Static
-        {
-            private static readonly string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            private static string DirFont = Path.Combine(CurrentFolderEXE, "font");
-            private static PersonaEncodingManager PersonaEncodingManager { get; } = new PersonaEncodingManager(DirFont);
-            private static PersonaFontManager PersonaFontManager { get; } = new PersonaFontManager(DirFont);
-
-            private static PersonaEncoding oldEncoding = null;
-            private static PersonaEncoding newEncoding = null;
-            private static PersonaFont newFont = null;
-
-            public static string OldFontName { get; set; } = "P4";
-            public static string NewFontName { get; set; } = "P4";
-
-            public static PersonaEncoding OldEncoding()
-            {
-                if (oldEncoding == null)
-                    oldEncoding = Static.PersonaEncodingManager.GetPersonaEncoding(Static.OldFontName);
-                return oldEncoding;
-            }
-
-            public static PersonaEncoding NewEncoding()
-            {
-                if (newEncoding == null)
-                    newEncoding = Static.PersonaEncodingManager.GetPersonaEncoding(Static.NewFontName);
-                return newEncoding;
-            }
-
-            public static PersonaFont NewFont()
-            {
-                if (newFont == null)
-                    newFont = PersonaFontManager.GetPersonaFont(NewFontName);
-                return newFont;
-            }
-        }
-
         static void LoadSetting()
         {
             string setting = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "PersonaEditor.xml");
@@ -179,12 +145,12 @@ namespace PersonaEditor
             if (objectFile.Object is IImage image)
             {
                 if (parameters.Size >= 0)
-                    if (objectFile.Object is AuxiliaryLibraries.GameFormat.Other.FNT.FNT fnt)
+                    if (objectFile.Object is AuxiliaryLibraries.GameFormat.Other.FNT fnt)
                         fnt.Resize(parameters.Size);
 
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG") : value;
                 if (File.Exists(path))
-                    image.SetBitmap(PersonaEditorTools.OpenPNG(path).GetBitmap());
+                    image.SetBitmap(AuxiliaryLibraries.WPF.Tools.ImageTools.OpenPNG(path).GetBitmap());
             }
         }
 

@@ -2,6 +2,7 @@
 using AuxiliaryLibraries.GameFormat.Sprite;
 using AuxiliaryLibraries.GameFormat.SpriteContainer;
 using AuxiliaryLibraries.WPF;
+using AuxiliaryLibraries.WPF.Wrapper;
 using PersonaEditor;
 using System;
 using System.Collections.Generic;

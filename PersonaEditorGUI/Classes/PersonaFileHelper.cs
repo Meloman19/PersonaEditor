@@ -12,7 +12,8 @@ namespace PersonaEditorGUI.Classes
             FormatEnum.SPD,
             FormatEnum.SPR,
             FormatEnum.FTD,
-            FormatEnum.DAT
+            FormatEnum.DAT,
+            FormatEnum.FNT
         };
 
         public static bool IsEdited(FormatEnum fileType)
