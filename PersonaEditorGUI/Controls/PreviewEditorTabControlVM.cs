@@ -92,11 +92,11 @@ namespace PersonaEditorGUI.Controls
                     DataContext = new Editors.FTDEditorVM(sender.PersonaFile.Object as FTD);
                     DataContextType = TabItemType.FTD;
                 }
-                //else if (pf.Type == FileType.FNT)
-                //{
-                //    DataContext = new Editors.FNTEditorVM(sender.personaFile.Object as PersonaEditorLib.FileStructure.FNT.FNT);
-                //    DataContextType = TabItemType.FNT;
-                //}
+                else if (pf.Type == FormatEnum.FNT)
+                {
+                    DataContext = new Editors.FNTEditorVM(sender.PersonaFile.Object as FNT);
+                    DataContextType = TabItemType.FNT;
+                }
                 else if (pf.Type == FormatEnum.DAT)
                 {
                     DataContext = new Editors.HEXEditorVM(sender.PersonaFile.Object as DAT);

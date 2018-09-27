@@ -4,6 +4,7 @@ using PersonaEditorGUI.Controls;
 using System.Windows.Input;
 using System.ComponentModel;
 using AuxiliaryLibraries.WPF;
+using System.Windows;
 
 namespace PersonaEditorGUI
 {

@@ -1,4 +1,5 @@
 ﻿using AuxiliaryLibraries.GameFormat.Text;
+using AuxiliaryLibraries.Tools;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace PersonaEditor
                         var tempPrefix = str.Prefix.FirstOrDefault(x => x.Array.SequenceEqual(searchArray));
                         if (tempPrefix.Array != null)
                         {
-                            string DIR = AuxiliaryLibraries.IO.IOTools.RelativePath(Path.GetDirectoryName(file), temp);
+                            string DIR = IOTools.RelativePath(Path.GetDirectoryName(file), temp);
                             if (DIRtemp != DIR)
                             {
                                 DIRtemp = DIR;
@@ -41,7 +42,7 @@ namespace PersonaEditor
                             string MSGINDEX = msg.Index.ToString();
                             string STRINGINDEX = str.Index.ToString();
 
-                            returned.Add($"{DIR}\t{FILE}\t{MSGINDEX}\t{STRINGINDEX}\t{str.OldString.GetString(Program.Static.OldEncoding(), false).Replace('\n', ' ')}");
+                            returned.Add($"{DIR}\t{FILE}\t{MSGINDEX}\t{STRINGINDEX}\t{str.OldString.GetString(Static.OldEncoding(), false).Replace('\n', ' ')}");
                         }
                     }
                 }

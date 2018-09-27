@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 
-namespace PersonaEditor
+namespace PersonaEditorGUI.Classes
 {
     public class PersonaFontManager : BindingObject
     {

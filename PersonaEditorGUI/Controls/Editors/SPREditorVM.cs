@@ -12,6 +12,7 @@ using AuxiliaryLibraries.GameFormat;
 using AuxiliaryLibraries.GameFormat.SpriteContainer;
 using AuxiliaryLibraries.GameFormat.Sprite;
 using PersonaEditor;
+using AuxiliaryLibraries.WPF.Wrapper;
 
 namespace PersonaEditorGUI.Controls.Editors
 {

@@ -1,76 +1,24 @@
 ﻿using AuxiliaryLibraries.GameFormat;
 using AuxiliaryLibraries.GameFormat.Text;
-using System;
-using System.Collections.Generic;
+using AuxiliaryLibraries.WPF.Wrapper;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Xml.Linq;
+
 
 namespace PersonaEditor
 {
     public static class PersonaEditorTools
     {
-        public static byte[] GetData(this BitmapSource image)
-        {
-            var width = image.PixelWidth;
-            var height = image.PixelHeight;
-            var bitPerPixel = image.Format.BitsPerPixel;
-            var stride = GetStride(image.Format, width);
-
-            var LengthData = (height * width * bitPerPixel) / 8;
-
-            var returned = new byte[LengthData];
-            image.CopyPixels(returned, stride, 0);
-
-            return returned;
-        }
-
-        public static int GetStride(PixelFormat pixelFormat, int width)
-        {
-            return (pixelFormat.BitsPerPixel * width + 7) / 8;
-        }
-
-        public static BitmapSource OpenPNG(string path)
-        {
-            return new BitmapImage(new Uri(Path.GetFullPath(path)));
-
-            //using (FileStream FS = new FileStream(path, FileMode.Open))
-            //{
-            //    var returned = new BitmapImage(new Uri(Path.GetFullPath(path)));
-            //    returned.BeginInit();
-            //    returned.StreamSource = FS;
-            //    returned.EndInit();
-
-            //    return returned;
-            //}
-        }
-
         public static void OpenImageFile(ObjectContainer objectFile, string path)
         {
             if (objectFile.Object is IImage image)
             {
                 try
                 {
-                    var temp = OpenPNG(path).GetBitmap();
+                    var temp = AuxiliaryLibraries.WPF.Tools.ImageTools.OpenPNG(path).GetBitmap();
                     image.SetBitmap(temp);
                 }
                 catch { }
-            }
-        }
-
-        public static void SaveToPNG(BitmapSource image, string path)
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
-            using (FileStream FS = new FileStream(path, FileMode.Create))
-            {
-                PngBitmapEncoder PNGencoder = new PngBitmapEncoder();
-
-                PNGencoder.Frames.Add(BitmapFrame.Create(image));
-                PNGencoder.Save(FS);
             }
         }
 
@@ -80,7 +28,7 @@ namespace PersonaEditor
             {
                 var temp = image.GetBitmap().GetBitmapSource();
                 if (temp != null)
-                    SaveToPNG(temp, path);
+                    AuxiliaryLibraries.WPF.Tools.ImageTools.SaveToPNG(temp, path);
             }
         }
 

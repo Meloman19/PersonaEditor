@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PersonaEditorGUI.Controls.Editors"
-             mc:Ignorable="d" 
+             xmlns:prim="clr-namespace:PersonaEditorGUI.Controls.Primitive"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
     <Grid>
         <Grid.RowDefinitions>
@@ -14,62 +15,56 @@
         </Grid.RowDefinitions>
 
         <StatusBar Grid.Row="0">
-            <ComboBox ItemsSource="{Binding EncodingList}" SelectedIndex="{Binding SelectEncodingIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button Content="Copy All" Command="{Binding CopyAll}"/>
-            <Button Content="Import" Command="{Binding Import}"/>
+            <ComboBox ItemsSource="{Binding EncodingList}"
+                      SelectedIndex="{Binding SelectEncodingIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StatusBar>
-        
-        <TreeView Grid.Row="1" ItemsSource="{Binding Entries}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=SubItems}">
-                    <Grid HorizontalAlignment="Stretch" ContextMenu="{Binding ContextMenu}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="1*"/>
-                        </Grid.ColumnDefinitions>
 
-                        <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="2">
-                            <TextBlock Foreground="Black" Text="{Binding Entry}" Background="{x:Static SystemColors.ControlBrush}" FontFamily="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeView}, Path=DataContext.FontFamily}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        
-                        </Border>
+        <ScrollViewer Grid.Row="1" Background="White">
+            <ItemsControl ItemsSource="{Binding Entrie}" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type local:FTDSingleVM}">
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Copy Data" Command="{Binding CopyData}"/>
+                                    <MenuItem Header="Paste Data" Command="{Binding PasteData}"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                            <Border BorderBrush="Black" BorderThickness="1" Margin="2" HorizontalAlignment="Left">
+                                <prim:LabelHEX ByteArray="{Binding Data}"
+                                               Background="{x:Static SystemColors.ControlBrush}"
+                                               Foreground="Black"/>
+                            </Border>
+                            <TextBlock TextWrapping="Wrap" Text="{Binding DataDecode}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type local:FTDMultiVM}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Column="1" Text="{Binding EntryString, UpdateSourceTrigger=PropertyChanged}"/>
-                        
-                    </Grid>
+                                <Button Grid.Column="0" Grid.Row="0" Content="{Binding ButtonContent}" Command="{Binding Expand}"
+                                        VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                        Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}"/>
 
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
-        
-        
+                                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
+                                    <Button Content="Resize" Command="{Binding Resize}"/>
+                                </StackPanel>
 
-        <!--<ItemsControl ItemsSource="{Binding Entries}">
-
-            <ItemsControl.Template>
-                <ControlTemplate>
-                    <ScrollViewer>
-                        <ItemsPresenter/>
-                    </ScrollViewer>
-                </ControlTemplate>
-            </ItemsControl.Template>
-
-
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel>
-                        <Separator/>
-                        <TextBlock Text="{Binding Entry}" FontFamily="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Path=DataContext.FontFamily}">
-                            
-                        </TextBlock>
-                        <Separator/>
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>-->
+                                <Grid Grid.Column="0" Grid.Row="1" Background="White"/>
+                                <ItemsControl Grid.Column="1" Grid.Row="1" ItemsSource="{Binding MultiElements}" Visibility="{Binding Visibility}"/>
+                            </Grid>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </UserControl>

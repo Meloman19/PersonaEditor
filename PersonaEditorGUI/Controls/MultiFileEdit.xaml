@@ -15,7 +15,7 @@
 
     <UserControl.Resources>
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
-        <convert:DropConverter x:Key="DropConv"/>
+        <convert:SecondArgTranslator x:Key="DropConv"/>
     </UserControl.Resources>
 
     <Grid>

@@ -38,9 +38,6 @@ namespace PersonaEditorGUI.Controls.ToolBox
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
-            int newsize;
-            if (int.TryParse(TextB.Text, out newsize))
-                Size = newsize;
             Close();
         }
 
@@ -48,6 +45,18 @@ namespace PersonaEditorGUI.Controls.ToolBox
         {
             DialogResult = false;
             Close();
+        }
+
+        private string tempText = "0";
+        private void TextB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(TextB.Text, out int newsize))
+            {
+                size = newsize;
+                tempText = TextB.Text;
+            }
+            else
+                TextB.Text = tempText;
         }
     }
 }

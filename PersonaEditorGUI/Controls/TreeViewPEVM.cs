@@ -30,7 +30,7 @@ namespace PersonaEditorGUI.Controls
             item.ItemAction += Item_Action;
             tree.Add(item);
 
-            if (personaFile.Object is IGameFile pfile && pfile.SubFiles.Count == 0)
+            if (personaFile.Object is IGameFile pfile && pfile.Type == FormatEnum.PTP)
                 ItemAction(item, UserTreeViewItemEventEnum.Open);
         }
 
