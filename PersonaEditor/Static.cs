@@ -1,39 +1,36 @@
-﻿using AuxiliaryLibraries.GameFormat;
+﻿using PersonaEditor.Classes.Managers;
+using System.Collections.Generic;
 using System.IO;
 
 namespace PersonaEditor
 {
     internal static class Static
     {
-        private static readonly string CurrentFolderEXE = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-        private static string DirFont = Path.Combine(CurrentFolderEXE, "font");
-
-        private static PersonaEncoding oldEncoding = null;
-        private static PersonaEncoding newEncoding = null;
-        private static PersonaFont newFont = null;
-
-        public static string OldFontName { get; set; } = "P4";
-        public static string NewFontName { get; set; } = "P4";
-
-        public static PersonaEncoding OldEncoding()
+        public static class Paths
         {
-            if (oldEncoding == null)
-                oldEncoding = new PersonaEncoding(Path.Combine(DirFont, OldFontName + ".fntmap"));
-            return oldEncoding;
+            public static string CurrentFolderEXE { get; } = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            public static string DirBackgrounds { get; } = Path.Combine(CurrentFolderEXE, ApplicationSettings.AppSetting.Default.DirBackground);
+            public static string DirFont { get; } = Path.Combine(CurrentFolderEXE, ApplicationSettings.AppSetting.Default.DirFont);
+            public static string DirLang { get; } = Path.Combine(CurrentFolderEXE, "lang");
         }
 
-        public static PersonaEncoding NewEncoding()
+        public static class FontMap
         {
-            if (newEncoding == null)
-                newEncoding = new PersonaEncoding(Path.Combine(DirFont, NewFontName + ".fntmap"));
-            return newEncoding;
+            public static Dictionary<int, byte> Shift = new Dictionary<int, byte>()
+            {
+                { 81, 2 },
+                { 103, 2 },
+                { 106, 2 },
+                { 112, 2 },
+                { 113, 2 },
+                { 121, 2 }
+            };
         }
 
-        public static PersonaFont NewFont()
-        {
-            if (newFont == null)
-                newFont = new PersonaFont(Path.Combine(DirFont, NewFontName + ".fnt"));
-            return newFont;
-        }
+        public static PersonaEncodingManager EncodingManager { get; } = new PersonaEncodingManager(Paths.DirFont);
+        public static PersonaFontManager FontManager { get; } = new PersonaFontManager(Paths.DirFont);
+        public static BackgroundManager BackManager { get; } = new BackgroundManager(Paths.DirBackgrounds);
+
+        public static string OpenedFile = "";
     }
 }

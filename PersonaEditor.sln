@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonaEditor", "PersonaEditor\PersonaEditor.csproj", "{77BD32F6-F52E-4A72-A919-B96255A4D23E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonaEditorCMD", "PersonaEditorCMD\PersonaEditorCMD.csproj", "{77BD32F6-F52E-4A72-A919-B96255A4D23E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonaEditorGUI", "PersonaEditorGUI\PersonaEditorGUI.csproj", "{8115435E-B5D3-489C-B066-145BCFA1F933}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonaEditor", "PersonaEditor\PersonaEditor.csproj", "{8115435E-B5D3-489C-B066-145BCFA1F933}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

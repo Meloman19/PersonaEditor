@@ -1,0 +1,138 @@
+﻿<UserControl x:Class="PersonaEditor.View.Settings.DefaultBackground"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Header="{DynamicResource setting_Text}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{DynamicResource setting_XPosition}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=TextXpos, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{DynamicResource setting_YPosition}" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=TextYpos, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Grid Grid.Row="1" Grid.ColumnSpan="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{DynamicResource setting_Color}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=TextColor, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Margin="5" Content="{DynamicResource setting_ColorPick}" Command="{Binding Path=SetColor}" CommandParameter="Text"/>
+                </Grid>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Header="Name">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{DynamicResource setting_XPosition}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=NameXpos, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{DynamicResource setting_YPosition}" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=NameYpos, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Grid Grid.Row="1" Grid.ColumnSpan="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{DynamicResource setting_Color}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=NameColor, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Margin="5" Content="{DynamicResource setting_ColorPick}" Command="{Binding Path=SetColor}" CommandParameter="Name"/>
+                </Grid>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" Header="{DynamicResource setting_Background}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{DynamicResource setting_Width}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundWidth, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{DynamicResource setting_Height}" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundHeight, UpdateSourceTrigger=PropertyChanged}"/>
+
+
+                <Grid Grid.Row="1" Grid.ColumnSpan="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{DynamicResource setting_Color}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundColor, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Margin="5" Content="{DynamicResource setting_ColorPick}" Command="{Binding Path=SetColor}" CommandParameter="Back"/>
+                </Grid>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="3" Header="{DynamicResource setting_Other}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{DynamicResource setting_GlyphScale}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=GlyphScale, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="{DynamicResource setting_LineSpace}" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=LineSpacing, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+
+</UserControl>

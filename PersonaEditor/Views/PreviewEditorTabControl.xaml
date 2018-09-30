@@ -1,0 +1,184 @@
+﻿<UserControl x:Class="PersonaEditor.Views.PreviewEditorTabControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:PersonaEditor.Views"             
+             xmlns:classes="clr-namespace:PersonaEditor.Classes"
+             xmlns:editorsVM="clr-namespace:PersonaEditor.ViewModels.Editors"
+             xmlns:localVM="clr-namespace:PersonaEditor.ViewModels"
+             xmlns:editors="clr-namespace:PersonaEditor.Views.Editors"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:converters="clr-namespace:PersonaEditor.Classes.Converters"
+             xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
+             xmlns:convert ="clr-namespace:PersonaEditor.ArgumentConverters"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
+
+
+    <UserControl.Resources>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <convert:SecondArgTranslator x:Key="DropConv"/>
+        <convert:MouseButtonConverter x:Key="MouseConv"/>
+    </UserControl.Resources>
+    
+    <wpf:Interaction.Triggers>
+        <wpf:EventTrigger EventName="Drop">
+            <wpf:EventTrigger.Actions>
+                <wpf:ActionInvokeCommand Command="{Binding Drop}" CommandArgConverter="{StaticResource DropConv}"/>
+            </wpf:EventTrigger.Actions>
+        </wpf:EventTrigger>
+    </wpf:Interaction.Triggers>
+    
+    <TabControl Grid.Column="0" SelectedIndex="{Binding SelectedTabIndex}" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TabCollection}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <Grid>
+                    <wpf:Interaction.Triggers>
+                        <wpf:EventTrigger EventName="MouseUp">
+                            <wpf:EventTrigger.Actions>
+                                <wpf:ActionInvokeCommand Command="{Binding MouseUp}" CommandArgConverter="{StaticResource MouseConv}"/>
+                            </wpf:EventTrigger.Actions>
+                        </wpf:EventTrigger>
+                    </wpf:Interaction.Triggers>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding TabTitle}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    <Button Grid.Column="1" Margin="2" Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}" Command="{Binding FileClose}"
+                            Visibility="{Binding IsClosable, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}">
+                        <Button.Content>
+                            <TextBlock Text="X" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <classes:CachedContentPresenter>
+                    <DataTemplate>
+                        <ContentControl Content="{Binding DataContext}">
+                            <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type localVM:ImagePreviewVM}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <!--<ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto" MinWidth="100"/>-->
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border BorderBrush="Black" BorderThickness="1">
+                                            <controls:ImagePreview/>
+                                        </Border>
+
+                                        <!--<GridSplitter ResizeBehavior="PreviousAndNext"  Grid.Column="1" Width="5" ShowsPreview="True"/>
+
+                                        <DataGrid Grid.Column="2" ItemsSource="{Binding PropertiesView}" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False">
+
+                                            <DataGrid.Resources>
+                                                <DataTemplate x:Key="ReadonlyCellTemplate">
+                                                    <TextBlock Text="{Binding StringValue}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ReadOnly}" Value="True">
+                                                                        <Setter Property="Foreground" Value="DarkGray"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </DataTemplate>
+
+                                                <DataTemplate x:Key="EditableCellTemplate">
+                                                    <TextBox Text="{Binding StringValue}"/>
+                                                </DataTemplate>
+
+                                                <DataTemplate x:Key="ComboBoxCellTemplate">
+                                                    <ComboBox ItemsSource="{Binding ComboValue}" SelectedIndex="{Binding ComboIndex}"/>
+                                                </DataTemplate>
+                                            </DataGrid.Resources>
+
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Property" Binding="{Binding Name}" IsReadOnly="True"/>
+                                                <DataGridTemplateColumn Header="Value">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <ContentPresenter x:Name="Presenter" Content="{Binding}" ContentTemplate="{StaticResource ReadonlyCellTemplate}" />
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding Type}" Value="ComboBox">
+                                                                    <Setter TargetName="Presenter" Property="ContentTemplate" Value="{StaticResource ComboBoxCellTemplate}"/>
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                   
+                                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                                        <DataTemplate>
+                                                            <ContentPresenter x:Name="Presenter" Content="{Binding}" ContentTemplate="{StaticResource ReadonlyCellTemplate}" />
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding ReadOnly}" Value="False">
+                                                                    <Setter TargetName="Presenter" Property="ContentTemplate" Value="{StaticResource EditableCellTemplate}" />
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>-->
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editorsVM:SPREditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:SPREditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editorsVM:SPDEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:SPREditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editorsVM:BMDEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:BMDEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editorsVM:PTPEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:PTPEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editorsVM:HEXEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:HEXEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editorsVM:FTDEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:FTDEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editorsVM:FNTEditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:FNTEditor/>
+                                    </Border>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type editorsVM:FNT0EditorVM}">
+                                    <Border BorderBrush="Black" BorderThickness="1">
+                                        <editors:FNTEditor/>
+                                    </Border>
+                                </DataTemplate>
+                            </ContentControl.Resources>
+                        </ContentControl>
+                    </DataTemplate>
+                </classes:CachedContentPresenter>
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+    </TabControl>
+</UserControl>
