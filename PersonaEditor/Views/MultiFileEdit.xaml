@@ -1,0 +1,103 @@
+﻿<UserControl x:Class="PersonaEditor.Views.MultiFileEdit"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:PersonaEditor.Classes.Converters"
+             xmlns:controls="clr-namespace:PersonaEditor.Views"
+             xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
+             xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
+             xmlns:convert ="clr-namespace:PersonaEditor.ArgumentConverters"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+        <convert:SecondArgTranslator x:Key="DropConv"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="FirstCol" Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWLeftWidth, Mode=TwoWay}"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <controls:TreeViewPE Grid.Row="0" DataContext="{Binding Tree}"/>
+                <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+                    <Grid AllowDrop="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
+                        <wpf:Interaction.Triggers>
+                            <wpf:EventTrigger EventName="Drop">
+                                <wpf:EventTrigger.Actions>
+                                    <wpf:ActionInvokeCommand Command="{Binding Drop}" CommandArgConverter="{StaticResource DropConv}"/>
+                                </wpf:EventTrigger.Actions>
+                            </wpf:EventTrigger>
+                        </wpf:Interaction.Triggers>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource main_DropFile}" TextAlignment="Center"/>
+                    </Grid>
+                </Border>
+                <StatusBar Grid.Row="2">
+                    <StatusBarItem>
+                        <TextBlock Text="{Binding StatusBar}"/>
+                    </StatusBarItem>
+                </StatusBar>
+            </Grid>
+
+            <GridSplitter ResizeBehavior="PreviousAndCurrent" ShowsPreview="True" Grid.Column="1" Width="4"/>
+        </Grid>
+
+        <controls:PreviewEditorTabControl Grid.Column="1" DataContext="{Binding Tab}"/>
+
+        <!--<Grid Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <GridSplitter ShowsPreview="True" ResizeDirection="Columns" ResizeBehavior="CurrentAndNext"  Grid.Column="0" Width="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+            <Border BorderBrush="Black" Name="RightCC" BorderThickness="1,1,0,0" Grid.Column="1" >
+                <Grid Background="White" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Expander Grid.Row="0" HorizontalAlignment="Stretch" IsExpanded="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPropertyExpanded, Mode=TwoWay}">
+                        <Expander.Header>
+                            <TextBlock Text="Properties" Grid.Column="1" VerticalAlignment="Center"/>
+                        </Expander.Header>
+                        <StackPanel>
+                            <TextBlock Text="No available properties"  Visibility="{Binding Converter={StaticResource NullVisibilityConverter},ConverterParameter='ItemsSource', ElementName=PropertyCC, Path=ItemsSource}"/>
+                            <DataGrid Name="PropertyCC" Visibility="{Binding Converter={StaticResource NullVisibilityConverter},ConverterParameter='ItemsSourceReverse', ElementName=PropertyCC, Path=ItemsSource}"
+                                      IsReadOnly="True" AutoGenerateColumns="False" DataContext="{Binding Properties}" ItemsSource="{Binding}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Property name" Binding="{Binding Path=Key}"/>
+                                    <DataGridTextColumn Header="Property value" Binding="{Binding Path=Value}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Expander>
+
+                    <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Visibility="{Binding Converter={StaticResource NullVisibilityConverter}, Path=Preview}">
+                        <ContentControl Content="{Binding Preview}"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+        </Grid>-->
+    </Grid>
+</UserControl>

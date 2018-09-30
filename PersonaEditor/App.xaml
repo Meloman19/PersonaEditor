@@ -1,0 +1,19 @@
+﻿<Application x:Class="PersonaEditor.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PersonaEditor"             
+             Startup="Application_Startup"
+             DispatcherUnhandledException="App_DispatcherUnhandledException"
+             Exit="Application_Exit">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ApplicationResource/lang_main.xaml"/>
+                <ResourceDictionary Source="ApplicationResource/lang_setting_main.xaml"/>
+                <ResourceDictionary Source="ApplicationResource/lang_setting_background.xaml"/>
+                <ResourceDictionary Source="ApplicationResource/lang_toolbox.xaml"/>
+                <ResourceDictionary Source="ApplicationResource/lang_tree_contextmenu.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

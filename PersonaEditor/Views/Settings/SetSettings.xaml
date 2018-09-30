@@ -1,0 +1,50 @@
+﻿<Window x:Class="PersonaEditor.View.Settings.SetSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PersonaEditor.View.Settings"
+        mc:Ignorable="d"
+        Name="SettingSetWindow"
+        Title="{DynamicResource main_Settings}" Height="420" Width="300" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TabControl Grid.Row ="0">
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{DynamicResource setting_Main}"/>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <local:Main DataContext="{Binding MainVM}"/>
+                </TabItem.Content>
+            </TabItem>
+
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{DynamicResource setting_DefaultBack}"/>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <local:DefaultBackground DataContext="{Binding DefaultBackgroundVM}"/>
+                </TabItem.Content>
+            </TabItem>
+        </TabControl>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="OK" Margin="5" Grid.Column="1" Width="60" Height="25" Command="{Binding Path=ClickOk}" Click="ButtonOK_Click"/>
+            <Button Content="Cancel" Margin="5" Grid.Column="2" Width="60" Height="25" Click="ButtonCancel_Click"/>
+        </Grid>
+    </Grid>
+
+</Window>

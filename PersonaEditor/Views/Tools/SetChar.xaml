@@ -1,0 +1,57 @@
+﻿<Window x:Class="PersonaEditor.Views.Tools.SetChar"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
+        xmlns:convert ="clr-namespace:PersonaEditor.ArgumentConverters"
+        mc:Ignorable="d"
+        Title="SetChar" Height="590.663" Width="552.885" WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <convert:SecondArgTranslator x:Key="Translator"/>
+    </Window.Resources>
+    
+    <wpf:Interaction.Triggers>
+        <wpf:EventTrigger EventName="Closing">
+            <wpf:EventTrigger.Actions>
+                <wpf:ActionInvokeCommand Command="{Binding Closing}" CommandArgConverter="{StaticResource Translator}"/>
+            </wpf:EventTrigger.Actions>
+        </wpf:EventTrigger>
+    </wpf:Interaction.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StatusBar>
+            <ComboBox Width="100" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
+        </StatusBar>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl Name="wrap" ItemsSource="{Binding GlyphList}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <Border>
+                                <Border.Background>
+                                    <SolidColorBrush Color="Black"/>
+                                </Border.Background>
+                                <Image Width="70" Height="70" Source="{Binding Path=Image}" OpacityMask="{x:Null}"/>
+                            </Border>
+                            <TextBox MaxLength="1" Text="{Binding Path=Char, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="16" TextAlignment="Center" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Window>
