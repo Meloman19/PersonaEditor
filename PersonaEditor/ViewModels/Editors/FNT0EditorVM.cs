@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class FNT0EditorVM : BindingObject, IViewModel
+    class FNT0EditorVM : BindingObject, IEditorViewModel
     {
         private bool edited = false;
         private FNT0 fnt;
