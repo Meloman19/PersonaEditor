@@ -11,7 +11,7 @@ using PersonaEditor.Classes.Managers;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class PTPEditorVM : BindingObject, IViewModel
+    class PTPEditorVM : BindingObject, IEditorViewModel
     {
         #region Private
 

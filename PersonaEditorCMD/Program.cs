@@ -69,10 +69,6 @@ namespace PersonaEditorCMD
             catch (Exception e)
             {
             }
-
-#if DEBUG
-            //Console.ReadKey();
-#endif
         }
 
         static void Test(string[] args)
@@ -84,13 +80,7 @@ namespace PersonaEditorCMD
             ArgumentsWork argwrk = new ArgumentsWork(args);
             if (argwrk.OpenedFile != "")
             {
-                ObjectContainer file = null;
-                if (argwrk.OpenedArgument.ToLower() == "/stringlist")
-                {
-                    file = new ObjectContainer(Path.GetFileName(argwrk.OpenedFile), new StringList(argwrk.OpenedFile, Static.OldEncoding()) { DestEncoding = Static.NewEncoding() });
-                }
-                else
-                    file = GameFormatHelper.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile));
+                ObjectContainer file = GameFormatHelper.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile));
 
                 if (file.Object != null)
                     foreach (var command in argwrk.ArgumentList)
@@ -202,7 +192,7 @@ namespace PersonaEditorCMD
             if (objectFile.Object is PTP ptp)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
-                string[] exp = ptp.ExportTXT(objectFile.Name, parameters.RemoveSplit, Static.OldEncoding());
+                var exp = ptp.ExportTXT(parameters.RemoveSplit, Static.OldEncoding()).Select(x => $"{objectFile.Name}\t{x}");
 
                 File.AppendAllLines(path, exp);
             }
@@ -223,19 +213,55 @@ namespace PersonaEditorCMD
 
                 if (File.Exists(path))
                 {
-                    List<string[]> import = File.ReadAllLines(path, parameters.Encode).Select(x => x.Split('\t')).ToList();
+                    List<string[]> import = File.ReadAllLines(path, parameters.FileEncoding).Select(x => x.Split('\t')).ToList();
                     LineMap MAP = new LineMap(parameters.Map);
-                    if (MAP.CanGetText)
+
+                    if (parameters.LineByLine)
                     {
-                        string[][] importedText = import.
-                            FindAll(x => x[MAP[LineMap.Type.FileName]].Equals(Path.GetFileName(path), StringComparison.CurrentCultureIgnoreCase) && x.Length > MAP.MinLength && !x[MAP[LineMap.Type.NewText]].Equals("")).
-                            Select(x => new string[] { x[MAP[LineMap.Type.MSGindex]], x[MAP[LineMap.Type.StringIndex]], x[MAP[LineMap.Type.NewText]] }).ToArray();
-                        ptp.ImportText(importedText);
+                        if (MAP[LineMap.Type.NewText] >= 0)
+                        {
+                            string[] importedText = import
+                                .Select(x => x[MAP[LineMap.Type.NewText]])
+                                .ToArray();
+                            ptp.ImportTextLBL(importedText);
+                        }
                     }
-                    if (MAP.CanGetName)
+                    else
                     {
-                        Dictionary<string, string> NameDic = import.Where(x => x.Length >= MAP.MinLength).ToDictionary(x => x[MAP[LineMap.Type.OldName]], x => x[MAP[LineMap.Type.NewName]]);
-                        ptp.ImportNames(NameDic, Static.NewEncoding());
+                        if (MAP[LineMap.Type.FileName] >= 0
+                            & MAP[LineMap.Type.MSGindex] >= 0
+                            & MAP[LineMap.Type.StringIndex] >= 0
+                            & MAP[LineMap.Type.NewText] >= 0)
+                        {
+                            string[][] importedText = import
+                                .Where(x => x.Length >= MAP.MinLength)
+                                .Where(x => x[MAP[LineMap.Type.FileName]].Equals(Path.GetFileName(path), StringComparison.CurrentCultureIgnoreCase))
+                                .Where(x => x[MAP[LineMap.Type.NewText]] != "")
+                                .Select(x => new string[]
+                                {
+                                    x[MAP[LineMap.Type.MSGindex]],
+                                    x[MAP[LineMap.Type.StringIndex]],
+                                    x[MAP[LineMap.Type.NewText]]
+                                })
+                                .ToArray();
+
+                            if (parameters.Width > 0)
+                            {
+                                var charWidth = Static.NewFont().GetCharWidth(Static.NewEncoding());
+                                ptp.ImportText(importedText, charWidth, parameters.Width);
+                            }
+                            else
+                                ptp.ImportText(importedText);
+                        }
+                    }
+
+                    if (MAP[LineMap.Type.OldName] >= 0 & MAP[LineMap.Type.NewName] >= 0)
+                    {
+                        Dictionary<string, string> importedText = import
+                                .Where(x => x.Length >= MAP.MinLength)
+                                .GroupBy(x => x[MAP[LineMap.Type.OldName]])
+                                .ToDictionary(x => x.Key, x => x.First()[MAP[LineMap.Type.NewName]]);
+                        ptp.ImportNames(importedText, Static.OldEncoding());
                     }
                 }
             }
@@ -244,7 +270,7 @@ namespace PersonaEditorCMD
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 if (File.Exists(path))
                 {
-                    string[][] importedtext = File.ReadAllLines(path, parameters.Encode).Select(x => x.Split('\t')).
+                    string[][] importedtext = File.ReadAllLines(path, parameters.FileEncoding).Select(x => x.Split('\t')).
                         Where(x => x.Length > 1 && x[1] != "").ToArray();
                     strlst.ImportText(importedtext);
                 }

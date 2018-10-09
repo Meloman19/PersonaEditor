@@ -214,7 +214,7 @@
     </Compile>
     <Compile Include="ViewModels\TreeViewItemVM.cs" />
     <Compile Include="ViewModels\TreeViewPEVM.cs" />
-    <Compile Include="Classes\IViewModel.cs" />
+    <Compile Include="Classes\IEditorViewModel.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
     <Compile Include="ApplicationResource\Localization.Designer.cs">
       <AutoGen>True</AutoGen>

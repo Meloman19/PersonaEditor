@@ -1,6 +1,6 @@
 ﻿namespace PersonaEditor.Classes
 {
-    public interface IViewModel
+    public interface IEditorViewModel
     {
         bool Close();
     }
