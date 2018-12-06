@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using AuxiliaryLibraries.WPF;
 using AuxiliaryLibraries.GameFormat.Text;
+using System.Linq;
 
 namespace PersonaEditor.ViewModels.Editors
 {
     class BMDMsgVM : BindingObject
     {
-        BMD.MSGs msg;
+        BMDMSG msg;
 
         public string Name => msg.Name;
 
@@ -19,13 +19,7 @@ namespace PersonaEditor.ViewModels.Editors
                 a.Changes(save, destFont);
 
             if (save)
-            {
-                List<byte> temp = new List<byte>();
-                foreach (var a in StringList)
-                    temp.AddRange(a.data);
-
-                msg.MsgBytes = temp.ToArray();
-            }
+                msg.MsgStrings = StringList.Select(x => x.data).ToArray();
         }
 
         public void Update(int sourceFont)
@@ -34,12 +28,11 @@ namespace PersonaEditor.ViewModels.Editors
                 a.Update(sourceFont);
         }
 
-        public BMDMsgVM(BMD.MSGs msg, int sourceFont)
+        public BMDMsgVM(BMDMSG msg, int sourceFont)
         {
             this.msg = msg;
 
-            var list = msg.MsgBytes.SplitSourceBytes();
-            foreach (var a in list)
+            foreach (var a in msg.MsgStrings)
                 StringList.Add(new BMDMsgStrVM(a, sourceFont));
         }
     }

@@ -21,7 +21,6 @@
     <Window.Resources>
         <v:Int32 x:Key="MyInt">10</v:Int32>
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
-        <BitmapImage x:Key="Setting" UriSource="Resource/settings-work-tool.png"/>
         <convert:SecondArgTranslator x:Key="Translator"/>
     </Window.Resources>
     

@@ -11,7 +11,7 @@ namespace PersonaEditor.ViewModels.Editors
 {
     class PTPMsgStrEditVM : BindingObject
     {
-        MSGstr str;
+        PTPMSGstr str;
 
         private Encoding OldEncoding;
         private Encoding NewEncoding;
@@ -114,7 +114,7 @@ namespace PersonaEditor.ViewModels.Editors
             NewText.IsEnable = view;
         }
 
-        public PTPMsgStrEditVM(MSGstr str, Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple, string oldEncoding, string newEncoding, int backgroundIndex)
+        public PTPMsgStrEditVM(PTPMSGstr str, Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple, string oldEncoding, string newEncoding, int backgroundIndex)
         {
             this.str = str;
             

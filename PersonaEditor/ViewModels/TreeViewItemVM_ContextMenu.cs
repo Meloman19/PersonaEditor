@@ -143,8 +143,7 @@ namespace PersonaEditor.ViewModels
                     else if (ext.Equals(".bmd", StringComparison.CurrentCultureIgnoreCase))
                     {
                         Encoding encoding = Static.EncodingManager.GetPersonaEncoding(ApplicationSettings.AppSetting.Default.PTPNewDefault);
-                        BMD bmd = new BMD();
-                        bmd.Open(PersonaFile.Object as PTP, encoding);
+                        BMD bmd = new BMD(PersonaFile.Object as PTP, encoding);
                         File.WriteAllBytes(SFD.FileName, bmd.GetData());
                     }
                     else if (ext.Equals(".xml", StringComparison.CurrentCultureIgnoreCase))

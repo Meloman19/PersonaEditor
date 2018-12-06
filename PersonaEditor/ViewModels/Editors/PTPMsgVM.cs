@@ -8,7 +8,7 @@ namespace PersonaEditor.ViewModels.Editors
 {
     class PTPMsgVM : BindingObject
     {
-        MSG msg;
+        PTPMSG msg;
         private int BackgroundIndex;
 
         public string Name => msg.Name;
@@ -47,7 +47,7 @@ namespace PersonaEditor.ViewModels.Editors
                 a.UpdateBackground(BackgroundIndex);
         }
 
-        public PTPMsgVM(MSG msg, Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple, string OldEncoding, string NewEncoding, int backgroundIndex)
+        public PTPMsgVM(PTPMSG msg, Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple, string OldEncoding, string NewEncoding, int backgroundIndex)
         {
             BackgroundIndex = backgroundIndex;
             this.msg = msg;

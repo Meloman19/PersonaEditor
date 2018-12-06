@@ -6,7 +6,7 @@ namespace PersonaEditor.ViewModels.Editors
 {
     class BMDNameVM : BindingObject
     {
-        BMD.Names name;
+        BMDName name;
         int sourceFont;
 
         public int Index => name.Index;
@@ -31,7 +31,7 @@ namespace PersonaEditor.ViewModels.Editors
             Notify("Name");
         }
 
-        public BMDNameVM(BMD.Names name, int sourceFont)
+        public BMDNameVM(BMDName name, int sourceFont)
         {
             this.name = name;
             this.sourceFont = sourceFont;

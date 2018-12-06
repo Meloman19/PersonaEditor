@@ -176,13 +176,13 @@ namespace PersonaEditorCMD
 
         static void ImportPTP(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is BMD bmd)
+            if (objectFile.Object is BMD)
             {
                 string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name.Replace('/', '+')) + ".PTP");
                 if (File.Exists(path))
                 {
                     PTP PTP = new PTP(File.ReadAllBytes(path));
-                    bmd.Open(PTP, Static.NewEncoding());
+                    objectFile.Object = new BMD(PTP, Static.NewEncoding());
                 }
             }
         }
@@ -235,7 +235,7 @@ namespace PersonaEditorCMD
                         {
                             string[][] importedText = import
                                 .Where(x => x.Length >= MAP.MinLength)
-                                .Where(x => x[MAP[LineMap.Type.FileName]].Equals(Path.GetFileName(path), StringComparison.CurrentCultureIgnoreCase))
+                                .Where(x => x[MAP[LineMap.Type.FileName]].Equals(objectFile.Name, StringComparison.CurrentCultureIgnoreCase))
                                 .Where(x => x[MAP[LineMap.Type.NewText]] != "")
                                 .Select(x => new string[]
                                 {
@@ -355,8 +355,8 @@ namespace PersonaEditorCMD
                 {
                     string path = savePath == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".BMD") : savePath;
                     Encoding encoding = Static.NewEncoding();
-                    BMD bmd = new BMD();
-                    bmd.Open(objectFile.Object as PTP, encoding);
+
+                    BMD bmd = new BMD(objectFile.Object as PTP, encoding);
                     File.WriteAllBytes(path, bmd.GetData());
                 }
                 else
