@@ -50,7 +50,7 @@ namespace PersonaEditorCMD
                 if (File.Exists(path))
                 {
                     PTP PTP = new PTP(File.ReadAllBytes(path));
-                    bmd.Open(PTP, newEncoding);
+                    objectFile.Object = new BMD(PTP, newEncoding);
                 }
         }
 

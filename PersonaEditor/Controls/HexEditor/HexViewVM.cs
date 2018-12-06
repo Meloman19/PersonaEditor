@@ -82,8 +82,8 @@ namespace PersonaEditor.Controls.HexEditor
                 else if (bytes.Length > 4)
                     pos = new int[] { 0, 4 };
 
-                var a = bytes.SplitArray(pos);
-                for (int i = 0; i < a.Count; i++)
+                var a = bytes.Split(pos).ToArray();
+                for (int i = 0; i < a.Length; i++)
                     UInts[i].SetBytes(a[i]);
 
                 Encode(bytes);
