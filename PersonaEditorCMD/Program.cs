@@ -60,7 +60,7 @@ namespace PersonaEditorCMD
         static void Main(string[] args)
         {
             LoadSetting();
-            Test(args);
+            //Test(args);
 
             try
             {
@@ -73,6 +73,39 @@ namespace PersonaEditorCMD
 
         static void Test(string[] args)
         {
+            string testPath = @"d:\Persona 5\DATA_PS3_JAP\";
+            var par = new Parameters(new string[][] { new string[] { "/sub" } });
+            var files = Directory.EnumerateFiles(testPath, "*.*", SearchOption.AllDirectories).ToArray();
+            int index = 0;
+
+            foreach (var filePath in files)
+            {
+                Console.Write($"{index++}/{files.Length}\r");
+
+                var OpenedFileDir = Path.GetDirectoryName(filePath);
+                if (new FileInfo(filePath).Length > 10000000)
+                    continue;
+                ObjectContainer file = GameFormatHelper.OpenFile(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
+                if (file.Object != null)
+                {
+                    SubFileAction((a, b, c, d) =>
+                    {
+                        try
+                        {
+                            if (a.Object is BMD bmd)
+                            {
+                                PTP ptp = new PTP(bmd);
+                                var newName = a.Name.Replace('/', '+');
+                                string path = Path.Combine(c, Path.GetFileNameWithoutExtension(newName) + ".TXT");
+
+                                var exp = ptp.ExportTXT(true, Static.OldEncoding());
+                                File.WriteAllLines(path, exp);
+                            }
+                        }
+                        catch { }
+                    }, file, "", OpenedFileDir, par);
+                }
+            }
         }
 
         static void DoSome(string[] args)
@@ -176,13 +209,15 @@ namespace PersonaEditorCMD
 
         static void ImportPTP(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is BMD)
+            if (objectFile.Object is BMD bmd)
             {
                 string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name.Replace('/', '+')) + ".PTP");
                 if (File.Exists(path))
                 {
                     PTP PTP = new PTP(File.ReadAllBytes(path));
-                    objectFile.Object = new BMD(PTP, Static.NewEncoding());
+                    var temp = new BMD(PTP, Static.NewEncoding());
+                    temp.IsLittleEndian = bmd.IsLittleEndian;
+                    objectFile.Object = temp;
                 }
             }
         }
