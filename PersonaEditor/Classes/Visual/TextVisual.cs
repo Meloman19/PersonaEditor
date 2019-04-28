@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat.Text;
+using PersonaEditorLib.Text;
 using AuxiliaryLibraries;
-using AuxiliaryLibraries.GameFormat;
+using PersonaEditorLib;
 using AuxiliaryLibraries.WPF.Wrapper;
 
 namespace PersonaEditor.Classes.Visual

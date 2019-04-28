@@ -1,4 +1,4 @@
-﻿using AuxiliaryLibraries.GameFormat.Text;
+﻿using PersonaEditorLib.Text;
 using AuxiliaryLibraries.Tools;
 using System.Collections.Generic;
 using System.IO;

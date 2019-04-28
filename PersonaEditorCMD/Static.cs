@@ -1,4 +1,4 @@
-﻿using AuxiliaryLibraries.GameFormat;
+﻿using PersonaEditorLib;
 using System.IO;
 
 namespace PersonaEditorCMD

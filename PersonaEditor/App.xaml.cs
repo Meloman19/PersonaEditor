@@ -8,6 +8,9 @@ using System.Xml.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using PersonaEditor.Views;
+using PersonaEditor.Classes;
+using PersonaEditorLib.Text;
+using PersonaEditorLib.FileContainer;
 
 namespace PersonaEditor
 {
@@ -19,37 +22,39 @@ namespace PersonaEditor
 
         public App()
         {
-            PreInit();
+            Test();
             InitializeComponent();
             LoadLocalization();
             //SaveLocalization();
         }
 
-        private void PreInit()
+        private void Test()
         {
-            //    string result = "{";
-            //    for (int a = 0; a < 256; a++)
-            //    {
-            //        byte a5 = (byte)((double)a * 15d / 255d + 0.5d);
+            string dir = @"";
+            var enc = new PersonaEditorLib.PersonaEncoding(@"");
 
-            //        result += a5.ToString().PadRight(2, ' ');
-            //        result += ",";
-            //        if ((a + 1) % 16 == 0)
-            //            result += Environment.NewLine;
-            //    }
-            //    result += "}";
-            //    File.WriteAllLines("D:\\4bit.txt", new string[] { result });
+            string[] files = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                if (new FileInfo(file).Length > 100000000)
+                    continue;
 
-            //var img = PersonaEditorLib.Extension.Imaging.OpenPNG("D:\\ps3_tittle_01.PNG");
-            //PersonaEditorLib.Media.Imaging.ImageBaseConverter imageBaseConverter = new PersonaEditorLib.Media.Imaging.ImageBaseConverter(img);
-            //if (imageBaseConverter.TryConvert(PersonaEditorLib.Media.Imaging.PixelBaseFormat.DXT5))
-            //{
-            //    PersonaEditorLib.Extension.Imaging.SavePNG(imageBaseConverter.GetBitmapSource(), "D:\\ps3_tittle_01 2.PNG");
-            //}
-            //else
-            //{
+                var temp = PersonaEditorLib.GameFormatHelper.OpenFile(Path.GetFileName(file), File.ReadAllBytes(file));
 
-            //}
+                if (temp.Object != null)
+                {
+                    var temp2 = temp.GetAllObjectFiles(PersonaEditorLib.FormatEnum.BMD);
+
+                    foreach (var a in temp2)
+                    {
+                        var bmd = a.Object as BMD;
+                        var ptp = new PTP(bmd);
+
+                        string newPath = Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(a.Name.Replace('/', '+')) + ".txt");
+                        File.WriteAllLines(newPath, ptp.ExportTXT(true, enc));
+                    }
+                }
+            }
         }
 
         private void LoadLocalization()
@@ -150,111 +155,6 @@ namespace PersonaEditor
         private void Application_Exit(object sender, ExitEventArgs e)
         {
             NamedPipeManager?.Stop();
-        }
-    }
-
-    public class NamedPipeManager
-    {
-        public static string NamedPipeName { get; } = "PersonaEditor";
-        public event Action<string> ReceiveString;
-
-        private const string EXIT_STRING = "__EXIT__";
-        private BackgroundWorker backgroundWorker;
-
-        public void Start()
-        {
-            backgroundWorker = new BackgroundWorker();
-            backgroundWorker.WorkerReportsProgress = true;
-            backgroundWorker.DoWork += BackgroundWorker_DoWork;
-            backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
-            backgroundWorker.RunWorkerAsync();
-        }
-
-        public void Stop()
-        {
-            Write(EXIT_STRING);
-        }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            backgroundWorker.Dispose();
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            ReceiveString?.Invoke(e.UserState as string);
-        }
-
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            while (true)
-            {
-                string result;
-                using (var server = new NamedPipeServerStream(NamedPipeName))
-                {
-                    server.WaitForConnection();
-
-                    using (StreamReader reader = new StreamReader(server))
-                        result = reader.ReadToEnd();
-                }
-
-                if (result == EXIT_STRING)
-                    break;
-
-                backgroundWorker.ReportProgress(0, result);
-            }
-        }
-
-        public static bool Write(string[] text, int connectTimeout = 300)
-        {
-            using (var client = new NamedPipeClientStream(NamedPipeName))
-            {
-                try
-                {
-                    client.Connect(connectTimeout);
-                }
-                catch
-                {
-                    return false;
-                }
-
-                if (!client.IsConnected)
-                    return false;
-
-                using (StreamWriter writer = new StreamWriter(client))
-                {
-                    foreach (var a in text)
-                        writer.Write(a + '\n');
-                    writer.Flush();
-                }
-            }
-            return true;
-        }
-
-        public static bool Write(string text, int connectTimeout = 300)
-        {
-            using (var client = new NamedPipeClientStream(NamedPipeName))
-            {
-                try
-                {
-                    client.Connect(connectTimeout);
-                }
-                catch
-                {
-                    return false;
-                }
-
-                if (!client.IsConnected)
-                    return false;
-
-                using (StreamWriter writer = new StreamWriter(client))
-                {
-                    writer.Write(text);
-                    writer.Flush();
-                }
-            }
-            return true;
         }
     }
 }

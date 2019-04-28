@@ -1,4 +1,4 @@
-﻿using AuxiliaryLibraries.GameFormat.SpriteContainer;
+﻿using PersonaEditorLib.SpriteContainer;
 using AuxiliaryLibraries.WPF;
 using PersonaEditor.Classes;
 using System;

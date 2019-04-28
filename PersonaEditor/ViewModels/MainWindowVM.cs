@@ -7,6 +7,7 @@ using PersonaEditor.ViewModels;
 using PersonaEditor.Views;
 using PersonaEditor.View.Settings;
 using PersonaEditor.ViewModels.Settings;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditor.Views
 {

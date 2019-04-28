@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat.SpriteContainer;
+using PersonaEditorLib.SpriteContainer;
 using PersonaEditor.Classes;
 
 namespace PersonaEditor.ViewModels.Editors

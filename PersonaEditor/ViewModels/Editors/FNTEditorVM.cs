@@ -1,4 +1,4 @@
-﻿using AuxiliaryLibraries.GameFormat.Other;
+﻿using PersonaEditorLib.Other;
 using AuxiliaryLibraries.Tools;
 using AuxiliaryLibraries.WPF;
 using AuxiliaryLibraries.WPF.Extensions;
@@ -20,12 +20,14 @@ namespace PersonaEditor.ViewModels.Editors
         public BitmapSource Image { get; } = null;
         public int Left { get; set; } = 0;
         public int Right { get; set; } = 0;
+        public int Index { get; }
 
-        public GlyphCut(BitmapSource bitmapSource, VerticalCut verticalCut)
+        public GlyphCut(BitmapSource bitmapSource, VerticalCut verticalCut, int index)
         {
             Image = bitmapSource;
             Left = verticalCut.Left;
             Right = verticalCut.Right;
+            Index = index;
         }
     }
 
@@ -141,7 +143,7 @@ namespace PersonaEditor.ViewModels.Editors
                         GlyphList[i],
                         (pixelFormat.BitsPerPixel * fnt.Header.Glyphs.Size2 + 7) / 8);
                     image.Freeze();
-                    GlyphCuts.Add(new GlyphCut(image, CutList[i]));
+                    GlyphCuts.Add(new GlyphCut(image, CutList[i], i));
                 }
             }
         }

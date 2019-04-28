@@ -1,4 +1,4 @@
-﻿using AuxiliaryLibraries.GameFormat.Other;
+﻿using PersonaEditorLib.Other;
 using AuxiliaryLibraries.WPF;
 using System;
 using System.Collections.Generic;

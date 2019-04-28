@@ -1,5 +1,5 @@
-﻿using AuxiliaryLibraries.GameFormat;
-using AuxiliaryLibraries.GameFormat.Text;
+﻿using PersonaEditorLib;
+using PersonaEditorLib.Text;
 using AuxiliaryLibraries.WPF;
 using Microsoft.Win32;
 using PersonaEditor.Classes;

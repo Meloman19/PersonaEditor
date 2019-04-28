@@ -1,7 +1,7 @@
-﻿using AuxiliaryLibraries.GameFormat;
-using AuxiliaryLibraries.GameFormat.Other;
-using AuxiliaryLibraries.GameFormat.SpriteContainer;
-using AuxiliaryLibraries.GameFormat.Text;
+﻿using PersonaEditorLib;
+using PersonaEditorLib.Other;
+using PersonaEditorLib.SpriteContainer;
+using PersonaEditorLib.Text;
 using AuxiliaryLibraries.WPF;
 using PersonaEditor.Classes;
 using PersonaEditor.ViewModels.Editors;
