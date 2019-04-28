@@ -6,8 +6,8 @@ using System.ComponentModel;
 using System.Windows.Media;
 using PersonaEditor.Classes.Visual;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat;
-using AuxiliaryLibraries.GameFormat.Text;
+using PersonaEditorLib;
+using PersonaEditorLib.Text;
 using PersonaEditor.Classes;
 using PersonaEditor.Classes.Managers;
 

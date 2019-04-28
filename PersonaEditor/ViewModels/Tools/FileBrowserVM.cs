@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat;
+using PersonaEditorLib;
 
 namespace PersonaEditor.ViewModels.Tools
 {

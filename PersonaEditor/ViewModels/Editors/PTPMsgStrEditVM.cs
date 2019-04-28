@@ -4,7 +4,7 @@ using PersonaEditor.Classes.Visual;
 using System.Windows.Media;
 using System.Windows.Input;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat.Text;
+using PersonaEditorLib.Text;
 using PersonaEditor.Classes;
 
 namespace PersonaEditor.ViewModels.Editors

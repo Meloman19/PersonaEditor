@@ -1,5 +1,5 @@
 ﻿using AuxiliaryLibraries.Extensions;
-using AuxiliaryLibraries.GameFormat;
+using PersonaEditorLib;
 using System.Linq;
 
 namespace PersonaEditorCMD.ArgumentHandler

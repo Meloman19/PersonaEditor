@@ -1,6 +1,6 @@
 ﻿using PersonaEditor.Classes;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat.Text;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels.Editors
 {

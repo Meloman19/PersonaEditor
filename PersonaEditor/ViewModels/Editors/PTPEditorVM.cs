@@ -5,7 +5,7 @@ using System.Linq;
 using PersonaEditor.Classes.Visual;
 using System.Windows.Media;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat.Text;
+using PersonaEditorLib.Text;
 using PersonaEditor.Classes;
 using PersonaEditor.Classes.Managers;
 

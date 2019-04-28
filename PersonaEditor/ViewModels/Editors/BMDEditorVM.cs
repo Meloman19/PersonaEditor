@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Windows;
 using PersonaEditor.Classes;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat;
-using AuxiliaryLibraries.GameFormat.Text;
+using PersonaEditorLib;
+using PersonaEditorLib.Text;
 using PersonaEditor.Classes.Managers;
 
 namespace PersonaEditor.ViewModels.Editors

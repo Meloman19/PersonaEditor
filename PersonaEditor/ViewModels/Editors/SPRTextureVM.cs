@@ -7,9 +7,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.GameFormat;
-using AuxiliaryLibraries.GameFormat.SpriteContainer;
-using AuxiliaryLibraries.GameFormat.Sprite;
+using PersonaEditorLib;
+using PersonaEditorLib.SpriteContainer;
+using PersonaEditorLib.Sprite;
 using AuxiliaryLibraries.WPF.Wrapper;
 
 namespace PersonaEditor.ViewModels.Editors

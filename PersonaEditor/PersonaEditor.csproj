@@ -32,31 +32,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TrimUnusedDependencies>true</TrimUnusedDependencies>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\Release\PersonaEditor\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TrimUnusedDependencies>true</TrimUnusedDependencies>
-    <DocumentationFile>
-    </DocumentationFile>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-  </PropertyGroup>
   <PropertyGroup>
     <StartupObject>PersonaEditor.App</StartupObject>
   </PropertyGroup>
@@ -85,14 +60,12 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AuxiliaryLibraries, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Release\AuxiliaryLibraries\netstandard2.0\AuxiliaryLibraries.dll</HintPath>
-    </Reference>
-    <Reference Include="AuxiliaryLibraries.GameFormat">
-      <HintPath>..\..\..\Release\AuxiliaryLibraries\netstandard2.0\AuxiliaryLibraries.GameFormat.dll</HintPath>
     </Reference>
     <Reference Include="AuxiliaryLibraries.WPF, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
@@ -124,6 +97,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\NamedPipeManager.cs" />
     <Compile Include="ViewModels\Editors\BMDMsgStrVM.cs" />
     <Compile Include="ViewModels\Editors\BMDMsgVM.cs" />
     <Compile Include="ViewModels\Editors\BMDNameVM.cs" />
@@ -494,6 +468,10 @@
     <ProjectReference Include="..\PersonaEditorCMD\PersonaEditorCMD.csproj">
       <Project>{77bd32f6-f52e-4a72-a919-b96255a4d23e}</Project>
       <Name>PersonaEditorCMD</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj">
+      <Project>{d437d1fd-1d68-499f-bced-3b17a4316a76}</Project>
+      <Name>PersonaEditorLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

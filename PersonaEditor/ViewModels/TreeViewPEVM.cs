@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using AuxiliaryLibraries.GameFormat;
+using PersonaEditorLib;
 using AuxiliaryLibraries.WPF;
 using PersonaEditor.Classes;
 using PersonaEditor.Classes.Delegates;

@@ -1,6 +1,6 @@
-﻿using AuxiliaryLibraries.GameFormat;
-using AuxiliaryLibraries.GameFormat.Sprite;
-using AuxiliaryLibraries.GameFormat.SpriteContainer;
+﻿using PersonaEditorLib;
+using PersonaEditorLib.Sprite;
+using PersonaEditorLib.SpriteContainer;
 using AuxiliaryLibraries.WPF;
 using AuxiliaryLibraries.WPF.Wrapper;
 using System;

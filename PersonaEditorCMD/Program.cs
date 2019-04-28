@@ -4,10 +4,11 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using AuxiliaryLibraries.GameFormat;
-using AuxiliaryLibraries.GameFormat.Text;
+using PersonaEditorLib;
+using PersonaEditorLib.Text;
 using AuxiliaryLibraries.WPF.Wrapper;
 using PersonaEditorCMD.ArgumentHandler;
+using PersonaEditorLib.Other;
 
 namespace PersonaEditorCMD
 {
@@ -167,7 +168,7 @@ namespace PersonaEditorCMD
             if (objectFile.Object is IImage image)
             {
                 if (parameters.Size >= 0)
-                    if (objectFile.Object is AuxiliaryLibraries.GameFormat.Other.FNT fnt)
+                    if (objectFile.Object is FNT fnt)
                         fnt.Resize(parameters.Size);
 
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG") : value;
@@ -356,7 +357,7 @@ namespace PersonaEditorCMD
                 foreach (var a in sublist)
                 {
                     string newpath = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
-                    File.WriteAllBytes(newpath, pFile.GetData());
+                    File.WriteAllBytes(newpath, (a.Object as IGameFile).GetData());
                 }
             }
         }
