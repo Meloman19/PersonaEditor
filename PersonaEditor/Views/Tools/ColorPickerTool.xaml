@@ -1,0 +1,45 @@
+﻿<Window x:Class="PersonaEditor.Views.Tools.ColorPickerTool"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:AuxiliaryLibraries.WPF.Controls;assembly=AuxiliaryLibraries.WPF"
+             mc:Ignorable="d"
+             Title="Select Color" Height="300" Width="500"  WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <controls:CanvasRGB x:Name="CanvasRGBUC" Grid.RowSpan="2" Grid.Row="0" Margin="10" Color="{Binding ElementName=SliderRGBUC, Path=Color}"/>
+        <controls:SliderRGB x:Name="SliderRGBUC" Grid.Row="2" VerticalAlignment="Center"/>
+
+        <controls:NumericRGBA x:Name="NumericRGBA" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+                                   Color="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Color}"/>
+
+        <Border Grid.Row="1" Grid.Column="1" BorderBrush="LightGray" BorderThickness="3" Margin="2" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Border.Background>
+                <SolidColorBrush Color="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Color}"></SolidColorBrush>
+            </Border.Background>
+        </Border>
+
+        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="OK" Grid.Column="0" Margin="5" Width="50" Height="25" IsDefault="True" Click="ButtonOK_Click"/>
+            <Button Content="Cancel" Grid.Column="1" Margin="5" Width="50" Height="25" IsCancel="True" Click="ButtonCancel_Click"/>
+        </Grid>
+    </Grid>
+    
+</Window>

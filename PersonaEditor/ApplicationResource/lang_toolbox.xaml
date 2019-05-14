@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PersonaEditor.Resource"
+                    xmlns:v="clr-namespace:System;assembly=mscorlib">
+    <v:String x:Key="SavePTP_Ok">OK</v:String>
+    <v:String x:Key="SavePTP_Cancel">Cancel</v:String>
+    <v:String x:Key="SavePTP_ToolTip1">Save?</v:String>
+    <v:String x:Key="SavePTP_Font">Select old encoding:</v:String>
+    <v:String x:Key="OpenPTP_Font">Select new encoding:</v:String>
+    <v:String x:Key="toolbox_NeverAskAgain">Never ask again</v:String>
+    
+</ResourceDictionary>

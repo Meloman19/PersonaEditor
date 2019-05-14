@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="PersonaEditor.Views.Editors.FTDEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:editorsVM="clr-namespace:PersonaEditor.ViewModels.Editors"
+             xmlns:prim="clr-namespace:PersonaEditor.Controls.Primitive"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StatusBar Grid.Row="0">
+            <ComboBox ItemsSource="{Binding EncodingList}"
+                      SelectedIndex="{Binding SelectEncodingIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </StatusBar>
+
+        
+        <ScrollViewer Grid.Row="1" Background="White" CanContentScroll="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+            <ItemsControl ItemsSource="{Binding Entrie}">
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type editorsVM:FTDSingleVM}">
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Copy Data" Command="{Binding CopyData}"/>
+                                    <MenuItem Header="Paste Data" Command="{Binding PasteData}"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                            <Border BorderBrush="Black" BorderThickness="1" Margin="2" HorizontalAlignment="Left">
+                                <prim:LabelHEX ByteArray="{Binding Data}"
+                                               Background="{x:Static SystemColors.ControlBrush}"
+                                               Foreground="Black"/>
+                            </Border>
+                            <TextBlock TextWrapping="Wrap" Text="{Binding DataDecode}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type editorsVM:FTDMultiVM}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <Button Grid.Column="0" Grid.Row="0" Content="{Binding ButtonContent}" Command="{Binding Expand}"
+                                        VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                        Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}"/>
+
+                                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
+                                    <Button Content="Resize" Command="{Binding Resize}"/>
+                                </StackPanel>
+
+                                <Grid Grid.Column="0" Grid.Row="1" Background="White"/>
+                                <ItemsControl Grid.Column="1" Grid.Row="1" ItemsSource="{Binding MultiElements}" Visibility="{Binding Visibility}"/>
+                            </Grid>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

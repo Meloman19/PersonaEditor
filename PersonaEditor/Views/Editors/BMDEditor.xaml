@@ -1,0 +1,107 @@
+﻿<UserControl x:Class="PersonaEditor.Views.Editors.BMDEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{Binding Source={x:Static settings:AppSetting.Default}, Path=PTPNameBlockSize, Mode=TwoWay}"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <StatusBar Grid.Row="0">
+            <TextBlock Text="Source Font: " VerticalAlignment="Center"/>
+            <ComboBox Width="70" IsEnabled="{Binding IsSelectCharList}" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedSourceFont}"/>
+
+            <TextBlock Text="Dest. Font: " VerticalAlignment="Center"/>
+            <ComboBox Width="70" IsEnabled="{Binding IsEdit, Mode=OneWay}" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedDestFont}"/>
+
+            <CheckBox Content="Enable Edit" IsChecked="{Binding IsEdit}" VerticalAlignment="Center"/>
+        </StatusBar>
+
+        <Separator Grid.Row="1"/>
+
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding NameList}" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer Focusable="False">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
+                        <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
+                        <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
+                        <TextBox IsReadOnly="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.IsSelectCharList}" Grid.Column="3" Margin="2" Text="{Binding Path=Name, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <GridSplitter ResizeBehavior="BasedOnAlignment" Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
+
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding MsgList}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.IsVirtualizing="True">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer CanContentScroll="True">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+
+                        <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
+
+                        <ItemsControl ItemsSource="{Binding StringList}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+
+                                        <!--<control:EditorRichTextBox AcceptsReturn="True" Margin="2" Document="{Binding Document}" IsDocumentEnabled="True"/>-->
+                                        <TextBox Text="{Binding Text, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="2" TextWrapping="Wrap"
+                                                         IsReadOnly="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.IsSelectCharList}" />
+
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

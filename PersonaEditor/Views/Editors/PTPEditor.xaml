@@ -1,0 +1,170 @@
+﻿<UserControl x:Class="PersonaEditor.Views.Editors.PTPEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:PersonaEditor.Classes.Converters"
+             xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
+             mc:Ignorable="d" Name="USC"
+             d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VirtualizingPanel.IsVirtualizing="True">
+
+    <UserControl.Resources>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="{Binding Source={x:Static settings:AppSetting.Default}, Path=PTPNameBlockSize, Mode=TwoWay}"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <StatusBar Grid.Row="0">
+            <ComboBox ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding SelectedBackgroundIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <TextBlock Text="Old Font:"/>
+            <ComboBox ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedOldFont, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Text="Old Font:"/>
+            <ComboBox ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedNewFont, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <CheckBox Content="Image View" IsChecked="{Binding ViewImage}" x:Name="VIEW" x:FieldModifier="private"/>
+        </StatusBar>
+
+        <Separator Grid.Row="1"/>
+
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Path=Names}" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer Focusable="False">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
+                            <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
+                            <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
+                            <TextBox Grid.Column="3" Margin="2" Text="{Binding OldName, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap"/>
+                        </Grid>
+
+                        <TextBox Grid.Column="1" Margin="2" Text="{Binding NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <GridSplitter ResizeBehavior="BasedOnAlignment" Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
+
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding Path=MSG}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.VirtualizationMode="Recycling"  VirtualizingPanel.IsVirtualizing="True" Margin="0,4,0,1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer CanContentScroll="True">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <Separator/>
+                        
+                        <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
+                        
+                        <Separator/>
+
+                        <ItemsControl ItemsSource="{Binding Strings}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                            </Grid.RowDefinitions>
+
+                                            <Grid Grid.Row="0" Background="Transparent">
+                                                <Grid.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Try move Text's element to Prefix" Command="{Binding MovePrefixUp}"/>
+                                                        <MenuItem Header="Move Prefix's element to Text" Command="{Binding MovePrefixDown}"/>
+                                                    </ContextMenu>
+                                                </Grid.ContextMenu>
+
+                                                <TextBlock TextWrapping="Wrap" Text="{Binding Prefix, Mode=OneWay}" HorizontalAlignment="Center"/>
+                                            </Grid>
+
+                                            <Grid Grid.Row="1" Margin="5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition Width="1*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding OldString, Mode=OneWay}"/>
+                                                <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                                <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}"
+                                                       Source="{Binding OldTextImage}"/>
+
+                                                <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}"
+                                                       Source="{Binding NewTextImage}"/>
+                                            </Grid>
+
+                                            <Grid Grid.Row="2" Background="Transparent">
+                                                <Grid.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Move Postfix's element to Text" Command="{Binding MovePostfixUp}"/>
+                                                        <MenuItem Header="Try move Text's element to Postfix" Command="{Binding MovePostfixDown}"/>
+                                                    </ContextMenu>
+                                                </Grid.ContextMenu>
+
+                                                <TextBlock TextWrapping="Wrap" Text="{Binding Postfix, Mode=OneWay}" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                        <Separator/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>
