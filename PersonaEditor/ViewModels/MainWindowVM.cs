@@ -4,10 +4,8 @@ using System.Windows.Input;
 using System.ComponentModel;
 using AuxiliaryLibraries.WPF;
 using PersonaEditor.ViewModels;
-using PersonaEditor.Views;
 using PersonaEditor.View.Settings;
 using PersonaEditor.ViewModels.Settings;
-using PersonaEditorLib.Text;
 
 namespace PersonaEditor.Views
 {
@@ -156,14 +154,7 @@ namespace PersonaEditor.Views
 
         public ICommand clickTest { get; }
         private void TestClick()
-        {
-            //Thread thread = new Thread(delegate ()
-            //{
-            //    Tools.Visualizer visualizer = new Tools.Visualizer() { DataContext = new Tools.VisualizerVM() };
-            //    visualizer.ShowDialog();
-            //});
-            //thread.ApartmentState = ApartmentState.STA;
-            //thread.Start();
+        {          
         }
 
         public void OpenFile(string path)

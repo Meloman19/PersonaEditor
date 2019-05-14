@@ -302,7 +302,10 @@ namespace PersonaEditorLib.Text
             {
                 string old = oldEncoding.GetString(name.OldName);
                 if (Names.ContainsKey(old))
-                    name.NewName = Names[old];
+                {
+                    if(Names[old] != "")
+                        name.NewName = Names[old];
+                }                    
             }
         }
 
