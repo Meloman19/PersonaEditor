@@ -22,7 +22,7 @@ namespace PersonaEditor
 
         public App()
         {
-            Test();
+            //Test();
             InitializeComponent();
             LoadLocalization();
             //SaveLocalization();
