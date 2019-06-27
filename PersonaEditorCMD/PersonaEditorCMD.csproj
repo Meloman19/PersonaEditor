@@ -49,7 +49,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>..\..\..\Release\PersonaEditor\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <PlatformTarget>x86</PlatformTarget>
@@ -118,15 +118,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="readme.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj">
       <Project>{d437d1fd-1d68-499f-bced-3b17a4316a76}</Project>
       <Name>PersonaEditorLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="readme.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets" Condition="Exists('..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets')" />

@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class FTDEditorVM : BindingObject, IEditorViewModel
+    class FTDEditorVM : BindingObject, IEditor
     {
         FTD ftd;
 

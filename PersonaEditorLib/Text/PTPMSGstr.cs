@@ -15,16 +15,13 @@ namespace PersonaEditorLib.Text
 
         public PTPMSGstr(int index, string newstring, byte[] Prefix, byte[] OldString, byte[] Postfix) : this(index, newstring)
         {
-            List<TextBaseElement> temp = Prefix.GetTextBaseList();
-            foreach (var a in temp)
+            foreach (var a in Prefix.GetTextBases())
                 this.Prefix.Add(a);
 
-            temp = OldString.GetTextBaseList();
-            foreach (var a in temp)
+            foreach (var a in OldString.GetTextBases())
                 this.OldString.Add(a);
 
-            temp = Postfix.GetTextBaseList();
-            foreach (var a in temp)
+            foreach (var a in Postfix.GetTextBases())
                 this.Postfix.Add(a);
         }
 
@@ -41,7 +38,7 @@ namespace PersonaEditorLib.Text
         {
             List<byte> returned = new List<byte>();
             returned.AddRange(Prefix.GetByteArray());
-            returned.AddRange(NewString.GetTextBaseList(New).GetByteArray().ToArray());
+            returned.AddRange(NewString.GetTextBases(New).GetByteArray().ToArray());
             returned.AddRange(Postfix.GetByteArray());
             return returned.ToArray();
         }

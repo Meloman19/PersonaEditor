@@ -58,7 +58,7 @@ namespace PersonaEditor.Classes.Visual
 
         Func<ImageData> GetData;
 
-        PersonaFont Font;
+        PersonaFont font;
 
         #region PrivateField
 
@@ -160,10 +160,10 @@ namespace PersonaEditor.Classes.Visual
 
         ImageData CreateData()
         {
-            if (Text is IList<TextBaseElement> list)
-                return ImageData.DrawText(list, Font, Static.FontMap.Shift, LineSpacing);
+            if (Text is IEnumerable<TextBaseElement> list)
+                return ImageData.DrawText(list, font, Static.FontMap.Shift, LineSpacing);
             else if (Text is byte[] array)
-                return ImageData.DrawText(array.GetTextBaseList(), Font, Static.FontMap.Shift, LineSpacing);
+                return ImageData.DrawText(array.GetTextBases(), font, Static.FontMap.Shift, LineSpacing);
             else return new ImageData();
         }
 
@@ -174,11 +174,11 @@ namespace PersonaEditor.Classes.Visual
             return new Rect(start, new Size(Width, Height));
         }
 
-        public void UpdateText(IList<TextBaseElement> List, PersonaFont Font = null)
+        public void UpdateText(IEnumerable<TextBaseElement> textBases, PersonaFont font = null)
         {
-            Text = List.ToArray();
-            if (Font != null)
-                this.Font = Font;
+            Text = textBases;
+            if (font != null)
+                this.font = font;
             UpdateText();
         }
 
@@ -211,19 +211,18 @@ namespace PersonaEditor.Classes.Visual
 
         public void UpdateFont(PersonaFont Font)
         {
-            this.Font = Font;
+            this.font = Font;
             UpdateText();
         }
 
         public TextVisual()
         {
-            GetData = new Func<ImageData>(CreateData);
+            GetData = CreateData;
         }
 
-        public TextVisual(PersonaFont Font)
+        public TextVisual(PersonaFont font) : this()
         {
-            this.Font = Font;
-            GetData = new Func<ImageData>(CreateData);
+            this.font = font;
         }
     }
 }

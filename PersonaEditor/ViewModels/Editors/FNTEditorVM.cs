@@ -31,7 +31,7 @@ namespace PersonaEditor.ViewModels.Editors
         }
     }
 
-    class FNTEditorVM : BindingObject, IEditorViewModel
+    class FNTEditorVM : BindingObject, IEditor
     {
         private bool edited = false;
         private FNT fnt;

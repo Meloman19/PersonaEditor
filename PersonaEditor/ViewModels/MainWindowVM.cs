@@ -13,7 +13,6 @@ namespace PersonaEditor.Views
     {
         Views.Tools.Visualizer visualizer;
         Views.Tools.SetChar setchar;
-        Views.Tools.FileBrowser fileBrowser;
 
         public MultiFileEditVM MultiFile { get; } = new MultiFileEditVM();
 
@@ -39,8 +38,6 @@ namespace PersonaEditor.Views
                     visualizer.Close();
                 if (setchar != null)
                     setchar.Close();
-                if (fileBrowser != null)
-                    fileBrowser.Close();
 
                 ApplicationSettings.AppSetting.Default.Save();
                 ApplicationSettings.BackgroundDefault.Default.Save();
@@ -82,18 +79,6 @@ namespace PersonaEditor.Views
 
         }
 
-        public ICommand clickSettingOpen { get; }
-        private void SettingOpen()
-        {
-            ApplicationSettings.AppSetting.Default.Save();
-            ApplicationSettings.BackgroundDefault.Default.Save();
-            ApplicationSettings.SPREditor.Default.Save();
-            ApplicationSettings.WindowSetting.Default.Save();
-            SetSettings setSettings = new SetSettings() { DataContext = new SetSettingsVM() };
-            setSettings.ShowDialog();
-            Static.BackManager.EmptyUpdate();
-        }
-
         public ICommand clickVisualizerOpen { get; }
         private void ToolVisualizerOpen()
         {
@@ -122,26 +107,16 @@ namespace PersonaEditor.Views
             setchar.Show();
         }
 
-        public ICommand clickFileBrowserOpen { get; }
-        private void FileBrowserOpen()
+        public ICommand clickSettingOpen { get; }
+        private void SettingOpen()
         {
-            if (fileBrowser != null)
-                if (fileBrowser.IsLoaded)
-                {
-                    fileBrowser.Activate();
-                    return;
-                }
-
-            ViewModels.Tools.FileBrowserVM fileBrowserVM = new ViewModels.Tools.FileBrowserVM();
-            fileBrowserVM.OpenFile += FileBrowserVM_OpenFile;
-            fileBrowser = new Views.Tools.FileBrowser() { DataContext = fileBrowserVM };
-
-            fileBrowser.Show();
-        }
-
-        private void FileBrowserVM_OpenFile(string path)
-        {
-            MultiFile.OpenFile(path);
+            ApplicationSettings.AppSetting.Default.Save();
+            ApplicationSettings.BackgroundDefault.Default.Save();
+            ApplicationSettings.SPREditor.Default.Save();
+            ApplicationSettings.WindowSetting.Default.Save();
+            SetSettings setSettings = new SetSettings() { DataContext = new SetSettingsVM() };
+            setSettings.ShowDialog();
+            Static.BackManager.EmptyUpdate();
         }
 
         public ICommand clickAboutOpen { get; }
@@ -171,7 +146,6 @@ namespace PersonaEditor.Views
             clickSettingOpen = new RelayCommand(SettingOpen);
             clickVisualizerOpen = new RelayCommand(ToolVisualizerOpen);
             clickSetCharOpen = new RelayCommand(ToolSetCharOpen);
-            clickFileBrowserOpen = new RelayCommand(FileBrowserOpen);
 
             clickAboutOpen = new RelayCommand(AboutOpen);
 

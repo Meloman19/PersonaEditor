@@ -11,7 +11,7 @@ using PersonaEditor.Classes.Managers;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class PTPEditorVM : BindingObject, IEditorViewModel
+    class PTPEditorVM : BindingObject, IEditor
     {
         #region Private
 
@@ -187,12 +187,12 @@ namespace PersonaEditor.ViewModels.Editors
             View = ApplicationSettings.AppSetting.Default.PTPImageView;
             EncodingManagerEW = new EventWrapperINPC(Static.EncodingManager, this);
 
-            foreach (var a in ptp.names)
+            foreach (var a in ptp.Names)
                 Names.Add(new PTPNameEditVM(a, OldEncoding, NewEncoding, SelectedBackgroundIndex));
 
 
 
-            foreach (var a in ptp.msg)
+            foreach (var a in ptp.Msg)
             {
                 var name = Names.FirstOrDefault(x => x.Index == a.CharacterIndex);
                 Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple;

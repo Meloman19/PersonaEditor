@@ -171,7 +171,7 @@ namespace PersonaEditorLib
 
         }
 
-        public static ImageData DrawText(IList<TextBaseElement> text, PersonaFont personaFont, Dictionary<int, byte> Shift, int LineSpacing)
+        public static ImageData DrawText(IEnumerable<TextBaseElement> text, PersonaFont personaFont, Dictionary<int, byte> Shift, int LineSpacing)
         {
             if (text != null && personaFont != null)
             {
@@ -181,15 +181,15 @@ namespace PersonaEditorLib
                 {
                     if (a.IsText)
                     {
-                        for (int i = 0; i < a.Array.Length; i++)
+                        for (int i = 0; i < a.Data.Length; i++)
                         {
                             int index = 0;
 
-                            if (0x20 <= a.Array[i] & a.Array[i] < 0x80)
-                                index = a.Array[i];
-                            else if (0x80 <= a.Array[i] & a.Array[i] < 0xF0)
+                            if (0x20 <= a.Data[i] & a.Data[i] < 0x80)
+                                index = a.Data[i];
+                            else if (0x80 <= a.Data[i] & a.Data[i] < 0xF0)
                             {
-                                index = (a.Array[i] - 0x81) * 0x80 + a.Array[i + 1] + 0x20;
+                                index = (a.Data[i] - 0x81) * 0x80 + a.Data[i + 1] + 0x20;
                                 i++;
                             }
 
@@ -210,7 +210,7 @@ namespace PersonaEditorLib
                     }
                     else
                     {
-                        if (ArrayTool.ByteArrayCompareWithSimplest(a.Array, new byte[] { 0x0A }))
+                        if (ArrayTool.ByteArrayCompareWithSimplest(a.Data, new byte[] { 0x0A }))
                         {
                             if (returned.IsEmpty)
                             {

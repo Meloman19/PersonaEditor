@@ -67,8 +67,8 @@ namespace PersonaEditor.ViewModels.Tools
                 PersonaEncoding = Static.EncodingManager.GetPersonaEncoding(_FontSelect);
                 PersonaFont = Static.FontManager.GetPersonaFont(Static.EncodingManager.GetPersonaEncodingName(_FontSelect));
                 Notify("FontSelect");
-                Text.UpdateText(_TextTB.GetTextBaseList(PersonaEncoding));
-                Name.UpdateText(_NameTB.GetTextBaseList(PersonaEncoding));
+                Text.UpdateText(_TextTB.GetTextBases(PersonaEncoding));
+                Name.UpdateText(_NameTB.GetTextBases(PersonaEncoding));
                 Text.UpdateFont(PersonaFont);
                 Name.UpdateFont(PersonaFont);
                 Text2HEX();
@@ -154,7 +154,7 @@ namespace PersonaEditor.ViewModels.Tools
                 if (_NameTB != value)
                 {
                     _NameTB = value;
-                    Name.UpdateText(value.GetTextBaseList(PersonaEncoding));
+                    Name.UpdateText(value.GetTextBases(PersonaEncoding));
                 }
             }
         }
@@ -169,7 +169,7 @@ namespace PersonaEditor.ViewModels.Tools
                 {
                     _TextTB = value;
                     Text2HEX();
-                    Text.UpdateText(_TextTB.GetTextBaseList(PersonaEncoding));
+                    Text.UpdateText(_TextTB.GetTextBases(PersonaEncoding));
                 }
             }
         }
@@ -190,7 +190,7 @@ namespace PersonaEditor.ViewModels.Tools
 
         private void Text2HEX()
         {
-            var temp = _TextTB.GetTextBaseList(PersonaEncoding).GetByteArray();
+            var temp = _TextTB.GetTextBases(PersonaEncoding).GetByteArray();
             _HexTB = BitConverter.ToString(temp).Replace('-', ' ');
             Notify("HexTB");
         }

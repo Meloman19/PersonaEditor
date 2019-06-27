@@ -16,6 +16,8 @@ namespace PersonaEditor
 {
     public partial class App : Application
     {
+        private const string CURRENT_NAMED_PIPE = "PersonaEditor";
+
         Mutex Mutex;
         NamedPipeManager NamedPipeManager;
         MainWindowVM MainWindowVM;
@@ -116,15 +118,15 @@ namespace PersonaEditor
         {
             if (ApplicationSettings.AppSetting.Default.Single_Instance_Application)
             {
-                Mutex = new Mutex(true, "PersonaEditor", out bool Is);
+                Mutex = new Mutex(true, CURRENT_NAMED_PIPE, out bool Is);
                 if (!Is)
                 {
-                    NamedPipeManager.Write(e.Args);
+                    NamedPipeManager.Write(CURRENT_NAMED_PIPE, e.Args);
                     Shutdown(0);
                     return;
                 }
 
-                NamedPipeManager = new NamedPipeManager();
+                NamedPipeManager = new NamedPipeManager(CURRENT_NAMED_PIPE);
                 NamedPipeManager.ReceiveString += NamedPipeManager_ReceiveString;
                 NamedPipeManager.Start();
             }

@@ -47,57 +47,52 @@ namespace PersonaEditorLib
         {
             try
             {
-                object Obj = FileFix.OpenFileWithFix(name, data, type);
+                object Obj;
 
-                if (Obj == null)
-                {
-                    if (type == FormatEnum.BIN)
+                if (type == FormatEnum.BIN)
+                    Obj = new FileContainer.BIN(data);
+                else if (type == FormatEnum.SPR)
+                    Obj = new SpriteContainer.SPR(data);
+                else if (type == FormatEnum.TMX)
+                    Obj = new Sprite.TMX(data);
+                else if (type == FormatEnum.BF)
+                    Obj = new FileContainer.BF(data, name);
+                else if (type == FormatEnum.PM1)
+                    Obj = new FileContainer.PM1(data);
+                else if (type == FormatEnum.BMD)
+                    Obj = new Text.BMD(data);
+                else if (type == FormatEnum.PTP)
+                    Obj = new Text.PTP(data);
+                else if (type == FormatEnum.FNT)
+                    Obj = new FNT(data);
+                else if (type == FormatEnum.FNT0)
+                    Obj = new FNT0(data);
+                else if (type == FormatEnum.BVP)
+                    Obj = new FileContainer.BVP(name, data);
+                else if (type == FormatEnum.TBL)
+                    try
+                    {
+                        Obj = new FileContainer.TBL(data, name);
+                    }
+                    catch
+                    {
                         Obj = new FileContainer.BIN(data);
-                    else if (type == FormatEnum.SPR)
-                        Obj = new SpriteContainer.SPR(data);
-                    else if (type == FormatEnum.TMX)
-                        Obj = new Sprite.TMX(data);
-                    else if (type == FormatEnum.BF)
-                        Obj = new FileContainer.BF(data, name);
-                    else if (type == FormatEnum.PM1)
-                        Obj = new FileContainer.PM1(data);
-                    else if (type == FormatEnum.BMD)
-                        Obj = new Text.BMD(data);
-                    else if (type == FormatEnum.PTP)
-                        Obj = new Text.PTP(data);
-                    else if (type == FormatEnum.FNT)
-                        Obj = new FNT(data);
-                    else if (type == FormatEnum.FNT0)
-                        Obj = new FNT0(data);
-                    else if (type == FormatEnum.BVP)
-                        Obj = new FileContainer.BVP(name, data);
-                    else if (type == FormatEnum.TBL)
-                        try
-                        {
-                            Obj = new FileContainer.TBL(data, name);
-                        }
-                        catch
-                        {
-                            Obj = new FileContainer.BIN(data);
-                        }
-                    else if (type == FormatEnum.FTD)
-                        Obj = new FTD(data);
-                    else if (type == FormatEnum.DDS)
-                        try
-                        {
-                            Obj = new Sprite.DDS(data);
-                        }
-                        catch
-                        {
-                            Obj = new Sprite.DDSAtlus(data);
-                        }
-                    else if (type == FormatEnum.SPD)
-                        Obj = new SpriteContainer.SPD(data);
-                    else
-                        Obj = new DAT(data);
-                }
-
-
+                    }
+                else if (type == FormatEnum.FTD)
+                    Obj = new FTD(data);
+                else if (type == FormatEnum.DDS)
+                    try
+                    {
+                        Obj = new Sprite.DDS(data);
+                    }
+                    catch
+                    {
+                        Obj = new Sprite.DDSAtlus(data);
+                    }
+                else if (type == FormatEnum.SPD)
+                    Obj = new SpriteContainer.SPD(data);
+                else
+                    Obj = new DAT(data);
 
                 return new ObjectContainer(name, Obj);
             }

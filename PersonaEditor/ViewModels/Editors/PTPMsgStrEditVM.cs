@@ -28,7 +28,7 @@ namespace PersonaEditor.ViewModels.Editors
             set
             {
                 str.NewString = value;
-                NewText.UpdateText(str.NewString.GetTextBaseList(NewEncoding));
+                NewText.UpdateText(str.NewString.GetTextBases(NewEncoding));
             }
         }
 
@@ -87,7 +87,7 @@ namespace PersonaEditor.ViewModels.Editors
         public void UpdateNewEncoding(string newEncoding)
         {
             NewEncoding = Static.EncodingManager.GetPersonaEncoding(newEncoding);
-            NewText.UpdateText(str.NewString.GetTextBaseList(NewEncoding), Static.FontManager.GetPersonaFont(newEncoding));
+            NewText.UpdateText(str.NewString.GetTextBases(NewEncoding), Static.FontManager.GetPersonaFont(newEncoding));
         }
 
         public void UpdateBackground(int backgroundIndex)
@@ -128,7 +128,7 @@ namespace PersonaEditor.ViewModels.Editors
             UpdateBackground(backgroundIndex);
 
             OldText.UpdateText(str.OldString);
-            NewText.UpdateText(str.NewString.GetTextBaseList(NewEncoding));
+            NewText.UpdateText(str.NewString.GetTextBases(NewEncoding));
 
             DrawingGroup oldDrawingGroup = new DrawingGroup();
             oldDrawingGroup.Children.Add(tuple.Item3);

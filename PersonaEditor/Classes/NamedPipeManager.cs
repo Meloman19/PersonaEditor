@@ -7,60 +7,52 @@ namespace PersonaEditor.Classes
 {
     class NamedPipeManager
     {
-        public static string NamedPipeName { get; } = "PersonaEditor";
-        public event Action<string> ReceiveString;
+        #region Private Field
 
-        private const string EXIT_STRING = "__EXIT__";
         private BackgroundWorker backgroundWorker;
 
-        public void Start()
+        private string name;
+
+        private bool disposed = false;
+
+        #endregion
+
+        #region Events
+
+        public event Action<string> ReceiveString;
+
+        #endregion
+
+        public NamedPipeManager(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("message", nameof(name));
+
+            this.name = name;
+
             backgroundWorker = new BackgroundWorker();
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.DoWork += BackgroundWorker_DoWork;
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
             backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+        }
+
+        #region Public Methods
+        
+        public void Start()
+        {
             backgroundWorker.RunWorkerAsync();
         }
 
         public void Stop()
         {
-            Write(EXIT_STRING);
+            disposed = false;
+            Write(name, "");
         }
 
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        public static bool Write(string name, string[] text, int connectTimeout = 300)
         {
-            backgroundWorker.Dispose();
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            ReceiveString?.Invoke(e.UserState as string);
-        }
-
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            while (true)
-            {
-                string result;
-                using (var server = new NamedPipeServerStream(NamedPipeName))
-                {
-                    server.WaitForConnection();
-
-                    using (StreamReader reader = new StreamReader(server))
-                        result = reader.ReadToEnd();
-                }
-
-                if (result == EXIT_STRING)
-                    break;
-
-                backgroundWorker.ReportProgress(0, result);
-            }
-        }
-
-        public static bool Write(string[] text, int connectTimeout = 300)
-        {
-            using (var client = new NamedPipeClientStream(NamedPipeName))
+            using (var client = new NamedPipeClientStream(name))
             {
                 try
                 {
@@ -84,9 +76,9 @@ namespace PersonaEditor.Classes
             return true;
         }
 
-        public static bool Write(string text, int connectTimeout = 300)
+        public static bool Write(string name, string text, int connectTimeout = 300)
         {
-            using (var client = new NamedPipeClientStream(NamedPipeName))
+            using (var client = new NamedPipeClientStream(name))
             {
                 try
                 {
@@ -108,5 +100,44 @@ namespace PersonaEditor.Classes
             }
             return true;
         }
+
+        #endregion Public Methods
+
+        #region Private Methods
+
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            backgroundWorker.Dispose();
+        }
+
+        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            ReceiveString?.Invoke(e.UserState as string);
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (disposed)
+                return;
+
+            while (true)
+            {
+                string result;
+                using (var server = new NamedPipeServerStream(name))
+                {
+                    server.WaitForConnection();
+
+                    using (StreamReader reader = new StreamReader(server))
+                        result = reader.ReadToEnd();
+                }
+
+                if (disposed)
+                    break;
+
+                backgroundWorker.ReportProgress(0, result);
+            }
+        }
+
+        #endregion
     }
 }

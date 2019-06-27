@@ -42,7 +42,7 @@ namespace PersonaEditor.ViewModels
         {
             if (IsClosable)
             {
-                if (DataContext is IEditorViewModel vm)
+                if (DataContext is IEditor vm)
                     if (!vm.Close())
                         return false;
 

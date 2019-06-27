@@ -5,7 +5,7 @@ using PersonaEditor.Classes;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class HEXEditorVM : BindingObject, IEditorViewModel
+    class HEXEditorVM : BindingObject, IEditor
     {
         DAT hex;
         MemoryStream MemoryStream;

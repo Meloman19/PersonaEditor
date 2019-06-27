@@ -17,7 +17,7 @@ namespace PersonaEditor.ViewModels.Editors
         public TextVisual NewNameVisual { get; } = new TextVisual();
 
         public int Index => name.Index;
-        public string OldName => name.OldName.GetTextBaseList().GetString(OldEncoding);
+        public string OldName => name.OldName.GetTextBases().GetString(OldEncoding);
         public string NewName
         {
             get { return name.NewName; }
@@ -26,7 +26,7 @@ namespace PersonaEditor.ViewModels.Editors
                 if (name.NewName != value)
                 {
                     name.NewName = value;
-                    NewNameVisual.UpdateText(value.GetTextBaseList(NewEncoding));
+                    NewNameVisual.UpdateText(value.GetTextBases(NewEncoding));
                     Notify("NewName");
                 }
             }
@@ -77,7 +77,7 @@ namespace PersonaEditor.ViewModels.Editors
             UpdateBackground(background);
 
             OldNameVisual.UpdateText(name.OldName);
-            NewNameVisual.UpdateText(name.NewName.GetTextBaseList(NewEncoding));
+            NewNameVisual.UpdateText(name.NewName.GetTextBases(NewEncoding));
         }
     }
 }

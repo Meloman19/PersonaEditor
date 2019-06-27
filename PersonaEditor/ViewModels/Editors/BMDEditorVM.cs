@@ -9,7 +9,7 @@ using PersonaEditor.Classes.Managers;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class BMDEditorVM : BindingObject, IEditorViewModel
+    class BMDEditorVM : BindingObject, IEditor
     {
         EventWrapperINPC EncodingEW;
 

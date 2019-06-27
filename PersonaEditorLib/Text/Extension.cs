@@ -11,28 +11,25 @@ namespace PersonaEditorLib.Text
 {
     public static class Extension
     {
-        public static List<TextBaseElement> GetTextBaseList(this string String, Encoding FontMap)
+        public static IEnumerable<TextBaseElement> GetTextBases(this string s, Encoding enc)
         {
             List<TextBaseElement> MyByteArrayList = new List<TextBaseElement>();
 
-            foreach (var a in Regex.Split(String, "(\r\n|\r|\n)"))
+            foreach (var a in Regex.Split(s, "(\r\n|\r|\n)"))
                 if (Regex.IsMatch(a, "\r\n|\r|\n"))
-                    MyByteArrayList.Add(new TextBaseElement(false, new byte[] { 0x0A }));
+                    yield return new TextBaseElement(false, new byte[] { 0x0A });
                 else
                     foreach (var b in Regex.Split(a, @"({[^}]+})"))
-                        if (Regex.IsMatch(b, @"{.+}"))
-                            MyByteArrayList.Add(new TextBaseElement(false, StringTool.SplitString(b.Substring(1, b.Length - 2), ' ')));
+                        if (Regex.IsMatch(b, @"{.+}") && StringTool.TryParseArray(b.Substring(1, b.Length - 2), out byte[] parsed))
+                            yield return new TextBaseElement(false, parsed);
                         else
-                            MyByteArrayList.Add(new TextBaseElement(true, FontMap.GetBytes(b)));
-
-            return MyByteArrayList;
+                            yield return new TextBaseElement(true, enc.GetBytes(b));
         }
 
-        public static List<TextBaseElement> GetTextBaseList(this byte[] array)
+        public static IEnumerable<TextBaseElement> GetTextBases(this byte[] array)
         {
             List<TextBaseElement> returned = new List<TextBaseElement>();
 
-            bool isText = true;
             List<byte> temp = new List<byte>();
 
             for (int i = 0; i < array.Length; i++)
@@ -44,7 +41,7 @@ namespace PersonaEditorLib.Text
                 else if (0x80 <= array[i] & array[i] < 0xF0)
                 {
                     temp.Add(array[i]);
-                    i = i + 1;
+                    i++;
                     temp.Add(array[i]);
                 }
                 else
@@ -53,27 +50,22 @@ namespace PersonaEditorLib.Text
                     {
                         if (temp.Count != 0)
                         {
-                            returned.Add(new TextBaseElement(isText, temp.ToArray()));
+                            yield return new TextBaseElement(true, temp.ToArray());
                             temp.Clear();
                         }
 
-                        isText = false;
                         temp.Add(array[i]);
-
-                        returned.Add(new TextBaseElement(isText, temp.ToArray()));
-                        isText = true;
+                        yield return new TextBaseElement(false, temp.ToArray());
                         temp.Clear();
                     }
                     else
                     {
                         if (temp.Count != 0)
                         {
-                            returned.Add(new TextBaseElement(isText, temp.ToArray()));
-                            isText = true;
+                            yield return new TextBaseElement(true, temp.ToArray());
                             temp.Clear();
                         }
 
-                        isText = false;
                         temp.Add(array[i]);
                         int count = (array[i] - 0xF0) * 2 - 1;
                         for (int k = 0; k < count; k++)
@@ -82,8 +74,7 @@ namespace PersonaEditorLib.Text
                             temp.Add(array[i]);
                         }
 
-                        returned.Add(new TextBaseElement(isText, temp.ToArray()));
-                        isText = true;
+                        yield return new TextBaseElement(false, temp.ToArray());
                         temp.Clear();
                     }
                 }
@@ -91,12 +82,9 @@ namespace PersonaEditorLib.Text
 
             if (temp.Count != 0)
             {
-                returned.Add(new TextBaseElement(isText, temp.ToArray()));
+                yield return new TextBaseElement(true, temp.ToArray());
                 temp.Clear();
             }
-
-
-            return returned;
         }
 
         public static List<string> SplitBySystem(this string str)
@@ -112,115 +100,7 @@ namespace PersonaEditorLib.Text
 
             return returned;
         }
-
-        public static void ParseStrings(this IList<PTPMSGstr> Strings, byte[][] SourceBytes)
-        {
-            Strings.Clear();
-
-            int Index = 0;
-            foreach (var Bytes in SourceBytes)
-            {
-                PTPMSGstr MSG = new PTPMSGstr(Index, "");
-
-                List<TextBaseElement> temp = Bytes.GetTextBaseList();
-
-                int tempdown = 0;
-                int temptop = temp.Count;
-
-                for (int i = 0; i < temp.Count; i++)
-                {
-                    if (temp[i].IsText)
-                    {
-                        tempdown = i;
-                        i = temp.Count;
-                    }
-                    else
-                        MSG.Prefix.Add(temp[i]);
-                }
-
-                if (MSG.Prefix.Count < temp.Count)
-                {
-                    for (int i = temp.Count - 1; i >= tempdown; i--)
-                    {
-                        if (temp[i].IsText)
-                        {
-                            temptop = i;
-                            i = 0;
-                        }
-                        else
-                            MSG.Postfix.Add(temp[i]);
-                    }
-
-                    var temparray = MSG.Postfix.Reverse().ToList();
-
-                    MSG.Postfix.Clear();
-                    foreach (var a in temparray)
-                        MSG.Postfix.Add(a);
-
-
-                    for (int i = tempdown; i <= temptop; i++)
-                        MSG.OldString.Add(temp[i]);
-                }
-
-                Strings.Add(MSG);
-                Index++;
-            }
-        }
-
-        public static void ParseStrings(this IList<PTPMSGstr> Strings, byte[] SourceBytes)
-        {
-            Strings.Clear();
-
-            int Index = 0;
-            foreach (var Bytes in SplitSourceBytes(SourceBytes))
-            {
-                PTPMSGstr MSG = new PTPMSGstr(Index, "");
-
-                List<TextBaseElement> temp = Bytes.GetTextBaseList();
-
-                int tempdown = 0;
-                int temptop = temp.Count;
-
-                for (int i = 0; i < temp.Count; i++)
-                {
-                    if (temp[i].IsText)
-                    {
-                        tempdown = i;
-                        i = temp.Count;
-                    }
-                    else
-                        MSG.Prefix.Add(temp[i]);
-                }
-
-                if (MSG.Prefix.Count < temp.Count)
-                {
-                    for (int i = temp.Count - 1; i >= tempdown; i--)
-                    {
-                        if (temp[i].IsText)
-                        {
-                            temptop = i;
-                            i = 0;
-                        }
-                        else
-                            MSG.Postfix.Add(temp[i]);
-                    }
-
-                    var temparray = MSG.Postfix.Reverse().ToList();
-
-                    MSG.Postfix.Clear();
-                    foreach (var a in temparray)
-                        MSG.Postfix.Add(a);
-
-
-                    for (int i = tempdown; i <= temptop; i++)
-                        MSG.OldString.Add(temp[i]);
-                }
-
-                Strings.Add(MSG);
-                Index++;
-            }
-        }
-
+        
         public static string SplitByWidth(this string String, Dictionary<char, int> charWidth, int width)
         {
             var temp = GetStringWidth(String, charWidth);
@@ -350,45 +230,12 @@ namespace PersonaEditorLib.Text
             return (tempStr, tempWidth);
         }
 
-        public static List<byte[]> SplitSourceBytes(this byte[] B)
-        {
-            List<byte[]> returned = new List<byte[]>();
-
-            if (B.Length == 0)
-                return returned;
-
-            byte[] LineSplit = B.ToArray().Take((B[0] - 0xF0) * 2).ToArray();
-
-            List<byte> String = new List<byte>();
-            for (int i = 0; i < B.Length; i++)
-            {
-                if (B.CheckEntrance(LineSplit, i))
-                {
-                    if (String.Count != 0)
-                    {
-                        returned.Add(String.ToArray());
-                        String.Clear();
-                    }
-                }
-
-                String.Add(B[i]);
-            }
-
-            if (String.Count != 0)
-            {
-                returned.Add(String.ToArray());
-                String.Clear();
-            }
-
-            return returned;
-        }
-
         public static string MSGListToSystem(this IList<TextBaseElement> list)
         {
             string returned = "";
             foreach (var Bytes in list)
             {
-                byte[] temp = Bytes.Array.ToArray();
+                byte[] temp = Bytes.Data.ToArray();
                 if (temp.Length > 0)
                 {
                     returned += "{" + System.Convert.ToString(temp[0], 16).PadLeft(2, '0').ToUpper();
@@ -402,31 +249,24 @@ namespace PersonaEditorLib.Text
             return returned;
         }
 
-        public static string GetString(this IList<TextBaseElement> ByteCollection, Encoding encoding, bool LineSplit = false)
+        public static string GetString(this IEnumerable<TextBaseElement> textBases, Encoding encoding, bool lineSplit = false)
         {
             string returned = "";
 
-            foreach (var MSG in ByteCollection)
-                returned += MSG.GetText(encoding, LineSplit);
+            foreach (var MSG in textBases)
+                returned += MSG.GetText(encoding, lineSplit);
 
             return returned;
         }
 
-        public static string GetString(this IList<TextBaseElement> ByteCollection)
+        public static byte[] GetByteArray(this IEnumerable<TextBaseElement> textBaseElements)
         {
-            string returned = "";
+            if (textBaseElements == null)
+                throw new ArgumentNullException(nameof(textBaseElements));
 
-            foreach (var MSG in ByteCollection)
-                returned += MSG.GetSystem();
-
-            return returned;
-        }
-
-        public static byte[] GetByteArray(this IList<TextBaseElement> ByteCollection)
-        {
             List<byte> temp = new List<byte>();
-            foreach (var a in ByteCollection)
-                temp.AddRange(a.Array);
+            foreach (var textBase in textBaseElements)
+                temp.AddRange(textBase.Data);
             return temp.ToArray();
         }
     }

@@ -25,12 +25,12 @@ namespace PersonaEditorCMD
                 try { PTP = new PTP(File.ReadAllBytes(file)); }
                 catch { continue; }
 
-                foreach (var msg in PTP.msg)
+                foreach (var msg in PTP.Msg)
                 {
                     foreach (var str in msg.Strings)
                     {
-                        var tempPrefix = str.Prefix.FirstOrDefault(x => x.Array.SequenceEqual(searchArray));
-                        if (tempPrefix.Array != null)
+                        var tempPrefix = str.Prefix.FirstOrDefault(x => x.Data.SequenceEqual(searchArray));
+                        if (tempPrefix.Data != null)
                         {
                             string DIR = IOTools.RelativePath(Path.GetDirectoryName(file), temp);
                             if (DIRtemp != DIR)

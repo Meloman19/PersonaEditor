@@ -11,7 +11,6 @@
              d:DesignHeight="300" d:DesignWidth="300">
 
     <UserControl.Resources>
-        <BitmapImage x:Key="MyImageSource" UriSource="../Resource/settings-work-tool.png" />
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <converter:SecondArgTranslator x:Key="SecondArg"/>
     </UserControl.Resources>

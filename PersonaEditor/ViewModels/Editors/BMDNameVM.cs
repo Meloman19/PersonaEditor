@@ -19,7 +19,7 @@ namespace PersonaEditor.ViewModels.Editors
                 name.NameBytes = Static.EncodingManager.GetPersonaEncoding(destFont).GetBytes(Name);
             else
             {
-                Name = name.NameBytes.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
+                Name = name.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
                 Notify("Name");
             }
         }
@@ -27,7 +27,7 @@ namespace PersonaEditor.ViewModels.Editors
         public void Update(int sourceFont)
         {
             this.sourceFont = sourceFont;
-            Name = name.NameBytes.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
+            Name = name.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
             Notify("Name");
         }
 
@@ -35,7 +35,7 @@ namespace PersonaEditor.ViewModels.Editors
         {
             this.name = name;
             this.sourceFont = sourceFont;
-            Name = name.NameBytes.GetTextBaseList().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
+            Name = name.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
         }
     }
 }

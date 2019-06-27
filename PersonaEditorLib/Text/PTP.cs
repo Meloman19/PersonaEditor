@@ -10,6 +10,14 @@ namespace PersonaEditorLib.Text
 {
     public class PTP : IGameFile
     {
+        #region Properties
+
+        public List<PTPName> Names { get; } = new List<PTPName>();
+
+        public List<PTPMSG> Msg { get; } = new List<PTPMSG>();
+
+        #endregion
+
         public PTP(byte[] data)
         {
             using (MemoryStream MS = new MemoryStream(data))
@@ -26,7 +34,7 @@ namespace PersonaEditorLib.Text
         public PTP(BMD bmd)
         {
             foreach (var name in bmd.Name)
-                names.Add(new PTPName
+                Names.Add(new PTPName
                 {
                     Index = name.Index,
                     OldName = name.NameBytes
@@ -42,15 +50,66 @@ namespace PersonaEditorLib.Text
                     CharacterIndex = msgs.NameIndex
                 };
 
-                temp.Strings.ParseStrings(msgs.MsgStrings);
-                msg.Add(temp);
+                ParseStrings(temp.Strings, msgs.MsgStrings);
+                Msg.Add(temp);
             }
         }
 
-        public List<PTPName> names { get; } = new List<PTPName>();
-        public List<PTPMSG> msg { get; } = new List<PTPMSG>();
+        public static void ParseStrings(IList<PTPMSGstr> Strings, byte[][] SourceBytes)
+        {
+            Strings.Clear();
 
-        bool Open(Stream stream)
+            int Index = 0;
+            foreach (var Bytes in SourceBytes)
+            {
+                PTPMSGstr MSG = new PTPMSGstr(Index, "");
+
+                List<TextBaseElement> temp = Bytes.GetTextBases().ToList();
+
+                int tempdown = 0;
+                int temptop = temp.Count;
+
+                for (int i = 0; i < temp.Count; i++)
+                {
+                    if (temp[i].IsText)
+                    {
+                        tempdown = i;
+                        i = temp.Count;
+                    }
+                    else
+                        MSG.Prefix.Add(temp[i]);
+                }
+
+                if (MSG.Prefix.Count < temp.Count)
+                {
+                    for (int i = temp.Count - 1; i >= tempdown; i--)
+                    {
+                        if (temp[i].IsText)
+                        {
+                            temptop = i;
+                            i = 0;
+                        }
+                        else
+                            MSG.Postfix.Add(temp[i]);
+                    }
+
+                    var temparray = MSG.Postfix.Reverse().ToList();
+
+                    MSG.Postfix.Clear();
+                    foreach (var a in temparray)
+                        MSG.Postfix.Add(a);
+
+
+                    for (int i = tempdown; i <= temptop; i++)
+                        MSG.OldString.Add(temp[i]);
+                }
+
+                Strings.Add(MSG);
+                Index++;
+            }
+        }
+
+        private bool Open(Stream stream)
         {
             try
             {
@@ -58,8 +117,8 @@ namespace PersonaEditorLib.Text
                 stream.Position = 0;
                 if (Encoding.ASCII.GetString(reader.ReadBytes(4)) == "PTP0")
                 {
-                    names.Clear();
-                    msg.Clear();
+                    Names.Clear();
+                    Msg.Clear();
 
                     int MSGPos = reader.ReadInt32();
                     int MSGCount = reader.ReadInt32();
@@ -77,7 +136,7 @@ namespace PersonaEditorLib.Text
                         string NewName = Encoding.UTF8.GetString(reader.ReadBytes(size));
                         stream.Position += IOTools.Alignment(stream.Position, 4);
 
-                        names.Add(new PTPName(i, OldName, NewName));
+                        Names.Add(new PTPName(i, OldName, NewName));
                     }
 
                     stream.Position = MSGPos;
@@ -111,7 +170,7 @@ namespace PersonaEditorLib.Text
                             mSG.Strings.Add(new PTPMSGstr(k, NewString, Prefix, OldString, Postfix) { CharacterIndex = CharacterIndex });
                         }
 
-                        msg.Add(mSG);
+                        Msg.Add(mSG);
                     }
 
                     return true;
@@ -121,8 +180,8 @@ namespace PersonaEditorLib.Text
             }
             catch (Exception e)
             {
-                names.Clear();
-                msg.Clear();
+                Names.Clear();
+                Msg.Clear();
                 //  Logging.Write("PTPfactory", e.ToString());
                 return false;
             }
@@ -130,10 +189,10 @@ namespace PersonaEditorLib.Text
 
         public void CopyOld2New(Encoding Old)
         {
-            foreach (var Name in names)
-                Name.NewName = Name.OldName.GetTextBaseList().GetString(Old, true);
+            foreach (var Name in Names)
+                Name.NewName = Name.OldName.GetTextBases().GetString(Old, true);
 
-            foreach (var Msg in msg)
+            foreach (var Msg in Msg)
                 foreach (var Str in Msg.Strings)
                     Str.NewString = Str.OldString.GetString(Old, true);
         }
@@ -157,7 +216,7 @@ namespace PersonaEditorLib.Text
                 string NewName = Encoding.UTF8.GetString(reader.ReadBytes(size));
                 reader.BaseStream.Position += IOTools.Alignment(reader.BaseStream.Position, 4);
 
-                names.Add(new PTPName(i, OldName, NewName));
+                Names.Add(new PTPName(i, OldName, NewName));
             }
 
             reader.BaseStream.Position = MSGPos;
@@ -191,7 +250,7 @@ namespace PersonaEditorLib.Text
                     mSG.Strings.Add(new PTPMSGstr(k, NewString, Prefix, OldString, Postfix) { CharacterIndex = CharacterIndex });
                 }
 
-                msg.Add(mSG);
+                Msg.Add(mSG);
             }
         }
 
@@ -207,7 +266,7 @@ namespace PersonaEditorLib.Text
                 string OldNameSource = NAME.Element("OldNameSource").Value;
                 string NewName = NAME.Element("NewName").Value;
 
-                names.Add(new PTPName(Index, OldNameSource, NewName));
+                Names.Add(new PTPName(Index, OldNameSource, NewName));
             }
 
             foreach (var Message in MSG1Doc.Element("MSG").Elements())
@@ -218,7 +277,7 @@ namespace PersonaEditorLib.Text
                 int CharacterNameIndex = Convert.ToInt32(Message.Element("CharacterNameIndex").Value);
 
                 PTPMSG temp = new PTPMSG(Index, Type, Name, CharacterNameIndex);
-                msg.Add(temp);
+                Msg.Add(temp);
 
                 foreach (var Strings in Message.Element("MessageStrings").Elements())
                 {
@@ -273,7 +332,7 @@ namespace PersonaEditorLib.Text
         public string[] ExportTXT(bool removesplit, Encoding Old)
         {
             List<string> list = new List<string>();
-            foreach (var a in msg)
+            foreach (var a in Msg)
             {
                 foreach (var b in a.Strings)
                 {
@@ -282,8 +341,8 @@ namespace PersonaEditorLib.Text
                         OldName += "<SELECT>";
                     else
                     {
-                        var name = names.FirstOrDefault(x => x.Index == a.CharacterIndex);
-                        OldName += name == null ? "<EMPTY>" : name.OldName.GetTextBaseList().GetString(Old, false).Replace("\n", " ");
+                        var name = Names.FirstOrDefault(x => x.Index == a.CharacterIndex);
+                        OldName += name == null ? "<EMPTY>" : name.OldName.GetTextBases().GetString(Old, false).Replace("\n", " ");
                     }
                     string OldText = removesplit ? b.OldString.GetString(Old, removesplit).Replace("\n", " ") : b.OldString.GetString(Old, removesplit).Replace("\n", "\\n");
 
@@ -298,14 +357,14 @@ namespace PersonaEditorLib.Text
 
         public void ImportNames(Dictionary<string, string> Names, Encoding oldEncoding)
         {
-            foreach (var name in names)
+            foreach (var name in this.Names)
             {
                 string old = oldEncoding.GetString(name.OldName);
                 if (Names.ContainsKey(old))
                 {
-                    if(Names[old] != "")
+                    if (Names[old] != "")
                         name.NewName = Names[old];
-                }                    
+                }
             }
         }
 
@@ -332,7 +391,7 @@ namespace PersonaEditorLib.Text
             {
                 int count = 1;
                 foreach (var a in msg.OldString)
-                    if (a.Array.Contains<byte>(0x0A))
+                    if (a.Data.Contains<byte>(0x0A))
                         count++;
 
                 return str.SplitByLineCount(charWidth, count);
@@ -356,7 +415,7 @@ namespace PersonaEditorLib.Text
         public void ImportTextLBL(string[] text)
         {
             int index = 0;
-            foreach (var a in msg)
+            foreach (var a in Msg)
                 foreach (var b in a.Strings)
                 {
                     b.NewString = text[index];
@@ -373,8 +432,8 @@ namespace PersonaEditorLib.Text
                 {
                     if (int.TryParse(line[0], out int msgInd) && int.TryParse(line[1], out int strInd))
                     {
-                        if (msg.Count > msgInd && msg[msgInd].Strings.Count > strInd)
-                            msg[msgInd].Strings[strInd].NewString = func.Invoke(line[2], msg[msgInd].Strings[strInd]);
+                        if (Msg.Count > msgInd && Msg[msgInd].Strings.Count > strInd)
+                            Msg[msgInd].Strings[strInd].NewString = func.Invoke(line[2], Msg[msgInd].Strings[strInd]);
                     }
                 }
         }
@@ -397,14 +456,14 @@ namespace PersonaEditorLib.Text
                     writer.Write(Encoding.ASCII.GetBytes("PTP0"));
                     long MSGLinkPos = MS.Position;
                     writer.Write(0);
-                    writer.Write(msg.Count);
+                    writer.Write(Msg.Count);
                     long NamesLinkPos = MS.Position;
                     writer.Write(0);
-                    writer.Write(names.Count);
+                    writer.Write(Names.Count);
                     writer.Write(new byte[IOTools.Alignment(MS.Position, 0x10)]);
 
                     long MSGPos = MS.Position;
-                    foreach (var a in msg)
+                    foreach (var a in Msg)
                     {
                         writer.Write(a.Type);
                         buffer = new byte[24];
@@ -440,7 +499,7 @@ namespace PersonaEditorLib.Text
                     }
 
                     long NamesPos = MS.Position;
-                    foreach (var a in names)
+                    foreach (var a in Names)
                     {
                         buffer = a.OldName;
                         writer.Write(buffer.Length);

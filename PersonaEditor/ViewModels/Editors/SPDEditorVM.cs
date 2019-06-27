@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class SPDEditorVM : BindingObject, IEditorViewModel
+    class SPDEditorVM : BindingObject, IEditor
     {
         public ObservableCollection<object> TextureList { get; set; } = new ObservableCollection<object>();
 

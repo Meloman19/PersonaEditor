@@ -108,10 +108,10 @@ namespace PersonaEditorLib.Text
 
         private void Read(PTP ptp, Encoding newEncoding)
         {
-            foreach (var a in ptp.names)
-                Name.Add(new BMDName(a.Index, a.NewName.GetTextBaseList(newEncoding).GetByteArray()));
+            foreach (var a in ptp.Names)
+                Name.Add(new BMDName(a.Index, a.NewName.GetTextBases(newEncoding).GetByteArray()));
 
-            foreach (var a in ptp.msg)
+            foreach (var a in ptp.Msg)
             {
                 Msg.Add(new BMDMSG
                 {

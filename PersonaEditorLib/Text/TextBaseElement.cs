@@ -7,17 +7,17 @@ namespace PersonaEditorLib.Text
     {
         public TextBaseElement(bool isText, byte[] array)
         {
-            Array = array;
-            IsText = isText;
+            Data = array;
+            IsText = isText;            
         }
 
         public string GetText(Encoding encoding, bool linesplit = false)
         {
             if (IsText)
-                return String.Concat(encoding.GetChars(Array));
+                return String.Concat(encoding.GetChars(Data));
             else
             {
-                if (Array[0] == 0x0A)
+                if (Data[0] == 0x0A)
                     if (linesplit)
                         return "\n";
                     else
@@ -31,11 +31,11 @@ namespace PersonaEditorLib.Text
         {
             string returned = "";
 
-            if (Array.Length > 0)
+            if (Data.Length > 0)
             {
-                returned += "{" + Convert.ToString(Array[0], 16).PadLeft(2, '0').ToUpper();
-                for (int i = 1; i < Array.Length; i++)
-                    returned += " " + Convert.ToString(Array[i], 16).PadLeft(2, '0').ToUpper();
+                returned += "{" + Convert.ToString(Data[0], 16).PadLeft(2, '0').ToUpper();
+                for (int i = 1; i < Data.Length; i++)
+                    returned += " " + Convert.ToString(Data[i], 16).PadLeft(2, '0').ToUpper();
 
                 returned += "}";
             }
@@ -44,6 +44,6 @@ namespace PersonaEditorLib.Text
         }
 
         public bool IsText { get; }
-        public byte[] Array { get; }
+        public byte[] Data { get; }
     }
 }
