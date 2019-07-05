@@ -149,7 +149,7 @@ namespace PersonaEditorLib.FileContainer
                 string name = fileNameList[fileNameIndex++];
                 var singleFile = GameFormatHelper.OpenFile(name, data[(int)typeMap][0], GameFormatHelper.GetFormat(name));
 
-                if (singleFile.Object == null)
+                if (singleFile == null)
                     singleFile = GameFormatHelper.OpenFile(name, data[(int)typeMap][0], FormatEnum.DAT);
 
                 singleFile.Tag = new object[] { (int)typeMap };

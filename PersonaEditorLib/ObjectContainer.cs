@@ -1,32 +1,51 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PersonaEditorLib
 {
     public class ObjectContainer
     {
-        public object Object { get; set; } = null;
-        public object Tag { get; set; } = null;
-        public string Name { get; set; } = "";
+        private object @object;
+        private string name;
+
+        public object Object
+        {
+            get => @object;
+            set => @object = value ?? throw new ArgumentNullException(nameof(Object));
+        }
+
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if(string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Null or WhiteSpace", nameof(Name));
+                name = value;
+            }
+        }
+
+        public object Tag { get; set; }
 
         public ObjectContainer(string name, object obj)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Null or WhiteSpace", nameof(name));
+
             Name = name;
-            Object = obj;
+            Object = obj ?? throw new ArgumentNullException(nameof(obj));
         }
 
-        public ObjectContainer[] GetAllObjectFiles(FormatEnum fileType)
+        public IEnumerable<ObjectContainer> GetAllObjectFiles(FormatEnum fileType)
         {
-            List<ObjectContainer> objectFiles = new List<ObjectContainer>();
-
             if (Object is IGameFile pFile)
             {
                 if (pFile.Type == fileType)
-                    objectFiles.Add(this);
+                    yield return this;
                 foreach (var sub in pFile.SubFiles)
-                    objectFiles.AddRange(sub.GetAllObjectFiles(fileType));
+                    foreach (var obj in sub.GetAllObjectFiles(fileType))
+                        yield return obj;
             }
-
-            return objectFiles.ToArray();
         }
     }
 }

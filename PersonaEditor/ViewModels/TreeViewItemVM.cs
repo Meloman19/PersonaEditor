@@ -108,8 +108,8 @@ namespace PersonaEditor.ViewModels
                 if (temp.Length > 0)
                     if (MessageBox.Show("Replace " + PersonaFile.Name + "?", "Replace?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
                     {
-                        var personaFile = GameFormatHelper.OpenFile(this.PersonaFile.Name, File.ReadAllBytes(temp[0]), pFile.Type);
-                        if (personaFile.Object != null)
+                        var personaFile = GameFormatHelper.OpenFile(PersonaFile.Name, File.ReadAllBytes(temp[0]), pFile.Type);
+                        if (personaFile != null)
                             _personaFile.Object = personaFile.Object;
                         else
                             MessageBox.Show("Error. " + Path.GetFileName(temp[0]) + " is not a " + pFile.Type + " type");

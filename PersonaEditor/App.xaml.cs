@@ -43,11 +43,9 @@ namespace PersonaEditor
 
                 var temp = PersonaEditorLib.GameFormatHelper.OpenFile(Path.GetFileName(file), File.ReadAllBytes(file));
 
-                if (temp.Object != null)
+                if (temp != null)
                 {
-                    var temp2 = temp.GetAllObjectFiles(PersonaEditorLib.FormatEnum.BMD);
-
-                    foreach (var a in temp2)
+                    foreach (var a in temp.GetAllObjectFiles(PersonaEditorLib.FormatEnum.BMD))
                     {
                         var bmd = a.Object as BMD;
                         var ptp = new PTP(bmd);

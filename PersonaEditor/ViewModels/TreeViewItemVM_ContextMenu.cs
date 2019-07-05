@@ -77,9 +77,9 @@ namespace PersonaEditor.ViewModels
             {
                 if (OFD.FilterIndex == 1)
                 {
-                    var item = GameFormatHelper.OpenFile("", File.ReadAllBytes(OFD.FileName), fileType);
-
-                    if (item.Object != null)
+                    var item = GameFormatHelper.OpenFile(PersonaFile.Name, File.ReadAllBytes(OFD.FileName), fileType);
+                    
+                    if (item != null)
                         PersonaFile.Object = item.Object;
                 }
                 else

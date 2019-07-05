@@ -52,7 +52,7 @@ namespace PersonaEditorLib.FileContainer
                     reader.BaseStream.Position += IOTools.Alignment(reader.BaseStream.Position, 0x40);
 
                     ObjectContainer objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
-                    if (objectFile.Object == null)
+                    if (objectFile == null)
                         objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
                     SubFiles.Add(objectFile);
                 }
@@ -73,7 +73,7 @@ namespace PersonaEditorLib.FileContainer
                     byte[] Data = reader.ReadBytes(Size);
 
                     ObjectContainer objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
-                    if (objectFile.Object == null)
+                    if (objectFile == null)
                         objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
                     SubFiles.Add(objectFile);
                 }

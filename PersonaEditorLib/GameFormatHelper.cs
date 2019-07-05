@@ -43,6 +43,13 @@ namespace PersonaEditorLib
             { ".ptp", FormatEnum.PTP }
         };
 
+        /// <summary>
+        /// Tries to open a file with the specified data type.
+        /// </summary>
+        /// <param name="name">Name of file</param>
+        /// <param name="data">Data of file</param>
+        /// <param name="type">Type of file</param>
+        /// <returns>Return ObjectContainer for this file or null if an error occurred.</returns>
         public static ObjectContainer OpenFile(string name, byte[] data, FormatEnum type)
         {
             try
@@ -98,7 +105,7 @@ namespace PersonaEditorLib
             }
             catch
             {
-                return new ObjectContainer(name, null);
+                return null;
             }
         }
 

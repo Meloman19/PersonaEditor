@@ -97,7 +97,7 @@ namespace PersonaEditorLib.FileContainer
                     byte[] data = reader.ReadBytes(element[1] * element[2]);
 
                     var item = GameFormatHelper.OpenFile(tempN, data, type);
-                    if (item.Object == null)
+                    if (item == null)
                         item = GameFormatHelper.OpenFile(tempN, data, FormatEnum.DAT);
 
                     item.Tag = element[0];

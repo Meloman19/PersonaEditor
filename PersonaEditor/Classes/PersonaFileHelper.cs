@@ -24,7 +24,10 @@ namespace PersonaEditor.Classes
 
         public static bool IsEdited(ObjectContainer objectFile)
         {
-            if (objectFile?.Object is IGameFile personaFile)
+            if (objectFile == null)
+                throw new System.ArgumentNullException(nameof(objectFile));
+
+            if (objectFile.Object is IGameFile personaFile)
                 return contextMenuItemsEdited.Contains(personaFile.Type);
 
             return false;

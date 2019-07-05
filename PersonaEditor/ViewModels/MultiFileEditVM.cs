@@ -50,7 +50,7 @@ namespace PersonaEditor.ViewModels
 
                 var file = GameFormatHelper.OpenFile(Path.GetFileName(path), File.ReadAllBytes(path));
 
-                if (file.Object != null)
+                if (file != null)
                 {
                     Tree.SetRoot(file);
                     Static.OpenedFile = Path.GetFullPath(path);

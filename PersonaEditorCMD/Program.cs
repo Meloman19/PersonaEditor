@@ -87,7 +87,7 @@ namespace PersonaEditorCMD
                 if (new FileInfo(filePath).Length > 10000000)
                     continue;
                 ObjectContainer file = GameFormatHelper.OpenFile(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
-                if (file.Object != null)
+                if (file != null)
                 {
                     SubFileAction((a, b, c, d) =>
                     {
@@ -116,7 +116,7 @@ namespace PersonaEditorCMD
             {
                 ObjectContainer file = GameFormatHelper.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile));
 
-                if (file.Object != null)
+                if (file != null)
                     foreach (var command in argwrk.ArgumentList)
                     {
                         Action<ObjectContainer, string, string, Parameters> action = null;
@@ -376,7 +376,7 @@ namespace PersonaEditorCMD
                     if (File.Exists(newpath))
                     {
                         var file = GameFormatHelper.OpenFile(objectFile.Name, File.ReadAllBytes(newpath), fileType);
-                        if (file.Object != null)
+                        if (file != null)
                             a.Object = file.Object;
                     }
                 }
