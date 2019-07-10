@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PersonaEditorLib.Text
 {
-    public class StringList : IGameFile
+    public class StringList : IGameData
     {
         public class Element
         {
@@ -90,7 +90,7 @@ namespace PersonaEditorLib.Text
 
         public FormatEnum Type => FormatEnum.StringList;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => List.Sum(x => x.Length);
 

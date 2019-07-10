@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using AuxiliaryLibraries.WPF;
@@ -16,50 +14,31 @@ namespace PersonaEditor.ViewModels.Editors
 {
     class SPRTextureVM : BindingObject
     {
-        ObjectContainer texture;
+        GameFile texture;
 
         private BitmapSource _TextureImage = null;
         private Rect _Rect;
         private object _SelectedItem = null;
 
-        public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        public SPRTextureVM(GameFile tmx, IList<SPRKey> keylist, int textureindex)
         {
-            if (e.PropertyName == "Image")
-            {
-                if (sender is TMX tmx)
-                {
-                    TextureImage = tmx.GetBitmap().GetBitmapSource();
-                }
-            }
-        }
+            if (tmx == null)
+                throw new ArgumentNullException(nameof(tmx));
+            if (keylist == null)
+                throw new ArgumentNullException(nameof(keylist));
 
-        public SPRTextureVM(ObjectContainer tmx, IList<SPRKey> keylist, int textureindex)
-        {
-            texture = tmx ?? throw new ArgumentNullException("tmx");
-            if (texture.Object == null) throw new ArgumentNullException("tmx.Object");
-            var list = (keylist ?? throw new ArgumentNullException("keylist")).Where(x => x.mTextureIndex == textureindex);
+            texture = tmx;
+            TextureImage = (tmx.GameData as IImage).GetBitmap().GetBitmapSource();
 
-            TextureImage = (tmx.Object as TMX).GetBitmap().GetBitmapSource();
-
-            foreach (var a in list)
+            foreach (var a in keylist.Where(x => x.mTextureIndex == textureindex))
                 KeyList.Add(new SPRKeyVM(a));
         }
 
         #region PublicProperties
 
-        public ObservableCollection<object> KeyList { get; } = new ObservableCollection<object>();
+        public ObservableCollection<SPRKeyVM> KeyList { get; } = new ObservableCollection<SPRKeyVM>();
 
-        public DrawingCollection Drawings { get; } = new DrawingCollection();
-
-        public string Name
-        {
-            get
-            {
-                if (texture.Object is TMX tmx)
-                    return tmx.Comment;
-                else return texture.Name;
-            }
-        }
+        public string Name => texture.GameData is TMX tmx ? tmx.Comment : texture.Name;
 
         public BitmapSource TextureImage
         {

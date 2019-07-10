@@ -16,7 +16,7 @@ namespace PersonaEditor.ViewModels.Editors
 {
     class SPDTextureVM : BindingObject
     {
-        ObjectContainer texture;
+        GameFile texture;
 
         private BitmapSource _TextureImage = null;
         private Rect _Rect;
@@ -33,15 +33,17 @@ namespace PersonaEditor.ViewModels.Editors
             }
         }
 
-        public SPDTextureVM(ObjectContainer dds, IList<SPDKey> keylist, int index)
+        public SPDTextureVM(GameFile dds, IList<SPDKey> keylist, int index)
         {
-            texture = dds ?? throw new ArgumentNullException("dds");
-            if (texture.Object == null) throw new ArgumentNullException("dds.Object");
-            var list = (keylist ?? throw new Exception("keylist")).Where(x => x.TextureIndex == index);
+            if (dds == null)
+                throw new ArgumentNullException(nameof(dds));
+            if (keylist == null)
+                throw new ArgumentNullException(nameof(keylist));
 
-            TextureImage = (dds.Object as DDS).GetBitmap().GetBitmapSource();
+            texture = dds;
+            TextureImage = (dds.GameData as IImage).GetBitmap().GetBitmapSource();
 
-            foreach (var a in list)
+            foreach (var a in keylist.Where(x => x.TextureIndex == index))
                 KeyList.Add(new SPDKeyVM(a));
         }
 

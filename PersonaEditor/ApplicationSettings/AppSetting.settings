@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PersonaEditorGUI.Settings" GeneratedClassName="AppSetting">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PersonaEditor.ApplicationSettings" GeneratedClassName="AppSetting">
   <Profiles />
   <Settings>
     <Setting Name="BMDFontDefault" Type="System.String" Scope="User">
@@ -44,8 +44,8 @@
     <Setting Name="OpenPTP_NeverAskAgain" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="Single_Instance_Application" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="SingleInstanceApplication" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="PTPImageView" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

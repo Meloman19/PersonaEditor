@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace PersonaEditorLib.Other
 {
-    public class FNT0 : IGameFile, IImage, ITable
+    public class FNT0 : IGameData, IImage, ITable
     {
         private List<byte[]> glyphs = null;
         private bool glyphsChanged = false;
@@ -95,7 +95,7 @@ namespace PersonaEditorLib.Other
 
         public FormatEnum Type => FormatEnum.FNT0;
 
-        public List<ObjectContainer> SubFiles => new List<ObjectContainer>();
+        public List<GameFile> SubFiles => new List<GameFile>();
 
         public int GetSize()
         {

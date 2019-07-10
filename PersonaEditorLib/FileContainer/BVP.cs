@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PersonaEditorLib.FileContainer
 {
-    public class BVP : IGameFile
+    public class BVP : IGameData
     {
         List<int> FlagList = new List<int>();
 
@@ -49,22 +49,6 @@ namespace PersonaEditorLib.FileContainer
             get { return SubFiles.Count; }
         }
 
-        public object this[int index]
-        {
-            get
-            {
-                if (SubFiles.Count > index)
-                    return SubFiles[index].Object;
-
-                return null;
-            }
-            set
-            {
-                if (SubFiles.Count > index)
-                    SubFiles[index].Object = value;
-            }
-        }
-
         public bool IsLittleEndian { get; set; } = true;
 
         public string Name { get; private set; } = "";
@@ -73,7 +57,7 @@ namespace PersonaEditorLib.FileContainer
 
         public FormatEnum Type => FormatEnum.BVP;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => GetData().Length;
 
@@ -88,10 +72,9 @@ namespace PersonaEditorLib.FileContainer
 
                 for (int i = 0; i < SubFiles.Count; i++)
                 {
-                    var temp = SubFiles[i].Object as IGameFile;
-                    Entry.Add(new int[] { FlagList[i], (int)writer.BaseStream.Position, temp.GetSize() });
+                    Entry.Add(new int[] { FlagList[i], (int)writer.BaseStream.Position, SubFiles[i].GameData.GetSize() });
 
-                    writer.Write(temp.GetData());
+                    writer.Write(SubFiles[i].GameData.GetData());
                     writer.Write(new byte[IOTools.Alignment(writer.BaseStream.Position, 16)]);
                 }
 

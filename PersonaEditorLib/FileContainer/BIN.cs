@@ -6,9 +6,9 @@ using AuxiliaryLibraries.Tools;
 
 namespace PersonaEditorLib.FileContainer
 {
-    public class BIN : IGameFile
+    public class BIN : IGameData
     {
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public BIN(string path)
         {
@@ -51,7 +51,7 @@ namespace PersonaEditorLib.FileContainer
                     byte[] Data = reader.ReadBytes(Size);
                     reader.BaseStream.Position += IOTools.Alignment(reader.BaseStream.Position, 0x40);
 
-                    ObjectContainer objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
+                    GameFile objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
                     if (objectFile == null)
                         objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
                     SubFiles.Add(objectFile);
@@ -72,7 +72,7 @@ namespace PersonaEditorLib.FileContainer
                     int Size = reader.ReadInt32();
                     byte[] Data = reader.ReadBytes(Size);
 
-                    ObjectContainer objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
+                    GameFile objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
                     if (objectFile == null)
                         objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
                     SubFiles.Add(objectFile);
@@ -83,7 +83,7 @@ namespace PersonaEditorLib.FileContainer
             }
         }
 
-        public ObjectContainer this[int index]
+        public GameFile this[int index]
         {
             get
             {
@@ -102,7 +102,7 @@ namespace PersonaEditorLib.FileContainer
 
         public FormatEnum Type => FormatEnum.BIN;
 
-        public List<ObjectContainer> GetSubFiles()
+        public List<GameFile> GetSubFiles()
         {
             return SubFiles;
         }
@@ -114,25 +114,24 @@ namespace PersonaEditorLib.FileContainer
             if (Old)
             {
                 foreach (var a in SubFiles)
-                    if (a.Object is IGameFile file)
-                    {
-                        returned += 0x100;
-                        returned += file.GetSize();
-                        returned += IOTools.Alignment(returned, 0x40);
-                    }
+                {
+                    returned += 0x100;
+                    returned += a.GameData.GetSize();
+                    returned += IOTools.Alignment(returned, 0x40);
+                }
+
                 returned += 0x100;
             }
             else
             {
                 returned += 4;
                 foreach (var a in SubFiles)
-                    if (a.Object is IGameFile file)
-                    {
-                        returned += 0x20 + 4;
-                        int size = file.GetSize();
-                        int align = IOTools.Alignment(size, 0x20);
-                        returned += size + align;
-                    }
+                {
+                    returned += 0x20 + 4;
+                    int size = a.GameData.GetSize();
+                    int align = IOTools.Alignment(size, 0x20);
+                    returned += size + align;
+                }
             }
 
             return returned;
@@ -155,21 +154,20 @@ namespace PersonaEditorLib.FileContainer
                 BinaryWriter writer = IOTools.OpenWriteFile(MS, IsLittleEndian);
 
                 foreach (var a in SubFiles)
-                    if (a.Object is IGameFile pfile)
+                {
+                    byte[] name = new byte[0x100 - 4];
+                    Encoding.ASCII.GetBytes(a.Name, 0, a.Name.Length, name, 0);
+                    writer.Write(name);
+                    byte[] data = a.GameData.GetData();
+                    int size = a.GameData.GetSize();
+                    if (data.Length != size)
                     {
-                        byte[] name = new byte[0x100 - 4];
-                        Encoding.ASCII.GetBytes(a.Name, 0, a.Name.Length, name, 0);
-                        writer.Write(name);
-                        byte[] data = pfile.GetData();
-                        int size = pfile.GetSize();
-                        if (data.Length != size)
-                        {
 
-                        }
-                        writer.Write(size);
-                        writer.Write(data);
-                        writer.Write(new byte[IOTools.Alignment(MS.Position, 0x40)]);
                     }
+                    writer.Write(size);
+                    writer.Write(data);
+                    writer.Write(new byte[IOTools.Alignment(MS.Position, 0x40)]);
+                }
 
                 writer.Write(new byte[0x100]);
 
@@ -185,16 +183,15 @@ namespace PersonaEditorLib.FileContainer
 
                 writer.Write((int)SubFiles.Count);
                 foreach (var a in SubFiles)
-                    if (a.Object is IGameFile file)
-                    {
-                        writer.Write(Encoding.ASCII.GetBytes(a.Name));
-                        writer.Write(new byte[IOTools.Alignment(a.Name.Length, 0x20)]);
-                        int size = file.GetSize();
-                        int align = IOTools.Alignment(size, 0x20);
-                        writer.Write(size + align);
-                        writer.Write(file.GetData());
-                        writer.Write(new byte[align]);
-                    }
+                {
+                    writer.Write(Encoding.ASCII.GetBytes(a.Name));
+                    writer.Write(new byte[IOTools.Alignment(a.Name.Length, 0x20)]);
+                    int size = a.GameData.GetSize();
+                    int align = IOTools.Alignment(size, 0x20);
+                    writer.Write(size + align);
+                    writer.Write(a.GameData.GetData());
+                    writer.Write(new byte[align]);
+                }
 
                 return MS.ToArray();
             }

@@ -18,7 +18,7 @@ namespace PersonaEditor.ViewModels
         private object _sel = 10;
         public object Sel => _sel;
 
-        public void SetRoot(ObjectContainer personaFile)
+        public void SetRoot(GameFile personaFile)
         {
             if (tree.Count > 0)
                 if (!tree[0].Close())
@@ -30,30 +30,19 @@ namespace PersonaEditor.ViewModels
             item.ItemAction += Item_Action;
             tree.Add(item);
 
-            if (personaFile.Object is IGameFile pfile && pfile.Type == FormatEnum.PTP)
+            if (personaFile.GameData.Type == FormatEnum.PTP)
                 ItemAction(item, UserTreeViewItemEventEnum.Open);
         }
 
         private void Item_Action(TreeViewItemVM sender, UserTreeViewItemEventEnum action) => ItemAction?.Invoke(sender, action);
 
-        public ObjectContainer GetRoot()
+        public GameFile GetRoot()
         {
             if (tree.Count > 0)
                 return tree[0].PersonaFile;
             else
                 return null;
         }
-
-        //public override void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        //{
-        //    if (sender is UserTreeViewItem item)
-        //    {
-        //        if (e.PropertyName == "IsSelected")
-        //            ItemAction?.Invoke(item, UserTreeViewItemEventEnum.Selected);
-        //        else if (e.PropertyName == "Open")
-        //            ItemAction?.Invoke(item, UserTreeViewItemEventEnum.Open);
-        //    }
-        //}
 
         public TreeViewPEVM()
         {

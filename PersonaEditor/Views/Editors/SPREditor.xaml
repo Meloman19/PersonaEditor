@@ -77,7 +77,7 @@
                         </MenuItem>
                     </Menu>
                     <StatusBar Grid.Column="1">
-                        <controls:NumericIncDec x:Name="NUM" x:FieldModifier="private" Min="0" Max="5" Width="40" Value="{Binding Source={x:Static settings:SPREditor.Default}, Path=BorderThickness, Mode=TwoWay}"/>
+                        <controls:NumericIncDec x:Name="NUM" Min="0" Max="5" Width="40" Value="{Binding Source={x:Static settings:SPREditor.Default}, Path=BorderThickness, Mode=TwoWay}"/>
                     </StatusBar>
                 </Grid>
 

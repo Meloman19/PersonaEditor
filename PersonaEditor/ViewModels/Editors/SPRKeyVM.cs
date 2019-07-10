@@ -15,6 +15,7 @@ namespace PersonaEditor.ViewModels.Editors
         {
             get { return Key.mComment; }
         }
+
         public int X1
         {
             get { return Key.X1; }
@@ -28,6 +29,7 @@ namespace PersonaEditor.ViewModels.Editors
                 }
             }
         }
+
         public int X2
         {
             get { return Key.X2; }
@@ -41,6 +43,7 @@ namespace PersonaEditor.ViewModels.Editors
                 }
             }
         }
+
         public int Y1
         {
             get { return Key.Y1; }
@@ -88,7 +91,10 @@ namespace PersonaEditor.ViewModels.Editors
 
         public SPRKeyVM(SPRKey key)
         {
-            Key = key ?? throw new ArgumentNullException("key");
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            Key = key;
         }
     }
 }

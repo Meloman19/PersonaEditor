@@ -9,7 +9,7 @@ using System.Text;
 
 namespace PersonaEditorLib.Sprite
 {
-    public class DDSAtlus : IGameFile, IImage
+    public class DDSAtlus : IGameData, IImage
     {
         public DDSAtlusHeader Header { get; private set; }
 
@@ -104,7 +104,7 @@ namespace PersonaEditorLib.Sprite
 
         public FormatEnum Type => FormatEnum.DDS;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => Header.Size + 4 + dataList.Sum(x => x.Length) + LastBlock.Length;
 

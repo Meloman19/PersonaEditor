@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace PersonaEditorLib.SpriteContainer
 {
-    public class SPD : IGameFile, ITable
+    public class SPD : IGameData, ITable
     {
         public const int MagicNumber = 0x30525053;
 
@@ -82,7 +82,7 @@ namespace PersonaEditorLib.SpriteContainer
 
         public FormatEnum Type => FormatEnum.SPD;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()
         {
@@ -91,7 +91,7 @@ namespace PersonaEditorLib.SpriteContainer
             returned += 0x20; // Add Header
             returned += SubFiles.Count * 0x30; // Add Textures Header
             returned += KeyList.Count * 0xa0; // Add Keys
-            SubFiles.ForEach(x => returned += (x.Object as Sprite.DDS).GetSize()); // Add Textures
+            SubFiles.ForEach(x => returned += (x.GameData as Sprite.DDS).GetSize()); // Add Textures
 
             return returned;
         }
@@ -121,12 +121,12 @@ namespace PersonaEditorLib.SpriteContainer
                 SubFiles.ForEach(x =>
                 {
                     pos.Add((int)MS.Position);
-                    writer.Write((x.Object as Sprite.DDS).GetData());
+                    writer.Write((x.GameData as Sprite.DDS).GetData());
                 });
 
                 MS.Position = 0x20;
                 for (int i = 0; i < SubFiles.Count; i++)
-                    if (SubFiles[i].Object is Sprite.DDS dds)
+                    if (SubFiles[i].GameData is Sprite.DDS dds)
                     {
                         writer.Write((int)SubFiles[i].Tag);
                         writer.Write(0);

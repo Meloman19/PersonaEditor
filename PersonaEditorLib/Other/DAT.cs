@@ -5,13 +5,13 @@ using System.Text;
 
 namespace PersonaEditorLib.Other
 {
-    public class DAT : IGameFile
+    public class DAT : IGameData
     {
         public byte[] Data { get; set; } = new byte[0];
 
         private StreamPart StreamFile;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public DAT(byte[] data)
         {
@@ -27,7 +27,7 @@ namespace PersonaEditorLib.Other
 
         public FormatEnum Type => FormatEnum.DAT;
 
-        public List<ObjectContainer> GetSubFiles()
+        public List<GameFile> GetSubFiles()
         {
             return SubFiles;
         }

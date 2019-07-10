@@ -119,9 +119,9 @@ namespace PersonaEditor.ViewModels.Editors
             }
         }
 
-        public BMDEditorVM(ObjectContainer objbmd)
+        public BMDEditorVM(GameFile objbmd)
         {
-            if (objbmd.Object is BMD bmd)
+            if (objbmd.GameData is BMD bmd)
             {
                 EncodingEW = new EventWrapperINPC(Static.EncodingManager, this);
 

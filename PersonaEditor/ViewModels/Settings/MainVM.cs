@@ -75,10 +75,10 @@ namespace PersonaEditor.ViewModels.Settings
 
         public bool SingleInstanceApplication
         {
-            get { return AppSetting_Temp.Single_Instance_Application; }
+            get { return AppSetting_Temp.SingleInstanceApplication; }
             set
             {
-                AppSetting_Temp.Single_Instance_Application = value;
+                AppSetting_Temp.SingleInstanceApplication = value;
                 Notify("SingleInstanceApplication");
             }
         }

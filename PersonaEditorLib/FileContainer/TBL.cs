@@ -8,7 +8,7 @@ using System.Text;
 
 namespace PersonaEditorLib.FileContainer
 {
-    public class TBL : IGameFile
+    public class TBL : IGameData
     {
         List<byte[]> List = new List<byte[]>();
 
@@ -124,7 +124,7 @@ namespace PersonaEditorLib.FileContainer
 
         public FormatEnum Type => FormatEnum.TBL;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => GetData().Length;
 
@@ -135,12 +135,9 @@ namespace PersonaEditorLib.FileContainer
             {
                 foreach (var element in SubFiles)
                 {
-                    if (element.Object is IGameFile pFile)
-                    {
-                        writer.Write(pFile.GetSize());
-                        writer.Write(pFile.GetData());
-                        writer.Write(new byte[IOTools.Alignment(writer.BaseStream.Position, 16)]);
-                    }
+                    writer.Write(element.GameData.GetSize());
+                    writer.Write(element.GameData.GetData());
+                    writer.Write(new byte[IOTools.Alignment(writer.BaseStream.Position, 16)]);
                 }
                 return MS.ToArray();
             }

@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace PersonaEditorLib.Text
 {
-    public class PTP : IGameFile
+    public class PTP : IGameData
     {
         #region Properties
 
@@ -442,7 +442,7 @@ namespace PersonaEditorLib.Text
 
         public FormatEnum Type => FormatEnum.PTP;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => GetData().Length;
 

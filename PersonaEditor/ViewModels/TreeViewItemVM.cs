@@ -24,7 +24,7 @@ namespace PersonaEditor.ViewModels
         private bool _isEnable = true;
         private bool _isSelected = false;
         private bool _AllowDrop = true;
-        private ObjectContainer _personaFile = null;
+        private GameFile _personaFile = null;
 
         #endregion Private Properties
 
@@ -58,7 +58,7 @@ namespace PersonaEditor.ViewModels
 
         public bool IsEnable => _isEnable;
 
-        public ObjectContainer PersonaFile => _personaFile;
+        public GameFile PersonaFile => _personaFile;
 
         public bool AllowDrop => _AllowDrop;
 
@@ -101,7 +101,7 @@ namespace PersonaEditor.ViewModels
 
         private void DropItem(object sender, DragEventArgs e)
         {
-            if (PersonaFile is IGameFile pFile)
+            if (PersonaFile is IGameData pFile)
             {
                 string[] temp = e.Data.GetData(DataFormats.FileDrop) as string[];
 
@@ -110,7 +110,7 @@ namespace PersonaEditor.ViewModels
                     {
                         var personaFile = GameFormatHelper.OpenFile(PersonaFile.Name, File.ReadAllBytes(temp[0]), pFile.Type);
                         if (personaFile != null)
-                            _personaFile.Object = personaFile.Object;
+                            _personaFile.GameData = personaFile.GameData;
                         else
                             MessageBox.Show("Error. " + Path.GetFileName(temp[0]) + " is not a " + pFile.Type + " type");
                     }
@@ -126,7 +126,7 @@ namespace PersonaEditor.ViewModels
             data.SetData(typeof(TreeViewItemVM), this);
 
             string[] paths = new string[] { filepath };
-            File.WriteAllBytes(paths[0], (PersonaFile.Object as IGameFile).GetData());
+            File.WriteAllBytes(paths[0], (PersonaFile.GameData as IGameData).GetData());
 
             data.SetData(DataFormats.FileDrop, paths);
 
@@ -168,7 +168,7 @@ namespace PersonaEditor.ViewModels
             return true;
         }
 
-        public TreeViewItemVM(ObjectContainer personaFile)
+        public TreeViewItemVM(GameFile personaFile)
         {
             DoubleClick = new RelayCommand(MouseDoubleClick);
             Leave = new RelayCommand(MouseLeave);
@@ -177,17 +177,13 @@ namespace PersonaEditor.ViewModels
             SubItems = new ReadOnlyObservableCollection<TreeViewItemVM>(_subItems);
             ContextMenu = new ReadOnlyObservableCollection<object>(_contextMenu);
 
-            _personaFile = personaFile;
-
-            if (!(personaFile.Object is IGameFile))
-                throw new Exception("UserTreeViewItem: context not IPersonaFile");
-
+            _personaFile = personaFile ?? throw new ArgumentNullException(nameof(personaFile));
             Update(personaFile);
         }
 
-        private void Update(ObjectContainer newObject)
+        private void Update(GameFile newObject)
         {
-            if (newObject.Object is IGameFile item)
+            if (newObject.GameData is IGameData item)
             {
                 UpdateContextMenu();
 
@@ -201,7 +197,7 @@ namespace PersonaEditor.ViewModels
                     _subItems.Add(temp);
                 }
             }
-            if (newObject.Object is IImage image)
+            if (newObject.GameData is IImage image)
             {
                 BitmapSource = image.GetBitmap().GetBitmapSource();
             }

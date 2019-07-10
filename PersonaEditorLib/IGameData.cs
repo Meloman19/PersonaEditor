@@ -2,10 +2,10 @@
 
 namespace PersonaEditorLib
 {
-    public interface IGameFile
+    public interface IGameData
     {
         FormatEnum Type { get; }
-        List<ObjectContainer> SubFiles { get; }
+        List<GameFile> SubFiles { get; }
         int GetSize();
         byte[] GetData();
     }

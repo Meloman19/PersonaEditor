@@ -9,7 +9,7 @@ using System.Text;
 
 namespace PersonaEditorLib.FileContainer
 {
-    public class PM1 : IGameFile
+    public class PM1 : IGameData
     {
         #region Private Classes and Enum
 
@@ -40,7 +40,7 @@ namespace PersonaEditorLib.FileContainer
 
         private byte[] Unknown;
 
-        private List<ObjectContainer> HidList = new List<ObjectContainer>();
+        private List<GameFile> HidList = new List<GameFile>();
 
         private static int[] MainFileList = new int[]
         {
@@ -349,7 +349,7 @@ namespace PersonaEditorLib.FileContainer
                 if (TYPE != null)
                 {
                     byte[][] type = new byte[1][];
-                    var temp = (TYPE.Object as IGameFile).GetData();
+                    var temp = TYPE.GameData.GetData();
 
                     int align = IOTools.Alignment(temp.Length, 16);
                     byte[] tempType = null;
@@ -382,7 +382,7 @@ namespace PersonaEditorLib.FileContainer
                 {
                     for (int i = 0; i < RMD.Count; i++)
                     {
-                        byte[] temp = (RMD[i].Object as IGameFile).GetData();
+                        byte[] temp = RMD[i].GameData.GetData();
                         byte[] tempRMD = new byte[temp.Length + IOTools.Alignment(temp.Length, 16)];
                         Buffer.BlockCopy(temp, 0, tempRMD, 0, temp.Length);
                         MS.Write(tempRMD, 0, tempRMD.Length);
@@ -424,7 +424,7 @@ namespace PersonaEditorLib.FileContainer
                 {
                     for (int i = 0; i < EPL.Count; i++)
                     {
-                        byte[] temp = (EPL[i].Object as IGameFile).GetData();
+                        byte[] temp = EPL[i].GameData.GetData();
                         byte[] tempEPL = new byte[temp.Length + IOTools.Alignment(temp.Length, 16)];
                         Buffer.BlockCopy(temp, 0, tempEPL, 0, temp.Length);
                         MS.Write(tempEPL, 0, tempEPL.Length);
@@ -462,7 +462,7 @@ namespace PersonaEditorLib.FileContainer
                 {
                     for (int i = 0; i < TMX.Count; i++)
                     {
-                        byte[] temp = (TMX[i].Object as IGameFile).GetData();
+                        byte[] temp = TMX[i].GameData.GetData();
                         byte[] tempTMX = new byte[temp.Length + IOTools.Alignment(temp.Length, 16)];
                         Buffer.BlockCopy(temp, 0, tempTMX, 0, temp.Length);
                         MS.Write(tempTMX, 0, tempTMX.Length);
@@ -497,7 +497,7 @@ namespace PersonaEditorLib.FileContainer
             foreach (var a in unnamedFiles)
             {
                 byte[][] type = new byte[1][];
-                var temp = (a.Object as IGameFile).GetData();
+                var temp = a.GameData.GetData();
 
                 int align = IOTools.Alignment(temp.Length, 16);
                 byte[] tempType = null;
@@ -631,7 +631,7 @@ namespace PersonaEditorLib.FileContainer
 
         public FormatEnum Type => FormatEnum.PM1;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => GetData().Length;
 

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PersonaEditorLib.FileContainer
 {
-    public class BF : IGameFile
+    public class BF : IGameData
     {
         private static Dictionary<int, FormatEnum> MAP = new Dictionary<int, FormatEnum>()
         {
@@ -46,7 +46,7 @@ namespace PersonaEditorLib.FileContainer
         {
             foreach (var a in SubFiles)
             {
-                FormatEnum fileType = (a.Object as IGameFile).Type;
+                FormatEnum fileType = a.GameData.Type;
                 string ext = Path.GetExtension(name);
                 if (fileType == FormatEnum.DAT)
                     a.Name = name.Substring(0, name.Length - ext.Length) + "(" + ((int)a.Tag).ToString().PadLeft(2, '0') + ").DAT";
@@ -121,7 +121,7 @@ namespace PersonaEditorLib.FileContainer
                 var sub = SubFiles.Find(x => (int)x.Tag == element[0]);
                 if (sub != null)
                 {
-                    tempsize = (sub.Object as IGameFile).GetSize();
+                    tempsize = sub.GameData.GetSize();
                     if (tempsize % element[1] == 0)
                         element[2] = tempsize / element[1];
                     else
@@ -139,14 +139,14 @@ namespace PersonaEditorLib.FileContainer
 
         public FormatEnum Type => FormatEnum.BF;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()
         {
             int returned = 0;
 
             returned += 0x20 + 0x10 * Table.Length;
-            SubFiles.ForEach(x => returned += (x.Object as IGameFile).GetSize());
+            SubFiles.ForEach(x => returned += x.GameData.GetSize());
 
             return returned;
         }
@@ -164,7 +164,7 @@ namespace PersonaEditorLib.FileContainer
                 int tempSize = GetSize();
                 var temp = SubFiles.FindAll(x => (int)x.Tag > endIndex);
                 foreach (var a in temp)
-                    tempSize -= (a.Object as IGameFile).GetSize();
+                    tempSize -= a.GameData.GetSize();
 
                 writer.Write(tempSize);
                 writer.Write(Encoding.ASCII.GetBytes("FLW0"));
@@ -176,7 +176,7 @@ namespace PersonaEditorLib.FileContainer
                 foreach (var line in Table)
                     writer.WriteInt32Array(line);
 
-                SubFiles.ForEach(x => writer.Write((x.Object as IGameFile).GetData()));
+                SubFiles.ForEach(x => writer.Write(x.GameData.GetData()));
 
                 returned = MS.ToArray();
             }

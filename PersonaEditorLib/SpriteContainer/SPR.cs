@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PersonaEditorLib.SpriteContainer
 {
-    public class SPR : IGameFile
+    public class SPR : IGameData
     {
         SPRHeader Header;
         List<int> TextureOffsetList = new List<int>();
@@ -49,7 +49,7 @@ namespace PersonaEditorLib.SpriteContainer
             foreach (var a in TextureOffsetList)
             {
                 var tmx = new Sprite.TMX(new StreamPart(reader.BaseStream, -1, a));
-                SubFiles.Add(new ObjectContainer(tmx.Comment + ".tmx", tmx));
+                SubFiles.Add(new GameFile(tmx.Comment + ".tmx", tmx));
             }
         }
 
@@ -59,7 +59,7 @@ namespace PersonaEditorLib.SpriteContainer
 
             for (int i = 1; i < SubFiles.Count; i++)
             {
-                start += (SubFiles[i - 1].Object as IGameFile).GetSize();
+                start += SubFiles[i - 1].GameData.GetSize();
                 int temp = IOTools.Alignment(start, 16);
                 start += temp == 0 ? 16 : temp;
                 list[i] = start;
@@ -72,7 +72,7 @@ namespace PersonaEditorLib.SpriteContainer
 
         public FormatEnum Type => FormatEnum.SPR;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()
         {
@@ -86,12 +86,12 @@ namespace PersonaEditorLib.SpriteContainer
             int temp = IOTools.Alignment(returned, 16);
             returned += temp == 0 ? 16 : temp;
 
-            returned += (SubFiles[0].Object as IGameFile).GetSize();
+            returned += (SubFiles[0].GameData as IGameData).GetSize();
             for (int i = 1; i < SubFiles.Count; i++)
             {
                 temp = IOTools.Alignment(returned, 16);
                 returned += temp == 0 ? 16 : temp;
-                returned += (SubFiles[i].Object as IGameFile).GetSize();
+                returned += SubFiles[i].GameData.GetSize();
             }
 
             return returned;
@@ -123,12 +123,12 @@ namespace PersonaEditorLib.SpriteContainer
 
                 UpdateOffsets(TextureOffsetList, (int)writer.BaseStream.Position);
 
-                writer.Write((SubFiles[0].Object as IGameFile).GetData());
+                writer.Write(SubFiles[0].GameData.GetData());
                 for (int i = 1; i < SubFiles.Count; i++)
                 {
                     int temp2 = IOTools.Alignment(writer.BaseStream.Length, 16);
                     writer.Write(new byte[temp2 == 0 ? 16 : temp2]);
-                    writer.Write((SubFiles[i].Object as IGameFile).GetData());
+                    writer.Write(SubFiles[i].GameData.GetData());
                 }
 
                 writer.BaseStream.Position = Header.Size;

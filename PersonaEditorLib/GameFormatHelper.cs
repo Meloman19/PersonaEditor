@@ -50,11 +50,11 @@ namespace PersonaEditorLib
         /// <param name="data">Data of file</param>
         /// <param name="type">Type of file</param>
         /// <returns>Return ObjectContainer for this file or null if an error occurred.</returns>
-        public static ObjectContainer OpenFile(string name, byte[] data, FormatEnum type)
+        public static GameFile OpenFile(string name, byte[] data, FormatEnum type)
         {
             try
             {
-                object Obj;
+                IGameData Obj;
 
                 if (type == FormatEnum.BIN)
                     Obj = new FileContainer.BIN(data);
@@ -101,7 +101,7 @@ namespace PersonaEditorLib
                 else
                     Obj = new DAT(data);
 
-                return new ObjectContainer(name, Obj);
+                return new GameFile(name, Obj);
             }
             catch
             {
@@ -109,7 +109,7 @@ namespace PersonaEditorLib
             }
         }
 
-        public static ObjectContainer OpenFile(string name, byte[] data)
+        public static GameFile OpenFile(string name, byte[] data)
         {
             var format = GetFormat(data);
             if (format == FormatEnum.Unknown)

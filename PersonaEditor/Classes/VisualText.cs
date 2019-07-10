@@ -12,9 +12,9 @@ namespace PersonaEditor.Classes
     {
         #region DependencyProperty Encoding
 
-        public static DependencyProperty EncodingProperty = DependencyProperty.Register("Encoding", typeof(Encoding), typeof(VisualText), new PropertyMetadata(null, encodingPropertyChanged));
+        public static DependencyProperty EncodingProperty = DependencyProperty.Register("Encoding", typeof(Encoding), typeof(VisualText), new PropertyMetadata(null, EncodingPropertyChanged));
 
-        private static void encodingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void EncodingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
         }
 

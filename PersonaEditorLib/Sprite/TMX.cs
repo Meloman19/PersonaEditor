@@ -8,7 +8,7 @@ using System.Text;
 
 namespace PersonaEditorLib.Sprite
 {
-    public class TMX : IGameFile, IImage
+    public class TMX : IGameData, IImage
     {
         #region Constants
         public const int ID = 0x2;
@@ -98,7 +98,7 @@ namespace PersonaEditorLib.Sprite
 
         public FormatEnum Type => FormatEnum.TMX;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()
         {

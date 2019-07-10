@@ -9,7 +9,7 @@ using System.Text;
 
 namespace PersonaEditorLib.Other
 {
-    public class FTD : IGameFile
+    public class FTD : IGameData
     {
         public const uint HeaderNumber = 0x00010000;
         public const uint MagicNumber = 0x46544430;
@@ -124,7 +124,7 @@ namespace PersonaEditorLib.Other
 
         public FormatEnum Type => FormatEnum.FTD;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()
         {

@@ -62,45 +62,50 @@ namespace PersonaEditor.ViewModels
                 return false;
             }
 
-            if (sender.PersonaFile.Object is IGameFile pf)
+            object DataContext;
+            string Title = sender.PersonaFile.Name;
+
+            switch (sender.PersonaFile.GameData.Type)
             {
-                object DataContext;
-                string Title = sender.PersonaFile.Name;
-
-                if (pf.Type == FormatEnum.SPR)
-                    DataContext = new SPREditorVM(sender.PersonaFile.Object as SPR);
-                else if (pf.Type == FormatEnum.SPD)
-                    DataContext = new SPDEditorVM(sender.PersonaFile.Object as SPD);
-                else if (pf.Type == FormatEnum.PTP)
-                    DataContext = new PTPEditorVM(sender.PersonaFile.Object as PTP);
-                else if (pf.Type == FormatEnum.BMD)
+                case FormatEnum.SPR:
+                    DataContext = new SPREditorVM(sender.PersonaFile.GameData as SPR);
+                    break;
+                case FormatEnum.SPD:
+                    DataContext = new SPDEditorVM(sender.PersonaFile.GameData as SPD);
+                    break;
+                case FormatEnum.PTP:
+                    DataContext = new PTPEditorVM(sender.PersonaFile.GameData as PTP);
+                    break;
+                case FormatEnum.BMD:
                     DataContext = new BMDEditorVM(sender.PersonaFile);
-                else if (pf.Type == FormatEnum.FTD)
-                    DataContext = new FTDEditorVM(sender.PersonaFile.Object as FTD);
-                else if (pf.Type == FormatEnum.FNT)
-                    DataContext = new FNTEditorVM(sender.PersonaFile.Object as FNT);
-                else if (pf.Type == FormatEnum.FNT0)
-                    DataContext = new FNT0EditorVM(sender.PersonaFile.Object as FNT0);
-                else if (pf.Type == FormatEnum.DAT)
-                    DataContext = new HEXEditorVM(sender.PersonaFile.Object as DAT);
-                else
+                    break;
+                case FormatEnum.FTD:
+                    DataContext = new FTDEditorVM(sender.PersonaFile.GameData as FTD);
+                    break;
+                case FormatEnum.FNT:
+                    DataContext = new FNTEditorVM(sender.PersonaFile.GameData as FNT);
+                    break;
+                case FormatEnum.FNT0:
+                    DataContext = new FNT0EditorVM(sender.PersonaFile.GameData as FNT0);
+                    break;
+                case FormatEnum.DAT:
+                    DataContext = new HEXEditorVM(sender.PersonaFile.GameData as DAT);
+                    break;
+                default:
                     return false;
-
-
-                ClosableTabItemVM closableTabItemVM = new ClosableTabItemVM();
-                closableTabItemVM.DataContext = DataContext;
-                closableTabItemVM.TabTitle = Title;
-                closableTabItemVM.PropertyChanged += ClosableTabItemVM_PropertyChanged;
-                closableTabItemVM.PersonaFile = sender;
-
-                tabCollection.Add(closableTabItemVM);
-                SelectedTabIndex = tabCollection.IndexOf(closableTabItemVM);
-
-                sender.UnEnable();
-                return true;
             }
 
-            return false;
+            ClosableTabItemVM closableTabItemVM = new ClosableTabItemVM();
+            closableTabItemVM.DataContext = DataContext;
+            closableTabItemVM.TabTitle = Title;
+            closableTabItemVM.PropertyChanged += ClosableTabItemVM_PropertyChanged;
+            closableTabItemVM.PersonaFile = sender;
+
+            tabCollection.Add(closableTabItemVM);
+            SelectedTabIndex = tabCollection.IndexOf(closableTabItemVM);
+
+            sender.UnEnable();
+            return true;
         }
 
         public void SetPreview(ImageSource Preview)
@@ -118,7 +123,7 @@ namespace PersonaEditor.ViewModels
             string tabtitle = "";
             tabtitle = Application.Current.Resources.MergedDictionaries.GetString("main_Preview");
             Drop = new RelayCommand(SingleFileEdit_Drop);
-            tabCollection.Add(new ClosableTabItemVM() { TabTitle = tabtitle, IsClosable = false, DataContext = previewVM});
+            tabCollection.Add(new ClosableTabItemVM() { TabTitle = tabtitle, IsClosable = false, DataContext = previewVM });
             TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(tabCollection);
         }
     }

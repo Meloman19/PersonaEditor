@@ -22,20 +22,20 @@ namespace PersonaEditor.Classes
             return contextMenuItemsEdited.Contains(fileType);
         }
 
-        public static bool IsEdited(ObjectContainer objectFile)
+        public static bool IsEdited(GameFile gameFile)
+        {
+            if (gameFile == null)
+                throw new System.ArgumentNullException(nameof(gameFile));
+
+            return contextMenuItemsEdited.Contains(gameFile.GameData.Type);
+        }
+
+        public static bool HaveSubFiles(GameFile objectFile)
         {
             if (objectFile == null)
                 throw new System.ArgumentNullException(nameof(objectFile));
 
-            if (objectFile.Object is IGameFile personaFile)
-                return contextMenuItemsEdited.Contains(personaFile.Type);
-
-            return false;
-        }
-
-        public static bool HaveSubFiles(ObjectContainer objectFile)
-        {
-            if (objectFile?.Object is IGameFile personaFile && personaFile.SubFiles.Count != 0)
+            if (objectFile.GameData.SubFiles.Count != 0)
                 return true;
 
             return false;

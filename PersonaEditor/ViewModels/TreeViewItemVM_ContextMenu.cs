@@ -57,7 +57,7 @@ namespace PersonaEditor.ViewModels
 
         private void ContextMenu_Replace()
         {
-            FormatEnum fileType = (PersonaFile.Object as IGameFile).Type;
+            FormatEnum fileType = PersonaFile.GameData.Type;
 
             OpenFileDialog OFD = new OpenFileDialog();
             string name = PersonaFile.Name.Replace('/', '+');
@@ -66,11 +66,11 @@ namespace PersonaEditor.ViewModels
             OFD.CheckPathExists = true;
             OFD.Multiselect = false;
 
-            if (PersonaFile.Object is IImage)
+            if (PersonaFile.GameData is IImage)
                 OFD.Filter += $"|PNG (*.png)|*.png";
-            if (PersonaFile.Object is ITable)
+            if (PersonaFile.GameData is ITable)
                 OFD.Filter += $"|XML data table (*.xml)|*.xml";
-            if (PersonaFile.Object is BMD)
+            if (PersonaFile.GameData is BMD)
                 OFD.Filter += $"|Persona Text Project (*.ptp)|*.ptp";
 
             if (OFD.ShowDialog() == true)
@@ -78,9 +78,9 @@ namespace PersonaEditor.ViewModels
                 if (OFD.FilterIndex == 1)
                 {
                     var item = GameFormatHelper.OpenFile(PersonaFile.Name, File.ReadAllBytes(OFD.FileName), fileType);
-                    
+
                     if (item != null)
-                        PersonaFile.Object = item.Object;
+                        PersonaFile.GameData = item.GameData;
                 }
                 else
                 {
@@ -113,19 +113,19 @@ namespace PersonaEditor.ViewModels
             SFD.FileName = PersonaFile.Name.Replace('/', '+');
             SFD.Filter = $"RAW(*{Path.GetExtension(SFD.FileName)})|*{Path.GetExtension(SFD.FileName)}";
 
-            if (PersonaFile.Object is IImage)
+            if (PersonaFile.GameData is IImage)
                 SFD.Filter += $"|PNG (*.png)|*.png";
-            if (PersonaFile.Object is ITable)
+            if (PersonaFile.GameData is ITable)
                 SFD.Filter += $"|XML data table (*.xml)|*.xml";
-            if (PersonaFile.Object is BMD)
+            if (PersonaFile.GameData is BMD)
                 SFD.Filter += $"|Persona Text Project (*.ptp)|*.ptp";
-            if (PersonaFile.Object is PTP)
+            if (PersonaFile.GameData is PTP)
                 SFD.Filter += $"|BMD Text File (*.bmd)|*.bmd";
 
             SFD.InitialDirectory = Path.GetDirectoryName(Static.OpenedFile);
             if (SFD.ShowDialog() == true)
                 if (SFD.FilterIndex == 1)
-                    File.WriteAllBytes(SFD.FileName, (PersonaFile.Object as IGameFile).GetData());
+                    File.WriteAllBytes(SFD.FileName, PersonaFile.GameData.GetData());
                 else
                 {
                     string ext = Path.GetExtension(SFD.FileName);
@@ -143,7 +143,7 @@ namespace PersonaEditor.ViewModels
                     else if (ext.Equals(".bmd", StringComparison.CurrentCultureIgnoreCase))
                     {
                         Encoding encoding = Static.EncodingManager.GetPersonaEncoding(ApplicationSettings.AppSetting.Default.PTPNewDefault);
-                        BMD bmd = new BMD(PersonaFile.Object as PTP, encoding);
+                        BMD bmd = new BMD(PersonaFile.GameData as PTP, encoding);
                         File.WriteAllBytes(SFD.FileName, bmd.GetData());
                     }
                     else if (ext.Equals(".xml", StringComparison.CurrentCultureIgnoreCase))
@@ -158,12 +158,9 @@ namespace PersonaEditor.ViewModels
             if (FBD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 string path = FBD.SelectedPath;
-                if (PersonaFile.Object is IGameFile file)
-                {
-                    var list = file.SubFiles;
-                    foreach (var item in list)
-                        File.WriteAllBytes(Path.Combine(path, item.Name), (item.Object as IGameFile).GetData());
-                }
+
+                foreach (var item in PersonaFile.GameData.SubFiles)
+                    File.WriteAllBytes(Path.Combine(path, item.Name), item.GameData.GetData());
             }
         }
     }

@@ -86,14 +86,14 @@ namespace PersonaEditorCMD
                 var OpenedFileDir = Path.GetDirectoryName(filePath);
                 if (new FileInfo(filePath).Length > 10000000)
                     continue;
-                ObjectContainer file = GameFormatHelper.OpenFile(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
+                GameFile file = GameFormatHelper.OpenFile(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
                 if (file != null)
                 {
                     SubFileAction((a, b, c, d) =>
                     {
                         try
                         {
-                            if (a.Object is BMD bmd)
+                            if (a.GameData is BMD bmd)
                             {
                                 PTP ptp = new PTP(bmd);
                                 var newName = a.Name.Replace('/', '+');
@@ -114,12 +114,12 @@ namespace PersonaEditorCMD
             ArgumentsWork argwrk = new ArgumentsWork(args);
             if (argwrk.OpenedFile != "")
             {
-                ObjectContainer file = GameFormatHelper.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile));
+                GameFile file = GameFormatHelper.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile));
 
                 if (file != null)
                     foreach (var command in argwrk.ArgumentList)
                     {
-                        Action<ObjectContainer, string, string, Parameters> action = null;
+                        Action<GameFile, string, string, Parameters> action = null;
                         if (command.Command == CommandType.Export)
                         {
                             if (command.Type == CommandSubType.Image)
@@ -157,18 +157,18 @@ namespace PersonaEditorCMD
             }
         }
 
-        static void ExportImage(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportImage(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
             string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG");
             PersonaEditorTools.SaveImageFile(objectFile, path);
         }
 
-        static void ImportImage(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ImportImage(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is IImage image)
+            if (objectFile.GameData is IImage image)
             {
                 if (parameters.Size >= 0)
-                    if (objectFile.Object is FNT fnt)
+                    if (objectFile.GameData is FNT fnt)
                         fnt.Resize(parameters.Size);
 
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG") : value;
@@ -177,18 +177,18 @@ namespace PersonaEditorCMD
             }
         }
 
-        static void ExportTable(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportTable(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is ITable table)
+            if (objectFile.GameData is ITable table)
             {
                 string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".XML");
                 table.GetTable().Save(path);
             }
         }
 
-        static void ImportTable(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ImportTable(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is ITable table)
+            if (objectFile.GameData is ITable table)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".XML") : value;
                 if (File.Exists(path))
@@ -196,9 +196,9 @@ namespace PersonaEditorCMD
             }
         }
 
-        static void ExportPTP(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportPTP(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is BMD bmd)
+            if (objectFile.GameData is BMD bmd)
             {
                 string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name.Replace('/', '+')) + ".PTP");
                 PTP PTP = new PTP(bmd);
@@ -208,9 +208,9 @@ namespace PersonaEditorCMD
             }
         }
 
-        static void ImportPTP(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ImportPTP(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is BMD bmd)
+            if (objectFile.GameData is BMD bmd)
             {
                 string path = Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name.Replace('/', '+')) + ".PTP");
                 if (File.Exists(path))
@@ -218,21 +218,21 @@ namespace PersonaEditorCMD
                     PTP PTP = new PTP(File.ReadAllBytes(path));
                     var temp = new BMD(PTP, Static.NewEncoding());
                     temp.IsLittleEndian = bmd.IsLittleEndian;
-                    objectFile.Object = temp;
+                    objectFile.GameData = temp;
                 }
             }
         }
 
-        static void ExportText(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportText(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is PTP ptp)
+            if (objectFile.GameData is PTP ptp)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 var exp = ptp.ExportTXT(parameters.RemoveSplit, Static.OldEncoding()).Select(x => $"{objectFile.Name}\t{x}");
 
                 File.AppendAllLines(path, exp);
             }
-            else if (objectFile.Object is StringList strlst)
+            else if (objectFile.GameData is StringList strlst)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 string[] exp = strlst.ExportText();
@@ -241,9 +241,9 @@ namespace PersonaEditorCMD
             }
         }
 
-        static void ImportText(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ImportText(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is PTP ptp)
+            if (objectFile.GameData is PTP ptp)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
 
@@ -301,7 +301,7 @@ namespace PersonaEditorCMD
                     }
                 }
             }
-            else if (objectFile.Object is StringList strlst)
+            else if (objectFile.GameData is StringList strlst)
             {
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".TXT") : value;
                 if (File.Exists(path))
@@ -313,31 +313,23 @@ namespace PersonaEditorCMD
             }
         }
 
-        static void ExportByType(ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void ExportByType(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is IGameFile pFile)
+            foreach (var a in objectFile.GameData.SubFiles)
             {
-                var sublist = pFile.SubFiles;
-
-                foreach (var a in sublist)
-                {
-                    string path = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
-                    if (pFile.Type == GetFileType(value))
-                        File.WriteAllBytes(path, pFile.GetData());
-                }
+                string path = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
+                if (objectFile.GameData.Type == GetFileType(value))
+                    File.WriteAllBytes(path, objectFile.GameData.GetData());
             }
         }
 
-        static void SubFileAction(Action<ObjectContainer, string, string, Parameters> action, ObjectContainer objectFile, string value, string openedFileDir, Parameters parameters)
+        static void SubFileAction(Action<GameFile, string, string, Parameters> action, GameFile objectFile, string value, string openedFileDir, Parameters parameters)
         {
             action.Invoke(objectFile, value, openedFileDir, parameters);
 
-            if (parameters.Sub && objectFile.Object is IGameFile pFile)
-            {
-                var sublist = pFile.SubFiles;
-                foreach (var a in sublist)
+            if (parameters.Sub)
+                foreach (var a in objectFile.GameData.SubFiles)
                     SubFileAction(action, a, value, openedFileDir, parameters);
-            }
         }
 
         static FormatEnum GetFileType(string type)
@@ -348,51 +340,41 @@ namespace PersonaEditorCMD
                 return FormatEnum.Unknown;
         }
 
-        static void ExportAll(ObjectContainer objectFile, string openedFileDir)
+        static void ExportAll(GameFile objectFile, string openedFileDir)
         {
-            if (objectFile.Object is IGameFile pFile)
+            foreach (var a in objectFile.GameData.SubFiles)
             {
-                var sublist = pFile.SubFiles;
+                string newpath = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
+                File.WriteAllBytes(newpath, a.GameData.GetData());
+            }
+        }
 
-                foreach (var a in sublist)
+        static void ImportAll(GameFile objectFile, string openedFileDir)
+        {
+            foreach (var item in objectFile.GameData.SubFiles)
+            {
+                string newpath = Path.Combine(openedFileDir, item.Name.Replace('/', '+'));
+                FormatEnum fileType = item.GameData.Type;
+
+                if (File.Exists(newpath))
                 {
-                    string newpath = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
-                    File.WriteAllBytes(newpath, (a.Object as IGameFile).GetData());
+                    var file = GameFormatHelper.OpenFile(objectFile.Name, File.ReadAllBytes(newpath), fileType);
+                    if (file != null)
+                        item.GameData = file.GameData;
                 }
             }
         }
 
-        static void ImportAll(ObjectContainer objectFile, string openedFileDir)
+        static void SaveFile(GameFile objectFile, string savePath, string openedFileDir, Parameters parameters)
         {
-            if (objectFile.Object is IGameFile pFile)
-            {
-                var sublist = pFile.SubFiles;
-
-                foreach (var a in sublist)
-                {
-                    string newpath = Path.Combine(openedFileDir, a.Name.Replace('/', '+'));
-                    FormatEnum fileType = ((IGameFile)a.Object).Type;
-
-                    if (File.Exists(newpath))
-                    {
-                        var file = GameFormatHelper.OpenFile(objectFile.Name, File.ReadAllBytes(newpath), fileType);
-                        if (file != null)
-                            a.Object = file.Object;
-                    }
-                }
-            }
-        }
-
-        static void SaveFile(ObjectContainer objectFile, string savePath, string openedFileDir, Parameters parameters)
-        {
-            if (objectFile.Object is PTP ptp)
+            if (objectFile.GameData is PTP ptp)
             {
                 if (parameters.AsBMD)
                 {
                     string path = savePath == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".BMD") : savePath;
                     Encoding encoding = Static.NewEncoding();
 
-                    BMD bmd = new BMD(objectFile.Object as PTP, encoding);
+                    BMD bmd = new BMD(objectFile.GameData as PTP, encoding);
                     File.WriteAllBytes(path, bmd.GetData());
                 }
                 else
@@ -401,10 +383,10 @@ namespace PersonaEditorCMD
                     File.WriteAllBytes(path, ptp.GetData());
                 }
             }
-            else if (objectFile.Object is IGameFile pFile)
+            else
             {
                 string path = savePath == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + "(NEW)" + Path.GetExtension(objectFile.Name)) : savePath;
-                File.WriteAllBytes(path, pFile.GetData());
+                File.WriteAllBytes(path, objectFile.GameData.GetData());
             }
         }
     }

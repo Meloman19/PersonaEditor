@@ -10,7 +10,7 @@ using System.Text;
 
 namespace PersonaEditorLib.Text
 {
-    public class BMD : IGameFile
+    public class BMD : IGameData
     {
         private BMD()
         {
@@ -134,7 +134,7 @@ namespace PersonaEditorLib.Text
 
         public FormatEnum Type => FormatEnum.BMD;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()
         {

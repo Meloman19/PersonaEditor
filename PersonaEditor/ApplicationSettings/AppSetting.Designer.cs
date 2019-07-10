@@ -12,7 +12,7 @@ namespace PersonaEditor.ApplicationSettings {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
     internal sealed partial class AppSetting : global::System.Configuration.ApplicationSettingsBase {
         
         private static AppSetting defaultInstance = ((AppSetting)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new AppSetting())));
@@ -193,13 +193,13 @@ namespace PersonaEditor.ApplicationSettings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool Single_Instance_Application {
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SingleInstanceApplication {
             get {
-                return ((bool)(this["Single_Instance_Application"]));
+                return ((bool)(this["SingleInstanceApplication"]));
             }
             set {
-                this["Single_Instance_Application"] = value;
+                this["SingleInstanceApplication"] = value;
             }
         }
         

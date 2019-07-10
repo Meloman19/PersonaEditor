@@ -12,7 +12,7 @@ using System.Xml.Linq;
 
 namespace PersonaEditorLib.Other
 {
-    public class FNT : IGameFile, IImage, ITable
+    public class FNT : IGameData, IImage, ITable
     {
         public FNTHeader Header { get; set; }
         public FNTPalette Palette { get; set; }
@@ -72,7 +72,7 @@ namespace PersonaEditorLib.Other
 
         public FormatEnum Type => FormatEnum.FNT;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size();
 

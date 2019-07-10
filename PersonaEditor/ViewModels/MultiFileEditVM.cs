@@ -64,8 +64,7 @@ namespace PersonaEditor.ViewModels
             {
                 var root = Tree.GetRoot();
                 if (root != null)
-                    if (root.Object is IGameFile pFile)
-                        File.WriteAllBytes(path, pFile.GetData());
+                    File.WriteAllBytes(path, root.GameData.GetData());
             }
         }
 
@@ -108,12 +107,9 @@ namespace PersonaEditor.ViewModels
             Tab.SetPreview(sender.BitmapSource);
 
             statusBar = "";
-            if (sender.PersonaFile.Object is IGameFile file)
-            {
-                int size = file.GetSize();
-                statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
-                Notify("StatusBar");
-            }
+            int size = sender.PersonaFile.GameData.GetSize();
+            statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
+            Notify("StatusBar");
         }
 
         private void Tree_ItemOpen(TreeViewItemVM sender)

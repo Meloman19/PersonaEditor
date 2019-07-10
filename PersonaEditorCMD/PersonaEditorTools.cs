@@ -8,9 +8,9 @@ namespace PersonaEditorCMD
 {
     public static class PersonaEditorTools
     {
-        public static void OpenImageFile(ObjectContainer objectFile, string path)
+        public static void OpenImageFile(GameFile objectFile, string path)
         {
-            if (objectFile.Object is IImage image)
+            if (objectFile.GameData is IImage image)
             {
                 try
                 {
@@ -21,19 +21,24 @@ namespace PersonaEditorCMD
             }
         }
 
-        public static void SaveImageFile(ObjectContainer objectFile, string path)
+        public static void SaveImageFile(GameFile objectFile, string path)
         {
-            if (objectFile?.Object is IImage image)
+            if (objectFile == null)
+                throw new System.ArgumentNullException(nameof(objectFile));
+            if (path == null)
+                throw new System.ArgumentNullException(nameof(path));
+
+            if (objectFile.GameData is IImage image)
             {
-                var temp = image.GetBitmap().GetBitmapSource();
+                var temp = image.GetBitmap()?.GetBitmapSource();
                 if (temp != null)
                     AuxiliaryLibraries.WPF.Tools.ImageTools.SaveToPNG(temp, path);
             }
         }
 
-        public static void SavePTPFile(ObjectContainer objectFile, string path, PersonaEncoding oldEncoding = null)
+        public static void SavePTPFile(GameFile objectFile, string path, PersonaEncoding oldEncoding = null)
         {
-            if (objectFile.Object is BMD bmd)
+            if (objectFile.GameData is BMD bmd)
             {
                 PTP PTP = new PTP(bmd);
                 if (oldEncoding != null)
@@ -42,21 +47,31 @@ namespace PersonaEditorCMD
             }
         }
 
-        public static void OpenPTPFile(ObjectContainer objectFile, string path, PersonaEncoding newEncoding)
+        public static void OpenPTPFile(GameFile objectFile, string path, PersonaEncoding newEncoding)
         {
+            if (objectFile == null)
+                throw new System.ArgumentNullException(nameof(objectFile));
+            if (path == null)
+                throw new System.ArgumentNullException(nameof(path));
             if (newEncoding == null)
                 return;
-            if (objectFile.Object is BMD bmd)
+
+            if (objectFile.GameData is BMD bmd)
                 if (File.Exists(path))
                 {
                     PTP PTP = new PTP(File.ReadAllBytes(path));
-                    objectFile.Object = new BMD(PTP, newEncoding);
+                    objectFile.GameData = new BMD(PTP, newEncoding);
                 }
         }
 
-        public static void SaveTableFile(ObjectContainer objectFile, string path)
+        public static void SaveTableFile(GameFile objectFile, string path)
         {
-            if (objectFile?.Object is ITable table)
+            if (objectFile == null)
+                throw new System.ArgumentNullException(nameof(objectFile));
+            if (path == null)
+                throw new System.ArgumentNullException(nameof(path));
+
+            if (objectFile.GameData is ITable table)
             {
                 var temp = table.GetTable();
                 if (temp != null)
@@ -64,9 +79,14 @@ namespace PersonaEditorCMD
             }
         }
 
-        public static void OpenTableFile(ObjectContainer objectFile, string path)
+        public static void OpenTableFile(GameFile objectFile, string path)
         {
-            if (objectFile?.Object is ITable table)
+            if (objectFile == null)
+                throw new System.ArgumentNullException(nameof(objectFile));
+            if (path == null)
+                throw new System.ArgumentNullException(nameof(path));
+
+            if (objectFile.GameData is ITable table)
             {
                 try
                 {

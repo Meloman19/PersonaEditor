@@ -4,7 +4,7 @@ using AuxiliaryLibraries.Media.Formats.DDS;
 
 namespace PersonaEditorLib.Sprite
 {
-    public class DDS : IGameFile, IImage
+    public class DDS : IGameData, IImage
     {
         DDSBase DDSBase = null;
         Bitmap bitmap = null;
@@ -49,7 +49,7 @@ namespace PersonaEditorLib.Sprite
 
         public FormatEnum Type => FormatEnum.DDS;
 
-        public List<ObjectContainer> SubFiles { get; } = new List<ObjectContainer>();
+        public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => DDSBase.Size();
 

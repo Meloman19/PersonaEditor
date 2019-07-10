@@ -47,7 +47,7 @@ namespace PersonaEditor
                 {
                     foreach (var a in temp.GetAllObjectFiles(PersonaEditorLib.FormatEnum.BMD))
                     {
-                        var bmd = a.Object as BMD;
+                        var bmd = a.GameData as BMD;
                         var ptp = new PTP(bmd);
 
                         string newPath = Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(a.Name.Replace('/', '+')) + ".txt");
@@ -114,7 +114,7 @@ namespace PersonaEditor
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (ApplicationSettings.AppSetting.Default.Single_Instance_Application)
+            if (ApplicationSettings.AppSetting.Default.SingleInstanceApplication)
             {
                 Mutex = new Mutex(true, CURRENT_NAMED_PIPE, out bool Is);
                 if (!Is)
@@ -133,9 +133,8 @@ namespace PersonaEditor
             if (e.Args.Length > 0)
                 MainWindowVM.OpenFile(e.Args[0]);
 
-            MainWindow window = new MainWindow() { DataContext = MainWindowVM };
-            MainWindow = window;
-            window.Show();
+            MainWindow = new MainWindow() { DataContext = MainWindowVM };
+            MainWindow.Show();
         }
 
         private void NamedPipeManager_ReceiveString(string obj)
@@ -148,7 +147,6 @@ namespace PersonaEditor
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            //Logging.Write("", e.Exception);
             NamedPipeManager?.Stop();
         }
 
