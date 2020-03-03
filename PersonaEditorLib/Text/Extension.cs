@@ -1,5 +1,4 @@
 ﻿using AuxiliaryLibraries.Extensions;
-using PersonaEditorLib.Other;
 using AuxiliaryLibraries.Tools;
 using System;
 using System.Collections.Generic;

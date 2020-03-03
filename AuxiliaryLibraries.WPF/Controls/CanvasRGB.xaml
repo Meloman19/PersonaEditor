@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="AuxiliaryLibraries.WPF.Controls.CanvasRGB"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" x:Name="CanvasRGBWindow">
+
+    <Border x:Name="CanvasBorder" BorderBrush="Black" BorderThickness="1">
+        <Grid>
+            <Image Name="BackgroundImage" Stretch="Fill">
+                <Image.Source>
+                    <DrawingImage>
+                        <DrawingImage.Drawing>
+                            <DrawingGroup>
+                                <DrawingCollection>
+                                    <GeometryDrawing>
+                                        <GeometryDrawing.Geometry>
+                                            <RectangleGeometry Rect="0,0,100,100"/>
+                                        </GeometryDrawing.Geometry>
+                                        <GeometryDrawing.Brush>
+                                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                                <GradientStop Offset="0">
+                                                    <GradientStop.Color>
+                                                        <Color A="255" R="255" G="255" B="255"></Color>
+                                                    </GradientStop.Color>
+                                                </GradientStop>
+                                                <GradientStop Offset="1" Color="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Color}"/>
+                                            </LinearGradientBrush>
+                                        </GeometryDrawing.Brush>
+                                    </GeometryDrawing>
+                                    <GeometryDrawing>
+                                        <GeometryDrawing.Geometry>
+                                            <RectangleGeometry Rect="0,0,100,100"/>
+                                        </GeometryDrawing.Geometry>
+                                        <GeometryDrawing.Brush>
+                                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                                <GradientStop Offset="0" Color="Transparent"/>
+                                                <GradientStop Offset="1" Color="Black"/>
+                                            </LinearGradientBrush>
+                                        </GeometryDrawing.Brush>
+                                    </GeometryDrawing>
+                                </DrawingCollection>
+                                <DrawingGroup.ClipGeometry>
+                                    <RectangleGeometry Rect="0,0,100,100"></RectangleGeometry>
+                                </DrawingGroup.ClipGeometry>
+                            </DrawingGroup>
+                        </DrawingImage.Drawing>
+                    </DrawingImage>
+                </Image.Source>
+            </Image>
+
+            <Canvas ClipToBounds="True" Name="ColorCanvas" MouseMove="ColorCanvas_MouseMove" MouseLeftButtonDown="ColorCanvas_MouseLeftButtonDown" Background="Transparent" >
+                <Ellipse Name="SelectColor" Canvas.Left="-15" Canvas.Top="-15" Width="30" Height="30" StrokeThickness="3">
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="{Binding ElementName=CanvasRGBWindow, Path=SelectedColor}"/>
+                    </Ellipse.Fill>
+                    <Ellipse.Stroke>
+                        <SolidColorBrush Color="White"></SolidColorBrush>
+                    </Ellipse.Stroke>
+
+                </Ellipse>
+            </Canvas>
+        </Grid>
+    </Border>
+</UserControl>

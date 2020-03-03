@@ -59,16 +59,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AuxiliaryLibraries, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Release\AuxiliaryLibraries\netstandard2.0\AuxiliaryLibraries.dll</HintPath>
-    </Reference>
-    <Reference Include="AuxiliaryLibraries.WPF">
-      <HintPath>..\..\..\Release\AuxiliaryLibraries\AuxiliaryLibraries.WPF.dll</HintPath>
-    </Reference>
-    <Reference Include="AuxiliaryLibraries.WPF.Wrapper">
-      <HintPath>..\..\..\Release\AuxiliaryLibraries\AuxiliaryLibraries.WPF.Wrapper.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -123,6 +113,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AuxiliaryLibraries.WPF.Wrapper\AuxiliaryLibraries.WPF.Wrapper.csproj">
+      <Project>{0a70017f-e0fa-4266-87dc-7337ba58a234}</Project>
+      <Name>AuxiliaryLibraries.WPF.Wrapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuxiliaryLibraries.WPF\AuxiliaryLibraries.WPF.csproj">
+      <Project>{b9670b59-0192-49e7-84c7-b7776e7339e8}</Project>
+      <Name>AuxiliaryLibraries.WPF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AuxiliaryLibraries\AuxiliaryLibraries.csproj">
+      <Project>{4acc1a56-2d6b-4f7d-a669-b0c27a801b56}</Project>
+      <Name>AuxiliaryLibraries</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj">
       <Project>{d437d1fd-1d68-499f-bced-3b17a4316a76}</Project>
       <Name>PersonaEditorLib</Name>
