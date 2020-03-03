@@ -105,7 +105,6 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.txt">
@@ -131,13 +130,6 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets" Condition="Exists('..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Packaging.Tools.Trimming.1.1.0-preview1-26619-01\build\Microsoft.Packaging.Tools.Trimming.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
