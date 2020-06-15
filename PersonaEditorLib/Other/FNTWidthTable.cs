@@ -33,7 +33,7 @@ namespace PersonaEditorLib.Other
 
         public int Size()
         {
-            return WidthTable.Count * 4 + 4;
+            return WidthTable.Count * 2 + 4;
         }
 
         public void Get(BinaryWriter writer)
