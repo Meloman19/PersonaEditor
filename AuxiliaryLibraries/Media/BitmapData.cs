@@ -39,7 +39,17 @@ namespace AuxiliaryLibraries.Media
                     IQuantization quantization = new WuQuantizer();
 
                     if (quantization.StartQuantization(data2color(data), Convert.ToInt32(Math.Pow(2, dstFormat.BitsPerPixel))))
-                        return new BitmapDataIndexed(Width, Height, dstFormat, quantization.QuantData, quantization.QuantPalette);
+                    {
+                        var data = quantization.QuantData;
+
+                        if (dstFormat.Format == PixelFormatEnum.Indexed4Reverse)
+                        {
+                            var data2data = PixelConverters.GetDataToDataConverter(PixelFormats.Indexed4, PixelFormats.Indexed4Reverse);
+                            data = data2data(data);
+                        }
+
+                        return new BitmapDataIndexed(Width, Height, dstFormat, data, quantization.QuantPalette);
+                    }
                     else
                         throw new Exception($"BitmapData: convert to {dstFormat} error. Quantization don't work.");
                 }

@@ -150,7 +150,11 @@ namespace PersonaEditorLib.Sprite
             if (bitmap.PixelFormat == this.bitmap.PixelFormat)
                 this.bitmap = bitmap;
             else
-                this.bitmap = bitmap.ConvertTo(bitmap.PixelFormat, null);
+                this.bitmap = bitmap.ConvertTo(this.bitmap.PixelFormat, null);
+
+            header.Width = (ushort)bitmap.Width;
+            header.Height = (ushort)bitmap.Height;
+            header.FileSize = GetSize();
         }
 
         #endregion IImage
