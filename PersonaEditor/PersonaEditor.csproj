@@ -88,6 +88,9 @@
     </ApplicationDefinition>
     <Compile Include="Classes\NamedPipeManager.cs" />
     <Compile Include="Classes\VisualText.cs" />
+    <Compile Include="Controls\IScrollInfo2.cs" />
+    <Compile Include="Controls\ZoomPresenter.cs" />
+    <Compile Include="Controls\ZoomScrollViewer.cs" />
     <Compile Include="ViewModels\Editors\BMDMsgStrVM.cs" />
     <Compile Include="ViewModels\Editors\BMDMsgVM.cs" />
     <Compile Include="ViewModels\Editors\BMDNameVM.cs" />

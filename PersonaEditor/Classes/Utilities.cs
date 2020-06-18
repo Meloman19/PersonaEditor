@@ -26,24 +26,24 @@ namespace PersonaEditor.Classes
         {
             Pen pen = new Pen(new SolidColorBrush(Colors.Gray), 0.1);
 
-            DrawingVisual drawingVisual = new DrawingVisual();
-            var render = drawingVisual.RenderOpen();
+            DrawingGroup drawingGroup = new DrawingGroup();
+            var context = drawingGroup.Append();
 
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                 {
                     Rect temp = new Rect(new Point(x, y), new Point(x + 1, y + 1));
-                    render.DrawGeometry(
+                    context.DrawRectangle(
                         new SolidColorBrush(colors[y * width + x]),
                         pen,
-                        new RectangleGeometry(temp));
+                        temp);
                 }
 
-            render.Close();
+            context.Close();
 
-            drawingVisual.Drawing.Freeze();
+            drawingGroup.Freeze();
 
-            return drawingVisual.Drawing;
+            return drawingGroup;
         }
     }
 }
