@@ -55,7 +55,9 @@
                     </DrawingBrush.Drawing>
                 </DrawingBrush>
             </Border.Background>
-            <Image Source="{Binding SourceIMG}" Stretch="Uniform"/>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Image Source="{Binding SourceIMG}" Stretch="Uniform"/>
+            </ScrollViewer>
         </Border>
     </Grid>
 </UserControl>
