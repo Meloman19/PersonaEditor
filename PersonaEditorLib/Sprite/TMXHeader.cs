@@ -4,7 +4,8 @@ namespace PersonaEditorLib.Sprite
 {
     struct TMXHeader
     {
-        public int ID;
+        public ushort ID;
+        public ushort UnknownID;
         public int FileSize;
         public uint MagicNumber;
         public int Padding;
