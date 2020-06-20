@@ -36,13 +36,39 @@
                 <GridSplitter Grid.Row="1" Height="6" Background="#FFbfbfbf"  VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
                 <DataGrid DataContext="{Binding Path=TextureList/}" Grid.Row="2" ItemsSource="{Binding Path=KeyList}" AutoGenerateColumns="False"
                           Background="#FFF0F0F0" SelectionMode="Single" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" VerticalScrollBarVisibility="Visible">
+                        
                     <DataGrid.Columns>
                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}"/>
-                        <DataGridTextColumn Header="X1" Binding="{Binding X1}"/>
-                        <DataGridTextColumn Header="Y1" Binding="{Binding Y1}"/>
-                        <DataGridTextColumn Header="X2" Binding="{Binding X2}"/>
-                        <DataGridTextColumn Header="Y2" Binding="{Binding Y2}"/>
+                        <DataGridTemplateColumn Header="X1" MinWidth="35">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <controls:NumericIncDec Max="2048" Value="{Binding Path=X1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Y1" MinWidth="35">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <controls:NumericIncDec Max="2048" Value="{Binding Path=Y1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="X2" MinWidth="35">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <controls:NumericIncDec Max="2048" Value="{Binding Path=X2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Y2" MinWidth="35">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <controls:NumericIncDec Max="2048" Value="{Binding Path=Y2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
+
                 </DataGrid>
 
                 <StatusBar Grid.Row="3">
