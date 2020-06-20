@@ -133,7 +133,7 @@ namespace PersonaEditor.ViewModels.Editors
 
             var pallete = new BitmapPalette(fnt.Palette.GetImagePalette().Select(x => Color.FromArgb(x.A, x.R, x.G, x.B)).ToArray());
 
-            if (GlyphList.Count == CutList.Count)
+            if (GlyphList.Count <= CutList.Count)
             {
                 for (int i = 0; i < GlyphList.Count; i++)
                 {
@@ -156,7 +156,7 @@ namespace PersonaEditor.ViewModels.Editors
                 if (result == MessageBoxResult.Yes)
                 {
                     var CutList = fnt.WidthTable.WidthTable;
-                    for (int i = 0; i < CutList.Count; i++)
+                    for (int i = 0; i < GlyphCuts.Count; i++)
                         CutList[i] = new VerticalCut((byte)GlyphCuts[i].Left, (byte)GlyphCuts[i].Right);
                     return true;
                 }
