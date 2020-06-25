@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace AuxiliaryLibraries.Media.Quantization
 {
-    public class WuQuantizer : IQuantization
+    public sealed class WuQuantizer : IQuantization
     {
         #region Private Structures
         struct Box
@@ -378,23 +378,12 @@ namespace AuxiliaryLibraries.Media.Quantization
         private const int MaxSideIndex = 256 / (1 << SidePixShift);
         private const int SideSize = MaxSideIndex + 1;
 
-        private PixelFormat pixelFormatBase = PixelFormats.Indexed8;
         private Color[] quantPalette = null;
         private byte[] quantData = null;
 
         public int AlphaThreshold { get; set; } = 10;
         public int AlphaFader { get; set; } = 70;
 
-        // Interface
-        public PixelFormat PixelFormat
-        {
-            get { return pixelFormatBase; }
-            set
-            {
-                if (value == PixelFormats.Indexed8 | value == PixelFormats.Indexed4)
-                    pixelFormatBase = value;
-            }
-        }
         public Color[] QuantPalette => quantPalette;
         public byte[] QuantData => quantData;
 

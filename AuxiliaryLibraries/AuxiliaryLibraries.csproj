@@ -65,8 +65,4 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Media\Imaging\" />
-  </ItemGroup>
-
 </Project>

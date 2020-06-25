@@ -36,19 +36,19 @@ namespace AuxiliaryLibraries.Media
                 var data2color = PixelConverters.GetDataToColorConverter(PixelFormat);
                 if (data2color != null)
                 {
-                    IQuantization quantization = new WuQuantizer();
+                    IQuantization quantization = new WuAlphaColorQuantizer();
 
                     if (quantization.StartQuantization(data2color(data), Convert.ToInt32(Math.Pow(2, dstFormat.BitsPerPixel))))
                     {
-                        var data = quantization.QuantData;
+                        var newData = quantization.QuantData;
 
                         if (dstFormat.Format == PixelFormatEnum.Indexed4Reverse)
                         {
                             var data2data = PixelConverters.GetDataToDataConverter(PixelFormats.Indexed4, PixelFormats.Indexed4Reverse);
-                            data = data2data(data);
+                            newData = data2data(newData);
                         }
 
-                        return new BitmapDataIndexed(Width, Height, dstFormat, data, quantization.QuantPalette);
+                        return new BitmapDataIndexed(Width, Height, dstFormat, newData, quantization.QuantPalette);
                     }
                     else
                         throw new Exception($"BitmapData: convert to {dstFormat} error. Quantization don't work.");

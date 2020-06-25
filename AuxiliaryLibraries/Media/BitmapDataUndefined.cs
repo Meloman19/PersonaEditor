@@ -22,10 +22,20 @@ namespace AuxiliaryLibraries.Media
                 return Copy();
             else if (dstFormat.IsIndexed)
             {
-                IQuantization quantization = new WuQuantizer();
+                IQuantization quantization = new WuAlphaColorQuantizer();
 
                 if (quantization.StartQuantization(pixels, Convert.ToInt32(Math.Pow(2, dstFormat.BitsPerPixel))))
-                    return new BitmapDataIndexed(Width, Height, dstFormat, quantization.QuantData, quantization.QuantPalette);
+                {
+                    var newData = quantization.QuantData;
+
+                    if (dstFormat.Format == PixelFormatEnum.Indexed4Reverse)
+                    {
+                        var data2data = PixelConverters.GetDataToDataConverter(PixelFormats.Indexed4, PixelFormats.Indexed4Reverse);
+                        newData = data2data(newData);
+                    }
+
+                    return new BitmapDataIndexed(Width, Height, dstFormat, newData, quantization.QuantPalette);
+                }
                 else
                     throw new Exception($"BitmapData: convert to {dstFormat} error. Quantization don't work.");
             }
