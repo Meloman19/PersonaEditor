@@ -151,7 +151,8 @@ namespace AuxiliaryLibraries.Media.Quantization
             this.Get3DMoments();
 
             Box[] cube;
-            this.BuildCube(out cube, ref colorCount);
+            var realColorCount = colorCount;
+            this.BuildCube(out cube, ref realColorCount);
             this.GenerateResult(image, colorCount, cube);
 
             return true;
