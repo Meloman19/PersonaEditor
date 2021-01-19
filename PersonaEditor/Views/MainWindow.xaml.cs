@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using PersonaEditor.ViewModels;
 
 namespace PersonaEditor.Views
 {
@@ -7,6 +8,7 @@ namespace PersonaEditor.Views
         public MainWindow()
         {
             InitializeComponent();
+
         }
     }
 }

@@ -48,9 +48,12 @@
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource main_DropFile}" TextAlignment="Center"/>
                     </Grid>
                 </Border>
+                <ProgressBar Maximum="{Binding ProgressMaximum}" Value="{Binding ProgressValue}" Grid.Row="2" />
+
                 <StatusBar Grid.Row="2">
                     <StatusBarItem>
                         <TextBlock Text="{Binding StatusBar}"/>
+
                     </StatusBarItem>
                 </StatusBar>
             </Grid>

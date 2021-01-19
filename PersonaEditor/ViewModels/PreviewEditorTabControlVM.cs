@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -53,6 +54,7 @@ namespace PersonaEditor.ViewModels
 
             return returned;
         }
+
 
         public bool Open(TreeViewItemVM sender)
         {

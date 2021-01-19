@@ -1,13 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Input;
 using PersonaEditor.Classes.Visual;
 using System.Windows.Media;
+using System.Windows.Threading;
 using AuxiliaryLibraries.WPF;
 using PersonaEditorLib.Text;
 using PersonaEditor.Classes;
 using PersonaEditor.Classes.Managers;
+using PersonaEditor.ViewModels.Tools;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace PersonaEditor.ViewModels.Editors
 {
@@ -23,6 +34,9 @@ namespace PersonaEditor.ViewModels.Editors
 
         private Background selectBack = null;
         private Background SelectBack
+
+
+
         {
             get { return selectBack; }
             set
@@ -157,6 +171,7 @@ namespace PersonaEditor.ViewModels.Editors
 
         private void UpdateView()
         {
+
             foreach (var a in Names)
                 a.UpdateView(View);
 
@@ -164,8 +179,15 @@ namespace PersonaEditor.ViewModels.Editors
                 a.UpdateView(View);
         }
 
+       
+
+        public ICommand FromCommand { get; }
+        public ICommand FindCommand { get; }
+
         public PTPEditorVM(PTP ptp)
         {
+            FromCommand = new RelayCommand(Replace);
+
             int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(ApplicationSettings.AppSetting.Default.PTPOldDefault);
             if (sourceInd >= 0)
                 OldEncoding = sourceInd;
@@ -203,6 +225,118 @@ namespace PersonaEditor.ViewModels.Editors
 
                 MSG.Add(new PTPMsgVM(a, tuple, ApplicationSettings.AppSetting.Default.PTPOldDefault, ApplicationSettings.AppSetting.Default.PTPNewDefault, SelectedBackgroundIndex));
             }
+        }
+
+        private int _RowsValue = 3;
+        public int RowsValue
+        {
+            get
+            {
+                return _RowsValue;
+            }
+            set
+            {
+                _RowsValue = value;
+                Notify("RowsValue");
+            }
+        }
+
+        public void Replace()
+        {
+            BackgroundWorker.Status = "Дождитесь открытия файла...";
+            BackgroundWorker.ProgressMaximum = MSG.Count;
+
+            OpenFileDialog ofs = new OpenFileDialog();
+            ofs.Filter = ".txt файл с notabenoid(*.txt)|*.txt|All files(*.*)|*.*";
+            if (ofs.ShowDialog() == DialogResult.OK)
+            {
+                List<string> textlist = NotaScript.Parse(ofs.FileName, _RowsValue);
+
+                foreach (var ms in MSG)
+                {
+                    foreach (var msg in ms.Strings)
+                    {
+
+                        for (int j = 0; j < textlist.Count; j++)
+                        {
+                            if (textlist[j].Contains(ms.Name))
+                            {
+
+                                string[] t = textlist[j].Split(new[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                msg.NewString = t[t.Length - 1];
+                                textlist.RemoveAt(j);
+                                break;
+                            }
+                        }
+                    }
+                }
+                BackgroundWorker.Status = "";
+
+                //DialogResult dialogResult = MessageBox.Show("Sure", "Some Title", MessageBoxButtons.YesNo);
+                //if (dialogResult == DialogResult.Yes)
+                //{
+                //    foreach (var ms in MSG)
+                //    {
+                //        foreach (var str in ms.Strings)
+                //        {
+                //            str.NewString = NewLine(str.NewString);
+                //        }
+                //    }
+                //}
+                //else if (dialogResult == DialogResult.No)
+                //{
+                //    //do something else
+                //}
+            }
+
+
+        }
+
+        public string NewLine(string line)
+        {
+            if (line.Length > 33)
+            {
+                return GetTextWithNewLines(line);
+            }
+            else
+            {
+                return line;
+            }
+
+            
+        }
+
+        public static string GetTextWithNewLines(string value = "", int charactersToWrapAt = 33, int maxLength = 250)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return "";
+
+            value = value.Replace("  ", " ");
+            var words = value.Split(' ');
+            var sb = new StringBuilder();
+            var currString = new StringBuilder();
+
+            foreach (var word in words)
+            {
+                if (currString.Length + word.Length + 1 < charactersToWrapAt) // The + 1 accounts for spaces
+                {
+                    sb.AppendFormat(" {0}", word);
+                    currString.AppendFormat(" {0}", word);
+                }
+                else
+                {
+                    currString.Clear();
+                    sb.AppendFormat("{0}{1}", Environment.NewLine, word);
+                    currString.AppendFormat(" {0}", word);
+                }
+            }
+
+            if (sb.Length > maxLength)
+            {
+                return sb.ToString().Substring(0, maxLength) + " ...";
+            }
+
+            return sb.ToString().TrimStart().TrimEnd();
         }
 
         public bool Close()

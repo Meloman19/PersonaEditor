@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using PersonaEditor.ViewModels;
 
 namespace PersonaEditor.Views
 {
@@ -9,7 +10,8 @@ namespace PersonaEditor.Views
     {
         public MultiFileEdit()
         {
-            InitializeComponent();            
+            InitializeComponent();        
+            DataContext = new MultiFileEditVM(this);
         }
         
         double temp = 0;

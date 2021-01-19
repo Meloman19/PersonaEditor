@@ -91,6 +91,7 @@
     <Compile Include="Controls\IScrollInfo2.cs" />
     <Compile Include="Controls\ZoomPresenter.cs" />
     <Compile Include="Controls\ZoomScrollViewer.cs" />
+    <Compile Include="ViewModels\BackgroundWorker.cs" />
     <Compile Include="ViewModels\Editors\BMDMsgStrVM.cs" />
     <Compile Include="ViewModels\Editors\BMDMsgVM.cs" />
     <Compile Include="ViewModels\Editors\BMDNameVM.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="ViewModels\Editors\SPDTextureVM.cs" />
     <Compile Include="ViewModels\Editors\SPRKeyVM.cs" />
     <Compile Include="ViewModels\Editors\SPRTextureVM.cs" />
+    <Compile Include="ViewModels\Tools\NotaScript.cs" />
     <Compile Include="Views\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
@@ -470,6 +472,11 @@
       <Name>PersonaEditorLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Views\Res\txt_tip_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\Res\row_tip_1.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

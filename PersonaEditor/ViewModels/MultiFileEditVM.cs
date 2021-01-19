@@ -3,7 +3,9 @@ using AuxiliaryLibraries.WPF;
 using PersonaEditor.Classes;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace PersonaEditor.ViewModels
@@ -27,35 +29,88 @@ namespace PersonaEditor.ViewModels
             }
         }
 
+        public int ProgressValue
+        {
+            get
+            {
+                return BackgroundWorker.ProgressValue;
+            }
+            set
+            {
+                BackgroundWorker.ProgressValue = value;
+                Notify("ProgressValue");
+            }
+            
+        }
+
+        public int ProgressMaximum
+        {
+            get
+            {
+                return BackgroundWorker.ProgressMaximum;
+            }
+            set
+            {
+                BackgroundWorker.ProgressMaximum = value;
+                Notify("ProgressMaximum");
+            }
+
+
+        }
+
         public string OpenFileName => Static.OpenedFile;
 
-        private string statusBar = "";
-        public string StatusBar => statusBar;
+
+        public string StatusBar
+        {
+            get
+            {
+
+                return BackgroundWorker.Status;
+            }
+            set
+            {
+                BackgroundWorker.Status = value;
+                Notify("StatusBar");
+            }
+        }
 
         #region Methods
 
+        public async void OpFile(string path)
+        {
+            await Task.Run(() =>
+            {
+                BackgroundWorker.Control.Dispatcher.Invoke(() =>
+                {
+                    if (Tab.CloseAll())
+                    {
+
+                        FileInfo fileInfo = new FileInfo(path);
+                        if (fileInfo.Length > 1000000000)
+                            return;
+
+                        //FileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+
+                        //var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
+                        //    PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)),
+                        //    new StreamFile(FileStream, FileStream.Length, 0));
+
+                        var file = GameFormatHelper.OpenFile(Path.GetFileName(path), File.ReadAllBytes(path));
+
+                        if (file != null)
+                        {
+                            Tree.SetRoot(file);
+                            Static.OpenedFile = Path.GetFullPath(path);
+                        }
+                    }
+                });
+            });
+        }
+
         public void OpenFile(string path)
         {
-            if (Tab.CloseAll())
-            {
-                FileInfo fileInfo = new FileInfo(path);
-                if (fileInfo.Length > 1000000000)
-                    return;
-
-                //FileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-
-                //var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
-                //    PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)),
-                //    new StreamFile(FileStream, FileStream.Length, 0));
-
-                var file = GameFormatHelper.OpenFile(Path.GetFileName(path), File.ReadAllBytes(path));
-
-                if (file != null)
-                {
-                    Tree.SetRoot(file);
-                    Static.OpenedFile = Path.GetFullPath(path);
-                }
-            }
+           OpFile(path);
         }
 
         public void SaveFile(string path)
@@ -106,9 +161,9 @@ namespace PersonaEditor.ViewModels
         {
             Tab.SetPreview(sender.BitmapSource);
 
-            statusBar = "";
+            BackgroundWorker.Status = "";
             int size = sender.PersonaFile.GameData.GetSize();
-            statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
+            BackgroundWorker.Status = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
             Notify("StatusBar");
         }
 
@@ -124,8 +179,9 @@ namespace PersonaEditor.ViewModels
 
         #endregion Events
 
-        public MultiFileEditVM()
+        public MultiFileEditVM(UserControl control)
         {
+            BackgroundWorker.Control = control;
             Drop = new RelayCommand(DropItem);
             Tree.ItemAction += Tree_ItemAction;
         }

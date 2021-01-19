@@ -6,6 +6,7 @@ using AuxiliaryLibraries.WPF;
 using PersonaEditor.ViewModels;
 using PersonaEditor.View.Settings;
 using PersonaEditor.ViewModels.Settings;
+using BackgroundWorker = PersonaEditor.ViewModels.BackgroundWorker;
 
 namespace PersonaEditor.Views
 {
@@ -14,7 +15,7 @@ namespace PersonaEditor.Views
         Views.Tools.Visualizer visualizer;
         Views.Tools.SetChar setchar;
 
-        public MultiFileEditVM MultiFile { get; } = new MultiFileEditVM();
+        public MultiFileEditVM MultiFile { get; } = new MultiFileEditVM(BackgroundWorker.Control);
 
         private object _MainControlDC = null;
         public object MainControlDC

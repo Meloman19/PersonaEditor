@@ -36,7 +36,7 @@
                 <GridSplitter Grid.Row="1" Height="6" Background="#FFbfbfbf"  VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
                 <DataGrid DataContext="{Binding Path=TextureList/}" Grid.Row="2" ItemsSource="{Binding Path=KeyList}" AutoGenerateColumns="False"
                           Background="#FFF0F0F0" SelectionMode="Single" SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" VerticalScrollBarVisibility="Visible">
-                        
+
                     <DataGrid.Columns>
                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}"/>
                         <DataGridTemplateColumn Header="X1" MinWidth="35">
@@ -67,6 +67,42 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+
+
+                        <!--ff-->
+
+                        <DataGridTemplateColumn Header="Slider X1" MinWidth="100" MaxWidth="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Slider Minimum="0"  Maximum="1024" Orientation="Horizontal" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Path=X1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Slider>
+
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Slider Y1" MinWidth="100" MaxWidth="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Slider Minimum="0"  Maximum="1024" Orientation="Horizontal" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Path=Y1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Slider>
+
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Slider X2" MinWidth="100" MaxWidth="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Slider Minimum="0"  Maximum="1024" Orientation="Horizontal" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Path=X2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Slider>
+
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Slider Y2" MinWidth="100" MaxWidth="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Slider Minimum="0"  Maximum="1024" Orientation="Horizontal" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Path=Y2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Slider>
+
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
 
                 </DataGrid>
@@ -92,19 +128,41 @@
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
 
-                    <Menu Grid.Column="0" VerticalAlignment="Center">
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35"></RowDefinition>
+                        <RowDefinition Height="35"></RowDefinition>
+                        <RowDefinition Height="35"></RowDefinition>
+
+                    </Grid.RowDefinitions>
+
+                    <Menu Grid.Column="0" VerticalAlignment="Center" Margin="0,8,0,9" Height="18">
                         <MenuItem Header="Color">
                             <MenuItem Header="Background" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=TwoWay}" Command="{Binding}"/>
                             <MenuItem Header="Border" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=TwoWay}"/>
                             <MenuItem Header="Selected Item" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=SelectColor, Mode=TwoWay}"/>
                         </MenuItem>
                     </Menu>
-                    <StatusBar Grid.Column="1">
+                    <StatusBar Grid.Column="1" Grid.ColumnSpan="2" Grid.RowSpan="1">
                         <controls:NumericIncDec x:Name="NUM" Min="0" Max="5" Width="40" Value="{Binding Source={x:Static settings:SPREditor.Default}, Path=BorderThickness, Mode=TwoWay}"/>
+                        <CheckBox Content="Is PC" IsChecked="{Binding Path=IsPCFormat, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></CheckBox>
+                        
                     </StatusBar>
+                    <!--<StatusBar Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="1">
+                        
+                        <Slider Minimum="0" Width="150" Maximum="1024" Orientation="Horizontal" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Path=Y1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Slider>
+                      
+                    </StatusBar>
+                    <StatusBar Grid.Row="2" Grid.ColumnSpan="3" Grid.RowSpan="1">
+
+                        <Slider Minimum="0" Width="150" Maximum="1024" Orientation="Horizontal" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Path=X2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Slider>
+                        <Slider Minimum="0" Width="150" Maximum="1024" Orientation="Horizontal" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding Path=Y2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></Slider>
+
+                    </StatusBar>-->
+
                 </Grid>
 
                 <Border DataContext="{Binding Path=TextureList/}" Grid.Row="1" BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">

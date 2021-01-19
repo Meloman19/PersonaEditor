@@ -66,7 +66,11 @@ namespace PersonaEditorLib.Sprite
                 PaletteFormat = TMXHelper.PS2ToAux(header.PaletteFormat);
 
                 tempsize += 0x40;
-                tempsize += TMXHelper.ReadPalette(reader, header.PixelFormat, header.PaletteFormat, out System.Drawing.Color[] colors);
+                System.Drawing.Color[] colors = null;
+                if (header.PaletteCount == 1)
+                {
+                    tempsize += TMXHelper.ReadPalette(reader, header.PixelFormat, header.PaletteFormat, out colors);
+                }
 
                 int datasize = header.Height * ImageHelper.GetStride(ImageFormat, header.Width);
                 imageData = reader.ReadBytes(datasize);
@@ -86,7 +90,7 @@ namespace PersonaEditorLib.Sprite
             if (Header.ID != ID) throw new Exception("TMX: (0x00) wrong ID");
             if (Header.MagicNumber != MagicNumber) throw new Exception("TMX: (0x08) wrong MagicNumber");
             if (Header.Padding != 0) throw new Exception("TMX: (0x0C) wrong padding");
-            if (Header.PaletteCount != 1) throw new Exception("TMX: (0x10) number of palette not 1");
+            if (Header.PaletteCount > 1) throw new Exception("TMX: (0x10) number of palette more than 1");
             if (Header.MipMapCount != 0) throw new Exception("TMX: (0x17) mipMapCount more than 0");
             if (Header.MipMapK != 0) throw new Exception("TMX: (0x18) mipMapK more than 0");
             if (Header.MipMapL != 0) throw new Exception("TMX: (0x19) mipMapL more than 0");

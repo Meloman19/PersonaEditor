@@ -1,11 +1,12 @@
-﻿<UserControl x:Class="PersonaEditor.Views.Editors.PTPEditor"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:converters="clr-namespace:PersonaEditor.Classes.Converters"
              xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
-             mc:Ignorable="d" Name="USC"
+             xmlns:Primitive="clr-namespace:PersonaEditor.Controls.Primitive" x:Class="PersonaEditor.Views.Editors.PTPEditor"
+             mc:Ignorable="d" x:Name="USC"
              d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VirtualizingPanel.IsVirtualizing="True">
 
     <UserControl.Resources>
@@ -16,7 +17,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="{Binding Source={x:Static settings:AppSetting.Default}, Path=PTPNameBlockSize, Mode=TwoWay}"/>
+            <RowDefinition Height="{Binding PTPNameBlockSize, Mode=TwoWay, Source={x:Static settings:AppSetting.Default}}"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
@@ -30,11 +31,38 @@
             <ComboBox ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedNewFont, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
             <CheckBox Content="Image View" IsChecked="{Binding ViewImage}" x:Name="VIEW" x:FieldModifier="private"/>
+            <Button Content="From .txt" Command="{Binding FromCommand}">
+                <Button.ToolTip>
+                    <StackPanel>
+                        <TextBlock Text="Подается на вход .txt с ноты такого вида(только 1 вариант перевода на фрагмент, если нет русского то пусть хотя бы англ будет):" />
+                        <Image Source="pack://application:,,,/Views/Res/txt_tip_1.png"/>
+                        <TextBlock Text="На табы похуй, алгоритмы их выставляют, главное что указано правее в Rows." />
+                        <TextBlock Text="Есть баг визуала. При повторном добавлении в диалоговых ingame окошках текст все также меняется, но в текстбоксах выше - нет." />
+                        <TextBlock Text="Можно забить и просто сохранить, все будет окей." />
+
+
+                    </StackPanel>
+                </Button.ToolTip>
+            </Button>
+            <Label Content="Rows:" Width="40"></Label>
+            <Primitive:NumericIncDec Value="{Binding RowsValue}" Height="22" Width="40">
+                <Primitive:NumericIncDec.ToolTip>
+                    <StackPanel>
+                        <TextBlock Text="Использовать значение 3 для скриптов наподобии field/pack/*, где столбцы выглядят вот так:" />
+                        <Image Source="pack://application:,,,/Views/Res/row_tip_1.png"/>
+                        <TextBlock Text="Для других типов можно поиграться с изменением этого значения." />
+
+                    </StackPanel>
+                </Primitive:NumericIncDec.ToolTip>
+            </Primitive:NumericIncDec>
+
+            <Button Content="MB" Command="{Binding FindCommand}"/>
+
         </StatusBar>
 
         <Separator Grid.Row="1"/>
 
-        <ItemsControl Grid.Row="2" ItemsSource="{Binding Path=Names}" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True">
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Names}" ScrollViewer.CanContentScroll="True" VirtualizingPanel.IsVirtualizing="True">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel/>
@@ -66,7 +94,7 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Name № " Margin="2,0,0,0"/>
-                            <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Path=Index, Mode=OneWay}"/>
+                            <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="{Binding Index, Mode=OneWay}"/>
                             <TextBlock VerticalAlignment="Center" Grid.Column="2" Text=":"/>
                             <TextBox Grid.Column="3" Margin="2" Text="{Binding OldName, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap"/>
                         </Grid>
@@ -79,7 +107,7 @@
 
         <GridSplitter ResizeBehavior="BasedOnAlignment" Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
 
-        <ItemsControl Grid.Row="4" ItemsSource="{Binding Path=MSG}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.VirtualizationMode="Recycling"  VirtualizingPanel.IsVirtualizing="True" Margin="0,4,0,1">
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding MSG}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.VirtualizationMode="Recycling"  VirtualizingPanel.IsVirtualizing="True" Margin="0,4,0,1">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel/>
@@ -98,9 +126,9 @@
                 <DataTemplate>
                     <StackPanel>
                         <Separator/>
-                        
+
                         <Label HorizontalContentAlignment="Center" FontWeight="Bold" Content="{Binding Name}"/>
-                        
+
                         <Separator/>
 
                         <ItemsControl ItemsSource="{Binding Strings}">
@@ -109,9 +137,9 @@
                                     <StackPanel>
                                         <Grid>
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"></RowDefinition>
-                                                <RowDefinition Height="Auto"></RowDefinition>
-                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
                                             </Grid.RowDefinitions>
 
                                             <Grid Grid.Row="0" Background="Transparent">
@@ -139,10 +167,10 @@
                                                 <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding OldString, Mode=OneWay}"/>
                                                 <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}"
+                                                <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding IsChecked, ConverterParameter=Bool, Converter={StaticResource NullVisibilityConverter}, ElementName=VIEW}"
                                                        Source="{Binding OldTextImage}"/>
 
-                                                <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}"
+                                                <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding IsChecked, ConverterParameter=Bool, Converter={StaticResource NullVisibilityConverter}, ElementName=VIEW}"
                                                        Source="{Binding NewTextImage}"/>
                                             </Grid>
 

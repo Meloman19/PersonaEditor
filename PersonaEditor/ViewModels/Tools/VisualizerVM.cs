@@ -49,6 +49,19 @@ namespace PersonaEditor.ViewModels.Tools
             }
         }
 
+        private string _HEXLength = "";
+        public string HEXLength
+        {
+            get
+            {
+                if(_HexTB.Length > 1)
+                    _HEXLength = (_HexTB.Replace(" ", "").Length / 2).ToString();
+                return _HEXLength;
+            }
+
+        }
+        
+
         private void SelectBack_BackgroundChanged(Classes.Visual.Background background)
         {
             SetBack();
@@ -193,6 +206,8 @@ namespace PersonaEditor.ViewModels.Tools
             var temp = _TextTB.GetTextBases(PersonaEncoding).GetByteArray();
             _HexTB = BitConverter.ToString(temp).Replace('-', ' ');
             Notify("HexTB");
+            Notify("HEXLength");
+            
         }
 
         private string HEX2Text(string hex)

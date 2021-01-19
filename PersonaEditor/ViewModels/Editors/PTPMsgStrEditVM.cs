@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using PersonaEditor.Classes.Visual;
 using System.Windows.Media;
@@ -6,6 +8,7 @@ using System.Windows.Input;
 using AuxiliaryLibraries.WPF;
 using PersonaEditorLib.Text;
 using PersonaEditor.Classes;
+using PersonaEditor.ViewModels.Tools;
 
 namespace PersonaEditor.ViewModels.Editors
 {
@@ -151,5 +154,8 @@ namespace PersonaEditor.ViewModels.Editors
             MovePostfixDown = new RelayCommand(movePostfixDown);
             MovePostfixUp = new RelayCommand(movePostfixUp);
         }
+
+       
+
     }
 }

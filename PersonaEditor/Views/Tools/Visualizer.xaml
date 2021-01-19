@@ -22,6 +22,8 @@
         <StatusBar Grid.Row="0">
             <ComboBox Width="120" ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding BackgroundSelect}"/>
             <ComboBox Width="90" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
+            <Label Content="Длина байтов:"></Label>
+            <Label Content="{Binding HEXLength, UpdateSourceTrigger=PropertyChanged}"></Label>
         </StatusBar>
 
         <Image Grid.Row="1">

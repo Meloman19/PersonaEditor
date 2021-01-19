@@ -2,6 +2,7 @@
 using AuxiliaryLibraries.WPF;
 using PersonaEditorLib.Text;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace PersonaEditor.ViewModels.Editors
 {
@@ -17,7 +18,7 @@ namespace PersonaEditor.ViewModels.Editors
         {
             foreach (var a in StringList)
                 a.Changes(save, destFont);
-
+            
             if (save)
                 msg.MsgStrings = StringList.Select(x => x.data).ToArray();
         }
