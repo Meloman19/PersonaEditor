@@ -11,7 +11,6 @@ namespace PersonaEditor.Views
         public MultiFileEdit()
         {
             InitializeComponent();        
-            DataContext = new MultiFileEditVM(this);
         }
         
         double temp = 0;

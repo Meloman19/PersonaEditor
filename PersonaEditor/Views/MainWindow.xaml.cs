@@ -8,6 +8,7 @@ namespace PersonaEditor.Views
         public MainWindow()
         {
             InitializeComponent();
+            BackgroundWorker.Control = this;
 
         }
     }

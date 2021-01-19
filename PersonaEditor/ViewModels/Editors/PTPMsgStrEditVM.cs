@@ -119,6 +119,7 @@ namespace PersonaEditor.ViewModels.Editors
 
         public PTPMsgStrEditVM(PTPMSGstr str, Tuple<ImageDrawing, ImageDrawing, ImageDrawing, RectangleGeometry> tuple, string oldEncoding, string newEncoding, int backgroundIndex)
         {
+
             this.str = str;
             
             OldEncoding = Static.EncodingManager.GetPersonaEncoding(oldEncoding);

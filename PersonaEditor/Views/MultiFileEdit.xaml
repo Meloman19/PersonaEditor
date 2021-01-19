@@ -45,17 +45,14 @@
                                 </wpf:EventTrigger.Actions>
                             </wpf:EventTrigger>
                         </wpf:Interaction.Triggers>
+                        <ProgressBar Maximum="{Binding ProgressMaximum}" Value="{Binding ProgressValue}" Grid.Row="2" />
+                        <TextBlock Text="{Binding StatusBar}" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource main_DropFile}" TextAlignment="Center"/>
                     </Grid>
                 </Border>
-                <ProgressBar Maximum="{Binding ProgressMaximum}" Value="{Binding ProgressValue}" Grid.Row="2" />
 
-                <StatusBar Grid.Row="2">
-                    <StatusBarItem>
-                        <TextBlock Text="{Binding StatusBar}"/>
 
-                    </StatusBarItem>
-                </StatusBar>
             </Grid>
 
             <GridSplitter ResizeBehavior="PreviousAndCurrent" ShowsPreview="True" Grid.Column="1" Width="4"/>

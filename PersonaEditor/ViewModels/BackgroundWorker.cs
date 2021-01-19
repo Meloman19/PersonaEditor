@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace PersonaEditor.ViewModels
@@ -12,7 +13,7 @@ namespace PersonaEditor.ViewModels
         public static int ProgressMaximum { get; set; }
         public static int ProgressValue { get; set; }
 
-        public static UserControl Control { get; set; }
+        public static Window Control { get; set; }
         public static string Status { get; set; }
     }
 }

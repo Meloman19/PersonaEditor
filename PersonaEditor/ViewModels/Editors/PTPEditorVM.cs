@@ -69,17 +69,19 @@ namespace PersonaEditor.ViewModels.Editors
             get { return Background; }
             set
             {
-                if (SelectBack != Static.BackManager.GetBackground(value) && Static.BackManager.GetBackground(value) != null)
-                {
-                    SelectBack = Static.BackManager.GetBackground(value);
-                    Background = value;
-                    ApplicationSettings.AppSetting.Default.PTPBackgroundDefault = Static.BackManager.GetBackgroundName(value);
-                    UpdateBackground(value);
-                    BackgroundDrawing.ImageSource = SelectBack.Image;
-                    BackgroundDrawing.Rect = SelectBack.Rect;
-                    ClipGeometry.Rect = SelectBack.Rect;
-                }
-                Notify("SelectedBackgroundIndex");
+
+                    if (SelectBack != Static.BackManager.GetBackground(value) && Static.BackManager.GetBackground(value) != null)
+                    {
+                        SelectBack = Static.BackManager.GetBackground(value);
+                        Background = value;
+                        ApplicationSettings.AppSetting.Default.PTPBackgroundDefault = Static.BackManager.GetBackgroundName(value);
+                        UpdateBackground(value);
+                        BackgroundDrawing.ImageSource = SelectBack.Image;
+                        BackgroundDrawing.Rect = SelectBack.Rect;
+                        ClipGeometry.Rect = SelectBack.Rect;
+                    }
+                    Notify("SelectedBackgroundIndex");
+                
             }
         }
 
@@ -186,7 +188,9 @@ namespace PersonaEditor.ViewModels.Editors
 
         public PTPEditorVM(PTP ptp)
         {
+
             FromCommand = new RelayCommand(Replace);
+            BackgroundWorker.Status = "Загрузка...";
 
             int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(ApplicationSettings.AppSetting.Default.PTPOldDefault);
             if (sourceInd >= 0)
@@ -212,8 +216,7 @@ namespace PersonaEditor.ViewModels.Editors
             foreach (var a in ptp.Names)
                 Names.Add(new PTPNameEditVM(a, OldEncoding, NewEncoding, SelectedBackgroundIndex));
 
-
-
+            
             foreach (var a in ptp.Msg)
             {
                 var name = Names.FirstOrDefault(x => x.Index == a.CharacterIndex);
@@ -225,7 +228,17 @@ namespace PersonaEditor.ViewModels.Editors
 
                 MSG.Add(new PTPMsgVM(a, tuple, ApplicationSettings.AppSetting.Default.PTPOldDefault, ApplicationSettings.AppSetting.Default.PTPNewDefault, SelectedBackgroundIndex));
             }
+
+
+            BackgroundWorker.Status = "Готово...";
+
+
         }
+
+
+
+
+        delegate void ProgressBarProcess(int value);
 
         private int _RowsValue = 3;
         public int RowsValue

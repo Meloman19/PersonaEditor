@@ -179,11 +179,13 @@ namespace PersonaEditor.ViewModels
 
         #endregion Events
 
-        public MultiFileEditVM(UserControl control)
+        public MultiFileEditVM()
         {
-            BackgroundWorker.Control = control;
             Drop = new RelayCommand(DropItem);
             Tree.ItemAction += Tree_ItemAction;
+            BackgroundWorker.ProgressMaximum = 100;
+            BackgroundWorker.ProgressValue = 0;
+
         }
 
         private void Tree_ItemAction(TreeViewItemVM sender, UserTreeViewItemEventEnum action)

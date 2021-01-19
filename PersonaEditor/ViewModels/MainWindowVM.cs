@@ -15,7 +15,7 @@ namespace PersonaEditor.Views
         Views.Tools.Visualizer visualizer;
         Views.Tools.SetChar setchar;
 
-        public MultiFileEditVM MultiFile { get; } = new MultiFileEditVM(BackgroundWorker.Control);
+        public MultiFileEditVM MultiFile { get; } = new MultiFileEditVM();
 
         private object _MainControlDC = null;
         public object MainControlDC
