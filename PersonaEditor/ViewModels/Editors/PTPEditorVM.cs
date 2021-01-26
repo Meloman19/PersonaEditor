@@ -277,6 +277,7 @@ namespace PersonaEditor.ViewModels.Editors
 
                                 string[] t = textlist[j].Split(new[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
                                 msg.NewString = t[t.Length - 1];
+                                
                                 textlist.RemoveAt(j);
                                 break;
                             }
