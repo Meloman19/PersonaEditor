@@ -19,6 +19,7 @@ namespace PersonaEditorLib.Other
         private readonly uint MagicNumber = 0x30544E46;
         private bool IsLittleEndian = true;
         private byte[] Unknown = null;
+        private int UnknownInt;
 
         public ushort Width { get; private set; } = 0;
         public ushort Height { get; private set; } = 0;
@@ -45,8 +46,9 @@ namespace PersonaEditorLib.Other
                     throw new Exception("FNT0 Header: wrong unknown");
                 Width = reader.ReadUInt16();
                 Height = reader.ReadUInt16();
-                if (reader.ReadInt32() != 0)
-                    throw new Exception("FNT0 Header: wrong padding");
+                UnknownInt = reader.ReadInt32();
+                //if (reader.ReadInt32() != 0)
+                //    throw new Exception("FNT0 Header: wrong padding");
 
                 int unknownPos = reader.ReadInt32();
                 int dicPos = reader.ReadInt32();
@@ -111,7 +113,7 @@ namespace PersonaEditorLib.Other
                 writer.Write(0x00010000);
                 writer.Write(Width);
                 writer.Write(Height);
-                writer.Write(0);
+                writer.Write(UnknownInt);
                 writer.Write(0x18);
                 writer.Write(0x18 + Unknown.Length);
 
