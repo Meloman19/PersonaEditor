@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+             d:DesignHeight="400
+             " Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -13,7 +14,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="{Binding Source={x:Static settings:AppSetting.Default}, Path=PTPNameBlockSize, Mode=TwoWay}"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="167*"/>
         </Grid.RowDefinitions>
 
         <StatusBar Grid.Row="0">
@@ -24,6 +25,8 @@
             <ComboBox Width="70" IsEnabled="{Binding IsEdit, Mode=OneWay}" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedDestFont}"/>
 
             <CheckBox Content="Enable Edit" IsChecked="{Binding IsEdit}" VerticalAlignment="Center"/>
+            <Button Content="Из файла с ноты" Command="{Binding Path=FromCommand}"></Button>
+            <!--<Button Content="Тест" Command="{Binding Path=TestCommand}"></Button>-->
         </StatusBar>
 
         <Separator Grid.Row="1"/>
@@ -64,7 +67,7 @@
 
         <GridSplitter ResizeBehavior="BasedOnAlignment" Grid.Row="3" Height="5" HorizontalAlignment="Stretch" ShowsPreview="True"/>
 
-        <ItemsControl Grid.Row="4" ItemsSource="{Binding MsgList}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.IsVirtualizing="True">
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding MsgList}" ScrollViewer.IsDeferredScrollingEnabled="True" VirtualizingPanel.ScrollUnit="Pixel" VirtualizingPanel.IsVirtualizing="True" Margin="0,0,0,5">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel/>
@@ -73,7 +76,7 @@
 
             <ItemsControl.Template>
                 <ControlTemplate>
-                    <ScrollViewer CanContentScroll="True">
+                    <ScrollViewer PanningMode="VerticalOnly" CanContentScroll="True">
                         <ItemsPresenter/>
                     </ScrollViewer>
                 </ControlTemplate>
@@ -91,7 +94,7 @@
                                     <StackPanel>
 
                                         <!--<control:EditorRichTextBox AcceptsReturn="True" Margin="2" Document="{Binding Document}" IsDocumentEnabled="True"/>-->
-                                        <TextBox Text="{Binding Text, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="2" TextWrapping="Wrap"
+                                        <TextBox  Text="{Binding Text, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="2" TextWrapping="Wrap"
                                                          IsReadOnly="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}, Path=DataContext.IsSelectCharList}" />
 
                                     </StackPanel>
@@ -103,5 +106,24 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <!--ПОИСК-->
+        <Separator Grid.Row="4" Margin="0,0,0,-1" RenderTransformOrigin="0.5,0.5" >
+            <Separator.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="-1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Separator.RenderTransform>
+        </Separator>
+
+
+        <!--<TextBlock Text="Результат поиска: " Margin="0,0,0,80" Grid.Row="5" Height="18" VerticalAlignment="Bottom"/>-->
+
+        <!--<StackPanel DataContext="{Binding Path=FindStringList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Row="5" Height="80" VerticalAlignment="Bottom">
+            <Label Content="{Binding Path=Text}"></Label>
+        </StackPanel>-->
+
     </Grid>
 </UserControl>

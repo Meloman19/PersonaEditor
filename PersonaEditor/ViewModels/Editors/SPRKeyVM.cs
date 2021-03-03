@@ -11,6 +11,9 @@ namespace PersonaEditor.ViewModels.Editors
 
         private bool _IsSelected = false;
 
+
+      
+
         public string Name
         {
             get { return Key.mComment; }

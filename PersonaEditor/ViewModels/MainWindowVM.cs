@@ -6,6 +6,7 @@ using AuxiliaryLibraries.WPF;
 using PersonaEditor.ViewModels;
 using PersonaEditor.View.Settings;
 using PersonaEditor.ViewModels.Settings;
+using BackgroundWorker = PersonaEditor.ViewModels.BackgroundWorker;
 
 namespace PersonaEditor.Views
 {

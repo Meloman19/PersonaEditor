@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Text.RegularExpressions;
 
 namespace PersonaEditorLib.Text
@@ -41,7 +42,15 @@ namespace PersonaEditorLib.Text
                 {
                     temp.Add(array[i]);
                     i++;
-                    temp.Add(array[i]);
+                    try
+                    {
+                        temp.Add(array[i]);
+                    }
+                    catch
+                    {
+                        temp.Add(array[i-1]);
+                        
+                    }
                 }
                 else
                 {

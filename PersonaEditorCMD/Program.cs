@@ -66,6 +66,7 @@ namespace PersonaEditorCMD
             try
             {
                 DoSome(args);
+                Console.ReadLine();
             }
             catch (Exception e)
             {
@@ -112,11 +113,10 @@ namespace PersonaEditorCMD
         static void DoSome(string[] args)
         {
             ArgumentsWork argwrk = new ArgumentsWork(args);
-            if (argwrk.OpenedFile != "")
-            {
+            
                 GameFile file = GameFormatHelper.OpenFile(Path.GetFileName(argwrk.OpenedFile), File.ReadAllBytes(argwrk.OpenedFile));
 
-                if (file != null)
+                
                     foreach (var command in argwrk.ArgumentList)
                     {
                         Action<GameFile, string, string, Parameters> action = null;
@@ -154,7 +154,7 @@ namespace PersonaEditorCMD
                         if (action != null)
                             SubFileAction(action, file, command.Value, argwrk.OpenedFileDir, command.Parameters);
                     }
-            }
+            
         }
 
         static void ExportImage(GameFile objectFile, string value, string openedFileDir, Parameters parameters)
@@ -249,7 +249,9 @@ namespace PersonaEditorCMD
 
                 if (File.Exists(path))
                 {
+
                     List<string[]> import = File.ReadAllLines(path, parameters.FileEncoding).Select(x => x.Split('\t')).ToList();
+                    
                     LineMap MAP = new LineMap(parameters.Map);
 
                     if (parameters.LineByLine)
@@ -376,6 +378,8 @@ namespace PersonaEditorCMD
 
                     BMD bmd = new BMD(objectFile.GameData as PTP, encoding);
                     File.WriteAllBytes(path, bmd.GetData());
+                    
+                    
                 }
                 else
                 {

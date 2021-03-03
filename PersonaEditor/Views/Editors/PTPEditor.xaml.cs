@@ -1,4 +1,6 @@
 ﻿using System.Windows.Controls;
+using PersonaEditor.ViewModels;
+using PersonaEditor.ViewModels.Editors;
 
 namespace PersonaEditor.Views.Editors
 {
@@ -7,6 +9,8 @@ namespace PersonaEditor.Views.Editors
         public PTPEditor()
         {
             InitializeComponent();
+
+
         }
     }
 }

@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using AuxiliaryLibraries.WPF;
+using PersonaEditor.ViewModels.Tools;
 using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels.Editors
@@ -33,10 +38,23 @@ namespace PersonaEditor.ViewModels.Editors
             //    a.UpdateBackground();
         }
 
-        public void UpdateView(bool isEnable)
+        public async void UpdateView(bool isEnable)
         {
+            await Task.Run((() => Update()));
+
+
+        }
+
+        void Update()
+        {
+
             foreach (var a in Strings)
-                a.UpdateView(isEnable);
+            {
+                
+                    a.UpdateView(true);
+
+                
+            }
         }
 
         public void UpdateBackground(int BackgroundIndex)
@@ -55,5 +73,7 @@ namespace PersonaEditor.ViewModels.Editors
             foreach (var a in msg.Strings)
                 Strings.Add(new PTPMsgStrEditVM(a, tuple, OldEncoding, NewEncoding, BackgroundIndex));
         }
+
+       
     }
 }

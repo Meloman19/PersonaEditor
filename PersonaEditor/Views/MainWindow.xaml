@@ -23,7 +23,7 @@
         <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <convert:SecondArgTranslator x:Key="Translator"/>
     </Window.Resources>
-    
+
     <wpf:Interaction.Triggers>
         <wpf:EventTrigger EventName="Closing">
             <wpf:EventTrigger.Actions>
@@ -55,5 +55,6 @@
         <Separator Grid.Row="1"/>
 
         <controls:MultiFileEdit DataContext="{Binding MultiFile}" Grid.Row="2"/>
+
     </Grid>
 </Window>

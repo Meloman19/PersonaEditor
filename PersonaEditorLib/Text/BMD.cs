@@ -8,13 +8,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+
 namespace PersonaEditorLib.Text
 {
     public class BMD : IGameData
     {
         private BMD()
         {
-
+            
         }
 
         public BMD(byte[] data)
@@ -22,6 +23,7 @@ namespace PersonaEditorLib.Text
             using (MemoryStream MS = new MemoryStream(data))
             {
                 Read(new StreamPart(MS, MS.Length, 0));
+                
             }
         }
 
@@ -78,31 +80,35 @@ namespace PersonaEditorLib.Text
 
                 #endregion
 
-                reader.BaseStream.Position = Name_Block_Position + MSG_Pointer_Start;
-                List<int> NamePosition = new List<int>();
-                for (int i = 0; i < Name_Count; i++)
-                    NamePosition.Add(reader.ReadInt32());
+            
 
-                for (int i = 0; i < NamePosition.Count; i++)
-                {
-                    reader.BaseStream.Position = NamePosition[i] + MSG_Pointer_Start;
-                    List<byte> Bytes = new List<byte>(30);
+                    reader.BaseStream.Position = Name_Block_Position + MSG_Pointer_Start;
+                    List<int> NamePosition = new List<int>();
+                    for (int i = 0; i < Name_Count; i++)
+                        NamePosition.Add(reader.ReadInt32());
 
-                    byte Byte = reader.ReadByte();
-                    while (Byte != 0)
+                    for (int i = 0; i < NamePosition.Count; i++)
                     {
-                        Bytes.Add(Byte);
-                        Byte = reader.ReadByte();
+                        reader.BaseStream.Position = NamePosition[i] + MSG_Pointer_Start;
+                        List<byte> Bytes = new List<byte>(30);
+
+                        byte Byte = reader.ReadByte();
+                        while (Byte != 0)
+                        {
+                            Bytes.Add(Byte);
+                            Byte = reader.ReadByte();
+                        }
+
+                        Name.Add(new BMDName(i, Bytes.ToArray()));
                     }
 
-                    Name.Add(new BMDName(i, Bytes.ToArray()));
-                }
+                    for (int i = 0; i < MSGPosition.Count; i++)
+                    {
+                        reader.BaseStream.Position = MSG_Pointer_Start + MSGPosition[i][1];
 
-                for (int i = 0; i < MSGPosition.Count; i++)
-                {
-                    reader.BaseStream.Position = MSG_Pointer_Start + MSGPosition[i][1];
-                    Msg.Add(new BMDMSG(reader, i, MSGPosition[i][0]));
-                }
+                        Msg.Add(new BMDMSG(reader, i, MSGPosition[i][0]));
+                    }
+                
             }
         }
 
@@ -241,6 +247,12 @@ namespace PersonaEditorLib.Text
                 writer.Write((int)MS.Length);
 
                 #endregion
+
+                
+
+
+
+
 
                 return MS.ToArray();
             }
