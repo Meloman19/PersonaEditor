@@ -36,7 +36,15 @@
                                                Background="{x:Static SystemColors.ControlBrush}"
                                                Foreground="Black"/>
                             </Border>
-                            <TextBlock TextWrapping="Wrap" Text="{Binding DataDecode}"/>
+                            <TextBlock TextWrapping="Wrap" Text="{Binding DataDecode}">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Copy"
+                                                  Click="MenuItem_Click"
+                                                  CommandParameter="{Binding}"/>
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
                         </StackPanel>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type editorsVM:FTDMultiVM}">
