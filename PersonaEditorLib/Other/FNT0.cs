@@ -149,9 +149,8 @@ namespace PersonaEditorLib.Other
 
             for (int i = 0, offset = 0; i < glyphs.Count; i++)
             {
-                ArraySection<byte> current = new ArraySection<byte>(glyphs[i], 6, Width * Height);
-                // ArraySegment<byte> current = new ArraySegment<byte>(data[i], 6, width * height);
-                //  byte[] current = System.ArraySegment< data[i];
+                var current = glyphs[i].AsSpan(6, Width * Height);
+                
                 for (int y = 0; y < Height; y++)
                     for (int x = 0; x < stride; x++)
                         newData[offset + y * imageStride + x] = current[y * stride + x];

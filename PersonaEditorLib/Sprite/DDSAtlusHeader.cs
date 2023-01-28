@@ -38,9 +38,8 @@ namespace PersonaEditorLib.Sprite
             if (HeaderSize != 0x80) throw new Exception("DDSHeaderV2: exception 0x10");
             if (Unknown0x1A != 0x02) throw new Exception("DDSHeaderV2: exception 0x1A");
             if (Unknown0x24 != 0x10000) throw new Exception("DDSHeaderV2: exception 0x24");
-            if (Reserved.Contains<int>(0, new ReverseStructComparer<int>()))
-                throw new Exception("DDSHeaderV2: exception 0x28 array");
-            
+            if (Reserved.Any(x => x != 0))
+                throw new Exception("DDSHeaderV2: exception 0x28 array");            
         }
 
         public DDSAtlusHeader(BinaryReader reader)

@@ -2,23 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TrimUnusedDependencies>true</TrimUnusedDependencies>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.5.0.0</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
@@ -30,31 +15,14 @@
   <PropertyGroup>
     <ApplicationIcon>ApplicationResource\PersonaEditor.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup>
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-  </PropertyGroup>
   <ItemGroup>
     <Resource Include="ApplicationResource\Background.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="ApplicationResource\settings-work-tool.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="ApplicationResource\hard-disk.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="ApplicationResource\PersonaEditor.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="ApplicationResource\icons\icons8-папка-96.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="ApplicationResource\icons\icons8-файл-80.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="ApplicationResource\icons\icons8-картина-80.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="ApplicationResource\icons\icons8-документ-80.png" />
   </ItemGroup>
   <ItemGroup>
@@ -63,9 +31,5 @@
     <ProjectReference Include="..\AuxiliaryLibraries\AuxiliaryLibraries.csproj" />
     <ProjectReference Include="..\PersonaEditorCMD\PersonaEditorCMD.csproj" />
     <ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
 </Project>
