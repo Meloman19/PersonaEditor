@@ -8,7 +8,7 @@ namespace AuxiliaryLibraries.WPF.Tools
     {
         public static BitmapSource OpenPNG(string path)
         {
-            using (FileStream FS = new FileStream(path, FileMode.Open))
+            using (FileStream FS = File.OpenRead(path))
             {
                 PngBitmapDecoder decoder = new PngBitmapDecoder(FS, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
                 var frame = decoder.Frames[0];
@@ -21,7 +21,7 @@ namespace AuxiliaryLibraries.WPF.Tools
         public static void SaveToPNG(BitmapSource image, string path)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
-            using (FileStream FS = new FileStream(path, FileMode.Create))
+            using (FileStream FS = File.Create(path))
             {
                 PngBitmapEncoder encoder = new PngBitmapEncoder();
 

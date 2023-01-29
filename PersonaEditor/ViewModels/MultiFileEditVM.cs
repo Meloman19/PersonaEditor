@@ -42,12 +42,6 @@ namespace PersonaEditor.ViewModels
                 if (fileInfo.Length > 1000000000)
                     return;
 
-                //FileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-
-                //var file = PersonaEditorLib.Utilities.PersonaFile.OpenFile(Path.GetFileName(path),
-                //    PersonaEditorLib.Utilities.PersonaFile.GetFileType(Path.GetFileName(path)),
-                //    new StreamFile(FileStream, FileStream.Length, 0));
-
                 var file = GameFormatHelper.OpenFile(Path.GetFileName(path), File.ReadAllBytes(path));
 
                 if (file != null)

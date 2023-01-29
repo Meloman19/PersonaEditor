@@ -79,7 +79,7 @@ namespace PersonaEditorLib.FileContainer
 
         public PM1(string path)
         {
-            using (FileStream FS = new FileStream(path, FileMode.Open, FileAccess.Read))
+            using (FileStream FS = File.OpenRead(path))
                 Read(FS);
         }
 

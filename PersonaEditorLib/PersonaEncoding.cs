@@ -44,7 +44,7 @@ namespace PersonaEditorLib
 
         public void SaveFNTMAP(string path)
         {
-            using (FileStream FS = new FileStream(path, FileMode.Create))
+            using (FileStream FS = File.Create(path))
                 foreach (var a in Dictionary)
                 {
                     FS.Position = a.Key * 2;
@@ -56,7 +56,7 @@ namespace PersonaEditorLib
 
         private void OpenFNTMAP(string path)
         {
-            using (FileStream FS = new FileStream(path, FileMode.Open))
+            using (FileStream FS = File.OpenRead(path))
             {
                 int count = (int)Math.Floor((double)FS.Length / 2);
                 byte[] buffer = new byte[2];
