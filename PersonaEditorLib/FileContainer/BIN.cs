@@ -47,6 +47,9 @@ namespace PersonaEditorLib.FileContainer
                 while (reader.BaseStream.Position < reader.BaseStream.Length - 0x100)
                 {
                     string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x100 - 4)).Trim('\0');
+                    if (string.IsNullOrWhiteSpace(Name))
+                        throw new Exception("BIN: entry name is empty");
+
                     int Size = reader.ReadInt32();
                     byte[] Data = reader.ReadBytes(Size);
                     reader.BaseStream.Position += IOTools.Alignment(reader.BaseStream.Position, 0x40);
