@@ -17,8 +17,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="ApplicationResource\Background.png" />
-    <Resource Include="ApplicationResource\settings-work-tool.png" />
-    <Resource Include="ApplicationResource\hard-disk.png" />
     <Resource Include="ApplicationResource\PersonaEditor.ico" />
     <Resource Include="ApplicationResource\icons\icons8-папка-96.png" />
     <Resource Include="ApplicationResource\icons\icons8-файл-80.png" />

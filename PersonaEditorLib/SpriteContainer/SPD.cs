@@ -162,15 +162,6 @@ namespace PersonaEditorLib.SpriteContainer
             {
                 XElement Key = new XElement("Key");
 
-                string temp = Encoding.GetEncoding("shift-jis").GetString(key.Comment).TrimEnd('\0');
-                if (temp.Contains("\0"))
-                {
-
-                }
-
-                XAttribute attribute = new XAttribute("Name", temp);
-                Key.Add(attribute);
-
                 XElement index = new XElement("Index", key.ListIndex.ToString());
                 Key.Add(index);
                 XElement texIndex = new XElement("TextureIndex", key.TextureIndex.ToString());
