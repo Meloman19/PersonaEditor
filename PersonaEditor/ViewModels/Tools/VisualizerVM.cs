@@ -64,7 +64,7 @@ namespace PersonaEditor.ViewModels.Tools
             set
             {
                 _FontSelect = value;
-                PersonaEncoding = Static.EncodingManager.GetPersonaEncoding(_FontSelect);
+                PersonaEncoding = Static.EncodingManager.GetPersonaEncoding(_FontSelect)?.Clone();
                 PersonaFont = Static.FontManager.GetPersonaFont(Static.EncodingManager.GetPersonaEncodingName(_FontSelect));
                 Notify("FontSelect");
                 Text.UpdateText(_TextTB.GetTextBases(PersonaEncoding));
@@ -185,6 +185,24 @@ namespace PersonaEditor.ViewModels.Tools
                     _HexTB = value;
 
                 }
+            }
+        }
+
+        private bool _twoBytesAscii = false;
+        public bool TwoBytesASCII
+        {
+            get => _twoBytesAscii;
+            set
+            {
+                if (_twoBytesAscii == value)
+                    return;
+
+                if (PersonaEncoding != null)
+                {
+                    PersonaEncoding.TwoByteASCII = value;
+                }
+                _twoBytesAscii = value;
+                Text2HEX();
             }
         }
 

@@ -16,7 +16,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StatusBar Grid.Row="0">
@@ -45,22 +44,48 @@
             </Image.Source>
         </Image>
 
-        <TextBox Grid.Row="2" Margin="4" Width="200" HorizontalAlignment="Left" MaxLines="1" Text="{Binding NameTB, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="2">
+            <Grid Margin="4">
+                <TextBox
+                    Width="200"                    
+                    HorizontalAlignment="Left"
+                    MaxLines="1"
+                    Text="{Binding NameTB, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
 
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+                <CheckBox Content="Two byte ASCII"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center"
+                          IsChecked="{Binding TwoBytesASCII, Mode=TwoWay}" />
+            </Grid>
 
-            <TextBlock Grid.Column="0" Grid.Row="0" Margin="4" Text="Text:" VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="0" Grid.Row="1" Margin="4" Text="HEX" VerticalAlignment="Center"/>
-            <TextBox Grid.Column="1" Grid.Row="0" Margin="4" AcceptsReturn="True" TextWrapping="NoWrap" Text="{Binding TextTB, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBox Grid.Column="1" Grid.Row="1" Margin="4" AcceptsReturn="False" TextWrapping="Wrap" Text="{Binding HexTB, UpdateSourceTrigger=PropertyChanged}"/>
-        </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Column="0" Grid.Row="0" Margin="4" Text="Text:" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Margin="4" Text="HEX:" VerticalAlignment="Center"/>
+                <TextBox
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Margin="4"
+                    AcceptsReturn="True"
+                    TextWrapping="NoWrap"
+                    Text="{Binding TextTB, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Margin="4"
+                    IsReadOnly="True"
+                    TextWrapping="Wrap"
+                    Text="{Binding HexTB, Mode=OneWay}"/>
+            </Grid>
+        </StackPanel>
     </Grid>
 </Window>

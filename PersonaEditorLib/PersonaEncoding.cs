@@ -12,9 +12,9 @@ namespace PersonaEditorLib
 
         public string Tag { get; set; } = "Empty";
 
-        public string FilePath { get; } = "";
+        public string FilePath { get; private set; } = "";
 
-        public Dictionary<int, char> Dictionary { get; } = new Dictionary<int, char>();
+        public Dictionary<int, char> Dictionary { get; private set; } = new Dictionary<int, char>();
 
         public PersonaEncoding()
         {
@@ -191,6 +191,15 @@ namespace PersonaEditorLib
         public override int GetMaxCharCount(int byteCount)
         {
             return byteCount;
+        }
+
+        public override PersonaEncoding Clone()
+        {
+            var clone = new PersonaEncoding();
+            clone.Tag = Tag;
+            clone.FilePath = FilePath;
+            clone.Dictionary = Dictionary.ToDictionary(x => x.Key, x => x.Value);
+            return clone;
         }
 
         #endregion Encoding
