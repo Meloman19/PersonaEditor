@@ -72,6 +72,11 @@ namespace PersonaEditorLib
 
         #endregion FNTMAP
 
+        /// <summary>
+        /// If true then all characters from the range 0x00 to 0x7F encoded as two bytes. Default - false.
+        /// </summary>
+        public bool TwoByteASCII { get; set; } = false;
+
         public char GetChar(int index)
         {
             if (Dictionary.ContainsKey(index))
@@ -97,9 +102,12 @@ namespace PersonaEditorLib
             for (int i = index; i < index + count; i++)
             {
                 int ind = GetIndex(chars[i]);
-                if (ind >= 0 && ind < 0x80)
+                if (ind < 0)
+                    continue;
+
+                if (ind < 0x80 && !TwoByteASCII)
                     bytenum += 1;
-                else if (ind >= 0x80)
+                else
                     bytenum += 2;
             }
 
@@ -113,12 +121,15 @@ namespace PersonaEditorLib
             for (int i = charIndex; i < charIndex + charCount; i++)
             {
                 int ind = GetIndex(chars[i]);
-                if (ind >= 0 && ind < 0x80)
+                if (ind < 0)
+                    continue;
+
+                if (ind < 0x80 && !TwoByteASCII)
                 {
                     bytes[byteIndex + bytenum] = System.Convert.ToByte(ind);
                     bytenum += 1;
                 }
-                else if (ind >= 0x80)
+                else
                 {
                     byte byte2 = System.Convert.ToByte(((ind - 0x20) % 0x80) + 0x80);
                     byte byte1 = System.Convert.ToByte(((ind - 0x20 - byte2) / 0x80) + 0x81);
