@@ -14,7 +14,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0" Header="{DynamicResource setting_Text}">
+        <GroupBox Grid.Row="0" Header="Text">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -27,9 +27,9 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="{DynamicResource setting_XPosition}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="X Position" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
                 <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=TextXpos, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="{DynamicResource setting_YPosition}" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="Y Position" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
                 <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=TextYpos, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <Grid Grid.Row="1" Grid.ColumnSpan="4">
@@ -39,9 +39,9 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{DynamicResource setting_Color}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
                     <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=TextColor, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="2" Margin="5" Content="{DynamicResource setting_ColorPick}" Command="{Binding Path=SetColor}" CommandParameter="Text"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Command="{Binding Path=SetColor}" CommandParameter="Text"/>
                 </Grid>
 
             </Grid>
@@ -60,9 +60,9 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="{DynamicResource setting_XPosition}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="X Position" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
                 <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=NameXpos, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="{DynamicResource setting_YPosition}" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="Y Position" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
                 <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=NameYpos, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <Grid Grid.Row="1" Grid.ColumnSpan="4">
@@ -72,15 +72,15 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{DynamicResource setting_Color}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
                     <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=NameColor, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="2" Margin="5" Content="{DynamicResource setting_ColorPick}" Command="{Binding Path=SetColor}" CommandParameter="Name"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Command="{Binding Path=SetColor}" CommandParameter="Name"/>
                 </Grid>
 
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="2" Header="{DynamicResource setting_Background}">
+        <GroupBox Grid.Row="2" Header="Background">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -93,9 +93,9 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="{DynamicResource setting_Width}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="Width" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
                 <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundWidth, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="{DynamicResource setting_Height}" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="Height" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
                 <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundHeight, UpdateSourceTrigger=PropertyChanged}"/>
 
 
@@ -106,15 +106,15 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{DynamicResource setting_Color}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBlock Text="Color" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
                     <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=BackgroundColor, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Button Grid.Column="2" Margin="5" Content="{DynamicResource setting_ColorPick}" Command="{Binding Path=SetColor}" CommandParameter="Back"/>
+                    <Button Grid.Column="2" Margin="5" Content="Pick" Command="{Binding Path=SetColor}" CommandParameter="Back"/>
                 </Grid>
 
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="3" Header="{DynamicResource setting_Other}">
+        <GroupBox Grid.Row="3" Header="Other">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -127,9 +127,9 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="{DynamicResource setting_GlyphScale}" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="Glyph Scale" Grid.Column="0" VerticalAlignment="Center" TextAlignment="Right"/>
                 <TextBox Grid.Column="1" Margin="5" TextAlignment="Center" Text="{Binding Path=GlyphScale, UpdateSourceTrigger=PropertyChanged}"/>
-                <TextBlock Text="{DynamicResource setting_LineSpace}" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="Line Spacing" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"/>
                 <TextBox Grid.Column="3" Margin="5" TextAlignment="Center" Text="{Binding Path=LineSpacing, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
         </GroupBox>

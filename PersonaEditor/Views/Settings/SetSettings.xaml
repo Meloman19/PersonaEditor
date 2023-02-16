@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PersonaEditor.View.Settings"
         mc:Ignorable="d"
         Name="SettingSetWindow"
-        Title="{DynamicResource main_Settings}" Height="420" Width="300" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="Settings" Height="420" Width="300" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -17,7 +17,7 @@
         <TabControl Grid.Row ="0">
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="{DynamicResource setting_Main}"/>
+                    <TextBlock Text="Main"/>
                 </TabItem.Header>
                 <TabItem.Content>
                     <local:Main DataContext="{Binding MainVM}"/>
@@ -26,7 +26,7 @@
 
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="{DynamicResource setting_DefaultBack}"/>
+                    <TextBlock Text="Default Background"/>
                 </TabItem.Header>
                 <TabItem.Content>
                     <local:DefaultBackground DataContext="{Binding DefaultBackgroundVM}"/>

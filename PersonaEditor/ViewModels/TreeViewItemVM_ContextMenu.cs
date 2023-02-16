@@ -24,27 +24,27 @@ namespace PersonaEditor.ViewModels
             if (PersonaFileHelper.IsEdited(PersonaFile))
             {
                 menuItem = new MenuItem();
-                menuItem.Header = Application.Current.Resources.MergedDictionaries.GetString("tree_Edit");
+                menuItem.Header = "View/Edit";
                 menuItem.Command = new RelayCommand(ContextMenu_Edit);
                 _contextMenu.Add(menuItem);
             }
 
             menuItem = new MenuItem();
-            menuItem.Header = Application.Current.Resources.MergedDictionaries.GetString("tree_Replace");
+            menuItem.Header = "Replace";
             menuItem.Command = new RelayCommand(ContextMenu_Replace);
             _contextMenu.Add(menuItem);
 
             _contextMenu.Add(new Separator());
 
             menuItem = new MenuItem();
-            menuItem.Header = Application.Current.Resources.MergedDictionaries.GetString("tree_SaveAs");
+            menuItem.Header = "Save As...";
             menuItem.Command = new RelayCommand(ContextMenu_SaveAs);
             _contextMenu.Add(menuItem);
 
             if (PersonaFileHelper.HaveSubFiles(PersonaFile))
             {
                 menuItem = new MenuItem();
-                menuItem.Header = Application.Current.Resources.MergedDictionaries.GetString("tree_SaveAll");
+                menuItem.Header = "Export All";
                 menuItem.Command = new RelayCommand(ContextMenu_SaveAll);
                 _contextMenu.Add(menuItem);
             }

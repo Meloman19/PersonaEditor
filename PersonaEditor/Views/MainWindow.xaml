@@ -40,17 +40,17 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <MenuItem Header="{DynamicResource main_File}">
-                <MenuItem Header="{DynamicResource main_OpenFile}" Command="{Binding Path=clickOpenFile}"/>
-                <MenuItem Header="{DynamicResource main_SaveAs}" Command="{Binding Path=clickSaveAsFile}"/>
+            <MenuItem Header="File">
+                <MenuItem Header="Open" Command="{Binding Path=clickOpenFile}"/>
+                <MenuItem Header="Save As..." Command="{Binding Path=clickSaveAsFile}"/>
             </MenuItem>
-            <MenuItem Header="{DynamicResource main_Tools}">
-                <MenuItem Header="{DynamicResource main_Visualizer}" Command="{Binding Path=clickVisualizerOpen}"/>
-                <MenuItem Header="{DynamicResource main_CharSet}" Command="{Binding Path=clickSetCharOpen}"/>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Visualizer" Command="{Binding Path=clickVisualizerOpen}"/>
+                <MenuItem Header="Char Set" Command="{Binding Path=clickSetCharOpen}"/>
                 <Separator/>
-                <MenuItem Header="{DynamicResource main_Settings}" Command="{Binding Path=clickSettingOpen}"/>
+                <MenuItem Header="Settings" Command="{Binding Path=clickSettingOpen}"/>
             </MenuItem>
-            <MenuItem Header="{DynamicResource main_About}" Command="{Binding Path=clickAboutOpen}"/>
+            <MenuItem Header="About" Command="{Binding Path=clickAboutOpen}"/>
         </Menu>
         <Separator Grid.Row="1"/>
 

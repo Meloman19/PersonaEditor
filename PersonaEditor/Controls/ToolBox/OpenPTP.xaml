@@ -22,7 +22,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="{DynamicResource OpenPTP_Font}" VerticalAlignment="Center" Margin="10,10,0,10"/>
+            <TextBlock Text="Select new encoding:" VerticalAlignment="Center" Margin="10,10,0,10"/>
             <ComboBox Grid.Column="1" Margin="10" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedFont}"/>
         </Grid>
 
@@ -34,10 +34,10 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="1" Content="{DynamicResource SavePTP_Ok}" Padding="5" Margin="4" MinWidth="{Binding ElementName=Can, Path=ActualWidth}" Click="Ok_Click"/>
-            <Button Grid.Column="2" Content="{DynamicResource SavePTP_Cancel}" Padding="5" Margin="4" Name="Can" IsCancel="True"/>
+            <Button Grid.Column="1" Content="OK" Padding="5" Margin="4" MinWidth="{Binding ElementName=Can, Path=ActualWidth}" Click="Ok_Click"/>
+            <Button Grid.Column="2" Content="Cancel" Padding="5" Margin="4" Name="Can" IsCancel="True"/>
         </Grid>
 
-        <CheckBox Grid.Row="3" Content="{DynamicResource toolbox_NeverAskAgain}" Margin="4" HorizontalAlignment="Right" IsChecked="{Binding NeverAskAgain}"/>
+        <CheckBox Grid.Row="3" Content="Never ask again" Margin="4" HorizontalAlignment="Right" IsChecked="{Binding NeverAskAgain}"/>
     </Grid>
 </Window>

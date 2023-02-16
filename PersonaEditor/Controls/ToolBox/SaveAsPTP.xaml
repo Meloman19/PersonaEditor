@@ -17,10 +17,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <CheckBox Grid.Row="0" Name="Check" Content="{DynamicResource setting_Main_CopyOld}" Margin="10" IsChecked="{Binding CopyOld2New}">
+        <CheckBox Grid.Row="0" Name="Check" Content="Copy old text" Margin="10" IsChecked="{Binding CopyOld2New}">
             <CheckBox.ToolTip>
                 <ToolTip>
-                    <TextBlock Text="{DynamicResource SavePTP_ToolTip1}"/>
+                    <TextBlock Text="Save?"/>
                 </ToolTip>
             </CheckBox.ToolTip>
         </CheckBox>
@@ -30,7 +30,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="{DynamicResource SavePTP_Font}" VerticalAlignment="Center" Margin="10,10,0,10"/>
+            <TextBlock Text="Select old encoding:" VerticalAlignment="Center" Margin="10,10,0,10"/>
             <ComboBox Grid.Column="1" IsEnabled="{Binding ElementName=Check, Path=IsChecked}" Margin="10" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedFont}"/>
         </Grid>
 
@@ -42,10 +42,10 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="1" Content="{DynamicResource SavePTP_Ok}" Padding="5" Margin="4" MinWidth="{Binding ElementName=Can, Path=ActualWidth}" Click="Ok_Click"/>
-            <Button Grid.Column="2" Content="{DynamicResource SavePTP_Cancel}" Padding="5" Margin="4" Name="Can" IsCancel="True"/>
+            <Button Grid.Column="1" Content="OK" Padding="5" Margin="4" MinWidth="{Binding ElementName=Can, Path=ActualWidth}" Click="Ok_Click"/>
+            <Button Grid.Column="2" Content="Cancel" Padding="5" Margin="4" Name="Can" IsCancel="True"/>
         </Grid>
 
-        <CheckBox Grid.Row="3" Content="{DynamicResource toolbox_NeverAskAgain}" Margin="4" HorizontalAlignment="Right" IsChecked="{Binding NeverAskAgain}"/>
+        <CheckBox Grid.Row="3" Content="Never ask again" Margin="4" HorizontalAlignment="Right" IsChecked="{Binding NeverAskAgain}"/>
     </Grid>
 </Window>

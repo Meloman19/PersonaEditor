@@ -12,7 +12,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <StatusBar Grid.Row="0">
-            <Button Content="{DynamicResource main_Background}" Command="{Binding SelectBack}"/>
+            <Button Content="Background" Command="{Binding SelectBack}"/>
             <CheckBox IsChecked="True"
                       Checked="CheckBox_Checked"
                       Unchecked="CheckBox_Unchecked"

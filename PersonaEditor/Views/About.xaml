@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="{DynamicResource main_About}" Height="170" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="About" Height="170" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
 
     <Grid>
         <Grid.RowDefinitions>

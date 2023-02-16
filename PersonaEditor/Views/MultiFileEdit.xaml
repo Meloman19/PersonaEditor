@@ -45,7 +45,7 @@
                                 </wpf:EventTrigger.Actions>
                             </wpf:EventTrigger>
                         </wpf:Interaction.Triggers>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource main_DropFile}" TextAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Drop File to Open" TextAlignment="Center"/>
                     </Grid>
                 </Border>
                 <StatusBar Grid.Row="2">

@@ -120,10 +120,8 @@ namespace PersonaEditor.ViewModels
 
         public PreviewEditorTabControlVM()
         {
-            string tabtitle = "";
-            tabtitle = Application.Current.Resources.MergedDictionaries.GetString("main_Preview");
             Drop = new RelayCommand(SingleFileEdit_Drop);
-            tabCollection.Add(new ClosableTabItemVM() { TabTitle = tabtitle, IsClosable = false, DataContext = previewVM });
+            tabCollection.Add(new ClosableTabItemVM() { TabTitle = "Preview", IsClosable = false, DataContext = previewVM });
             TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(tabCollection);
         }
     }

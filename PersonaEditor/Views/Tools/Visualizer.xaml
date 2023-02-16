@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:classes="clr-namespace:PersonaEditor.Classes"
         mc:Ignorable="d"
-        Title="{DynamicResource main_Visualizer}" MinHeight="250" Height="350" MinWidth="400" Width="500">
+        Title="Visualizer" MinHeight="250" Height="350" MinWidth="400" Width="500">
 
     <Grid>
         <Grid.Background>

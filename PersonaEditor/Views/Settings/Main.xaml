@@ -16,7 +16,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <CheckBox Grid.Row="0" Content="{DynamicResource setting_Main_SingleInstanceApp}" Margin="10" IsChecked="{Binding SingleInstanceApplication}"/>
+        <CheckBox Grid.Row="0" Content="Single Instance Application" Margin="10" IsChecked="{Binding SingleInstanceApplication}"/>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -24,21 +24,21 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Content="{DynamicResource setting_Main_Language}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+            <Label Grid.Column="0" Content="Language:" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
             <ComboBox Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5" ItemsSource="{Binding LangList}" SelectedIndex="{Binding SelectedLangIndex}"/>
         </Grid>
 
-        <GroupBox Grid.Row="2" Header="{DynamicResource setting_Main_HeadPTP}">
+        <GroupBox Grid.Row="2" Header="PTP save setting">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <CheckBox Grid.Row="0" Name="Check" Content="{DynamicResource setting_Main_CopyOld}" Margin="5" IsChecked="{Binding CopyOld2New}">
+                <CheckBox Grid.Row="0" Name="Check" Content="Copy old text" Margin="5" IsChecked="{Binding CopyOld2New}">
                     <CheckBox.ToolTip>
                         <ToolTip>
-                            <TextBlock Text="{DynamicResource SavePTP_ToolTip1}"/>
+                            <TextBlock Text="Save?"/>
                         </ToolTip>
                     </CheckBox.ToolTip>
                 </CheckBox>
@@ -49,13 +49,13 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{DynamicResource SavePTP_Font}" VerticalAlignment="Center" Margin="5,5,0,5"/>
+                    <TextBlock Text="Select old encoding:" VerticalAlignment="Center" Margin="5,5,0,5"/>
                     <ComboBox Grid.Column="1" IsEnabled="{Binding ElementName=Check, Path=IsChecked}" Margin="5" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedFontSave}"/>
                 </Grid>
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="3" Header="{DynamicResource setting_Main_HeadPTP2}">
+        <GroupBox Grid.Row="3" Header="PTP open setting">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -68,7 +68,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{DynamicResource OpenPTP_Font}" VerticalAlignment="Center" Margin="5,5,0,5"/>
+                    <TextBlock Text="Select new encoding:" VerticalAlignment="Center" Margin="5,5,0,5"/>
                     <ComboBox Grid.Column="1" IsEnabled="{Binding ElementName=Check, Path=IsChecked}" Margin="5" ItemsSource="{Binding FontList}" SelectedIndex="{Binding SelectedFontOpen}"/>
                 </Grid>
             </Grid>
