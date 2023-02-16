@@ -7,21 +7,25 @@ namespace PersonaEditor.ViewModels.Editors
 {
     class HEXEditorVM : BindingObject, IEditor
     {
-        DAT hex;
-        MemoryStream MemoryStream;
-
-        public Controls.HexEditor.HexEditorUserControlVM HexEditorUserControlVM { get; } = new Controls.HexEditor.HexEditorUserControlVM();
-
         public HEXEditorVM(DAT hex)
         {
-            this.hex = hex;
-            MemoryStream = new MemoryStream(hex.Data);
-            HexEditorUserControlVM.SetStream(MemoryStream);
+            _memoryStream = new MemoryStream(hex.Data);
+        }
+
+        private Stream _memoryStream;
+        public Stream Stream
+        {
+            get => _memoryStream;
+            set
+            {
+                _memoryStream = value;
+                Notify(nameof(Stream));
+            }
         }
 
         public bool Close()
         {
-            MemoryStream.Close();
+            _memoryStream?.Close();
             return true;
         }
     }

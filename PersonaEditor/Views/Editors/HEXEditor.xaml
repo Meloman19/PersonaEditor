@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:hexeditor="clr-namespace:PersonaEditor.Controls.HexEditor"
+             xmlns:hex="clr-namespace:PersonaEditor.Controls.Hex"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="400" d:DesignWidth="600">
     <Grid>
-        <hexeditor:HexEditorUserControl DataContext="{Binding HexEditorUserControlVM}"/>
+        <hex:HexViewer Stream="{Binding Stream}"/>
     </Grid>
 </UserControl>
