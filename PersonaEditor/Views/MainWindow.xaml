@@ -19,8 +19,6 @@
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Window.Resources>
-        <v:Int32 x:Key="MyInt">10</v:Int32>
-        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <convert:SecondArgTranslator x:Key="Translator"/>
     </Window.Resources>
     

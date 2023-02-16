@@ -42,7 +42,7 @@ namespace PersonaEditorLib.FileContainer
             SetName(name);
         }
 
-        public void SetName(string name)
+        private void SetName(string name)
         {
             foreach (var a in SubFiles)
             {

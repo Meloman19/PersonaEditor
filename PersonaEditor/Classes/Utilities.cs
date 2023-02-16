@@ -12,16 +12,6 @@ namespace PersonaEditor.Classes
 {
     public static class Utilities
     {
-        public static string GetString(this Collection<ResourceDictionary> resourceDictionaries, string key)
-        {
-            string returned = "";
-
-            if (Application.Current.Resources.MergedDictionaries.FirstOrDefault(x => x.Contains(key)) is var a)
-                returned = a[key] as string;
-
-            return returned;
-        }
-
         public static Drawing DrawBitmap(int width, int height, Color[] colors)
         {
             Pen pen = new Pen(new SolidColorBrush(Colors.Gray), 0.1);

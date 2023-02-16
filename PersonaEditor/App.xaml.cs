@@ -15,9 +15,7 @@ namespace PersonaEditor
 
         public App()
         {
-            Startup += Application_Startup;
-            DispatcherUnhandledException += App_DispatcherUnhandledException;
-            Exit += Application_Exit;
+            InitializeComponent();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -53,7 +51,7 @@ namespace PersonaEditor
                 MainWindowVM.OpenFile(objlist[0]);
         }
 
-        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             NamedPipeManager?.Stop();
         }

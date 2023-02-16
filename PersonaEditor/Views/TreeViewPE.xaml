@@ -11,7 +11,6 @@
              d:DesignHeight="300" d:DesignWidth="300">
 
     <UserControl.Resources>
-        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <converter:SecondArgTranslator x:Key="SecondArg"/>
     </UserControl.Resources>
 
@@ -35,11 +34,6 @@
                         <ContextMenu ItemsSource="{Binding Path=ContextMenu}"/>
                     </prim:EditableTextBlock.ContextMenu>
                 </prim:EditableTextBlock>
-                <!--<TextBlock Text="{Binding Path=Header}" AllowDrop="True" classes:Event.MouseLeave="{Binding Path=Leave}" classes:Event.Drop="{Binding Path=Drop}">
-                    <TextBlock.ContextMenu>
-                        <ContextMenu ItemsSource="{Binding Path=ContextMenu}"/>
-                    </TextBlock.ContextMenu>
-                </TextBlock>-->
             </HierarchicalDataTemplate>
         </TreeView.ItemTemplate>
 

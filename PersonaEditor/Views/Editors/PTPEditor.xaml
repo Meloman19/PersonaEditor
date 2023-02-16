@@ -8,10 +8,6 @@
              mc:Ignorable="d" Name="USC"
              d:DesignHeight="300" d:DesignWidth="500" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VirtualizingPanel.IsVirtualizing="True">
 
-    <UserControl.Resources>
-        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
-    </UserControl.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -139,10 +135,10 @@
                                                 <TextBox Grid.Column="0" Grid.Row="0" Margin="2" IsReadOnly="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding OldString, Mode=OneWay}"/>
                                                 <TextBox Grid.Column="1" Grid.Row="0" Margin="2" AcceptsReturn="True" HorizontalScrollBarVisibility="Hidden" Text="{Binding NewString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                                <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}"
+                                                <Image Grid.Column="0" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                        Source="{Binding OldTextImage}"/>
 
-                                                <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource NullVisibilityConverter}, ConverterParameter='Bool'}"
+                                                <Image Grid.Column="1" Grid.Row="1" Margin="2" Visibility="{Binding ElementName=VIEW, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                        Source="{Binding NewTextImage}"/>
                                             </Grid>
 
