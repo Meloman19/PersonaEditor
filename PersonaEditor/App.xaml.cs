@@ -1,16 +1,7 @@
 ﻿using System.Windows;
 using System.Threading;
-using System.IO;
-using System.IO.Pipes;
-using System;
-using System.ComponentModel;
-using System.Xml.Linq;
-using System.Collections;
-using System.Collections.Generic;
 using PersonaEditor.Views;
 using PersonaEditor.Classes;
-using PersonaEditorLib.Text;
-using PersonaEditorLib.FileContainer;
 
 namespace PersonaEditor
 {
@@ -24,7 +15,9 @@ namespace PersonaEditor
 
         public App()
         {
-            InitializeComponent();
+            Startup += Application_Startup;
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+            Exit += Application_Exit;
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
