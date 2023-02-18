@@ -46,12 +46,15 @@ namespace PersonaEditorLib.FileContainer
             using (BinaryReader reader = IOTools.OpenReadFile(new MemoryStream(data), IsLittleEndian, false))
                 while (reader.BaseStream.Position < reader.BaseStream.Length - 0x100)
                 {
-                    string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x100 - 4)).Trim('\0');
-                    if (string.IsNullOrWhiteSpace(Name))
-                        throw new Exception("BIN: entry name is empty");
+                    string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x100 - 4)).TrimEnd('\0');
+                    if (string.IsNullOrWhiteSpace(Name) || Name.Contains('\0'))
+                        throw new Exception("BIN: entry name is empty or have wrong char");
 
                     int Size = reader.ReadInt32();
                     byte[] Data = reader.ReadBytes(Size);
+                    if (Data.Length != Size)
+                        throw new Exception("BIN: readed size less than entry size");
+
                     reader.BaseStream.Position += IOTools.Alignment(reader.BaseStream.Position, 0x40);
 
                     GameFile objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
@@ -71,9 +74,14 @@ namespace PersonaEditorLib.FileContainer
 
                 for (int i = 0; i < count; i++)
                 {
-                    string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x20)).Trim('\0');
+                    string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x20)).TrimEnd('\0');
+                    if (string.IsNullOrWhiteSpace(Name) || Name.Contains('\0'))
+                        throw new Exception("BIN: entry name is empty or have wrong char");
+
                     int Size = reader.ReadInt32();
                     byte[] Data = reader.ReadBytes(Size);
+                    if (Data.Length != Size)
+                        throw new Exception("BIN: readed size less than entry size");
 
                     GameFile objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
                     if (objectFile == null)
