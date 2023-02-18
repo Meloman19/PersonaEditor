@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Editors
 {

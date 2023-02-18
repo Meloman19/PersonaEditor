@@ -14,7 +14,7 @@ namespace PersonaEditorCMD
             {
                 try
                 {
-                    var temp = AuxiliaryLibraries.WPF.Tools.ImageTools.OpenPNG(path).GetBitmap();
+                    var temp = ImageTools.OpenPNG(path).GetBitmap();
                     image.SetBitmap(temp);
                 }
                 catch { }
@@ -32,7 +32,7 @@ namespace PersonaEditorCMD
             {
                 var temp = image.GetBitmap()?.GetBitmapSource();
                 if (temp != null)
-                    AuxiliaryLibraries.WPF.Tools.ImageTools.SaveToPNG(temp, path);
+                    ImageTools.SaveToPNG(temp, path);
             }
         }
 

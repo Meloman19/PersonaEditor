@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using AuxiliaryLibraries.WPF;
 using PersonaEditor.ApplicationSettings;
+using PersonaEditor.Common;
 using PersonaEditor.Views.Tools;
 
 namespace PersonaEditor.ViewModels.Settings

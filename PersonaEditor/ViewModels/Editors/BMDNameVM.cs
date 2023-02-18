@@ -1,4 +1,4 @@
-﻿using PersonaEditor.Classes;
+﻿using PersonaEditor.Common;
 using AuxiliaryLibraries.WPF;
 using PersonaEditorLib.Text;
 

@@ -6,7 +6,7 @@
              xmlns:controls="clr-namespace:PersonaEditor.Views"
              xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:beh="clr-namespace:PersonaEditor.Classes.Behaviors"
+             xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="900">
 

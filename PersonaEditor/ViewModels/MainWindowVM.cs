@@ -6,6 +6,7 @@ using AuxiliaryLibraries.WPF;
 using PersonaEditor.ViewModels;
 using PersonaEditor.View.Settings;
 using PersonaEditor.ViewModels.Settings;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.Views
 {

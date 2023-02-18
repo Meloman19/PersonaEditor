@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using AuxiliaryLibraries.WPF;
 using PersonaEditorLib.Other;
-using PersonaEditor.Classes;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Editors
 {

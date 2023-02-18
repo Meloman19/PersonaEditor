@@ -1,4 +1,5 @@
 ﻿using AuxiliaryLibraries.WPF;
+using PersonaEditor.Common;
 using PersonaEditor.Views.Tools;
 using System.Windows.Input;
 using System.Windows.Media;

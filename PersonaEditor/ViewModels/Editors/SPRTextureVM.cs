@@ -9,6 +9,7 @@ using PersonaEditorLib;
 using PersonaEditorLib.SpriteContainer;
 using PersonaEditorLib.Sprite;
 using AuxiliaryLibraries.WPF.Wrapper;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Editors
 {

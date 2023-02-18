@@ -1,5 +1,6 @@
 ﻿using AuxiliaryLibraries.WPF;
 using PersonaEditor.ApplicationSettings;
+using PersonaEditor.Common;
 using System.Collections.ObjectModel;
 using System.IO;
 

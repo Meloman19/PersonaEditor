@@ -173,7 +173,7 @@ namespace PersonaEditorCMD
 
                 string path = value == "" ? Path.Combine(openedFileDir, Path.GetFileNameWithoutExtension(objectFile.Name) + ".PNG") : value;
                 if (File.Exists(path))
-                    image.SetBitmap(AuxiliaryLibraries.WPF.Tools.ImageTools.OpenPNG(path).GetBitmap());
+                    image.SetBitmap(ImageTools.OpenPNG(path).GetBitmap());
             }
         }
 

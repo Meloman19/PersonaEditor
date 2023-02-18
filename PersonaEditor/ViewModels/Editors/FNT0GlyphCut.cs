@@ -1,4 +1,5 @@
 ﻿using AuxiliaryLibraries.WPF;
+using PersonaEditor.Common;
 using System.Windows.Media.Imaging;
 
 namespace PersonaEditor.ViewModels.Editors

@@ -1,10 +1,10 @@
 ﻿using PersonaEditorLib.Other;
-using AuxiliaryLibraries.WPF;
 using PersonaEditor.Controls.ToolBox;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Editors
 {

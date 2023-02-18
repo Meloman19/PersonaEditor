@@ -1,6 +1,7 @@
 ﻿using PersonaEditorLib.Other;
 using AuxiliaryLibraries.WPF;
 using System.Text;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Editors
 {

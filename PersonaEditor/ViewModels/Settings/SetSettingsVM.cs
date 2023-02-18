@@ -1,4 +1,5 @@
 ﻿using AuxiliaryLibraries.WPF;
+using PersonaEditor.Common;
 using System.Windows.Input;
 
 namespace PersonaEditor.ViewModels.Settings

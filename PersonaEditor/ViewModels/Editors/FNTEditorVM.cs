@@ -1,17 +1,13 @@
 ﻿using PersonaEditorLib.Other;
 using AuxiliaryLibraries.Tools;
 using AuxiliaryLibraries.WPF;
-using AuxiliaryLibraries.WPF.Extensions;
-using PersonaEditor.Classes;
-using System;
-using System.Collections.Generic;
+using PersonaEditor.Common;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using AuxiliaryLibraries.WPF.Wrapper;
 
 namespace PersonaEditor.ViewModels.Editors
 {

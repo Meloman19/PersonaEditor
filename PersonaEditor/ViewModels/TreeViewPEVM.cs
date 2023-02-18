@@ -2,8 +2,8 @@
 using System.Linq;
 using PersonaEditorLib;
 using AuxiliaryLibraries.WPF;
-using PersonaEditor.Classes;
-using PersonaEditor.Classes.Delegates;
+using PersonaEditor.Common;
+using PersonaEditor.Common.Delegates;
 
 namespace PersonaEditor.ViewModels
 {

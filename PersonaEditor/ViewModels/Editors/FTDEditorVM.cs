@@ -1,6 +1,6 @@
 ﻿using PersonaEditorLib.Other;
 using AuxiliaryLibraries.WPF;
-using PersonaEditor.Classes;
+using PersonaEditor.Common;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 

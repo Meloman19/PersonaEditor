@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:classes="clr-namespace:PersonaEditor.Classes"
+        xmlns:classes="clr-namespace:PersonaEditor.Common"
         mc:Ignorable="d"
         Title="Visualizer" MinHeight="250" Height="350" MinWidth="400" Width="500">
 

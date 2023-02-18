@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Editors
 {

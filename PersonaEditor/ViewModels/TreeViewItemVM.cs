@@ -1,8 +1,8 @@
 ﻿using PersonaEditorLib;
 using AuxiliaryLibraries.WPF;
 using AuxiliaryLibraries.WPF.Wrapper;
-using PersonaEditor.Classes;
-using PersonaEditor.Classes.Delegates;
+using PersonaEditor.Common;
+using PersonaEditor.Common.Delegates;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;

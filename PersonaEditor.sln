@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonaEditorLib", "Persona
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuxiliaryLibraries", "AuxiliaryLibraries\AuxiliaryLibraries.csproj", "{4ACC1A56-2D6B-4F7D-A669-B0C27A801B56}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuxiliaryLibraries.WPF", "AuxiliaryLibraries.WPF\AuxiliaryLibraries.WPF.csproj", "{B9670B59-0192-49E7-84C7-B7776E7339E8}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuxiliaryLibraries.WPF.Wrapper", "AuxiliaryLibraries.WPF.Wrapper\AuxiliaryLibraries.WPF.Wrapper.csproj", "{0A70017F-E0FA-4266-87DC-7337BA58A234}"
 EndProject
 Global
@@ -37,10 +35,6 @@ Global
 		{4ACC1A56-2D6B-4F7D-A669-B0C27A801B56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ACC1A56-2D6B-4F7D-A669-B0C27A801B56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ACC1A56-2D6B-4F7D-A669-B0C27A801B56}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B9670B59-0192-49E7-84C7-B7776E7339E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9670B59-0192-49E7-84C7-B7776E7339E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9670B59-0192-49E7-84C7-B7776E7339E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B9670B59-0192-49E7-84C7-B7776E7339E8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0A70017F-E0FA-4266-87DC-7337BA58A234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0A70017F-E0FA-4266-87DC-7337BA58A234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A70017F-E0FA-4266-87DC-7337BA58A234}.Release|Any CPU.ActiveCfg = Release|Any CPU

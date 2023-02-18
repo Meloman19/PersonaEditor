@@ -1,4 +1,4 @@
-﻿using PersonaEditor.Classes.Managers;
+﻿using PersonaEditor.Common.Managers;
 using System.Collections.Generic;
 using System.IO;
 

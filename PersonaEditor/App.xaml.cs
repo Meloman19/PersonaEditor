@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Threading;
 using PersonaEditor.Views;
-using PersonaEditor.Classes;
+using PersonaEditor.Common;
 
 namespace PersonaEditor
 {

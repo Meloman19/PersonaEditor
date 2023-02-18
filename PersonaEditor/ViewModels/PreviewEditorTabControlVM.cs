@@ -3,7 +3,7 @@ using PersonaEditorLib.Other;
 using PersonaEditorLib.SpriteContainer;
 using PersonaEditorLib.Text;
 using AuxiliaryLibraries.WPF;
-using PersonaEditor.Classes;
+using PersonaEditor.Common;
 using PersonaEditor.ViewModels.Editors;
 using System;
 using System.Collections.ObjectModel;

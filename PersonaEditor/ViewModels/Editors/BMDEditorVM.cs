@@ -1,11 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using PersonaEditor.Classes;
+using PersonaEditor.Common;
 using AuxiliaryLibraries.WPF;
 using PersonaEditorLib;
 using PersonaEditorLib.Text;
-using PersonaEditor.Classes.Managers;
+using PersonaEditor.Common.Managers;
 
 namespace PersonaEditor.ViewModels.Editors
 {

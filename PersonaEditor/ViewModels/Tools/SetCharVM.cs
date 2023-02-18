@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Tools
 {

@@ -2,12 +2,12 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using PersonaEditor.Classes.Visual;
+using PersonaEditor.Common.Visual;
 using System.Windows.Media;
 using AuxiliaryLibraries.WPF;
 using PersonaEditorLib.Text;
-using PersonaEditor.Classes;
-using PersonaEditor.Classes.Managers;
+using PersonaEditor.Common;
+using PersonaEditor.Common.Managers;
 
 namespace PersonaEditor.ViewModels.Editors
 {

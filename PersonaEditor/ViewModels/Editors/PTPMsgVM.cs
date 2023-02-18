@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 using AuxiliaryLibraries.WPF;
+using PersonaEditor.Common;
 using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels.Editors

@@ -2,7 +2,7 @@
 using PersonaEditorLib.Text;
 using AuxiliaryLibraries.WPF;
 using Microsoft.Win32;
-using PersonaEditor.Classes;
+using PersonaEditor.Common;
 using PersonaEditor.Controls.ToolBox;
 using PersonaEditorCMD;
 using System;

@@ -8,7 +8,6 @@
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AuxiliaryLibraries.WPF\AuxiliaryLibraries.WPF.csproj" />
     <ProjectReference Include="..\AuxiliaryLibraries\AuxiliaryLibraries.csproj" />
   </ItemGroup>
 </Project>

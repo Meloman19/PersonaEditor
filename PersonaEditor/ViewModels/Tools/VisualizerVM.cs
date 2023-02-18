@@ -4,12 +4,12 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Media;
-using PersonaEditor.Classes.Visual;
+using PersonaEditor.Common.Visual;
 using AuxiliaryLibraries.WPF;
 using PersonaEditorLib;
 using PersonaEditorLib.Text;
-using PersonaEditor.Classes;
-using PersonaEditor.Classes.Managers;
+using PersonaEditor.Common;
+using PersonaEditor.Common.Managers;
 
 namespace PersonaEditor.ViewModels.Tools
 {
@@ -49,7 +49,7 @@ namespace PersonaEditor.ViewModels.Tools
             }
         }
 
-        private void SelectBack_BackgroundChanged(Classes.Visual.Background background)
+        private void SelectBack_BackgroundChanged(Common.Visual.Background background)
         {
             SetBack();
         }

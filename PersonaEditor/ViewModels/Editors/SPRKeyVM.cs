@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using AuxiliaryLibraries.WPF;
+using PersonaEditor.Common;
 using PersonaEditorLib.SpriteContainer;
 
 namespace PersonaEditor.ViewModels.Editors
