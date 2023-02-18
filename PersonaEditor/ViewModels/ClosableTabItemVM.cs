@@ -6,6 +6,14 @@ namespace PersonaEditor.ViewModels
 {
     class ClosableTabItemVM : BindingObject
     {
+        private object _dataContext = null;
+
+        public ClosableTabItemVM()
+        {
+            MouseUp = new RelayCommand(MouseButtonUp);
+            FileClose = new RelayCommand(CloseFile);
+        }
+
         public ICommand FileClose { get; }
         private void CloseFile()
         {
@@ -20,20 +28,11 @@ namespace PersonaEditor.ViewModels
                 Close();
         }
 
-        private object dataContext = null;
-
         public string TabTitle { get; set; }
         public object DataContext
         {
-            get { return dataContext; }
-            set
-            {
-                if (dataContext != value)
-                {
-                    dataContext = value;
-                    Notify("DataContext");
-                }
-            }
+            get => _dataContext;
+            set => SetProperty(ref _dataContext, value);
         }
         public bool IsClosable { get; set; } = true;
         public TreeViewItemVM PersonaFile { get; set; } = null;
@@ -56,10 +55,5 @@ namespace PersonaEditor.ViewModels
             return true;
         }
 
-        public ClosableTabItemVM()
-        {
-            MouseUp = new RelayCommand(MouseButtonUp);
-            FileClose = new RelayCommand(CloseFile);
-        }
     }
 }

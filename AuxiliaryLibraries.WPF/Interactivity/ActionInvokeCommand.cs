@@ -20,20 +20,11 @@ namespace AuxiliaryLibraries.WPF.Interactivity
                 typeof(object),
                 typeof(ActionInvokeCommand));
 
-        public static readonly DependencyProperty CommandArgConverterProperty =
-           DependencyProperty.Register("CommandArgConverter",
-               typeof(ICommandArgConverter),
-               typeof(ActionInvokeCommand));
-
         public override void Invoke(object[] args)
         {
             if (IsEnabled)
             {
-                var converter = CommandArgConverter;
-                if (converter == null)
-                    Command?.Execute(CommandParameter);
-                else
-                    Command?.Execute(converter.GetArguments(args));
+                Command?.Execute(CommandParameter);
             }
         }
 
@@ -49,12 +40,6 @@ namespace AuxiliaryLibraries.WPF.Interactivity
         {
             get => GetValue(CommandParameterProperty);
             set => SetValue(CommandParameterProperty, value);
-        }
-
-        public ICommandArgConverter CommandArgConverter
-        {
-            get => (ICommandArgConverter)GetValue(CommandArgConverterProperty);
-            set => SetValue(CommandArgConverterProperty, value);
         }
 
         #endregion

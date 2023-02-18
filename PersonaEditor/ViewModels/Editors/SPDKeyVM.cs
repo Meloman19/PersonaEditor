@@ -14,7 +14,7 @@ namespace PersonaEditor.ViewModels.Editors
 
         private bool _IsSelected = false;
 
-        public string Name => Encoding.GetEncoding("shift-jis").GetString(Key.Comment.Where(x => x != 0x00).ToArray());
+        public string Name => Encoding.Unicode.GetString(Key.Comment.Where(x => x != 0x00).ToArray());
 
         public int X1
         {

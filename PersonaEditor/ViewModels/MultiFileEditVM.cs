@@ -10,21 +10,20 @@ namespace PersonaEditor.ViewModels
 {
     class MultiFileEditVM : BindingObject
     {
+        public MultiFileEditVM()
+        {
+            DropFileCommand = new RelayCommand(DropFile);
+            Tree.ItemAction += Tree_ItemAction;
+        }
+
         public TreeViewPEVM Tree { get; } = new TreeViewPEVM();
         public PreviewEditorTabControlVM Tab { get; } = new PreviewEditorTabControlVM();
 
-        private string mainWindowType = "";
+        private string _mainWindowType = "";
         public string MainWindowType
         {
-            get { return mainWindowType; }
-            set
-            {
-                if (mainWindowType != value)
-                {
-                    mainWindowType = value;
-                    Notify("MainWindowType");
-                }
-            }
+            get => _mainWindowType;
+            set => SetProperty(ref _mainWindowType, value);
         }
 
         public string OpenFileName => Static.OpenedFile;
@@ -88,12 +87,12 @@ namespace PersonaEditor.ViewModels
 
         #region Events
 
-        public ICommand Drop { get; }
-        private void DropItem(object arg)
+        public ICommand DropFileCommand { get; }
+
+        private void DropFile(object arg)
         {
-            string[] temp = (arg as DragEventArgs).Data.GetData(DataFormats.FileDrop) as string[];
-            if (temp.Length > 0)
-                OpenFile(temp[0]);
+            if (arg is string filePath)
+                OpenFile(filePath);
         }
 
         private void Tree_ItemSelected(TreeViewItemVM sender)
@@ -117,12 +116,6 @@ namespace PersonaEditor.ViewModels
         }
 
         #endregion Events
-
-        public MultiFileEditVM()
-        {
-            Drop = new RelayCommand(DropItem);
-            Tree.ItemAction += Tree_ItemAction;
-        }
 
         private void Tree_ItemAction(TreeViewItemVM sender, UserTreeViewItemEventEnum action)
         {

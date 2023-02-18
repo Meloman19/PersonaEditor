@@ -10,15 +10,8 @@ namespace PersonaEditor.ViewModels
         private ImageSource imageSource = null;
         public ImageSource SourceIMG
         {
-            get { return imageSource; }
-            set
-            {
-                if (imageSource != value)
-                {
-                    imageSource = value;
-                    Notify("SourceIMG");
-                }
-            }
+            get => imageSource;
+            set => SetProperty(ref imageSource, value);
         }
 
         private Color background;

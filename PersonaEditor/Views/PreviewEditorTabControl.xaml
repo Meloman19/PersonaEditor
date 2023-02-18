@@ -3,54 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:beh="clr-namespace:PersonaEditor.Classes.Behaviors"
              xmlns:controls="clr-namespace:PersonaEditor.Views"             
              xmlns:classes="clr-namespace:PersonaEditor.Classes"
              xmlns:editorsVM="clr-namespace:PersonaEditor.ViewModels.Editors"
              xmlns:localVM="clr-namespace:PersonaEditor.ViewModels"
              xmlns:editors="clr-namespace:PersonaEditor.Views.Editors"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:converters="clr-namespace:PersonaEditor.Classes.Converters"
-             xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
-             xmlns:convert ="clr-namespace:PersonaEditor.ArgumentConverters"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
-    <UserControl.Resources>
-        <convert:SecondArgTranslator x:Key="DropConv"/>
-        <convert:MouseButtonConverter x:Key="MouseConv"/>
-    </UserControl.Resources>
-
-    <wpf:Interaction.Triggers>
-        <wpf:EventTrigger EventName="Drop">
-            <wpf:EventTrigger.Actions>
-                <wpf:ActionInvokeCommand Command="{Binding Drop}" CommandArgConverter="{StaticResource DropConv}"/>
-            </wpf:EventTrigger.Actions>
-        </wpf:EventTrigger>
-    </wpf:Interaction.Triggers>
 
     <TabControl Grid.Column="0" SelectedIndex="{Binding SelectedTabIndex}" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TabCollection}">
+        <i:Interaction.Behaviors>
+            <beh:DropTreeItemBehavior OpenFile="{Binding DropItemCommand}" />
+        </i:Interaction.Behaviors>
+
         <TabControl.ItemTemplate>
             <DataTemplate>
-                <Grid>
-                    <wpf:Interaction.Triggers>
-                        <wpf:EventTrigger EventName="MouseUp">
-                            <wpf:EventTrigger.Actions>
-                                <wpf:ActionInvokeCommand Command="{Binding MouseUp}" CommandArgConverter="{StaticResource MouseConv}"/>
-                            </wpf:EventTrigger.Actions>
-                        </wpf:EventTrigger>
-                    </wpf:Interaction.Triggers>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Text="{Binding TabTitle}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                    <Button Grid.Column="1" Margin="2" Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}" Command="{Binding FileClose}"
-                            Visibility="{Binding IsClosable, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Button.Content>
-                            <TextBlock Text="X" FontWeight="Bold" HorizontalAlignment="Center"/>
-                        </Button.Content>
-                    </Button>
-                </Grid>
+                <controls:ClosableTabItem Title="{Binding TabTitle}"
+                                          Command="{Binding FileClose}"
+                                          IsClosable="{Binding IsClosable}" />                
             </DataTemplate>
         </TabControl.ItemTemplate>
 

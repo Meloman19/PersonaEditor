@@ -16,6 +16,9 @@
     <ApplicationIcon>ApplicationResource\PersonaEditor.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="ApplicationResource\Background.png" />
     <Resource Include="ApplicationResource\PersonaEditor.ico" />
     <Resource Include="ApplicationResource\icons\icons8-папка-96.png" />

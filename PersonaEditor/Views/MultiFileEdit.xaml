@@ -3,17 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:converters="clr-namespace:PersonaEditor.Classes.Converters"
              xmlns:controls="clr-namespace:PersonaEditor.Views"
              xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
-             xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
-             xmlns:convert ="clr-namespace:PersonaEditor.ArgumentConverters"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:beh="clr-namespace:PersonaEditor.Classes.Behaviors"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="900">
-
-    <UserControl.Resources>
-        <convert:SecondArgTranslator x:Key="DropConv"/>
-    </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -30,24 +25,18 @@
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
-                    <RowDefinition Height="60"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <controls:TreeViewPE Grid.Row="0" DataContext="{Binding Tree}"/>
-                <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
-                    <Grid AllowDrop="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
-                        <wpf:Interaction.Triggers>
-                            <wpf:EventTrigger EventName="Drop">
-                                <wpf:EventTrigger.Actions>
-                                    <wpf:ActionInvokeCommand Command="{Binding Drop}" CommandArgConverter="{StaticResource DropConv}"/>
-                                </wpf:EventTrigger.Actions>
-                            </wpf:EventTrigger>
-                        </wpf:Interaction.Triggers>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Drop File to Open" TextAlignment="Center"/>
-                    </Grid>
-                </Border>
-                <StatusBar Grid.Row="2">
+                <Grid Background="Transparent" AllowDrop="True">
+                    <i:Interaction.Behaviors>
+                        <beh:DropFileBehavior OpenFile="{Binding DropFileCommand}" />
+                    </i:Interaction.Behaviors>
+
+                    <controls:TreeViewPE Grid.Row="0" DataContext="{Binding Tree}" />
+                </Grid>
+                
+                <StatusBar Grid.Row="1">
                     <StatusBarItem>
                         <TextBlock Text="{Binding StatusBar}"/>
                     </StatusBarItem>

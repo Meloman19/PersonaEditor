@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace AuxiliaryLibraries.WPF
 {
@@ -13,15 +9,12 @@ namespace AuxiliaryLibraries.WPF
 
         public virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-           
+
         }
 
-        protected void Notify(string propertyName)
+        protected void Notify([CallerMemberName] string propertyName = null)
         {
-            if (this.PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         protected void TunnelNotify(object sender, PropertyChangedEventArgs property)
@@ -30,6 +23,16 @@ namespace AuxiliaryLibraries.WPF
             {
                 PropertyChanged(sender, property);
             }
+        }
+
+        protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+                return false;
+
+            storage = value;
+            Notify(propertyName);
+            return true;
         }
     }
 }

@@ -11,20 +11,17 @@ namespace PersonaEditor.Views
 {
     class MainWindowVM : BindingObject
     {
+        private object _mainControlDC = null;
+
         Views.Tools.Visualizer visualizer;
         Views.Tools.SetChar setchar;
 
         public MultiFileEditVM MultiFile { get; } = new MultiFileEditVM();
 
-        private object _MainControlDC = null;
         public object MainControlDC
         {
-            get { return _MainControlDC; }
-            set
-            {
-                _MainControlDC = value;
-                Notify("MainControlDC");
-            }
+            get => _mainControlDC;
+            set => SetProperty(ref _mainControlDC, value);
         }
 
         #region Events

@@ -3,12 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:converters="clr-namespace:PersonaEditor.Classes.Converters"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:beh="clr-namespace:PersonaEditor.Classes.Behaviors"
         xmlns:controls="clr-namespace:PersonaEditor.Views"
         xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
-        xmlns:wpf="clr-namespace:AuxiliaryLibraries.WPF.Interactivity;assembly=AuxiliaryLibraries.WPF"
-        xmlns:v="clr-namespace:System;assembly=mscorlib"
-        xmlns:convert ="clr-namespace:PersonaEditor.ArgumentConverters"
         mc:Ignorable="d"
         Title="Persona Editor GUI" 
         Left="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosX, Mode=TwoWay}"
@@ -18,18 +16,10 @@
         Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWWidth, Mode=TwoWay}"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
-    <Window.Resources>
-        <convert:SecondArgTranslator x:Key="Translator"/>
-    </Window.Resources>
+    <i:Interaction.Behaviors>
+        <beh:ClosingWindowBehavior Closing="{Binding WindowClosing}" />
+    </i:Interaction.Behaviors>    
     
-    <wpf:Interaction.Triggers>
-        <wpf:EventTrigger EventName="Closing">
-            <wpf:EventTrigger.Actions>
-                <wpf:ActionInvokeCommand Command="{Binding WindowClosing}" CommandArgConverter="{StaticResource Translator}"/>
-            </wpf:EventTrigger.Actions>
-        </wpf:EventTrigger>
-    </wpf:Interaction.Triggers>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

@@ -14,31 +14,21 @@ namespace PersonaEditor.ViewModels.Tools
     {
         public class FnMpImg : BindingObject
         {
+            private string _char = "";
+            private BitmapSource _Image;
+
             public int Index { get; set; } = 0;
 
-            private string _Char = "";
             public string Char
             {
-                get { return _Char; }
-                set
-                {
-                    if (_Char != value)
-                    {
-                        _Char = value;
-                        Notify("Char");
-                    }
-                }
+                get => _char;
+                set => SetProperty(ref _char, value);
             }
 
-            private BitmapSource _Image;
             public BitmapSource Image
             {
-                get { return _Image; }
-                set
-                {
-                    _Image = value;
-                    Notify("Image");
-                }
+                get => _Image;
+                set => SetProperty(ref _Image, value);
             }
         }
 

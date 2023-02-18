@@ -18,29 +18,30 @@ namespace PersonaEditor.ViewModels
     class PreviewEditorTabControlVM : BindingObject
     {
         private ObservableCollection<ClosableTabItemVM> tabCollection = new ObservableCollection<ClosableTabItemVM>();
-        private int selectedTabIndex = 0;
+        private int _selectedTabIndex = 0;
         private ImagePreviewVM previewVM = new ImagePreviewVM();
 
-        public ReadOnlyObservableCollection<ClosableTabItemVM> TabCollection { get; }
-        public int SelectedTabIndex
+        public PreviewEditorTabControlVM()
         {
-            get { return selectedTabIndex; }
-            set
-            {
-                if (selectedTabIndex != value)
-                {
-                    selectedTabIndex = value;
-                    Notify("SelectedTabIndex");
-                }
-            }
+            DropItemCommand = new RelayCommand(SingleFileEdit_Drop);
+            tabCollection.Add(new ClosableTabItemVM() { TabTitle = "Preview", IsClosable = false, DataContext = previewVM });
+            TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(tabCollection);
         }
 
-        public ICommand Drop { get; }
+        public ReadOnlyObservableCollection<ClosableTabItemVM> TabCollection { get; }
+
+        public int SelectedTabIndex
+        {
+            get => _selectedTabIndex;
+            set => SetProperty(ref _selectedTabIndex, value);
+        }
+
+        public ICommand DropItemCommand { get; }
+
         private void SingleFileEdit_Drop(object arg)
         {
-            var data = (arg as DragEventArgs).Data.GetData(typeof(TreeViewItemVM));
-            if (data is TreeViewItemVM objF)
-                Open(objF);
+            if (arg is TreeViewItemVM treeItem)
+                Open(treeItem);
         }
 
         public bool CloseAll()
@@ -116,13 +117,6 @@ namespace PersonaEditor.ViewModels
         private void ClosableTabItemVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             tabCollection.Remove(sender as ClosableTabItemVM);
-        }
-
-        public PreviewEditorTabControlVM()
-        {
-            Drop = new RelayCommand(SingleFileEdit_Drop);
-            tabCollection.Add(new ClosableTabItemVM() { TabTitle = "Preview", IsClosable = false, DataContext = previewVM });
-            TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(tabCollection);
         }
     }
 }

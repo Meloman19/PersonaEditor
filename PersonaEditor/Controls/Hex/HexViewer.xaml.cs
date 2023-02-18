@@ -88,22 +88,14 @@ namespace PersonaEditor.Controls.Hex
             public long Offset
             {
                 get => _offset;
-                set
-                {
-                    _offset = value;
-                    Notify(nameof(Offset));
-                }
+                set => SetProperty(ref _offset, value);
             }
 
             private byte[] _data = null;
             public byte[] Data
             {
                 get => _data;
-                set
-                {
-                    _data = value;
-                    Notify(nameof(Data));
-                }
+                set => SetProperty(ref _data, value);
             }
         }
 
