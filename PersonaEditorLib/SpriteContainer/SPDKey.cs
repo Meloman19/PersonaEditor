@@ -12,11 +12,13 @@ namespace PersonaEditorLib.SpriteContainer
         public int Y0 { get; set; }
         public int Xdel { get; set; }
         public int Ydel { get; set; }
-        public int[] Unk0x30 { get; private set; } // x 2
+        public int[] Unk0x30 { get; private set; } // x 4
         public int[] Unk0x40 { get; private set; } // x 12
         public byte[] Comment { get; private set; }
 
         private bool sizeEqual = false;
+
+        public string CommentString => Static.ShiftJIS.GetString(Comment).TrimEnd('\0');
 
         public SPDKey(BinaryReader reader)
         {

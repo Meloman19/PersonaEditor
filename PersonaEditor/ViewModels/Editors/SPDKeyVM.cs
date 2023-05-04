@@ -1,9 +1,6 @@
-﻿using PersonaEditorLib.SpriteContainer;
-using AuxiliaryLibraries.WPF;
-using PersonaEditor.Common;
+﻿using PersonaEditor.Common;
+using PersonaEditorLib.SpriteContainer;
 using System;
-using System.Linq;
-using System.Text;
 using System.Windows;
 
 namespace PersonaEditor.ViewModels.Editors
@@ -14,7 +11,7 @@ namespace PersonaEditor.ViewModels.Editors
 
         private bool _IsSelected = false;
 
-        public string Name => Encoding.Unicode.GetString(Key.Comment.Where(x => x != 0x00).ToArray());
+        public string Name => Key.CommentString;
 
         public int X1
         {
@@ -24,8 +21,8 @@ namespace PersonaEditor.ViewModels.Editors
                 if (value != Key.X0)
                 {
                     Key.X0 = value;
-                    Notify("X1"); Notify("X2");
-                    Notify("Rect");
+                    Notify(nameof(X1)); Notify(nameof(X2));
+                    Notify(nameof(Rect));
                 }
             }
         }
@@ -37,8 +34,8 @@ namespace PersonaEditor.ViewModels.Editors
                 if (value != Key.X0 + Key.Xdel)
                 {
                     Key.Xdel = value - Key.X0;
-                    Notify("X1"); Notify("X2");
-                    Notify("Rect");
+                    Notify(nameof(X1)); Notify(nameof(X2));
+                    Notify(nameof(Rect));
                 }
             }
         }
@@ -50,8 +47,8 @@ namespace PersonaEditor.ViewModels.Editors
                 if (value != Key.Y0)
                 {
                     Key.Y0 = value;
-                    Notify("Y1"); Notify("Y2");
-                    Notify("Rect");
+                    Notify(nameof(Y1)); Notify(nameof(Y2));
+                    Notify(nameof(Rect));
                 }
             }
         }
@@ -63,8 +60,8 @@ namespace PersonaEditor.ViewModels.Editors
                 if (value != Key.Y0 + Key.Ydel)
                 {
                     Key.Ydel = value - Key.Y0;
-                    Notify("Y1"); Notify("Y2");
-                    Notify("Rect");
+                    Notify(nameof(Y1)); Notify(nameof(Y2));
+                    Notify(nameof(Rect));
                 }
             }
         }
@@ -82,7 +79,7 @@ namespace PersonaEditor.ViewModels.Editors
                 if (_IsSelected != value)
                 {
                     _IsSelected = value;
-                    Notify("IsSelected");
+                    Notify(nameof(IsSelected));
                 }
             }
         }
