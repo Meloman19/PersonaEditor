@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:PersonaEditor.Controls"
+             xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid Background="White">
@@ -25,6 +27,10 @@
                                    VerticalScrollBarVisibility="Visible"
                                    HorizontalScrollBarVisibility="Visible">
             <controls:ZoomPresenter>
+                <i:Interaction.Behaviors>
+                    <beh:ScrollViewerMouseDragBehavior />
+                </i:Interaction.Behaviors>
+
                 <Border x:Name="MainBorder"
                         x:FieldModifier="private"
                         BorderBrush="Black"
