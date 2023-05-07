@@ -22,8 +22,8 @@ namespace PersonaEditorLib.SpriteContainer
         public byte[] Comment { get; private set; }
 
 
-        private double XScale;
-        private double YScale;
+        private double? XScale;
+        private double? YScale;
 
         public string CommentString => Static.ShiftJIS.GetString(Comment).TrimEnd('\0');
 
@@ -43,8 +43,10 @@ namespace PersonaEditorLib.SpriteContainer
             X1Del = reader.ReadInt32();
             Y1Del = reader.ReadInt32();
 
-            XScale = X1Del == 0 ? 1 : ((double)Xdel / (double)X1Del);
-            YScale = Y1Del == 0 ? 1 : ((double)Ydel / (double)Y1Del);
+            if (Xdel != 0 && X1Del != 0)
+                XScale = (double)Xdel / (double)X1Del;
+            if (Ydel != 0 && Y1Del != 0)
+                YScale = (double)Ydel / (double)Y1Del;
 
             Unk0x40 = reader.ReadInt32Array(12);
             Comment = reader.ReadBytes(0x30);
@@ -63,8 +65,10 @@ namespace PersonaEditorLib.SpriteContainer
 
             writer.Write(X1);
             writer.Write(Y1);
-            X1Del = Convert.ToInt32(Xdel / XScale);
-            Y1Del = Convert.ToInt32(Ydel / YScale);
+            if (XScale.HasValue)
+                X1Del = Convert.ToInt32(Xdel / XScale.Value);
+            if (YScale.HasValue)
+                Y1Del = Convert.ToInt32(Ydel / YScale.Value);
             writer.Write(X1Del);
             writer.Write(Y1Del);
 
