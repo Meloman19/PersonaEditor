@@ -80,7 +80,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="controls:TextureAtlasEditControl">
                         <Grid ClipToBounds="True"
-                              DataContext="{x:Null}">
+                              DataContext="{x:Null}"
+                              Background="Transparent">
                             <Grid IsHitTestVisible="False">
                                 <Rectangle Fill="{StaticResource ImageBackground}"
                                            Stroke="Black"

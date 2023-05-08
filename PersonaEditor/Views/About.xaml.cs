@@ -17,7 +17,18 @@ namespace PersonaEditor.Views
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            try
+            {
+                var processInfo = new ProcessStartInfo()
+                {
+                    FileName = e.Uri.AbsoluteUri,
+                    UseShellExecute = true
+                };
+                Process.Start(processInfo);
+            }
+            catch
+            {
+            }
             e.Handled = true;
         }
     }

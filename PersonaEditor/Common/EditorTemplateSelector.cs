@@ -20,7 +20,7 @@ namespace PersonaEditor.Common
                     break;
                 case SPRTextureAtlasEditor:
                 case SPDTextureAtlasEditor:
-                    controlType = typeof(SPREditor);
+                    controlType = typeof(TextureAtlasEditor);
                     break;
                 case BMDEditorVM:
                     controlType = typeof(BMDEditor);

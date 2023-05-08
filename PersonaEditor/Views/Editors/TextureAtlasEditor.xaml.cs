@@ -6,9 +6,9 @@ using System.Windows.Media;
 
 namespace PersonaEditor.Views.Editors
 {
-    public partial class SPREditor : UserControl
+    public partial class TextureAtlasEditor : UserControl
     {
-        public SPREditor()
+        public TextureAtlasEditor()
         {
             InitializeComponent();
         }
