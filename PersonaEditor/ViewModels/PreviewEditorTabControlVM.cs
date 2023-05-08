@@ -69,10 +69,10 @@ namespace PersonaEditor.ViewModels
             switch (sender.PersonaFile.GameData.Type)
             {
                 case FormatEnum.SPR:
-                    DataContext = new SPREditorVM(sender.PersonaFile.GameData as SPR);
+                    DataContext = new SPRTextureAtlasEditor(sender.PersonaFile.GameData as SPR);
                     break;
                 case FormatEnum.SPD:
-                    DataContext = new SPDEditorVM(sender.PersonaFile.GameData as SPD);
+                    DataContext = new SPDTextureAtlasEditor(sender.PersonaFile.GameData as SPD);
                     break;
                 case FormatEnum.PTP:
                     DataContext = new PTPEditorVM(sender.PersonaFile.GameData as PTP);

@@ -1,9 +1,7 @@
-﻿using PersonaEditor.ViewModels.Editors;
+﻿using PersonaEditor.Controls;
 using PersonaEditor.Views.Tools;
-using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace PersonaEditor.Views.Editors
@@ -26,23 +24,14 @@ namespace PersonaEditor.Views.Editors
                 }
         }
 
-        private void ItemsControl_MouseMove(object sender, MouseEventArgs e)
+        private void TextureAtlasEditControl_CursorPositionChanged(object sender, RoutedEventArgs e)
         {
-            var sen = sender as FrameworkElement;
-            Rect temp;
-            if (sen.DataContext is SPRTextureVM spr)
-                temp = spr.Rect;
-            if (sen.DataContext is SPDTextureVM spd)
-                temp = spd.Rect;
-            else
+            var position = (sender as TextureAtlasEditControl).CursorPosition;
+            if (!position.HasValue)
                 return;
 
-            var a = e.GetPosition(sender as IInputElement);
-
-            var newX = Math.Round((a.X / sen.ActualWidth) * temp.Width);
-            XCoo.Text = newX.ToString();
-            var newY = Math.Round((a.Y / sen.ActualHeight) * temp.Height);
-            YCoo.Text = newY.ToString();
+            XCoo.Text = position.Value.X.ToString();
+            YCoo.Text = position.Value.Y.ToString();
         }
     }
 }

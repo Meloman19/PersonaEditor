@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace PersonaEditor.Common
 {
-    public class BindingObject : IEventWrapper
+    public abstract class BindingObject : IEventWrapper
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -15,14 +15,6 @@ namespace PersonaEditor.Common
         protected void Notify([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected void TunnelNotify(object sender, PropertyChangedEventArgs property)
-        {
-            if (this.PropertyChanged != null)
-            {
-                PropertyChanged(sender, property);
-            }
         }
 
         protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

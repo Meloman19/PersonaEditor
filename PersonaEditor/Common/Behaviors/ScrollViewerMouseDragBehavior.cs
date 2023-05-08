@@ -70,6 +70,10 @@ namespace PersonaEditor.Common.Behaviors
                 ScrollInfo.SetHorizontalOffset(horOff + horDelta);
                 ScrollInfo.SetVerticalOffset(verOff + verDelta);
             }
+            else if (Mouse.Captured != null)
+            {
+                LostCapture();
+            }
             else
             {
                 var rad = Math.Sqrt(Math.Abs(horDelta) * Math.Abs(horDelta) + Math.Abs(verDelta) * Math.Abs(verDelta));

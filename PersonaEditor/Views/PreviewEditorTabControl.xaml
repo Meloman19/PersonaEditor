@@ -7,12 +7,13 @@
              xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
              xmlns:controls="clr-namespace:PersonaEditor.Views"             
              xmlns:classes="clr-namespace:PersonaEditor.Common"
-             xmlns:editorsVM="clr-namespace:PersonaEditor.ViewModels.Editors"
-             xmlns:localVM="clr-namespace:PersonaEditor.ViewModels"
-             xmlns:editors="clr-namespace:PersonaEditor.Views.Editors"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" AllowDrop="True">
 
+    <UserControl.Resources>
+        <classes:EditorTemplateSelector x:Key="EditorTemplateSelector" />
+    </UserControl.Resources>
+    
     <TabControl Grid.Column="0" SelectedIndex="{Binding SelectedTabIndex}" HorizontalContentAlignment="Stretch" ItemsSource="{Binding TabCollection}">
         <i:Interaction.Behaviors>
             <beh:DropTreeItemBehavior OpenFile="{Binding DropItemCommand}" />
@@ -28,59 +29,14 @@
 
         <TabControl.ContentTemplate>
             <DataTemplate>
-                <classes:CachedContentPresenter>
-                    <DataTemplate>
-                        <ContentControl Content="{Binding DataContext}">
-                            <ContentControl.Resources>
-                                <DataTemplate DataType="{x:Type localVM:ImagePreviewVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <controls:ImagePreview/>
-                                    </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editorsVM:SPREditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:SPREditor/>
-                                    </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editorsVM:SPDEditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:SPREditor/>
-                                    </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editorsVM:BMDEditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:BMDEditor/>
-                                    </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editorsVM:PTPEditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:PTPEditor/>
-                                    </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editorsVM:HEXEditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:HEXEditor/>
-                                    </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editorsVM:FTDEditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:FTDEditor/>
-                                    </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editorsVM:FNTEditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:FNTEditor/>
-                                    </Border>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type editorsVM:FNT0EditorVM}">
-                                    <Border BorderBrush="Black" BorderThickness="1">
-                                        <editors:FNTEditor/>
-                                    </Border>
-                                </DataTemplate>
-                            </ContentControl.Resources>
-                        </ContentControl>
-                    </DataTemplate>
-                </classes:CachedContentPresenter>
+                <Border BorderBrush="Black" BorderThickness="1">
+                    <classes:CachedContentPresenter>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding DataContext}"
+                                            ContentTemplateSelector="{StaticResource EditorTemplateSelector}" />
+                        </DataTemplate>
+                    </classes:CachedContentPresenter>
+                </Border>
             </DataTemplate>
         </TabControl.ContentTemplate>
     </TabControl>
