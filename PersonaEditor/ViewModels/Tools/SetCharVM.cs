@@ -113,8 +113,12 @@ namespace PersonaEditor.ViewModels.Tools
                     else
                     {
                         foreach (var a in GlyphList)
+                        {
                             if (a.Char.Length > 0)
                                 enc.Add(a.Index, a.Char[0]);
+                            else
+                                enc.Remove(a.Index);
+                        }
                         enc.SaveFNTMAP(enc.FilePath);
                         Static.EncodingManager.Update(Static.FontManager.GetPersonaFontName(_FontSelect));
                     }

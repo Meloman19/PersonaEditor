@@ -40,6 +40,11 @@ namespace PersonaEditorLib
             }
         }
 
+        public void Remove(int index)
+        {
+            Dictionary.Remove(index);
+        }
+
         #region FNTMAP
 
         public void SaveFNTMAP(string path)
