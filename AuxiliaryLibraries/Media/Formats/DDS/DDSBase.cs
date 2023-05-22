@@ -13,6 +13,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
         static byte[] MagicNumber { get; } = new byte[] { 0x44, 0x44, 0x53, 0x20 };
 
         public DDSHeader Header;
+        public DDSHeaderDXT10? HeaderDXT10;
         public List<byte[]> dataList = new List<byte[]>();
 
         public DDSBase(byte[] data)
@@ -33,12 +34,64 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
                 {
                     Header = IOTools.FromBytes<DDSHeader>(reader.ReadBytes(124));
 
+                    if (Header.PixelFormat.FourCC == DDSFourCC.DX10)
+                        HeaderDXT10 = IOTools.FromBytes<DDSHeaderDXT10>(reader.ReadBytes(20));
+
+                    if (!IsSupportedFormat(Header, HeaderDXT10))
+                        throw new Exception("DDS: not supported format");
+
                     int temp = 0;
 
                     temp += ReadTexture(reader);
                 }
             else
                 throw new Exception("DDS: wrong Magic Number");
+        }
+
+        private static bool IsSupportedFormat(DDSHeader header, DDSHeaderDXT10? headerDXT10)
+        {
+            if (!IsSupportedPixelFlags(header.PixelFormat.PixelFlags))
+                return false;
+
+            if (header.PixelFormat.PixelFlags == PixelFormatFlags.DDPF_FOURCC)
+            {
+                switch (header.PixelFormat.FourCC)
+                {
+                    case DDSFourCC.NONE:
+                    case DDSFourCC.DX10:
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsSupportedPixelFlags(PixelFormatFlags pixelFormatFlags)
+        {
+            switch (pixelFormatFlags)
+            {
+                case PixelFormatFlags.DDPF_FOURCC:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsSupportedDX10(DDSHeaderDXT10 headerDXT10)
+        {
+            if (headerDXT10.ArraySize != 1)
+                return false;
+
+            if (headerDXT10.D3D10ResourceDimension != D3D10ResourceDimension.D3D10_RESOURCE_DIMENSION_TEXTURE2D)
+                return false;
+
+            switch (headerDXT10.DXGIFormat)
+            {
+                case DXGIFormat.DXGI_FORMAT_BC7_UNORM:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private int ReadTexture(BinaryReader reader)
@@ -98,6 +151,8 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             {
                 MS.Write(MagicNumber, 0, 4);
                 writer.Write(IOTools.GetBytes(Header));
+                if (HeaderDXT10.HasValue)
+                    writer.Write(IOTools.GetBytes(HeaderDXT10.Value));
                 dataList.ForEach(x => writer.Write(x));
                 returned = MS.ToArray();
             }

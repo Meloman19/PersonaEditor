@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AuxiliaryLibraries.Media.Formats.DDS
 {
@@ -17,12 +15,14 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
         /// <returns></returns>
         public static bool DDSDecompress(int width, int height, byte[] data, DDSFourCC fourCC, out byte[] newData)
         {
-            newData = null;
             if (fourCC == DDSFourCC.NONE)
+            {
+                newData = null;
                 return false;
+            }
 
-            int Width = (int)Math.Ceiling((float)width / 4);
-            int Heigth = (int)Math.Ceiling((float)height / 4);
+            int Width = (int)Math.Ceiling((double)width / 4);
+            int Heigth = (int)Math.Ceiling((double)height / 4);
 
             int step = fourCC == DDSFourCC.DXT1 ? 8 : 16;
 
