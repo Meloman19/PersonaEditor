@@ -131,19 +131,19 @@ namespace PersonaEditorLib.Other
 
         #region IImage
 
-        public Bitmap GetBitmap()
+        public PixelMap GetBitmap()
         {
             if (glyphs == null)
                 glyphs = Compressed.GetDecompressedData();
 
-            PixelFormat pixelFormat = PixelFormats.Indexed8;
-            Color[] palette = ImageHelper.GetGrayPalette(8);
+            int bitPerPixel = 8;
+            Pixel[] palette = ImageHelper.GetGrayPalette(8);
 
-            int stride = ImageHelper.GetStride(pixelFormat, Width);
+            int stride = ImageHelper.GetStride(bitPerPixel, Width);
 
             int imageWidth = Width * 16;
             int imageHeight = Height * (int)Math.Ceiling(glyphs.Count / 16d);
-            int imageStride = ImageHelper.GetStride(pixelFormat, imageWidth);
+            int imageStride = ImageHelper.GetStride(bitPerPixel, imageWidth);
 
             byte[] newData = new byte[imageStride * imageHeight];
 
@@ -161,13 +161,13 @@ namespace PersonaEditorLib.Other
                 }
                 else
                     offset += stride;
-
             }
 
-            return new Bitmap(imageWidth, imageHeight, pixelFormat, newData, palette);
+            var pixels = DecodingHelper.FromIndexed8(newData, palette);
+            return new PixelMap(imageWidth, imageHeight, pixels);
         }
 
-        public void SetBitmap(Bitmap bitmap)
+        public void SetBitmap(PixelMap bitmap)
         {
             if (bitmap == null)
                 throw new ArgumentNullException("bitmap");
@@ -175,14 +175,14 @@ namespace PersonaEditorLib.Other
             if (glyphs == null)
                 glyphs = Compressed.GetDecompressedData();
 
-            PixelFormat pixelFormat = PixelFormats.Indexed8;
-            Color[] palette = ImageHelper.GetGrayPalette(8);
+            int bitPerPixel = 8;
+            Pixel[] palette = ImageHelper.GetGrayPalette(8);
 
-            var tempBitmap = bitmap.ConvertTo(pixelFormat, palette).CopyData();
+            var tempBitmap = EncodingHelper.ToIndexed8(bitmap.Pixels, palette, bitmap.Width);
 
-            int srcStride = ImageHelper.GetStride(pixelFormat, bitmap.Width);
+            int srcStride = ImageHelper.GetStride(bitPerPixel, bitmap.Width);
             int rowSize = srcStride * Height;
-            int columnStride = ImageHelper.GetStride(pixelFormat, Width);
+            int columnStride = ImageHelper.GetStride(bitPerPixel, Width);
 
             int row = 0;
             int column = 0;

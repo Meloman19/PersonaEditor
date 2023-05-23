@@ -109,25 +109,29 @@ namespace PersonaEditorLib.Other
 
         #region IImage
 
-        public Bitmap GetBitmap()
+        public PixelMap GetBitmap()
         {
-            List<byte[]> data = Compressed.GetDecompressedData();
-            PixelFormat currentPF;
-            if (Header.Glyphs.BitsPerPixel == 4)
+            int bitsPerPixel;
+            switch (Header.Glyphs.BitsPerPixel)
             {
-                currentPF = PixelFormats.Indexed4Reverse;
-                //Tool.ArrayTool.ReverseByteInList(data);
+                case 4:
+                    bitsPerPixel = 4;
+                    break;
+                case 8:
+                    bitsPerPixel = 8;
+                    break;
+                default:
+                    throw new Exception("FNT: Unknown Pixel Format");
             }
-            else if (Header.Glyphs.BitsPerPixel == 8)
-                currentPF = PixelFormats.Indexed8;
-            else return null;
+
+            List<byte[]> data = Compressed.GetDecompressedData();
 
             int width = Header.Glyphs.Size1 * 16;
             int height = Header.Glyphs.Size2 * (int)Math.Ceiling(data.Count / 16d);
 
-            int stride = ImageHelper.GetStride(currentPF, Header.Glyphs.Size1);
-            int stridenew = ImageHelper.GetStride(currentPF, width);
-            byte[] newData = new byte[ImageHelper.GetStride(currentPF, width) * height];
+            int stride = ImageHelper.GetStride(bitsPerPixel, Header.Glyphs.Size1);
+            int stridenew = ImageHelper.GetStride(bitsPerPixel, width);
+            byte[] newData = new byte[ImageHelper.GetStride(bitsPerPixel, width) * height];
 
             for (int i = 0, offset = 0; i < data.Count; i++)
             {
@@ -145,27 +149,56 @@ namespace PersonaEditorLib.Other
 
             }
 
-            return new Bitmap(width, height, currentPF, newData, Palette.GetImagePalette());
+            Pixel[] pixels;
+            switch (bitsPerPixel)
+            {
+                case 4:
+                    pixels = DecodingHelper.FromIndexed4Reverse(newData, Palette.GetImagePalette(), width);
+                    break;
+                case 8:
+                    pixels = DecodingHelper.FromIndexed8(newData, Palette.GetImagePalette());
+                    break;
+                default:
+                    return null;
+            }
+
+            return new PixelMap(width, height, pixels);
         }
 
-        public void SetBitmap(Bitmap image)
+        public void SetBitmap(PixelMap image)
         {
-            PixelFormat pixelFormat;
-            if (Header.Glyphs.BitsPerPixel == 4)
-                pixelFormat = PixelFormats.Indexed4;
-            else if (Header.Glyphs.BitsPerPixel == 8)
-                pixelFormat = PixelFormats.Indexed8;
-            else
-                throw new Exception("FNT: Unknown Pixel Format");
+            int bitsPerPixel;
+            switch (Header.Glyphs.BitsPerPixel)
+            {
+                case 4:
+                    bitsPerPixel = 4;
+                    break;
+                case 8:
+                    bitsPerPixel = 8;
+                    break;
+                default:
+                    throw new Exception("FNT: Unknown Pixel Format");
+            }
 
             var palette = Palette.GetImagePalette();
 
-            var tempBitmap = image.ConvertTo(pixelFormat, palette).CopyData();
+            byte[] tempBitmap;
+            switch (bitsPerPixel)
+            {
+                case 4:
+                    tempBitmap = EncodingHelper.ToIndexed4Reverse(image.Pixels, palette, image.Width);
+                    break;
+                case 8:
+                    tempBitmap = EncodingHelper.ToIndexed8(image.Pixels, palette, image.Width);
+                    break;
+                default:
+                    throw new Exception("FNT: Unknown Pixel Format");
+            }
 
-            int srcStride = ImageHelper.GetStride(pixelFormat, image.Width);
+            int srcStride = ImageHelper.GetStride(bitsPerPixel, image.Width);
             int rowSize = srcStride * Header.Glyphs.Size2;
 
-            int columnStride = ImageHelper.GetStride(pixelFormat, Header.Glyphs.Size1);
+            int columnStride = ImageHelper.GetStride(bitsPerPixel, Header.Glyphs.Size1);
             int dstDataSize = columnStride * Header.Glyphs.Size2;
 
             List<byte[]> BMPdata = new List<byte[]>();
@@ -194,9 +227,6 @@ namespace PersonaEditorLib.Other
 
                 BMPdata.Add(glyph);
             }
-
-            if (Header.Glyphs.BitsPerPixel == 4)
-                AuxiliaryLibraries.Tools.ArrayTool.ReverseByteInList(BMPdata);
 
             Compressed.CompressData(BMPdata);
         }

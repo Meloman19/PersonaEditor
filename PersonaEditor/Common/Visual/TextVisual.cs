@@ -1,15 +1,12 @@
-﻿using System;
+﻿using AuxiliaryLibraries.WPF.Wrapper;
+using PersonaEditorLib;
+using PersonaEditorLib.Text;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using System.Windows;
-using AuxiliaryLibraries.WPF;
-using PersonaEditorLib.Text;
-using AuxiliaryLibraries;
-using PersonaEditorLib;
-using AuxiliaryLibraries.WPF.Wrapper;
+using System.Windows.Media;
 
 namespace PersonaEditor.Common.Visual
 {
@@ -17,41 +14,6 @@ namespace PersonaEditor.Common.Visual
 
     class TextVisual : BindingObject
     {
-        public static System.Drawing.Color[] CreatePallete(Color color, AuxiliaryLibraries.Media.PixelFormat pixelformat)
-        {
-            int colorcount = 0;
-            byte step = 0;
-            if (pixelformat == AuxiliaryLibraries.Media.PixelFormats.Indexed4)
-            {
-                colorcount = 16;
-                step = 0x10;
-            }
-            else if (pixelformat == AuxiliaryLibraries.Media.PixelFormats.Indexed8)
-            {
-                colorcount = 256;
-                step = 1;
-            }
-
-
-            List<System.Drawing.Color> ColorBMP = new List<System.Drawing.Color>();
-            ColorBMP.Add(System.Drawing.Color.FromArgb(0, 0, 0, 0));
-            for (int i = 1; i < colorcount; i++)
-                ColorBMP.Add(System.Drawing.Color.FromArgb(
-                    ByteTruncate(i * step),
-                    color.R,
-                    color.G,
-                    color.B));
-
-            return ColorBMP.ToArray();
-        }
-
-        public static byte ByteTruncate(int value)
-        {
-            if (value < 0) { return 0; }
-            else if (value > 255) { return 255; }
-            else { return (byte)value; }
-        }
-
         public event VisualChangedEventHandler VisualChanged;
 
         CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
@@ -78,7 +40,7 @@ namespace PersonaEditor.Common.Visual
             set
             {
                 _Data = value;
-                _Image = _Data.GetImageSource(CreatePallete(Color, _Data.PixelFormat)).GetBitmapSource();
+                _Image = _Data.GetImageSource()?.GetBitmapSource();
                 TextDrawing.ImageSource = _Image;
                 _Rect = GetSize(Start, _Data.PixelWidth, _Data.PixelHeight);
                 TextDrawing.Rect = _Rect;
@@ -111,7 +73,7 @@ namespace PersonaEditor.Common.Visual
                 if (_Color != value)
                 {
                     _Color = value;
-                    _Image = _Data.GetImageSource(CreatePallete(Color, _Data.PixelFormat))?.GetBitmapSource();
+                    _Image = _Data.GetImageSource()?.GetBitmapSource();
                     VisualChanged?.Invoke(_Image, _Rect);
                 }
             }
@@ -161,9 +123,9 @@ namespace PersonaEditor.Common.Visual
         ImageData CreateData()
         {
             if (Text is IEnumerable<TextBaseElement> list)
-                return ImageData.DrawText(list, font, Static.FontMap.Shift, LineSpacing);
+                return ImageData.DrawText(list, font, LineSpacing);
             else if (Text is byte[] array)
-                return ImageData.DrawText(array.GetTextBases(), font, Static.FontMap.Shift, LineSpacing);
+                return ImageData.DrawText(array.GetTextBases(), font, LineSpacing);
             else return new ImageData();
         }
 

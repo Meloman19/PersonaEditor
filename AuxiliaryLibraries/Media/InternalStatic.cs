@@ -1,44 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
 
 namespace AuxiliaryLibraries.Media
 {
     internal static class PixelFormatHelper
     {
-        public static int GetPixelFormatBPP(PixelFormatEnum pixelFormatEnum)
-        {
-            switch (pixelFormatEnum)
-            {
-                case (PixelFormatEnum.Indexed4):
-                case (PixelFormatEnum.Indexed4Reverse):
-                    return 4;
-                case (PixelFormatEnum.Indexed8):
-                    return 8;
-                case (PixelFormatEnum.Bgra32):
-                case (PixelFormatEnum.Rgba32):
-                case (PixelFormatEnum.Rgba32PS2):
-                case (PixelFormatEnum.Argb32):
-                    return 32;
-                default:
-                    return 0;
-            }
-        }
-
-        public static bool GetPixelFormatIndexed(PixelFormatEnum pixelFormatEnum)
-        {
-            switch (pixelFormatEnum)
-            {
-                case (PixelFormatEnum.Indexed4):
-                case (PixelFormatEnum.Indexed4Reverse):
-                case (PixelFormatEnum.Indexed8):
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
         public static byte ReverseByte(byte toReverse)
         {
             int temp = ((toReverse >> 4) & 0xF) + ((toReverse & 0xF) << 4);

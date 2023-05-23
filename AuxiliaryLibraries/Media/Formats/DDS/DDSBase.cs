@@ -70,7 +70,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
         {
             switch (pixelFormatFlags)
             {
-                case PixelFormatFlags.DDPF_FOURCC:
+                case PixelFormatFlags.DDPF_FOURCC:                    
                     return true;
                 default:
                     return false;
@@ -160,22 +160,26 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             return returned;
         }
 
-        public Bitmap GetBitmap()
+        public PixelMap GetBitmap()
         {
-            if (Header.PixelFormat.PixelFlags == PixelFormatFlags.DDPF_FOURCC)
+            Pixel[] pixels;
+            switch (Header.PixelFormat.PixelFlags)
             {
-                DDSDecompressor.DDSDecompress(Header.Width, Header.Height, dataList[0], Header.PixelFormat.FourCC, out byte[] newData);
-                return new Bitmap(Header.Width, Header.Height, PixelFormats.Bgra32, newData, null);
-            }
-            else if (Header.PixelFormat.PixelFlags == PixelFormatFlags.DDPF_RGBA)
-            {
-                return new Bitmap(Header.Width, Header.Height, PixelFormats.Rgba32, dataList[0], null);
+                case PixelFormatFlags.DDPF_FOURCC:
+                    DDSDecompressor.DDSDecompress(Header.Width, Header.Height, dataList[0], Header.PixelFormat.FourCC, out byte[] newData);
+                    pixels = DecodingHelper.FromBgra32(newData);
+                    break;
+                case PixelFormatFlags.DDPF_RGBA:
+                    pixels = DecodingHelper.FromRgba32(dataList[0]);
+                    break;
+                default:
+                    throw new Exception();
             }
 
-            return null;
+            return new PixelMap(Header.Width, Header.Height, pixels);
         }
 
-        public void SetBitmap(Bitmap bitmap)
+        public void SetBitmap(PixelMap bitmap)
         {
             if (DDSCompressor.DDSCompress(bitmap, Header.PixelFormat.FourCC, out byte[] newData))
             {
@@ -186,12 +190,12 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
 
                 if (dataList.Count > 1)
                 {
-                    Processing.Scale.Lanczos lanczos = new Processing.Scale.Lanczos();
-                    Bitmap temp = bitmap;
+                    LanczosScaling lanczos = new LanczosScaling();
+                    var temp = bitmap;
                     for (int i = 1; i < dataList.Count; i++)
                     {
-                        temp = lanczos.imageScale(bitmap, 0.5f, 0.5f);
-                        DDSCompressor.DDSCompress(temp.Width, temp.Height, temp.CopyData(), Header.PixelFormat.FourCC, out newData);
+                        temp = lanczos.imageScale(temp, 0.5f, 0.5f);
+                        DDSCompressor.DDSCompress(temp, Header.PixelFormat.FourCC, out newData);
                         dataList[i] = newData;
                     }
                 }

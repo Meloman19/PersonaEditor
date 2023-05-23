@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
 
-namespace AuxiliaryLibraries.Media.Processing.Scale
+namespace AuxiliaryLibraries.Media
 {
-    public class Lanczos
+    public class LanczosScaling
     {
         private int lanczosSize = 2;
 
-        public Bitmap imageScale(Bitmap bufferedImage, float widthScale, float heightScale)
+        public PixelMap imageScale(PixelMap bufferedImage, float widthScale, float heightScale)
         {
             widthScale = 1 / widthScale;
             heightScale = 1 / heightScale;
@@ -19,8 +16,8 @@ namespace AuxiliaryLibraries.Media.Processing.Scale
             int destW = (int)(bufferedImage.Width / widthScale);
             int destH = (int)(bufferedImage.Height / heightScale);
 
-            Color[] inPixels = bufferedImage.CopyPixels();
-            Color[] outPixels = new Color[destW * destH];
+            Pixel[] inPixels = bufferedImage.Pixels;
+            Pixel[] outPixels = new Pixel[destW * destH];
 
             for (int col = 0; col < destW; col++)
             {
@@ -48,7 +45,7 @@ namespace AuxiliaryLibraries.Media.Processing.Scale
 
                             if (weight > 0)
                             {
-                                int index = (subrow * srcW + subcol);
+                                int index = subrow * srcW + subcol;
 
                                 pargb[0] = inPixels[index].A;
                                 pargb[1] = inPixels[index].R;
@@ -64,7 +61,7 @@ namespace AuxiliaryLibraries.Media.Processing.Scale
                     for (int i = 0; i < 4; i++)
                         pargb[i] = (int)(argb[i] / totalWeight);
 
-                    outPixels[row * destW + col] = Color.FromArgb(
+                    outPixels[row * destW + col] = Pixel.FromArgb(
                         clamp(pargb[0]),
                         clamp(pargb[1]),
                         clamp(pargb[2]),
@@ -72,11 +69,11 @@ namespace AuxiliaryLibraries.Media.Processing.Scale
                 }
             }
 
-            return new Bitmap(destW, destH, outPixels);
+            return new PixelMap(destW, destH, outPixels);
         }
         private byte clamp(int v)
         {
-            return (byte)(v > 255 ? 255 : (v < 0 ? 0 : v));
+            return (byte)(v > 255 ? 255 : v < 0 ? 0 : v);
         }
 
         private double getLanczosFactor(double x)

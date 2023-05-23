@@ -1,5 +1,4 @@
-﻿using AuxiliaryLibraries.Media;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace PersonaEditorLib.Sprite
 {
@@ -12,25 +11,12 @@ namespace PersonaEditorLib.Sprite
             { DDSAtlusPixelFormat.DXT5, AuxiliaryLibraries.Media.Formats.DDS.DDSFourCC.DXT5 }
         };
 
-        static Dictionary<DDSAtlusPixelFormat, PixelFormat> DDSAtlusToAux = new Dictionary<DDSAtlusPixelFormat, PixelFormat>()
-        {
-            { DDSAtlusPixelFormat.Argb32, PixelFormats.Argb32 }
-        };
-
         public static AuxiliaryLibraries.Media.Formats.DDS.DDSFourCC ConvertFromDDSAtlus(DDSAtlusPixelFormat nativePixelFormat)
         {
             if (DDSAtlusToDDS.ContainsKey(nativePixelFormat))
                 return DDSAtlusToDDS[nativePixelFormat];
             else
                 return AuxiliaryLibraries.Media.Formats.DDS.DDSFourCC.NONE;
-        }
-
-        public static PixelFormat DDSAtlusToPixelFormat(DDSAtlusPixelFormat nativePixelFormat)
-        {
-            if (DDSAtlusToAux.ContainsKey(nativePixelFormat))
-                return DDSAtlusToAux[nativePixelFormat];
-            else
-                return PixelFormats.Undefined;
         }
     }
 }

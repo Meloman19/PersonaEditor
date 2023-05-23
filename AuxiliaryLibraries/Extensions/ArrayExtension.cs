@@ -46,5 +46,21 @@ namespace AuxiliaryLibraries.Extensions
             Array.Copy(array, pos[pos.Length - 1], temp2, 0, temp2.Length);
             yield return temp2;
         }
+
+        public static bool ArrayEquals<T>(this T[] left, T[] right) where T : IEquatable<T>
+        {
+            if (left == right)
+                return true;
+
+            if (left.Length != right.Length)
+                return false;
+
+            for (int i = 0; i < left.Length; i++)
+            {
+                if (!left[i].Equals(right[i]))
+                    return false;
+            }
+            return true;
+        }
     }
 }

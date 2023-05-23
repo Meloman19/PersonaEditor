@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using AuxiliaryLibraries.Media;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 
@@ -48,18 +49,18 @@ namespace PersonaEditorLib.Other
 
         public FNTPalette(BinaryReader reader, int NumberOfColor)
         {
-            Pallete = new Color[NumberOfColor];
+            Pallete = new Pixel[NumberOfColor];
             for (int i = 0; i < NumberOfColor; i++)
             {
                 byte R = reader.ReadByte();
                 byte G = reader.ReadByte();
                 byte B = reader.ReadByte();
                 byte A = AlphaPS2ToPC[reader.ReadByte()];
-                Pallete[i] = Color.FromArgb(A, R, G, B);
+                Pallete[i] = Pixel.FromArgb(A, R, G, B);
             }
         }
 
-        public Color[] Pallete { get; set; }
+        public Pixel[] Pallete { get; set; }
 
         public int Size
         {
@@ -77,11 +78,11 @@ namespace PersonaEditorLib.Other
             }
         }
 
-        public Color[] GetImagePalette()
+        public Pixel[] GetImagePalette()
         {
-            List<Color> palette = new List<Color>();
+            List<Pixel> palette = new List<Pixel>();
             foreach (var color in Pallete)
-                palette.Add(Color.FromArgb(0xFF, color));
+                palette.Add(Pixel.FromArgb(0xFF, color));
 
             return palette.ToArray();
         }

@@ -7,7 +7,7 @@ namespace PersonaEditorLib.Sprite
     public class DDS : IGameData, IImage
     {
         DDSBase DDSBase = null;
-        Bitmap bitmap = null;
+        PixelMap bitmap = null;
 
         public static byte[] MagicNumber { get; } = new byte[] { 0x44, 0x44, 0x53, 0x20 };
 
@@ -59,7 +59,7 @@ namespace PersonaEditorLib.Sprite
 
         #region IImage
 
-        public Bitmap GetBitmap()
+        public PixelMap GetBitmap()
         {
             if (bitmap == null)
                 bitmap = DDSBase.GetBitmap();
@@ -67,7 +67,7 @@ namespace PersonaEditorLib.Sprite
             return bitmap;
         }
 
-        public void SetBitmap(Bitmap bitmap)
+        public void SetBitmap(PixelMap bitmap)
         {
             DDSBase.SetBitmap(bitmap);
             this.bitmap = null;

@@ -2,7 +2,7 @@
 
 namespace PersonaEditorLib.Sprite
 {
-    struct TMXHeader
+    public struct TMXHeader
     {
         public ushort ID;
         public ushort UnknownID;

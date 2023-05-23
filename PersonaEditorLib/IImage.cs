@@ -4,7 +4,7 @@ namespace PersonaEditorLib
 {
     public interface IImage
     {
-        Bitmap GetBitmap();
-        void SetBitmap(Bitmap bitmap);
+        PixelMap GetBitmap();
+        void SetBitmap(PixelMap bitmap);
     }
 }

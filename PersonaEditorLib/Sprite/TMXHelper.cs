@@ -2,53 +2,12 @@
 using AuxiliaryLibraries.Media;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 
 namespace PersonaEditorLib.Sprite
 {
     public static class TMXHelper
     {
-        static Dictionary<TMXPixelFormatEnum, PixelFormat> PS2ToAuxdic = new Dictionary<TMXPixelFormatEnum, PixelFormat>()
-        {
-            { TMXPixelFormatEnum.PSMT4,   PixelFormats.Indexed4Reverse  },
-            { TMXPixelFormatEnum.PSMT8,   PixelFormats.Indexed8  },
-            { TMXPixelFormatEnum.PSMTC32, PixelFormats.Rgba32PS2 }
-        };
-
-        public static PixelFormat PS2ToAux(TMXPixelFormatEnum pixelFormat)
-        {
-            if (PS2ToAuxdic.ContainsKey(pixelFormat))
-                return PS2ToAuxdic[pixelFormat];
-            else
-                return PixelFormats.Undefined;
-        }
-
-        public static List<Color> TilePalette(IList<Color> colorArray)
-        {
-            List<Color> returned = new List<Color>();
-
-            int Index = 0;
-            for (int i = 0; i < 8; i++)
-            {
-                for (int x = 0; x < 8; x++)
-                    returned.Add(colorArray[Index++]);
-
-                Index += 8;
-                for (int x = 0; x < 8; x++)
-                    returned.Add(colorArray[Index++]);
-
-                Index -= 16;
-                for (int x = 0; x < 8; x++)
-                    returned.Add(colorArray[Index++]);
-
-                Index += 8;
-                for (int x = 0; x < 8; x++)
-                    returned.Add(colorArray[Index++]);
-            }
-            return returned;
-        }
-
         public static byte[] TilePalette(byte[] palette)
         {
             if (palette == null)
@@ -81,41 +40,38 @@ namespace PersonaEditorLib.Sprite
             return returned.ToArray();
         }
 
-        public static int ReadPalette(BinaryReader reader, TMXPixelFormatEnum pixelFormat, TMXPixelFormatEnum paletteFormat, out Color[] colors)
+        public static byte[] ReadPallete(BinaryReader reader, TMXPixelFormatEnum pixelFormat)
         {
-            int returned = 0;
-
-            var PaletteFormat = PS2ToAux(paletteFormat);
-
-            byte[] paletteData = null;
-            if (pixelFormat == TMXPixelFormatEnum.PSMT8)
+            switch (pixelFormat)
             {
-                paletteData = TilePalette(reader.ReadBytes(256 * 4));
-                returned += 256 * 4;
+                case TMXPixelFormatEnum.PSMT8:
+                    return reader.ReadBytes(256 * 4);
+                case TMXPixelFormatEnum.PSMT4:
+                    return reader.ReadBytes(16 * 4);
+                default:
+                    throw new Exception("Unknown pallete");
             }
-            else if (pixelFormat == TMXPixelFormatEnum.PSMT4)
-            {
-                paletteData = reader.ReadBytes(16 * 4);
-                returned += 16 * 4;
-            }
-
-            if (PaletteFormat.IsIndexed)
-                throw new Exception("TMX Palette is indexed!");
-            else
-                colors = PixelConverters.GetDataToColorConverter(PaletteFormat)(paletteData);
-
-            return returned;
         }
 
-        public static void WritePalette(BinaryWriter writer, TMXPixelFormatEnum pixelFormat, TMXPixelFormatEnum paletteFormat, Color[] colors)
+        public static int GetStride(TMXPixelFormatEnum pixelFormat, int width)
         {
-            var PaletteFormat = PS2ToAux(paletteFormat);
-            byte[] paletteData = PixelConverters.GetColorToDataConverter(PaletteFormat)(colors);
+            int bitsPerPixel;
+            switch (pixelFormat)
+            {
+                case TMXPixelFormatEnum.PSMT8:
+                    bitsPerPixel = 8;
+                    break;
+                case TMXPixelFormatEnum.PSMT4:
+                    bitsPerPixel = 4;
+                    break;
+                case TMXPixelFormatEnum.PSMTC32:
+                    bitsPerPixel = 32;
+                    break;
+                default:
+                    throw new Exception("Unknown format");
+            }
 
-            if (pixelFormat == TMXPixelFormatEnum.PSMT8)
-                writer.Write(TilePalette(paletteData));
-            else if (pixelFormat == TMXPixelFormatEnum.PSMT4)
-                writer.Write(paletteData);
+            return ImageHelper.GetStride(bitsPerPixel, width);
         }
     }
 }

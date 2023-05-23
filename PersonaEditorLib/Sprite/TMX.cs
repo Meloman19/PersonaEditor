@@ -17,8 +17,8 @@ namespace PersonaEditorLib.Sprite
 
         #region Private Fields
 
-        Bitmap bitmap;
-        TMXHeader header;
+        private PixelMap _pixelMap;
+        private TMXHeader _header;
 
         #endregion Private Fields
 
@@ -26,13 +26,11 @@ namespace PersonaEditorLib.Sprite
 
         public bool IsLittleEndian { get; set; } = true;
 
-        public uint TextureID => header.TextureID;
-        public uint ClutID => header.ClutID;
-        public string Comment => Encoding.ASCII.GetString(header.Comment).TrimEnd('\0');
-        private PixelFormat ImageFormat { get; set; }
-        private PixelFormat PaletteFormat { get; set; }
-        public int Width => bitmap.Width;
-        public int Height => bitmap.Height;
+        public TMXHeader Header => _header;
+        public byte[] Pallete { get; set; }
+        public byte[] ImageData { get; set; }
+
+        public string Comment => Encoding.ASCII.GetString(_header.Comment).TrimEnd('\0');
 
         #endregion Public Properties
 
@@ -58,29 +56,25 @@ namespace PersonaEditorLib.Sprite
             {
                 int tempsize = 0;
 
-                byte[] imageData;
+                _header = ReadHeader(reader.ReadBytes(0x40));
 
-                header = ReadHeader(reader.ReadBytes(0x40));
-
-                ImageFormat = TMXHelper.PS2ToAux(header.PixelFormat);
-                PaletteFormat = TMXHelper.PS2ToAux(header.PaletteFormat);
+                if (!IsSupported(_header))
+                    throw new Exception("TMX: unsupported format");
 
                 tempsize += 0x40;
-                System.Drawing.Color[] colors = null;
-                if (header.PaletteCount == 1)
+                if (_header.PaletteCount == 1)
                 {
-                    tempsize += TMXHelper.ReadPalette(reader, header.PixelFormat, header.PaletteFormat, out colors);
+                    Pallete = TMXHelper.ReadPallete(reader, _header.PixelFormat);
+                    tempsize += Pallete.Length;
                 }
 
-                int datasize = header.Height * ImageHelper.GetStride(ImageFormat, header.Width);
-                imageData = reader.ReadBytes(datasize);
+                int datasize = _header.Height * TMXHelper.GetStride(_header.PixelFormat, _header.Width);
+                ImageData = reader.ReadBytes(datasize);
 
                 tempsize += datasize;
 
-                if (header.FileSize != tempsize)
+                if (_header.FileSize != tempsize)
                     throw new Exception("TMX: filesize not equal");
-
-                bitmap = new Bitmap(header.Width, header.Height, ImageFormat, imageData, colors);
             }
         }
 
@@ -98,6 +92,19 @@ namespace PersonaEditorLib.Sprite
             return Header;
         }
 
+        private static bool IsSupported(TMXHeader tmxHeader)
+        {
+            switch (tmxHeader.PixelFormat)
+            {
+                case TMXPixelFormatEnum.PSMT4:
+                case TMXPixelFormatEnum.PSMT8:
+                case TMXPixelFormatEnum.PSMTC32:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         #region IGameFile
 
         public FormatEnum Type => FormatEnum.TMX;
@@ -108,57 +115,43 @@ namespace PersonaEditorLib.Sprite
         {
             int returned = 0;
             returned += 0x40;
-            returned += ImageFormat.IsIndexed ?
-                Convert.ToInt32(Math.Pow(2, ImageFormat.BitsPerPixel)) * PaletteFormat.BitsPerPixel / 8
-                : 0;
-            returned += ImageHelper.GetStride(ImageFormat, Width) * Height;
+            returned += Pallete?.Length ?? 0;
+            returned += ImageData.Length;
             return returned;
         }
 
         public byte[] GetData()
         {
-            byte[] returned = new byte[0];
-
             using (MemoryStream MS = new MemoryStream())
             {
                 BinaryWriter writer = IOTools.OpenWriteFile(MS, IsLittleEndian);
 
-                writer.Write(IOTools.GetBytes(header));
-
-                if (ImageFormat.IsIndexed)
-                    TMXHelper.WritePalette(writer, header.PixelFormat, header.PaletteFormat, bitmap.CopyPalette());
-
-                writer.Write(bitmap.CopyData());
-
-
-                returned = MS.ToArray();
+                writer.Write(IOTools.GetBytes(_header));
+                if (Pallete != null)
+                    writer.Write(Pallete);
+                writer.Write(ImageData);
+                return MS.ToArray();
             }
-
-            return returned;
         }
 
         #endregion
 
         #region IImage
 
-        public Bitmap GetBitmap()
+        public PixelMap GetBitmap()
         {
-            return bitmap;
+            if (_pixelMap == null)
+                _pixelMap = TMXDecoding.Decode(this);
+
+            return _pixelMap;
         }
 
-        public void SetBitmap(Bitmap bitmap)
+        public void SetBitmap(PixelMap bitmap)
         {
-            if (bitmap == null)
-                return;
-
-            if (bitmap.PixelFormat == this.bitmap.PixelFormat)
-                this.bitmap = bitmap;
-            else
-                this.bitmap = bitmap.ConvertTo(this.bitmap.PixelFormat, null);
-
-            header.Width = (ushort)bitmap.Width;
-            header.Height = (ushort)bitmap.Height;
-            header.FileSize = GetSize();
+            TMXEncoding.Encode(this, bitmap);
+            _header.Width = (ushort)bitmap.Width;
+            _header.Height = (ushort)bitmap.Height;
+            _header.FileSize = GetSize();
         }
 
         #endregion IImage

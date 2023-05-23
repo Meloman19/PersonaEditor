@@ -36,15 +36,11 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             return true;
         }
 
-        public static bool DDSCompress(Bitmap bitmap, DDSFourCC fourCC, out byte[] newData)
+        public static bool DDSCompress(PixelMap bitmap, DDSFourCC fourCC, out byte[] newData)
         {
-            Bitmap temp = null;
-            if (bitmap.PixelFormat == PixelFormats.Bgra32)
-                temp = bitmap;
-            else
-                temp = bitmap.ConvertTo(PixelFormats.Bgra32, null);
+            var bgra = EncodingHelper.ToBgra32(bitmap.Pixels);
 
-            bool returned = DDSCompress(temp.Width, temp.Height, temp.InternalGetData(), fourCC, out byte[] returneddata);
+            bool returned = DDSCompress(bitmap.Width, bitmap.Height, bgra, fourCC, out byte[] returneddata);
             newData = returneddata;
 
             return returned;

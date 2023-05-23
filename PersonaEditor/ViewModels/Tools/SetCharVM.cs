@@ -8,6 +8,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using PersonaEditor.Common;
+using AuxiliaryLibraries.Media;
+using AuxiliaryLibraries.WPF.Wrapper;
 
 namespace PersonaEditor.ViewModels.Tools
 {
@@ -74,12 +76,11 @@ namespace PersonaEditor.ViewModels.Tools
             if (font != null)
                 foreach (var a in font.DataList)
                 {
-                    var pallete = new BitmapPalette(font.Palette.Select(x => System.Windows.Media.Color.FromArgb(x.A, x.R, x.G, x.B)).ToArray());
-                    var form = AuxiliaryLibraries.WPF.Wrapper.Imaging.AuxToWPF(font.PixelFormat);
+                    var pixelMap = new PixelMap(font.Width, font.Height, a.Value);
                     var temp = new FnMpImg()
                     {
                         Index = a.Key,
-                        Image = BitmapSource.Create(font.Width, font.Height, 96, 96, form, pallete, a.Value, (font.PixelFormat.BitsPerPixel * font.Width + 7) / 8)
+                        Image = pixelMap.GetBitmapSource()
                     };
                     GlyphList.Add(temp);
                 }

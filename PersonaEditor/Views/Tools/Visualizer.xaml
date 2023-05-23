@@ -19,30 +19,12 @@
         </Grid.RowDefinitions>
 
         <StatusBar Grid.Row="0">
-            <ComboBox Width="120" ItemsSource="{Binding BackgroundList}" SelectedIndex="{Binding BackgroundSelect}"/>
-            <ComboBox Width="90" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
+            <ComboBox Width="150" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
         </StatusBar>
 
-        <Image Grid.Row="1">
-            <Image.Source>
-                <DrawingImage>
-                    <DrawingImage.Drawing>
-                        <DrawingGroup>
-                            <DrawingGroup.Children>
-                                <ImageDrawing ImageSource="{Binding BackgroundImage}" Rect="{Binding BackgroundRect}"/>
-
-                                <ImageDrawing ImageSource="{Binding NameImage}" Rect="{Binding NameRect}"/>
-
-                                <ImageDrawing ImageSource="{Binding TextImage}" Rect="{Binding TextRect}"/>
-                            </DrawingGroup.Children>
-                            <DrawingGroup.ClipGeometry>
-                                <RectangleGeometry Rect="{Binding BackgroundRect}"/>
-                            </DrawingGroup.ClipGeometry>
-                        </DrawingGroup>
-                    </DrawingImage.Drawing>
-                </DrawingImage>
-            </Image.Source>
-        </Image>
+        <Image Grid.Row="1"
+               Source="{Binding TextImage}"
+               Stretch="Uniform" />
 
         <StackPanel Grid.Row="2">
             <Grid Margin="4">

@@ -17,11 +17,11 @@ namespace AuxiliaryLibraries.Media
             0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF
         };
 
-        public static int GetStride(PixelFormat pixelFormat, int pixelWidth) => (pixelFormat.BitsPerPixel * pixelWidth + 7) / 8;
+        public static int GetStride(int bitsPerPixel, int pixelWidth) => (bitsPerPixel * pixelWidth + 7) / 8;
 
-        public static int[] GetIndexes(Color[] pixels, Color[] palette, PixelFormat pixelFormat, int pixelWidth)
+        public static int[] GetIndexes(Pixel[] pixels, Pixel[] palette)
         {
-            Dictionary<Color, int> temp = new Dictionary<Color, int>();
+            Dictionary<Pixel, int> temp = new Dictionary<Pixel, int>();
 
             int[] returned = new int[pixels.Length];
             for (int i = 0; i < pixels.Length; i++)
@@ -56,6 +56,15 @@ namespace AuxiliaryLibraries.Media
         }
 
         public static float ColorDistance(Color col1, Color col2)
+        {
+            float rmean = ((float)(col1.R + col2.R)) / 2;
+            float r = col1.R - col2.R;
+            float g = col1.G - col2.G;
+            float b = col1.B - col2.B;
+            return 2 * r * r + 4 * g * g + 3 * b * b + (rmean * (r * r - b * b) / 256);
+        }
+
+        public static float ColorDistance(Pixel col1, Pixel col2)
         {
             float rmean = ((float)(col1.R + col2.R)) / 2;
             float r = col1.R - col2.R;
@@ -111,7 +120,7 @@ namespace AuxiliaryLibraries.Media
             return returned;
         }
 
-        public static Color[] GetGrayPalette(int count)
+        public static Pixel[] GetGrayPalette(int count)
         {
             if (count < 1 | count > 8)
                 throw new ArgumentOutOfRangeException("count", count, "count must be between 1 and 8");
@@ -119,10 +128,10 @@ namespace AuxiliaryLibraries.Media
             int colorCount = (int)Math.Pow(2, count);
             int step = (int)Math.Pow(2, 8 - count);
 
-            Color[] palette = new Color[colorCount];
+            Pixel[] palette = new Pixel[colorCount];
 
             for (int i = 0, k = 0; i < 256; i += step, k++)
-                palette[k] = Color.FromArgb(i, i, i);
+                palette[k] = Pixel.FromArgb((byte)i, (byte)i, (byte)i);
 
             return palette;
         }
