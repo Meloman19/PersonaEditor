@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\AuxiliaryLibraries.WPF.Wrapper\AuxiliaryLibraries.WPF.Wrapper.csproj" />
+		<ProjectReference Include="..\..\PersonaEditorLib\PersonaEditorLib.csproj" />
+	</ItemGroup>
+
+</Project>

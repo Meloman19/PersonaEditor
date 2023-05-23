@@ -9,31 +9,49 @@ namespace AuxiliaryLibraries.Tools
 {
     public static class IOTools
     {
-        public static T FromBytes<T>(byte[] arr) where T : struct
+        public static T ReadStruct<T>(this BinaryReader reader) where T : struct
         {
-            T str = new T();
-
-            int size = Marshal.SizeOf(str);
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-
-            Marshal.Copy(arr, 0, ptr, size);
-
-            str = (T)Marshal.PtrToStructure(ptr, str.GetType());
-            Marshal.FreeHGlobal(ptr);
-
-            return str;
+            byte[] buffer = reader.ReadBytes(Marshal.SizeOf(typeof(T)));
+            return FromBytes<T>(buffer);
         }
 
-        public static byte[] GetBytes<T>(T str) where T : struct
+        public static void WriteStruct<T>(this BinaryWriter writer, T structure) where T : struct
         {
-            int size = Marshal.SizeOf(str);
-            byte[] arr = new byte[size];
+            byte[] buffer = GetBytes<T>(structure);
+            writer.Write(buffer);
+        }
 
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(str, ptr, true);
-            Marshal.Copy(ptr, arr, 0, size);
-            Marshal.FreeHGlobal(ptr);
-            return arr;
+        public static T FromBytes<T>(byte[] buffer) where T : struct
+        {
+            T structure;
+            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            try
+            {
+                structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+            }
+            finally
+            {
+                handle.Free();
+            }
+
+            return structure;
+        }
+
+        public static byte[] GetBytes<T>(T structure) where T : struct
+        {
+            byte[] buffer = new byte[Marshal.SizeOf(typeof(T))];
+
+            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            try
+            {
+                Marshal.StructureToPtr(structure, handle.AddrOfPinnedObject(), false);
+            }
+            finally
+            {
+                handle.Free();
+            }
+
+            return buffer;
         }
 
         public static BinaryReader OpenReadFile(Stream stream, bool IsLittleEndian, bool leaveOpen = true)

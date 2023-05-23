@@ -32,10 +32,10 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             if (magicNumberArray.SequenceEqual(MagicNumber))
                 using (BinaryReader reader = new BinaryReader(streamFile.Stream, Encoding.ASCII, true))
                 {
-                    Header = IOTools.FromBytes<DDSHeader>(reader.ReadBytes(124));
+                    Header = reader.ReadStruct<DDSHeader>();
 
                     if (Header.PixelFormat.FourCC == DDSFourCC.DX10)
-                        HeaderDXT10 = IOTools.FromBytes<DDSHeaderDXT10>(reader.ReadBytes(20));
+                        HeaderDXT10 = reader.ReadStruct<DDSHeaderDXT10>();
 
                     if (!IsSupportedFormat(Header, HeaderDXT10))
                         throw new Exception("DDS: not supported format");
@@ -150,9 +150,9 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             using (BinaryWriter writer = new BinaryWriter(MS))
             {
                 MS.Write(MagicNumber, 0, 4);
-                writer.Write(IOTools.GetBytes(Header));
+                writer.WriteStruct(Header);
                 if (HeaderDXT10.HasValue)
-                    writer.Write(IOTools.GetBytes(HeaderDXT10.Value));
+                    writer.WriteStruct(HeaderDXT10.Value);
                 dataList.ForEach(x => writer.Write(x));
                 returned = MS.ToArray();
             }

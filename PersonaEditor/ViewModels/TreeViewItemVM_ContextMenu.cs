@@ -1,14 +1,11 @@
-﻿using PersonaEditorLib;
-using PersonaEditorLib.Text;
-using AuxiliaryLibraries.WPF;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using PersonaEditor.Common;
 using PersonaEditor.Controls.ToolBox;
-using PersonaEditorCMD;
+using PersonaEditorLib;
+using PersonaEditorLib.Text;
 using System;
 using System.IO;
 using System.Text;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace PersonaEditor.ViewModels
@@ -130,14 +127,14 @@ namespace PersonaEditor.ViewModels
                 {
                     string ext = Path.GetExtension(SFD.FileName);
                     if (ext.Equals(".png", StringComparison.CurrentCultureIgnoreCase))
-                        PersonaEditorCMD.PersonaEditorTools.SaveImageFile(PersonaFile, SFD.FileName);
+                        PersonaEditorTools.SaveImageFile(PersonaFile, SFD.FileName);
                     else if (ext.Equals(".ptp", StringComparison.CurrentCultureIgnoreCase))
                     {
                         var result = ToolBox.Show(ToolBoxType.SaveAsPTP);
                         if (result == ToolBoxResult.Ok)
                         {
                             PersonaEncoding temp = ApplicationSettings.AppSetting.Default.SaveAsPTP_CO2N ? Static.EncodingManager.GetPersonaEncoding(ApplicationSettings.AppSetting.Default.SaveAsPTP_Font) : null;
-                            PersonaEditorCMD.PersonaEditorTools.SavePTPFile(PersonaFile, SFD.FileName, temp);
+                            PersonaEditorTools.SavePTPFile(PersonaFile, SFD.FileName, temp);
                         }
                     }
                     else if (ext.Equals(".bmd", StringComparison.CurrentCultureIgnoreCase))
@@ -147,7 +144,7 @@ namespace PersonaEditor.ViewModels
                         File.WriteAllBytes(SFD.FileName, bmd.GetData());
                     }
                     else if (ext.Equals(".xml", StringComparison.CurrentCultureIgnoreCase))
-                        PersonaEditorCMD.PersonaEditorTools.SaveTableFile(PersonaFile, SFD.FileName);
+                        PersonaEditorTools.SaveTableFile(PersonaFile, SFD.FileName);
                     else throw new Exception("SavePersonaFileDialog");
                 }
         }

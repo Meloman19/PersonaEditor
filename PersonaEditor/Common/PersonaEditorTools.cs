@@ -1,10 +1,10 @@
-﻿using PersonaEditorLib;
+﻿using AuxiliaryLibraries.WPF.Wrapper;
+using PersonaEditorLib;
 using PersonaEditorLib.Text;
-using AuxiliaryLibraries.WPF.Wrapper;
 using System.IO;
 using System.Xml.Linq;
 
-namespace PersonaEditorCMD
+namespace PersonaEditor.Common
 {
     public static class PersonaEditorTools
     {

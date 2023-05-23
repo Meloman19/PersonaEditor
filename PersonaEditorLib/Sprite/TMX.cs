@@ -4,6 +4,7 @@ using AuxiliaryLibraries.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace PersonaEditorLib.Sprite
@@ -56,12 +57,12 @@ namespace PersonaEditorLib.Sprite
             {
                 int tempsize = 0;
 
-                _header = ReadHeader(reader.ReadBytes(0x40));
+                _header = ReadHeader(reader);
 
                 if (!IsSupported(_header))
                     throw new Exception("TMX: unsupported format");
 
-                tempsize += 0x40;
+                tempsize += Marshal.SizeOf<TMXHeader>();
                 if (_header.PaletteCount == 1)
                 {
                     Pallete = TMXHelper.ReadPallete(reader, _header.PixelFormat);
@@ -78,9 +79,9 @@ namespace PersonaEditorLib.Sprite
             }
         }
 
-        private TMXHeader ReadHeader(byte[] data)
+        private TMXHeader ReadHeader(BinaryReader reader)
         {
-            var Header = IOTools.FromBytes<TMXHeader>(data);
+            var Header = reader.ReadStruct<TMXHeader>();
             if (Header.ID != ID) throw new Exception("TMX: (0x00) wrong ID");
             if (Header.MagicNumber != MagicNumber) throw new Exception("TMX: (0x08) wrong MagicNumber");
             if (Header.Padding != 0) throw new Exception("TMX: (0x0C) wrong padding");
@@ -126,7 +127,7 @@ namespace PersonaEditorLib.Sprite
             {
                 BinaryWriter writer = IOTools.OpenWriteFile(MS, IsLittleEndian);
 
-                writer.Write(IOTools.GetBytes(_header));
+                writer.WriteStruct(_header);
                 if (Pallete != null)
                     writer.Write(Pallete);
                 writer.Write(ImageData);

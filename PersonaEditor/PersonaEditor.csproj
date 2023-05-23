@@ -29,7 +29,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AuxiliaryLibraries.WPF.Wrapper\AuxiliaryLibraries.WPF.Wrapper.csproj" />
     <ProjectReference Include="..\AuxiliaryLibraries\AuxiliaryLibraries.csproj" />
-    <ProjectReference Include="..\PersonaEditorCMD\PersonaEditorCMD.csproj" />
     <ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj" />
   </ItemGroup>
 </Project>
