@@ -179,8 +179,7 @@ namespace PersonaEditorLib.Sprite
                                 default:
                                     throw new Exception();
                             }
-                            var newData = DDSDecompressor.DDSDecompress(Header.Width, Header.Height * Header.TileCount, dataList[0], fourCC);
-                            pixels = DecodingHelper.FromBgra32(newData);
+                            pixels = DDSDecompressor.DDSDecompress(Header.Width, Header.Height * Header.TileCount, dataList[0], fourCC);
                         }
                         break;
                     default:

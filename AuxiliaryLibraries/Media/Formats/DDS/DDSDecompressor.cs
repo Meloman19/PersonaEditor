@@ -4,7 +4,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
 {
     public class DDSDecompressor
     {
-        delegate void GetPixelDelegate(byte[,,] pixels, int x, int y, ReadOnlySpan<byte> block);
+        delegate void GetPixelDelegate(Array2D<Pixel> pixels, int x, int y, ReadOnlySpan<byte> block);
 
         /// <summary>
         /// If returned true then newData is Bgra32.
@@ -15,7 +15,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
         /// <param name="fourCC"></param>
         /// <param name="newData"></param>
         /// <returns></returns>
-        public static byte[] DDSDecompress(int width, int height, ReadOnlySpan<byte> data, DDSFourCC fourCC, DXGIFormat? dxgiFormat = null)
+        public static Pixel[] DDSDecompress(int width, int height, ReadOnlySpan<byte> data, DDSFourCC fourCC, DXGIFormat? dxgiFormat = null)
         {
             GetPixelDelegate getPixel;
             int step;
@@ -50,25 +50,23 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
                     throw new Exception();
             }
 
-            int Width = (int)Math.Ceiling((double)width / 4);
-            int Heigth = (int)Math.Ceiling((double)height / 4);
+            int blockWidth = (int)Math.Ceiling((double)width / 4);
+            int blockHeigth = (int)Math.Ceiling((double)height / 4);
 
-            byte[,,] pixel = new byte[height, width, 4];
-            byte[] uncompressed_data = new byte[width * height * 4];
+            var pixels = new Pixel[width * height];
+            var pixels2D = new Array2D<Pixel>(pixels, height, width);
 
-            for (int i = 0, index = 0; i < Heigth; i++)
-                for (int k = 0; k < Width; k++, index += step)
+            for (int i = 0, index = 0; i < blockHeigth; i++)
+                for (int k = 0; k < blockWidth; k++, index += step)
                 {
                     var block = data.Slice(index, step);
-                    getPixel(pixel, k * 4, i * 4, block);
+                    getPixel(pixels2D, k * 4, i * 4, block);
                 }
 
-            Buffer.BlockCopy(pixel, 0, uncompressed_data, 0, uncompressed_data.Length);
-
-            return uncompressed_data;
+            return pixels;
         }
 
-        private static void DDS_DXT1_GetPixels(byte[,,] pixels, int x, int y, ReadOnlySpan<byte> block)
+        private static void DDS_DXT1_GetPixels(Array2D<Pixel> pixels, int x, int y, ReadOnlySpan<byte> block)
         {
             byte[,] palette = new byte[4, 4];
 
@@ -102,8 +100,8 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
                 //palette[3, 3] = 0xFF;
             }
 
-            int pixHeight = Math.Min(pixels.GetLength(0) - y, 4);
-            int pixWidth = Math.Min(pixels.GetLength(1) - x, 4);
+            int pixHeight = Math.Min(pixels.Dim0 - y, 4);
+            int pixWidth = Math.Min(pixels.Dim1 - x, 4);
 
             int[,] pix = new int[4, 4];
 
@@ -117,19 +115,20 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             for (int i = 0; i < pixHeight; i++)
                 for (int k = 0; k < pixWidth; k++)
                 {
-                    pixels[y + i, x + k, 0] = palette[pix[i, k], 0];
-                    pixels[y + i, x + k, 1] = palette[pix[i, k], 1];
-                    pixels[y + i, x + k, 2] = palette[pix[i, k], 2];
-                    pixels[y + i, x + k, 3] = palette[pix[i, k], 3];
+                    var b = palette[pix[i, k], 0];
+                    var g = palette[pix[i, k], 1];
+                    var r = palette[pix[i, k], 2];
+                    var a = palette[pix[i, k], 3];
+                    pixels[y + i, x + k] = Pixel.FromArgb(a, r, g, b);
                 }
         }
 
-        private static void DDS_DXT3_GetPixels(byte[,,] pixels, int x, int y, ReadOnlySpan<byte> block)
+        private static void DDS_DXT3_GetPixels(Array2D<Pixel> pixels, int x, int y, ReadOnlySpan<byte> block)
         {
             DDS_DXT1_GetPixels(pixels, x, y, block.Slice(8));
 
-            int pixHeight = Math.Min(pixels.GetLength(0) - y, 4);
-            int pixWidth = Math.Min(pixels.GetLength(1) - x, 4);
+            int pixHeight = Math.Min(pixels.Dim0 - y, 4);
+            int pixWidth = Math.Min(pixels.Dim1 - x, 4);
 
             byte[] alpha = new byte[16];
 
@@ -141,10 +140,13 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
 
             for (int i = 0; i < pixHeight; i++)
                 for (int k = 0; k < pixWidth; k++)
-                    pixels[y + i, x + k, 3] = alpha[i * 4 + k];
+                {
+                    var a = alpha[i * 4 + k];
+                    pixels[y + i, x + k] = Pixel.FromArgb(a, pixels[y + i, x + k]);
+                }
         }
 
-        private static void DDS_DXT5_GetPixels(byte[,,] pixels, int x, int y, ReadOnlySpan<byte> block)
+        private static void DDS_DXT5_GetPixels(Array2D<Pixel> pixels, int x, int y, ReadOnlySpan<byte> block)
         {
             DDS_DXT1_GetPixels(pixels, x, y, block.Slice(8));
 
@@ -172,11 +174,14 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
                 for (int k = 0; k < 4; k++, ind++)
                     pix[i, k] = (int)(dat >> (ind * 3)) & 7;
 
-            int pixHeight = Math.Min(pixels.GetLength(0) - y, 4);
-            int pixWidth = Math.Min(pixels.GetLength(1) - x, 4);
+            int pixHeight = Math.Min(pixels.Dim0 - y, 4);
+            int pixWidth = Math.Min(pixels.Dim1 - x, 4);
             for (int i = 0; i < pixHeight; i++)
                 for (int k = 0; k < pixWidth; k++)
-                    pixels[y + i, x + k, 3] = alphaPalette[pix[i, k]];
+                {
+                    var a = alphaPalette[pix[i, k]];
+                    pixels[y + i, x + k] = Pixel.FromArgb(a, pixels[y + i, x + k]);
+                }
         }
 
         private static void RGB565ToBGRA32(byte[,] palette, int paletteIndex, ReadOnlySpan<byte> block)

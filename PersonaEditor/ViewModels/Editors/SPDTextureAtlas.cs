@@ -10,6 +10,7 @@ namespace PersonaEditor.ViewModels.Editors
     public sealed class SPDTextureAtlas : TextureAtlasBase<SPDTextureObject>
     {
         private readonly GameFile _texture;
+        private BitmapSource _textureImage;
 
         public SPDTextureAtlas(GameFile dds, SPDKey[] keylist)
         {
@@ -19,7 +20,8 @@ namespace PersonaEditor.ViewModels.Editors
                 throw new ArgumentNullException(nameof(keylist));
 
             _texture = dds;
-            TextureImage = (dds.GameData as IImage).GetBitmap().GetBitmapSource();
+            // temporarily disabled lazy load
+            _ = TextureImage;
 
             foreach (var key in keylist)
                 Objects.Add(new SPDTextureObject(key));
@@ -27,7 +29,16 @@ namespace PersonaEditor.ViewModels.Editors
             SelectedObject = Objects.FirstOrDefault();
         }
 
-        public override BitmapSource TextureImage { get; }
+        public override BitmapSource TextureImage
+        {
+            get
+            {
+                if (_textureImage == null)
+                    _textureImage = (_texture.GameData as IImage).GetBitmap().GetBitmapSource();
+
+                return _textureImage;
+            }
+        }
 
         public override string Name => _texture.Name;
     }

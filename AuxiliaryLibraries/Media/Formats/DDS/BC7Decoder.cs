@@ -473,20 +473,17 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             b = tmp;
         }
 
-        public static void DDS_BC7_GetPixels(byte[,,] pixels, int x, int y, ReadOnlySpan<byte> block)
+        public static void DDS_BC7_GetPixels(Array2D<Pixel> pixels, int x, int y, ReadOnlySpan<byte> block)
         {
             var newPixels = GetNewPixels(block);
 
-            int pixHeight = Math.Min(pixels.GetLength(0) - y, 4);
-            int pixWidth = Math.Min(pixels.GetLength(1) - x, 4);
+            int pixHeight = Math.Min(pixels.Dim0 - y, 4);
+            int pixWidth = Math.Min(pixels.Dim1 - x, 4);
             for (int i = 0; i < pixHeight; i++)
                 for (int k = 0; k < pixWidth; k++)
                 {
                     var color = newPixels[i * 4 + k];
-                    pixels[y + i, x + k, 0] = color.b;
-                    pixels[y + i, x + k, 1] = color.g;
-                    pixels[y + i, x + k, 2] = color.r;
-                    pixels[y + i, x + k, 3] = color.a;
+                    pixels[y + i, x + k] = Pixel.FromArgb(color.a, color.r, color.g, color.b);
                 }
         }
 

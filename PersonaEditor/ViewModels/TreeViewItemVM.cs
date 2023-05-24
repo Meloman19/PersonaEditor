@@ -24,6 +24,7 @@ namespace PersonaEditor.ViewModels
         private bool _isEnable = true;
         private bool _isSelected = false;
         private GameFile _personaFile = null;
+        private BitmapSource _bitmapSource = null;
 
         #endregion Private
 
@@ -74,7 +75,20 @@ namespace PersonaEditor.ViewModels
             }
         }
 
-        public BitmapSource BitmapSource { get; private set; } = null;
+        public BitmapSource BitmapSource
+        {
+            get
+            {
+                if (_bitmapSource == null &&
+                    _personaFile != null &&
+                    _personaFile.GameData is IImage image)
+                {
+                    _bitmapSource = image.GetBitmap().GetBitmapSource();
+                }
+
+                return _bitmapSource;
+            }
+        }
 
         #endregion Property
 
@@ -127,10 +141,9 @@ namespace PersonaEditor.ViewModels
                     _subItems.Add(temp);
                 }
             }
-            if (newObject.GameData is IImage image)
-            {
-                BitmapSource = image.GetBitmap().GetBitmapSource();
-            }
+            _bitmapSource = null;
+            // temporarily disabled lazy load
+            _ = BitmapSource;
         }
 
         private void SubFile_ItemAction(TreeViewItemVM sender, UserTreeViewItemEventEnum action) => ItemAction?.Invoke(sender, action);

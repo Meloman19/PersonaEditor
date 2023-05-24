@@ -163,8 +163,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             switch (Header.PixelFormat.PixelFlags)
             {
                 case PixelFormatFlags.DDPF_FOURCC:
-                    var newData = DDSDecompressor.DDSDecompress(Header.Width, Header.Height, dataList[0], Header.PixelFormat.FourCC, HeaderDXT10?.DXGIFormat);
-                    pixels = DecodingHelper.FromBgra32(newData);
+                    pixels = DDSDecompressor.DDSDecompress(Header.Width, Header.Height, dataList[0], Header.PixelFormat.FourCC, HeaderDXT10?.DXGIFormat);
                     break;
                 case PixelFormatFlags.DDPF_RGBA:
                     pixels = DecodingHelper.FromRgba32(dataList[0]);
