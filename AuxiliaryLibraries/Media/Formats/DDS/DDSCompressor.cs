@@ -1,22 +1,38 @@
 ﻿using AuxiliaryLibraries.Mathematic;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace AuxiliaryLibraries.Media.Formats.DDS
 {
     public static class DDSCompressor
     {
-        public static bool DDSCompress(int width, int height, byte[] data, DDSFourCC fourCC, out byte[] newData)
+        public static byte[] DDSCompress(int width, int height, byte[] data, DDSFourCC fourCC)
         {
-            newData = null;
+            Action<byte[,,], int, int, byte[], int> setPixel;
+            int step;
+            switch (fourCC)
+            {
+                case DDSFourCC.DXT1:
+                    setPixel = EncodeBC1;
+                    step = 8;
+                    break;
+                case DDSFourCC.DXT3:
+                    setPixel = EncodeBC2;
+                    step = 16;
+                    break;
+                case DDSFourCC.DXT5:
+                    setPixel = EncodeBC3;
+                    step = 16;
+                    break;
+                default:
+                    throw new Exception();
+            }
+
             if (fourCC == DDSFourCC.NONE)
-                return false;
+                throw new Exception();
 
             int Width = (int)Math.Ceiling((float)width / 4);
             int Heigth = (int)Math.Ceiling((float)height / 4);
-
-            int step = fourCC == DDSFourCC.DXT1 ? 8 : 16;
 
             byte[,,] pixels = new byte[height, width, 4];
             Buffer.BlockCopy(data, 0, pixels, 0, height * width * 4);
@@ -25,26 +41,20 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
 
             for (int y = 0, index = 0; y < height; y += 4)
                 for (int x = 0; x < width; x += 4, index += step)
-                    if (fourCC == DDSFourCC.DXT1)
-                        EncodeBC1(pixels, x, y, compressedData, index, false);
-                    else if (fourCC == DDSFourCC.DXT3)
-                        EncodeBC2(pixels, x, y, compressedData, index);
-                    else if (fourCC == DDSFourCC.DXT5)
-                        EncodeBC3(pixels, x, y, compressedData, index);
+                    setPixel(pixels, x, y, compressedData, index);
 
-            newData = compressedData;
-            return true;
+            return compressedData;
         }
 
-        public static bool DDSCompress(PixelMap bitmap, DDSFourCC fourCC, out byte[] newData)
+        public static byte[] DDSCompress(PixelMap bitmap, DDSFourCC fourCC)
         {
             var bgra = EncodingHelper.ToBgra32(bitmap.Pixels);
 
-            bool returned = DDSCompress(bitmap.Width, bitmap.Height, bgra, fourCC, out byte[] returneddata);
-            newData = returneddata;
-
-            return returned;
+            return DDSCompress(bitmap.Width, bitmap.Height, bgra, fourCC);
         }
+
+        private static void EncodeBC1(byte[,,] pixels, int x, int y, byte[] data, int dataIndex) =>
+             EncodeBC1(pixels, x, y, data, dataIndex, false);
 
         private static void EncodeBC1(byte[,,] pixels, int x, int y, byte[] data, int dataIndex, bool alphaIgnore)
         {
@@ -323,7 +333,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
         private static ushort BGR32ToRGB565(byte B, byte G, byte R)
         {
             byte R5 = BitHelper.Table8bitTo5bit[R];
-            byte G6 = BitHelper.Table8bitYo6bit[G];
+            byte G6 = BitHelper.Table8bitTo6bit[G];
             byte B5 = BitHelper.Table8bitTo5bit[B];
 
             return Convert.ToUInt16((R5 << 11) + (G6 << 5) + B5);
@@ -332,7 +342,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
         private static byte[] BGR32ToRGB565Array(byte B, byte G, byte R)
         {
             byte R5 = BitHelper.Table8bitTo5bit[R];
-            byte G6 = BitHelper.Table8bitYo6bit[G];
+            byte G6 = BitHelper.Table8bitTo6bit[G];
             byte B5 = BitHelper.Table8bitTo5bit[B];
 
             return new byte[] { R5, G6, B5 };

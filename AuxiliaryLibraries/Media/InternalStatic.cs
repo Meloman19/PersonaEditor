@@ -109,7 +109,7 @@ namespace AuxiliaryLibraries.Media
         };
 
         // byte 6bit = (byte)((double)8bit * 63d / 255d + 0.5d);
-        public static byte[] Table8bitYo6bit = new byte[]
+        public static byte[] Table8bitTo6bit = new byte[]
         {
             0 ,0 ,0 ,1 ,1 ,1 ,1 ,2 ,2 ,2 ,2 ,3 ,3 ,3 ,3 ,4 ,
             4 ,4 ,4 ,5 ,5 ,5 ,5 ,6 ,6 ,6 ,6 ,7 ,7 ,7 ,7 ,8 ,

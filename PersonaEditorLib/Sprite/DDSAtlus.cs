@@ -155,23 +155,36 @@ namespace PersonaEditorLib.Sprite
             {
                 Pixel[] pixels;
 
-                var ddsPF = DDSHelper.ConvertFromDDSAtlus(Header.PixelFormat);
-
-                if (ddsPF == DDSFourCC.NONE)
+                switch (Header.PixelFormat)
                 {
-                    switch (Header.PixelFormat)
-                    {
-                        case DDSAtlusPixelFormat.Argb32:
-                            pixels = DecodingHelper.FromArgb32(dataList[0]);
-                            break;
-                        default:
-                            throw new Exception();
-                    }
-                }
-                else
-                {
-                    DDSDecompressor.DDSDecompress(Header.Width, Header.Height * Header.TileCount, dataList[0], ddsPF, out byte[] newData);
-                    pixels = DecodingHelper.FromBgra32(newData);
+                    case DDSAtlusPixelFormat.Argb32:
+                        pixels = DecodingHelper.FromArgb32(dataList[0]);
+                        break;
+                    case DDSAtlusPixelFormat.DXT1:
+                    case DDSAtlusPixelFormat.DXT3:
+                    case DDSAtlusPixelFormat.DXT5:
+                        {
+                            DDSFourCC fourCC;
+                            switch (Header.PixelFormat)
+                            {
+                                case DDSAtlusPixelFormat.DXT1:
+                                    fourCC = DDSFourCC.DXT1;
+                                    break;
+                                case DDSAtlusPixelFormat.DXT3:
+                                    fourCC = DDSFourCC.DXT3;
+                                    break;
+                                case DDSAtlusPixelFormat.DXT5:
+                                    fourCC = DDSFourCC.DXT5;
+                                    break;
+                                default:
+                                    throw new Exception();
+                            }
+                            var newData = DDSDecompressor.DDSDecompress(Header.Width, Header.Height * Header.TileCount, dataList[0], fourCC);
+                            pixels = DecodingHelper.FromBgra32(newData);
+                        }
+                        break;
+                    default:
+                        throw new Exception();
                 }
 
                 bitmap = new PixelMap(Header.Width, Header.Height * Header.TileCount, pixels);
@@ -182,45 +195,67 @@ namespace PersonaEditorLib.Sprite
 
         public void SetBitmap(PixelMap bitmap)
         {
+            switch (Header.PixelFormat)
+            {
+                case DDSAtlusPixelFormat.Argb32:
+                    {
+                        switch (Header.PixelFormat)
+                        {
+                            case DDSAtlusPixelFormat.Argb32:
+                                dataList[0] = EncodingHelper.ToArgb32(bitmap.Pixels);
+                                break;
+                            default:
+                                throw new Exception();
+                        }
+
+                        if (dataList.Count > 1)
+                        {
+
+                        }
+                    }
+                    break;
+                case DDSAtlusPixelFormat.DXT1:
+                case DDSAtlusPixelFormat.DXT3:
+                case DDSAtlusPixelFormat.DXT5:
+                    {
+                        DDSFourCC fourCC;
+                        switch (Header.PixelFormat)
+                        {
+                            case DDSAtlusPixelFormat.DXT1:
+                                fourCC = DDSFourCC.DXT1;
+                                break;
+                            case DDSAtlusPixelFormat.DXT3:
+                                fourCC = DDSFourCC.DXT3;
+                                break;
+                            case DDSAtlusPixelFormat.DXT5:
+                                fourCC = DDSFourCC.DXT5;
+                                break;
+                            default:
+                                throw new Exception();
+                        }
+
+                        var newData = DDSCompressor.DDSCompress(bitmap, fourCC);
+                        dataList[0] = newData;
+
+                        if (dataList.Count > 1)
+                        {
+                            LanczosScaling lanczos = new LanczosScaling();
+                            var temp = bitmap;
+                            for (int i = 1; i < dataList.Count; i++)
+                            {
+                                temp = lanczos.imageScale(temp, 0.5f, 0.5f);
+                                newData = DDSCompressor.DDSCompress(temp, fourCC);
+                                dataList[i] = newData;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    throw new Exception();
+            }
+
             Header.Width = (ushort)bitmap.Width;
             Header.Height = (ushort)(bitmap.Height / Header.TileCount);
-
-            var ddsPF = DDSHelper.ConvertFromDDSAtlus(Header.PixelFormat);
-
-            if (ddsPF == DDSFourCC.NONE)
-            {
-                switch (Header.PixelFormat)
-                {
-                    case DDSAtlusPixelFormat.Argb32:
-                        dataList[0] = EncodingHelper.ToArgb32(bitmap.Pixels);
-                        break;
-                    default:
-                        throw new Exception();
-                }
-
-                if (dataList.Count > 1)
-                {
-
-                }
-            }
-            else
-            {
-                DDSCompressor.DDSCompress(bitmap, ddsPF, out byte[] newData);
-                dataList[0] = newData;
-
-                if (dataList.Count > 1)
-                {
-                    LanczosScaling lanczos = new LanczosScaling();
-                    var temp = bitmap;
-                    for (int i = 1; i < dataList.Count; i++)
-                    {
-                        temp = lanczos.imageScale(temp, 0.5f, 0.5f);
-                        DDSCompressor.DDSCompress(temp, ddsPF, out newData);
-                        dataList[i] = newData;
-                    }
-                }
-            }
-
             Header.SizeTexture = dataList.Sum(x => x.Length);
             Header.SizeWOHeader = Header.SizeTexture + (LastBlock == null ? 0 : LastBlock.Length);
 

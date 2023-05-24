@@ -53,14 +53,11 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             if (!IsSupportedPixelFlags(header.PixelFormat.PixelFlags))
                 return false;
 
-            if (header.PixelFormat.PixelFlags == PixelFormatFlags.DDPF_FOURCC)
+            if (header.PixelFormat.PixelFlags == PixelFormatFlags.DDPF_FOURCC &&
+                header.PixelFormat.FourCC == DDSFourCC.DX10)
             {
-                switch (header.PixelFormat.FourCC)
-                {
-                    case DDSFourCC.NONE:
-                    case DDSFourCC.DX10:
-                        return false;
-                }
+                if (!IsSupportedDX10(headerDXT10.Value))
+                    return false;
             }
 
             return true;
@@ -70,7 +67,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
         {
             switch (pixelFormatFlags)
             {
-                case PixelFormatFlags.DDPF_FOURCC:                    
+                case PixelFormatFlags.DDPF_FOURCC:
                     return true;
                 default:
                     return false;
@@ -166,7 +163,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             switch (Header.PixelFormat.PixelFlags)
             {
                 case PixelFormatFlags.DDPF_FOURCC:
-                    DDSDecompressor.DDSDecompress(Header.Width, Header.Height, dataList[0], Header.PixelFormat.FourCC, out byte[] newData);
+                    var newData = DDSDecompressor.DDSDecompress(Header.Width, Header.Height, dataList[0], Header.PixelFormat.FourCC, HeaderDXT10?.DXGIFormat);
                     pixels = DecodingHelper.FromBgra32(newData);
                     break;
                 case PixelFormatFlags.DDPF_RGBA:
@@ -181,25 +178,60 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
 
         public void SetBitmap(PixelMap bitmap)
         {
-            if (DDSCompressor.DDSCompress(bitmap, Header.PixelFormat.FourCC, out byte[] newData))
+            switch (Header.PixelFormat.PixelFlags)
             {
-                Header.Width = bitmap.Width;
-                Header.Height = bitmap.Height;
-                Header.PitchOrLinearSize = newData.Length;
-                dataList[0] = newData;
-
-                if (dataList.Count > 1)
-                {
-                    LanczosScaling lanczos = new LanczosScaling();
-                    var temp = bitmap;
-                    for (int i = 1; i < dataList.Count; i++)
+                case PixelFormatFlags.DDPF_FOURCC:
                     {
-                        temp = lanczos.imageScale(temp, 0.5f, 0.5f);
-                        DDSCompressor.DDSCompress(temp, Header.PixelFormat.FourCC, out newData);
-                        dataList[i] = newData;
+                        if (Header.PixelFormat.FourCC == DDSFourCC.DX10)
+                        {
+                            var pixelFormat = Header.PixelFormat;
+                            pixelFormat.FourCC = DDSFourCC.DXT5;
+                            Header.PixelFormat = pixelFormat;
+                            HeaderDXT10 = null;
+                        }
+
+                        var newData = DDSCompressor.DDSCompress(bitmap, Header.PixelFormat.FourCC);
+                        dataList[0] = newData;
+                        Header.PitchOrLinearSize = newData.Length;
+
+                        if (dataList.Count > 1)
+                        {
+                            LanczosScaling lanczos = new LanczosScaling();
+                            var temp = bitmap;
+                            for (int i = 1; i < dataList.Count; i++)
+                            {
+                                temp = lanczos.imageScale(temp, 0.5f, 0.5f);
+                                newData = DDSCompressor.DDSCompress(temp, Header.PixelFormat.FourCC);
+                                dataList[i] = newData;
+                            }
+                        }
                     }
-                }
+                    break;
+                case PixelFormatFlags.DDPF_RGBA:
+                    {
+                        var newData = EncodingHelper.ToRgba32(bitmap.Pixels);
+                        dataList[0] = newData;
+                        Header.PitchOrLinearSize = newData.Length;
+
+                        if (dataList.Count > 1)
+                        {
+                            LanczosScaling lanczos = new LanczosScaling();
+                            var temp = bitmap;
+                            for (int i = 1; i < dataList.Count; i++)
+                            {
+                                temp = lanczos.imageScale(temp, 0.5f, 0.5f);
+                                newData = EncodingHelper.ToRgba32(temp.Pixels);
+                                dataList[i] = newData;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    throw new Exception();
             }
+
+            Header.Width = bitmap.Width;
+            Header.Height = bitmap.Height;
         }
     }
 }
