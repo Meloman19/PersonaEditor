@@ -6,13 +6,14 @@ namespace PersonaEditorLib.Sprite
 {
     public class DDS : IGameData, IImage
     {
-        DDSBase DDSBase = null;
         PixelMap bitmap = null;
 
         public static byte[] MagicNumber { get; } = new byte[] { 0x44, 0x44, 0x53, 0x20 };
 
         public int Width => DDSBase.Header.Width;
         public int Height => DDSBase.Header.Height;
+
+        public DDSBase DDSBase { get; }
 
         public DDS(byte[] data)
         {

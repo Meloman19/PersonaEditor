@@ -1,4 +1,5 @@
-﻿using AuxiliaryLibraries.Tools;
+﻿using AuxiliaryLibraries.Extensions;
+using AuxiliaryLibraries.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -323,7 +324,7 @@ namespace PersonaEditorLib.Text
             reader.BaseStream.Position = 0;
             byte[] buffer = reader.ReadBytes(4);
             reader.BaseStream.Position = temp;
-            if (buffer.SequenceEqual(new byte[4] { 0x50, 0x54, 0x50, 0x30 }))
+            if (buffer.ArrayEquals(new byte[4] { 0x50, 0x54, 0x50, 0x30 }))
                 return 0;
             else
                 return -1;

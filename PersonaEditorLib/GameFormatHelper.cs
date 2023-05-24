@@ -132,19 +132,19 @@ namespace PersonaEditorLib
             if (data.Length >= 0xc)
             {
                 byte[] buffer = data.SubArray(0, 4);
-                if (buffer.SequenceEqual(new byte[] { 0x46, 0x4E, 0x54, 0x30 }))
+                if (buffer.ArrayEquals(new byte[] { 0x46, 0x4E, 0x54, 0x30 }))
                     return FormatEnum.FNT0;
 
                 buffer = data.SubArray(8, 4);
-                if (buffer.SequenceEqual(new byte[] { 0x31, 0x47, 0x53, 0x4D }) | buffer.SequenceEqual(new byte[] { 0x4D, 0x53, 0x47, 0x31 }))
+                if (buffer.ArrayEquals(new byte[] { 0x31, 0x47, 0x53, 0x4D }) | buffer.ArrayEquals(new byte[] { 0x4D, 0x53, 0x47, 0x31 }))
                     return FormatEnum.BMD;
-                else if (buffer.SequenceEqual(new byte[] { 0x54, 0x4D, 0x58, 0x30 }))
+                else if (buffer.ArrayEquals(new byte[] { 0x54, 0x4D, 0x58, 0x30 }))
                     return FormatEnum.TMX;
-                else if (buffer.SequenceEqual(new byte[] { 0x53, 0x50, 0x52, 0x30 }))
+                else if (buffer.ArrayEquals(new byte[] { 0x53, 0x50, 0x52, 0x30 }))
                     return FormatEnum.SPR;
-                else if (buffer.SequenceEqual(new byte[] { 0x46, 0x4C, 0x57, 0x30 }))
+                else if (buffer.ArrayEquals(new byte[] { 0x46, 0x4C, 0x57, 0x30 }))
                     return FormatEnum.BF;
-                else if (buffer.SequenceEqual(new byte[] { 0x50, 0x4D, 0x44, 0x31 }))
+                else if (buffer.ArrayEquals(new byte[] { 0x50, 0x4D, 0x44, 0x31 }))
                     return FormatEnum.PM1;
             }
             return FormatEnum.Unknown;

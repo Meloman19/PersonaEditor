@@ -44,7 +44,7 @@ namespace PersonaEditorLib.Text
 
                 #region Header
 
-                if (!reader.ReadBytes(4).SequenceEqual(new byte[] { 0x7, 0x0, 0x0, 0x0 }))
+                if (!reader.ReadBytes(4).ArrayEquals(new byte[] { 0x7, 0x0, 0x0, 0x0 }))
                     throw new Exception("BMD Read Error: (0x0) not 7");
                 int BMD_Size = reader.ReadInt32();
                 reader.ReadInt32(); // MagicNumber

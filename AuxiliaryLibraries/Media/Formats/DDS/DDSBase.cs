@@ -1,4 +1,5 @@
-﻿using AuxiliaryLibraries.IO;
+﻿using AuxiliaryLibraries.Extensions;
+using AuxiliaryLibraries.IO;
 using AuxiliaryLibraries.Tools;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
 {
     public class DDSBase
     {
-        static byte[] MagicNumber { get; } = new byte[] { 0x44, 0x44, 0x53, 0x20 };
+        private static readonly byte[] MagicNumber = new byte[] { 0x44, 0x44, 0x53, 0x20 };
 
         public DDSHeader Header;
         public DDSHeaderDXT10? HeaderDXT10;
@@ -29,7 +30,7 @@ namespace AuxiliaryLibraries.Media.Formats.DDS
             byte[] magicNumberArray = new byte[4];
             streamFile.Stream.Read(magicNumberArray, 0, 4);
 
-            if (magicNumberArray.SequenceEqual(MagicNumber))
+            if (magicNumberArray.ArrayEquals(MagicNumber))
                 using (BinaryReader reader = new BinaryReader(streamFile.Stream, Encoding.ASCII, true))
                 {
                     Header = reader.ReadStruct<DDSHeader>();
