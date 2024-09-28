@@ -71,5 +71,11 @@ namespace PersonaEditor.ViewModels.Editors
         }
 
         public Rect Rect => new Rect(new Point(_key.X0, _key.Y0), new Size(_key.Xdel, _key.Ydel));
+
+        public override int Red { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override int Green { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override int Blue { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override int Alpha { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
     }
 }

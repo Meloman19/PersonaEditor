@@ -14,7 +14,15 @@ namespace PersonaEditor.ViewModels.Editors
         public abstract int Width { get; set; }
 
         public abstract int Height { get; set; }
+        
+        public abstract int Red { get; set; }
 
+        public abstract int Green { get; set; }
+
+        public abstract int Blue { get; set; }
+
+        public abstract int Alpha { get; set; }
+        
         public string Name { get; protected set; }
 
         public bool IsSelected
