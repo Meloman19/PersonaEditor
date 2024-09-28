@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Threading;
+using System.Text;
 using PersonaEditor.Views;
 using PersonaEditor.Common;
 
@@ -15,6 +16,7 @@ namespace PersonaEditor
 
         public App()
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Add shift-jis encoding, .NET 6 mandatory
             InitializeComponent();
         }
 

@@ -69,7 +69,60 @@ namespace PersonaEditor.ViewModels.Editors
                 }
             }
         }
+        
+        
+        public override int Red
+        {
+            get => _key.Red;
+            set
+            {
+                if (value != _key.Red)
+                {
+                    _key.Red = (byte)value;
+                    Notify(nameof(Red));
+                }
+            }
+        }
 
+        public override int Green
+        {
+            get => _key.Green;
+            set
+            {
+                if (value != _key.Green)
+                {
+                    _key.Green = (byte)value;
+                    Notify(nameof(Green));
+                }
+            }
+        }
+
+        public override int Blue
+        {
+            get => _key.Blue;
+            set
+            {
+                if (value != _key.Blue)
+                {
+                    _key.Blue = (byte)value;
+                    Notify(nameof(Blue));
+                }
+            }
+        }
+        
+        public override int Alpha
+        {
+            get => _key.Alpha;
+            set
+            {
+                if (value != _key.Alpha)
+                {
+                    _key.Alpha = (byte)value;
+                    Notify(nameof(Alpha));
+                }
+            }
+        }
+        
         public Rect Rect => new Rect(new Point(_key.X1, _key.Y1), new Point(_key.X2, _key.Y2));
     }
 }

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.ExceptionServices;
 using System.Text;
 
 namespace PersonaEditorLib.SpriteContainer
@@ -30,10 +33,11 @@ namespace PersonaEditorLib.SpriteContainer
         public int Y1;
         public int X2;
         public int Y2;
-        public int ColorA;
-        public int ColorR;
-        public int ColorG;
-        public int ColorB;
+        public byte Red;
+        public byte Green;
+        public byte Blue;
+        public byte Alpha;
+        public int[][] RGBACoords;
         public int _unk0x74;
         public int _unk0x78;
         public int _unk0x7C;
@@ -65,10 +69,23 @@ namespace PersonaEditorLib.SpriteContainer
                 Y1 = reader.ReadInt32();
                 X2 = reader.ReadInt32();
                 Y2 = reader.ReadInt32();
-                ColorA = reader.ReadInt32();
-                ColorR = reader.ReadInt32();
-                ColorG = reader.ReadInt32();
-                ColorB = reader.ReadInt32();
+
+                byte[][] RGBACoords = new byte[4][];
+
+                for (int i = 0; i < RGBACoords.Length; i++) 
+                {   
+                    RGBACoords[i] = new byte[4];
+                    for (int j = 0; j < 4; j++) 
+                    {
+                        RGBACoords[i][j] = reader.ReadByte();
+                    }
+                }
+
+                Red = (byte)Math.Round(RGBACoords[0][3] / 128.0 * 255.0);
+                Green = (byte)Math.Round(RGBACoords[0][2] / 128.0 * 255.0);
+                Blue = (byte)Math.Round(RGBACoords[0][1] / 128.0 * 255.0);
+                Alpha = (byte)Math.Round(RGBACoords[0][0] / 128.0 * 255.0);
+
                 _unk0x74 = reader.ReadInt32();
                 _unk0x78 = reader.ReadInt32();
                 _unk0x7C = reader.ReadInt32();
@@ -104,10 +121,17 @@ namespace PersonaEditorLib.SpriteContainer
             writer.Write(Y1);
             writer.Write(X2);
             writer.Write(Y2);
-            writer.Write(ColorA);
-            writer.Write(ColorR);
-            writer.Write(ColorG);
-            writer.Write(ColorB);
+
+            byte[] newColor = {Alpha, Blue, Green, Red};
+
+            for (int i = 0; i < newColor.Length; i++)
+                newColor[i] = (byte)Math.Round(newColor[i] / 255.0 * 128.0);
+
+            int finalColor = BitConverter.ToInt32(newColor, 0);
+            
+            for (int i = 0; i < 4; i++)
+            writer.Write(finalColor); // Write same color for all coords
+
             writer.Write(_unk0x74);
             writer.Write(_unk0x78);
             writer.Write(_unk0x7C);

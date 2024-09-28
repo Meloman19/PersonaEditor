@@ -56,6 +56,10 @@
                         <DataGridTextColumn Header="Y" Binding="{Binding Y}"/>
                         <DataGridTextColumn Header="Width" Binding="{Binding Width}"/>
                         <DataGridTextColumn Header="Height" Binding="{Binding Height}"/>
+                        <DataGridTextColumn Header="Red" Binding="{Binding Red}"/>
+                        <DataGridTextColumn Header="Green" Binding="{Binding Green}"/>
+                        <DataGridTextColumn Header="Blue" Binding="{Binding Blue}"/>
+                        <DataGridTextColumn Header="Alpha" Binding="{Binding Alpha}"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
