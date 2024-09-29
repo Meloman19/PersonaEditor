@@ -22,20 +22,30 @@ namespace PersonaEditorLib.FileContainer
 
         private void Open(byte[] data)
         {
+            FES_format = false;
+            Old = false;
+
             if (data[0] == 0)
             {
-                Old = false;
                 IsLittleEndian = false;
                 OpenNew(data);
             }
-            else if (data[3] == 0 && data[4] != 0)
+            else if (data[0] == 100 && data[1] == 0 && data[2] == 0 && data[3] == 0)
             {
-                Old = false;
+                FES_format = true;
+                IsLittleEndian = true;
+                OpenSpecialFES(data);
+            }
+            else if (data[3] == 0 && data[4] != 0  && data[4] != 3)
+            {
                 IsLittleEndian = true;
                 OpenNew(data);
             }
-            else
+            else {
+                Old = true;
                 OpenOld(data);
+            }
+                
         }
 
         private void OpenOld(byte[] data)
@@ -82,13 +92,63 @@ namespace PersonaEditorLib.FileContainer
                     byte[] Data = reader.ReadBytes(Size);
                     if (Data.Length != Size)
                         throw new Exception("BIN: readed size less than entry size");
-
+                    
                     GameFile objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
                     if (objectFile == null)
                         objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
                     SubFiles.Add(objectFile);
                 }
 
+                if (reader.BaseStream.Position != reader.BaseStream.Length)
+                    throw new System.Exception("BIN: read error");
+            }
+        }
+
+        private void OpenSpecialFES(byte[] data)
+        {
+            using (BinaryReader reader = IOTools.OpenReadFile(new MemoryStream(data), IsLittleEndian))
+            {
+                reader.BaseStream.Seek(4, SeekOrigin.Begin);
+
+                int count = reader.ReadInt32();
+                if (count == 0)
+                    throw new Exception("BIN: incorrect special id");
+
+                int[] blockPosition = new int[count];
+                int[] blockSize = new int[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    blockPosition[i] = reader.ReadInt32();
+                    blockSize[i] = reader.ReadInt32();
+                }
+
+                for (int i = 0; i < count; i++)
+                {
+                    reader.BaseStream.Seek(blockPosition[i], SeekOrigin.Begin);
+
+                    int Size = blockSize[i];
+                    byte[] Data = reader.ReadBytes(Size);
+                    
+                    if (Data.Length != Size)
+                        throw new Exception("BIN: readed size less than entry size");
+
+                    FormatEnum format = GameFormatHelper.GetFormat(Data);
+                    String Name = "Unnamed_FES_" + i + "." + format.ToString();
+
+                    GameFile objectFile;
+
+                    try {
+                        objectFile = GameFormatHelper.OpenFile(Name, Data, format);
+                    }
+                    catch {
+                        objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
+                    }
+                    if (objectFile == null)
+                        objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
+                    SubFiles.Add(objectFile);
+                }
+                
                 if (reader.BaseStream.Position != reader.BaseStream.Length)
                     throw new System.Exception("BIN: read error");
             }
@@ -107,6 +167,7 @@ namespace PersonaEditorLib.FileContainer
         }
 
         bool Old = true;
+        bool FES_format = false;
         bool IsLittleEndian { get; set; } = true;
 
         #region IGameFile
@@ -150,7 +211,9 @@ namespace PersonaEditorLib.FileContainer
 
         public byte[] GetData()
         {
-            if (Old)
+            if (FES_format)
+                return GetFES();
+            else if (Old)
                 return GetOld();
             else
                 return GetNew();
@@ -200,6 +263,39 @@ namespace PersonaEditorLib.FileContainer
                     int size = a.GameData.GetSize();
                     int align = IOTools.Alignment(size, 0x20);
                     writer.Write(size + align);
+                    writer.Write(a.GameData.GetData());
+                    writer.Write(new byte[align]);
+                }
+
+                return MS.ToArray();
+            }
+        }
+
+        private byte[] GetFES()
+        {
+            using (MemoryStream MS = new MemoryStream())
+            {
+                BinaryWriter writer = IOTools.OpenWriteFile(MS, IsLittleEndian);
+
+                writer.Write(100);
+                writer.Write(SubFiles.Count);
+
+                int fileAddress = 8 + (SubFiles.Count * 8);
+                int align = 0;
+                
+                foreach (var a in SubFiles)
+                {
+                    int fileSize = a.GameData.GetSize();
+                    writer.Write(fileAddress + align);
+                    writer.Write(fileSize);
+
+                    fileAddress += fileSize + align;
+                    align = IOTools.Alignment(a.GameData.GetSize(), 0x4);
+                }
+
+                foreach (var a in SubFiles)
+                {
+                    align = IOTools.Alignment(a.GameData.GetSize(), 0x4);
                     writer.Write(a.GameData.GetData());
                     writer.Write(new byte[align]);
                 }
