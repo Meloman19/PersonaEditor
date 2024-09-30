@@ -30,7 +30,7 @@ namespace PersonaEditorLib.FileContainer
                 IsLittleEndian = false;
                 OpenNew(data);
             }
-            else if (data[0] == 100 && data[1] == 0 && data[2] == 0 && data[3] == 0)
+            else if (data[0] == 0x64 && data[1] == 0 && data[2] == 0 && data[3] == 0)
             {
                 FES_format = true;
                 IsLittleEndian = true;
@@ -277,7 +277,7 @@ namespace PersonaEditorLib.FileContainer
             {
                 BinaryWriter writer = IOTools.OpenWriteFile(MS, IsLittleEndian);
 
-                writer.Write(100);
+                writer.Write(0x64);
                 writer.Write(SubFiles.Count);
 
                 int fileAddress = 8 + (SubFiles.Count * 8);

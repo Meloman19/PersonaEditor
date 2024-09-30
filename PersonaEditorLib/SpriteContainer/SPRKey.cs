@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Runtime.ExceptionServices;
-using System.Text;
+using System.Reflection.PortableExecutable;
 
 namespace PersonaEditorLib.SpriteContainer
 {
@@ -37,7 +35,8 @@ namespace PersonaEditorLib.SpriteContainer
         public byte Green;
         public byte Blue;
         public byte Alpha;
-        public int[][] RGBACoords;
+        public bool ColorChanged;
+        public byte[][] RGBACoords;
         public int _unk0x74;
         public int _unk0x78;
         public int _unk0x7C;
@@ -70,9 +69,9 @@ namespace PersonaEditorLib.SpriteContainer
                 X2 = reader.ReadInt32();
                 Y2 = reader.ReadInt32();
 
-                byte[][] RGBACoords = new byte[4][];
+                RGBACoords = new byte[4][];
 
-                for (int i = 0; i < RGBACoords.Length; i++) 
+                for (int i = 0; i < 4; i++) 
                 {   
                     RGBACoords[i] = new byte[4];
                     for (int j = 0; j < 4; j++) 
@@ -81,10 +80,13 @@ namespace PersonaEditorLib.SpriteContainer
                     }
                 }
 
+                // Convert color to 255 color space
                 Red = (byte)Math.Round(RGBACoords[0][3] / 128.0 * 255.0);
                 Green = (byte)Math.Round(RGBACoords[0][2] / 128.0 * 255.0);
                 Blue = (byte)Math.Round(RGBACoords[0][1] / 128.0 * 255.0);
                 Alpha = (byte)Math.Round(RGBACoords[0][0] / 128.0 * 255.0);
+
+                ColorChanged = false;
 
                 _unk0x74 = reader.ReadInt32();
                 _unk0x78 = reader.ReadInt32();
@@ -122,15 +124,29 @@ namespace PersonaEditorLib.SpriteContainer
             writer.Write(X2);
             writer.Write(Y2);
 
-            byte[] newColor = {Alpha, Blue, Green, Red};
+            // Make sure if we didn't change any color, conversion doesn't mess original color
+            if (ColorChanged)
+            {
+                byte[] newColor = { Alpha, Blue, Green, Red };
 
-            for (int i = 0; i < newColor.Length; i++)
-                newColor[i] = (byte)Math.Round(newColor[i] / 255.0 * 128.0);
+                for (int i = 0; i < newColor.Length; i++)
+                    newColor[i] = (byte)Math.Round(newColor[i] / 255.0 * 128.0);
 
-            int finalColor = BitConverter.ToInt32(newColor, 0);
-            
-            for (int i = 0; i < 4; i++)
-            writer.Write(finalColor); // Write same color for all coords
+                int finalColor = BitConverter.ToInt32(newColor, 0);
+
+                for (int i = 0; i < 4; i++)
+                    writer.Write(finalColor); // Write same color for all 4 coords   
+            }
+            else
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    for (int j = 0; j < 4; j++)
+                    {
+                        writer.Write(RGBACoords[i][j]);
+                    }
+                }
+            }
 
             writer.Write(_unk0x74);
             writer.Write(_unk0x78);

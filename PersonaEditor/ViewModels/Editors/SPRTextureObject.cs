@@ -78,6 +78,7 @@ namespace PersonaEditor.ViewModels.Editors
             {
                 if (value != _key.Red)
                 {
+                    _key.ColorChanged = true;
                     _key.Red = (byte)value;
                     Notify(nameof(Red));
                 }
@@ -91,6 +92,7 @@ namespace PersonaEditor.ViewModels.Editors
             {
                 if (value != _key.Green)
                 {
+                    _key.ColorChanged = true;
                     _key.Green = (byte)value;
                     Notify(nameof(Green));
                 }
@@ -104,6 +106,7 @@ namespace PersonaEditor.ViewModels.Editors
             {
                 if (value != _key.Blue)
                 {
+                    _key.ColorChanged = true;
                     _key.Blue = (byte)value;
                     Notify(nameof(Blue));
                 }
@@ -117,6 +120,7 @@ namespace PersonaEditor.ViewModels.Editors
             {
                 if (value != _key.Alpha)
                 {
+                    _key.ColorChanged = true;
                     _key.Alpha = (byte)value;
                     Notify(nameof(Alpha));
                 }
