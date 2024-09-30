@@ -18,9 +18,12 @@ namespace PersonaEditor.Views.Editors
             if (sender is MenuItem item)
                 if (item.Tag is Color color)
                 {
-                    ColorPickerTool tool = new ColorPickerTool(color);
+                    ColorPickerTool tool = new ColorPickerTool()
+                    {
+                        SelectedColor = color
+                    };
                     if (tool.ShowDialog() == true)
-                        item.Tag = tool.Color;
+                        item.Tag = tool.SelectedColor;
                 }
         }
 

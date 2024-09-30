@@ -174,23 +174,32 @@ namespace PersonaEditor.ViewModels.Settings
             if ((string)param == "Text")
             {
                 var a = ColorConverter.ConvertFromString(TextColor);
-                ColorPickerTool colorPicker = new ColorPickerTool((Color)a);
+                ColorPickerTool colorPicker = new ColorPickerTool()
+                {
+                    SelectedColor = (Color)a
+                };
                 if (colorPicker.ShowDialog() == true)
-                    TextColor = colorPicker.Color.ToString();
+                    TextColor = colorPicker.SelectedColor.ToString();
             }
             else if ((string)param == "Name")
             {
                 var a = ColorConverter.ConvertFromString(NameColor);
-                ColorPickerTool colorPicker = new ColorPickerTool((Color)a);
+                ColorPickerTool colorPicker = new ColorPickerTool()
+                {
+                    SelectedColor = (Color)a
+                };
                 if (colorPicker.ShowDialog() == true)
-                    NameColor = colorPicker.Color.ToString();
+                    NameColor = colorPicker.SelectedColor.ToString();
             }
             else if ((string)param == "Back")
             {
                 var a = ColorConverter.ConvertFromString(BackgroundColor);
-                ColorPickerTool colorPicker = new ColorPickerTool((Color)a);
+                ColorPickerTool colorPicker = new ColorPickerTool()
+                {
+                    SelectedColor = (Color)a
+                };
                 if (colorPicker.ShowDialog() == true)
-                    BackgroundColor = colorPicker.Color.ToString();
+                    BackgroundColor = colorPicker.SelectedColor.ToString();
             }
         }
     }

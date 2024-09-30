@@ -13,295 +13,301 @@
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
              Exit="Application_Exit">
     <Application.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ColorPicker;component/Styles/DefaultColorPickerStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <DrawingBrush x:Key="ImageBackground"
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+            <DrawingBrush x:Key="ImageBackground"
                       Viewport="0,0,50,50"
                       ViewportUnits="Absolute"
                       TileMode="Tile"
                       PresentationOptions:Freeze="True">
-            <DrawingBrush.Drawing>
-                <DrawingGroup>
-                    <GeometryDrawing Brush="White">
-                        <GeometryDrawing.Geometry>
-                            <RectangleGeometry Rect="0,0,15,15"/>
-                        </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
+                <DrawingBrush.Drawing>
+                    <DrawingGroup>
+                        <GeometryDrawing Brush="White">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,0,15,15"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
 
-                    <GeometryDrawing Brush="LightGray">
-                        <GeometryDrawing.Geometry>
-                            <RectangleGeometry Rect="0,15,15,15"/>
-                        </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
+                        <GeometryDrawing Brush="LightGray">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="0,15,15,15"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
 
-                    <GeometryDrawing Brush="LightGray">
-                        <GeometryDrawing.Geometry>
-                            <RectangleGeometry Rect="15,0,15,15"/>
-                        </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
+                        <GeometryDrawing Brush="LightGray">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="15,0,15,15"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
 
-                    <GeometryDrawing Brush="White">
-                        <GeometryDrawing.Geometry>
-                            <RectangleGeometry Rect="15,15,15,15"/>
-                        </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
-                </DrawingGroup>
-            </DrawingBrush.Drawing>
-        </DrawingBrush>
+                        <GeometryDrawing Brush="White">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="15,15,15,15"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup>
+                </DrawingBrush.Drawing>
+            </DrawingBrush>
 
-        <SolidColorBrush x:Key="SPDEditorBackgroud"
-                         Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=OneWay}"/>
-        <SolidColorBrush x:Key="SPDEditorSelect"
-                         Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=SelectColor, Mode=OneWay}"/>
-        <SolidColorBrush x:Key="SPDEditorLine"
-                         Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=OneWay}"/>
+            <SolidColorBrush x:Key="SPDEditorBackgroud"
+                             Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=OneWay}"/>
+            <SolidColorBrush x:Key="SPDEditorSelect"
+                             Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=SelectColor, Mode=OneWay}"/>
+            <SolidColorBrush x:Key="SPDEditorLine"
+                            Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=OneWay}"/>
 
-        <StreamGeometry x:Key="ArrowUp">
-            M 0 4 L 4 0 L 8 4 L 7 5 L 4 2 L 1 5 Z
-        </StreamGeometry>
+            <StreamGeometry x:Key="ArrowUp">
+                M 0 4 L 4 0 L 8 4 L 7 5 L 4 2 L 1 5 Z
+            </StreamGeometry>
 
-        <StreamGeometry x:Key="ArrowDown">
-            M 0 1 L 4 5 L 8 1 L 7 0 L 4 3 L 1 0 Z
-        </StreamGeometry>
+            <StreamGeometry x:Key="ArrowDown">
+                M 0 1 L 4 5 L 8 1 L 7 0 L 4 3 L 1 0 Z
+            </StreamGeometry>
 
-        <Style TargetType="{x:Type controls:AtlasItemsContol}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type controls:AtlasItemsContol}">
-                        <Grid>
-                            <ItemsPresenter/>
-                            <Canvas x:Name="DragBorderCanvas" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-            <Setter Property="ItemsPanel">
-                <Setter.Value>
-                    <ItemsPanelTemplate>
-                        <Canvas Background="Transparent" />
-                    </ItemsPanelTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="controls:TextureAtlasEditControl">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="controls:TextureAtlasEditControl">
-                        <Grid ClipToBounds="True"
-                              DataContext="{x:Null}"
-                              Background="Transparent">
-                            <Grid IsHitTestVisible="False">
-                                <Rectangle Fill="{StaticResource ImageBackground}"
-                                           Stroke="Black"
-                                           StrokeThickness="2" />
-                                <Rectangle Fill="{StaticResource SPDEditorBackgroud}" />
-                                <Image Source="{TemplateBinding TextureBitmap}" />
-                            </Grid>
-
-                            <controls:AtlasItemsContol
-                                x:Name="ItemsControl"
-                                SelectedObject="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SelectedObject, Mode=TwoWay}"
-                                ObjectBorderThickness="{TemplateBinding ObjectBorderThickness}"
-                                ItemsSource="{TemplateBinding ObjectList}" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="{x:Type controls:AtlasObjectContainer}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type controls:AtlasObjectContainer}">
-                        <Border BorderBrush="{StaticResource SPDEditorLine}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Background="Transparent">
-                            <Rectangle Fill="{StaticResource SPDEditorSelect}"
-                                       Opacity="0.4"
-                                       Visibility="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IsSelected, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="DragBorderThumb"
-               TargetType="{x:Type Thumb}">
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="OverridesDefaultStyle" Value="true" />
-            <Setter Property="MinHeight" Value="12" />
-            <Setter Property="MinWidth" Value="12" />
-            <Setter Property="Margin" Value="-4" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Thumb}">
-                        <Border Background="Transparent"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="{x:Type controls:DragBorderVisualize}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type controls:DragBorderVisualize}">
-                        <Grid>
+            <Style TargetType="{x:Type controls:AtlasItemsContol}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type controls:AtlasItemsContol}">
                             <Grid>
-                                <Border BorderBrush="Red"
-                                        BorderThickness="4" />
-
-                                <Rectangle HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           Fill="Red"
-                                           Width="12"
-                                           Height="12" />
+                                <ItemsPresenter/>
+                                <Canvas x:Name="DragBorderCanvas" />
                             </Grid>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
 
-        <Style TargetType="controls:DragBorderControl">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="controls:DragBorderControl">
-                        <Grid>
-                            <Thumb x:Name="ThumbAll"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch"
-                                   Cursor="SizeAll"
-                                   Style="{StaticResource DragBorderThumb}" />
-                            <Thumb x:Name="ThumbL"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Stretch"
-                                   Cursor="SizeWE"
-                                   Style="{StaticResource DragBorderThumb}" />
-                            <Thumb x:Name="ThumbLT"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Top"
-                                   Cursor="SizeNWSE"
-                                   Panel.ZIndex="1"
-                                   Style="{StaticResource DragBorderThumb}" />
-                            <Thumb x:Name="ThumbT"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Top"
-                                   Cursor="SizeNS"
-                                   Style="{StaticResource DragBorderThumb}" />
-                            <Thumb x:Name="ThumbTR" 
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Top"
-                                   Cursor="SizeNESW"
-                                   Panel.ZIndex="1"
-                                   Style="{StaticResource DragBorderThumb}" />
-                            <Thumb x:Name="ThumbR"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Stretch"
-                                   Cursor="SizeWE"
-                                   Style="{StaticResource DragBorderThumb}" />
-                            <Thumb x:Name="ThumbRB"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Bottom"
-                                   Cursor="SizeNWSE"
-                                   Panel.ZIndex="1"
-                                   Style="{StaticResource DragBorderThumb}" />
-                            <Thumb x:Name="ThumbB"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Bottom"
-                                   Cursor="SizeNS"
-                                   Style="{StaticResource DragBorderThumb}"  />
-                            <Thumb x:Name="ThumbLB"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Bottom"
-                                   Cursor="SizeNESW"
-                                   Panel.ZIndex="1"
-                                   Style="{StaticResource DragBorderThumb}" />
-                            <Thumb x:Name="ThumbC"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Cursor="SizeAll"
-                                   Panel.ZIndex="2"
-                                   Style="{StaticResource DragBorderThumb}" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <Canvas Background="Transparent" />
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style x:Key="TreeView.Default"
+            <Style TargetType="controls:TextureAtlasEditControl">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="controls:TextureAtlasEditControl">
+                            <Grid ClipToBounds="True"
+                                  DataContext="{x:Null}"
+                                  Background="Transparent">
+                                <Grid IsHitTestVisible="False">
+                                    <Rectangle Fill="{StaticResource ImageBackground}"
+                                               Stroke="Black"
+                                               StrokeThickness="2" />
+                                    <Rectangle Fill="{StaticResource SPDEditorBackgroud}" />
+                                    <Image Source="{TemplateBinding TextureBitmap}" />
+                                </Grid>
+
+                                <controls:AtlasItemsContol
+                                    x:Name="ItemsControl"
+                                    SelectedObject="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SelectedObject, Mode=TwoWay}"
+                                    ObjectBorderThickness="{TemplateBinding ObjectBorderThickness}"
+                                    ItemsSource="{TemplateBinding ObjectList}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type controls:AtlasObjectContainer}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type controls:AtlasObjectContainer}">
+                            <Border BorderBrush="{StaticResource SPDEditorLine}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="Transparent">
+                                <Rectangle Fill="{StaticResource SPDEditorSelect}"
+                                           Opacity="0.4"
+                                           Visibility="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IsSelected, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="DragBorderThumb"
+               TargetType="{x:Type Thumb}">
+                <Setter Property="SnapsToDevicePixels" Value="true" />
+                <Setter Property="OverridesDefaultStyle" Value="true" />
+                <Setter Property="MinHeight" Value="12" />
+                <Setter Property="MinWidth" Value="12" />
+                <Setter Property="Margin" Value="-4" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Thumb}">
+                            <Border Background="Transparent"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type controls:DragBorderVisualize}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type controls:DragBorderVisualize}">
+                            <Grid>
+                                <Grid>
+                                    <Border BorderBrush="Red"
+                                            BorderThickness="4" />
+
+                                    <Rectangle HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Fill="Red"
+                                               Width="12"
+                                               Height="12" />
+                                </Grid>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="controls:DragBorderControl">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="controls:DragBorderControl">
+                            <Grid>
+                                <Thumb x:Name="ThumbAll"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       Cursor="SizeAll"
+                                       Style="{StaticResource DragBorderThumb}" />
+                                <Thumb x:Name="ThumbL"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Stretch"
+                                       Cursor="SizeWE"
+                                       Style="{StaticResource DragBorderThumb}" />
+                                <Thumb x:Name="ThumbLT"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Top"
+                                       Cursor="SizeNWSE"
+                                       Panel.ZIndex="1"
+                                       Style="{StaticResource DragBorderThumb}" />
+                                <Thumb x:Name="ThumbT"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Top"
+                                       Cursor="SizeNS"
+                                       Style="{StaticResource DragBorderThumb}" />
+                                <Thumb x:Name="ThumbTR" 
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Top"
+                                       Cursor="SizeNESW"
+                                       Panel.ZIndex="1"
+                                       Style="{StaticResource DragBorderThumb}" />
+                                <Thumb x:Name="ThumbR"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Stretch"
+                                       Cursor="SizeWE"
+                                       Style="{StaticResource DragBorderThumb}" />
+                                <Thumb x:Name="ThumbRB"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Bottom"
+                                       Cursor="SizeNWSE"
+                                       Panel.ZIndex="1"
+                                       Style="{StaticResource DragBorderThumb}" />
+                                <Thumb x:Name="ThumbB"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Bottom"
+                                       Cursor="SizeNS"
+                                       Style="{StaticResource DragBorderThumb}"  />
+                                <Thumb x:Name="ThumbLB"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Bottom"
+                                       Cursor="SizeNESW"
+                                       Panel.ZIndex="1"
+                                       Style="{StaticResource DragBorderThumb}" />
+                                <Thumb x:Name="ThumbC"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Cursor="SizeAll"
+                                       Panel.ZIndex="2"
+                                       Style="{StaticResource DragBorderThumb}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="TreeView.Default"
                TargetType="TreeView">
-            <Setter Property="ItemTemplate">
-                <Setter.Value>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=SubItems}">
-                        <TextBlock Text="{Binding Header}"
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=SubItems}">
+                            <TextBlock Text="{Binding Header}"
                                    MinWidth="100">
                             <i:Interaction.Behaviors>
                                 <beh:DragTreeItemBehavior />
                             </i:Interaction.Behaviors>
 
-                            <TextBlock.ContextMenu>
-                                <ContextMenu ItemsSource="{Binding Path=ContextMenu}"/>
-                            </TextBlock.ContextMenu>
-                        </TextBlock>
-                    </HierarchicalDataTemplate>
-                </Setter.Value>
-            </Setter>
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu ItemsSource="{Binding Path=ContextMenu}"/>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
+                        </HierarchicalDataTemplate>
+                    </Setter.Value>
+                </Setter>
 
-            <Setter Property="ItemContainerStyle">
-                <Setter.Value>
-                    <Style TargetType="TreeViewItem">
-                        <Setter Property="IsEnabled" Value="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </Style>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="IsEnabled" Value="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style TargetType="controls:NumericUpDown">
-            <Setter Property="MaxHeight" Value="30" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="controls:NumericUpDown">
-                        <DockPanel>
-                            <Grid DockPanel.Dock="Right">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
+            <Style TargetType="controls:NumericUpDown">
+                <Setter Property="MaxHeight" Value="30" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="controls:NumericUpDown">
+                            <DockPanel>
+                                <Grid DockPanel.Dock="Right">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
 
-                                <RepeatButton x:Name="NumericUp"
-                                              Grid.Row="0"
-                                              Delay="500"
-                                              VerticalContentAlignment="Center"
-                                              HorizontalContentAlignment="Center">
-                                    <RepeatButton.Content>
-                                        <Path Data="{StaticResource ArrowUp}"
+                                    <RepeatButton x:Name="NumericUp"
+                                                  Grid.Row="0"
+                                                  Delay="500"
+                                                  VerticalContentAlignment="Center"
+                                                  HorizontalContentAlignment="Center">
+                                        <RepeatButton.Content>
+                                            <Path Data="{StaticResource ArrowUp}"
                                               Fill="Black" />
-                                    </RepeatButton.Content>
-                                </RepeatButton>
-                                <RepeatButton x:Name="NumericDown"
-                                              Grid.Row="1"
-                                              Delay="500"
-                                              VerticalContentAlignment="Center"
-                                              HorizontalContentAlignment="Center">
-                                    <RepeatButton.Content>
-                                        <Path Data="{StaticResource ArrowDown}"
-                                              Fill="Black" />
-                                    </RepeatButton.Content>
-                                </RepeatButton>
-                            </Grid>
+                                        </RepeatButton.Content>
+                                    </RepeatButton>
+                                    <RepeatButton x:Name="NumericDown"
+                                                  Grid.Row="1"
+                                                  Delay="500"
+                                                  VerticalContentAlignment="Center"
+                                                  HorizontalContentAlignment="Center">
+                                        <RepeatButton.Content>
+                                            <Path Data="{StaticResource ArrowDown}"
+                                                  Fill="Black" />
+                                        </RepeatButton.Content>
+                                    </RepeatButton>
+                                </Grid>
 
-                            <TextBox x:Name="NumericTextBox"
-                                     VerticalContentAlignment="Center"
-                                     MaxLines="1"
-                                     TextWrapping="NoWrap" />
-                        </DockPanel>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                                <TextBox x:Name="NumericTextBox"
+                                         VerticalContentAlignment="Center"
+                                         MaxLines="1"
+                                         TextWrapping="NoWrap" />
+                            </DockPanel>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

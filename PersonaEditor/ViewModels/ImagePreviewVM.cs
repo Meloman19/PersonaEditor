@@ -33,9 +33,12 @@ namespace PersonaEditor.ViewModels
         public ICommand SelectBack { get; }
         private void SelectBackground()
         {
-            ColorPickerTool colorPickerTool = new ColorPickerTool(Background);
+            ColorPickerTool colorPickerTool = new ColorPickerTool()
+            {
+                SelectedColor = Background,
+            };
             if (colorPickerTool.ShowDialog() == true)
-                Background = colorPickerTool.Color;
+                Background = colorPickerTool.SelectedColor;
         }
 
         public ImagePreviewVM()

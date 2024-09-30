@@ -1,54 +1,23 @@
-﻿using System.ComponentModel;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 
 namespace PersonaEditor.Views.Tools
 {
-    public partial class ColorPickerTool : Window, INotifyPropertyChanged
+    public partial class ColorPickerTool : Window
     {
-        #region INotifyPropertyChanged implementation
-        public event PropertyChangedEventHandler PropertyChanged;
+        public static readonly DependencyProperty SelectedColorProperty =
+            DependencyProperty.Register(nameof(SelectedColor), typeof(Color), typeof(ColorPickerTool),
+                new FrameworkPropertyMetadata(Colors.White));
 
-        protected void Notify(string propertyName)
+        public Color SelectedColor
         {
-            if (this.PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            get { return (Color)GetValue(SelectedColorProperty); }
+            set { SetValue(SelectedColorProperty, value); }
         }
-        #endregion INotifyPropertyChanged implementation
 
-        private Color _Color = Colors.Transparent;
-        public Color Color
-        {
-            get { return _Color; }
-            set
-            {
-                if (value != _Color)
-                {
-                    _Color = value;
-                    Notify("Color");
-                }
-            }
-        }
-        
-        public ColorPickerTool(Color color = new Color())
+        public ColorPickerTool()
         {
             InitializeComponent();
-            Color = color;
-            CanvasRGBUC.SelectColorChanged += CanvasRGBUC_SelectColorChanged;
-        }
-
-        private void CanvasRGBUC_SelectColorChanged(Color color)
-        {
-            Color temp = new Color()
-            {
-                A = Color.A,
-                R = color.R,
-                G = color.G,
-                B = color.B
-            };
-            Color = temp;
         }
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
