@@ -1,0 +1,12 @@
+<Project>
+	<PropertyGroup>
+		<Authors>Meloman19</Authors>
+		<NeutralLanguage>en</NeutralLanguage>
+		<Product>PersonaEditor</Product>
+
+		<AssemblyVersion>1.6.1.0</AssemblyVersion>
+		<FileVersion>1.6.1.0</FileVersion>
+		<Version>1.6.1.0</Version>
+		<ApplicationVersion>1.6.1.0</ApplicationVersion>
+	</PropertyGroup>
+</Project>

@@ -1,34 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <OutputType>WinExe</OutputType>
-    <ApplicationVersion>1.5.0.0</ApplicationVersion>
-	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <Platforms>AnyCPU</Platforms>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>PersonaEditor.App</StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>ApplicationResource\PersonaEditor.ico</ApplicationIcon>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="ApplicationResource\Background.png" />
-    <Resource Include="ApplicationResource\PersonaEditor.ico" />
-    <Resource Include="ApplicationResource\icons\icons8-папка-96.png" />
-    <Resource Include="ApplicationResource\icons\icons8-файл-80.png" />
-    <Resource Include="ApplicationResource\icons\icons8-картина-80.png" />
-    <Resource Include="ApplicationResource\icons\icons8-документ-80.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AuxiliaryLibraries.WPF.Wrapper\AuxiliaryLibraries.WPF.Wrapper.csproj" />
-    <ProjectReference Include="..\AuxiliaryLibraries\AuxiliaryLibraries.csproj" />
-    <ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj" />
-  </ItemGroup>
+
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<OutputType>WinExe</OutputType>
+		<UseWindowsForms>true</UseWindowsForms>
+		<UseWPF>true</UseWPF>
+		<Platforms>AnyCPU</Platforms>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<StartupObject>PersonaEditor.App</StartupObject>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<ApplicationIcon>ApplicationResource\PersonaEditor.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="ApplicationResource\Background.png" />
+		<Resource Include="ApplicationResource\PersonaEditor.ico" />
+		<Resource Include="ApplicationResource\icons\icons8-папка-96.png" />
+		<Resource Include="ApplicationResource\icons\icons8-файл-80.png" />
+		<Resource Include="ApplicationResource\icons\icons8-картина-80.png" />
+		<Resource Include="ApplicationResource\icons\icons8-документ-80.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AuxiliaryLibraries.WPF.Wrapper\AuxiliaryLibraries.WPF.Wrapper.csproj" />
+		<ProjectReference Include="..\AuxiliaryLibraries\AuxiliaryLibraries.csproj" />
+		<ProjectReference Include="..\PersonaEditorLib\PersonaEditorLib.csproj" />
+	</ItemGroup>
+
 </Project>
