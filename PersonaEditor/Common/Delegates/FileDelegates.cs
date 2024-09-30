@@ -2,5 +2,5 @@
 {
     public delegate void OpenFilePathEventHandler(string path);
 
-    public delegate void TreeViewItemEventHandler(ViewModels.TreeViewItemVM sender, UserTreeViewItemEventEnum action);
+    public delegate void TreeViewItemEventHandler(ViewModels.GameFileTreeItem sender, UserTreeViewItemEventEnum action);
 }

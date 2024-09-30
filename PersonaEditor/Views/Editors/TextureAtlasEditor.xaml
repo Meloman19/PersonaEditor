@@ -94,10 +94,13 @@
                         </MenuItem>
                     </Menu>
                     <Grid Grid.Column="1">
-                        <prim:NumericIncDec x:Name="NUM" Min="0" Max="5" Width="40"
-                                            Margin="0,2"
-                                            Value="{Binding Source={x:Static settings:SPREditor.Default}, Path=BorderThickness, Mode=TwoWay}"
-                                            HorizontalAlignment="Left" />
+                        <controls:NumericUpDown x:Name="NUM"
+                                                MinValue="0"
+                                                MaxValue="5"
+                                                Width="40"
+                                                Margin="0,2"
+                                                Value="{Binding Source={x:Static settings:SPREditor.Default}, Path=BorderThickness, Mode=TwoWay}"
+                                                HorizontalAlignment="Left" />
                     </Grid>
                 </Grid>
 

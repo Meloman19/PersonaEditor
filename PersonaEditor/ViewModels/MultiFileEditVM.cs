@@ -95,7 +95,7 @@ namespace PersonaEditor.ViewModels
                 OpenFile(filePath);
         }
 
-        private void Tree_ItemSelected(TreeViewItemVM sender)
+        private void Tree_ItemSelected(GameFileTreeItem sender)
         {
             Tab.SetPreview(sender.BitmapSource);
 
@@ -105,19 +105,19 @@ namespace PersonaEditor.ViewModels
             Notify("StatusBar");
         }
 
-        private void Tree_ItemOpen(TreeViewItemVM sender)
+        private void Tree_ItemOpen(GameFileTreeItem sender)
         {
             MainWindowType = "Single";
             Tab.Open(sender);
         }
 
-        private void Tree_ItemSaveAs(TreeViewItemVM sender)
+        private void Tree_ItemSaveAs(GameFileTreeItem sender)
         {
         }
 
         #endregion Events
 
-        private void Tree_ItemAction(TreeViewItemVM sender, UserTreeViewItemEventEnum action)
+        private void Tree_ItemAction(GameFileTreeItem sender, UserTreeViewItemEventEnum action)
         {
             if (action == UserTreeViewItemEventEnum.Selected)
                 Tree_ItemSelected(sender);

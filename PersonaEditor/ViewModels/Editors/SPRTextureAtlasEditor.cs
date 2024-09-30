@@ -1,15 +1,20 @@
-﻿using PersonaEditorLib.SpriteContainer;
+﻿using System;
 using System.Linq;
+using PersonaEditorLib;
+using PersonaEditorLib.SpriteContainer;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class SPRTextureAtlasEditor : TextureAtlasEditorBase<SPRTextureAtlas, SPRTextureObject>
+    public sealed class SPRTextureAtlasEditor : TextureAtlasEditorBase<SPRTextureAtlas, SPRTextureObject>
     {
-        public SPRTextureAtlasEditor(SPR spr)
-        {
-            if (spr == null)
-                throw new System.ArgumentNullException(nameof(spr));
+        private readonly GameFile _sprGameFile;
 
+        public SPRTextureAtlasEditor(GameFile sprGameFile)
+        {
+            ArgumentNullException.ThrowIfNull(sprGameFile);
+            _sprGameFile = sprGameFile;
+
+            var spr = _sprGameFile.GameData as SPR;
             for (int i = 0; i < spr.SubFiles.Count; i++)
             {
                 var textureIndex = i;

@@ -35,7 +35,7 @@ namespace PersonaEditor.ViewModels
             set => SetProperty(ref _dataContext, value);
         }
         public bool IsClosable { get; set; } = true;
-        public TreeViewItemVM PersonaFile { get; set; } = null;
+        public GameFileTreeItem PersonaFile { get; set; } = null;
 
         public bool Close()
         {

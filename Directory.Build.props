@@ -4,9 +4,9 @@
 		<NeutralLanguage>en</NeutralLanguage>
 		<Product>PersonaEditor</Product>
 
-		<AssemblyVersion>1.6.1.0</AssemblyVersion>
-		<FileVersion>1.6.1.0</FileVersion>
-		<Version>1.6.1.0</Version>
-		<ApplicationVersion>1.6.1.0</ApplicationVersion>
+		<AssemblyVersion>1.6.2.0</AssemblyVersion>
+		<FileVersion>1.6.2.0</FileVersion>
+		<Version>1.6.2.0</Version>
+		<ApplicationVersion>1.6.2.0</ApplicationVersion>
 	</PropertyGroup>
 </Project>

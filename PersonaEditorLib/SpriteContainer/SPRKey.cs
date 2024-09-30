@@ -48,7 +48,7 @@ namespace PersonaEditorLib.SpriteContainer
             {
                 _unk0x00 = reader.ReadInt32();
                 mCommentByte = reader.ReadBytes(16);
-                mComment = Encoding.GetEncoding("shift-jis").GetString(mCommentByte.Where(x => x != 0x00).ToArray());
+                mComment = Static.ShiftJIS.GetString(mCommentByte.Where(x => x != 0x00).ToArray());
                 mTextureIndex = reader.ReadInt32();
                 _unk0x18 = reader.ReadInt32();
                 _unk0x1C = reader.ReadInt32();

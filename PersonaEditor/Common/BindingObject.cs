@@ -12,9 +12,15 @@ namespace PersonaEditor.Common
 
         }
 
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+
+        }
+
         protected void Notify([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            OnPropertyChanged(propertyName);
         }
 
         protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

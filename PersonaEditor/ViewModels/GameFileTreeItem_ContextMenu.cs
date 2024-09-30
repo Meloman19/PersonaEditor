@@ -10,11 +10,11 @@ using System.Windows.Controls;
 
 namespace PersonaEditor.ViewModels
 {
-    public partial class TreeViewItemVM : BindingObject
+    public partial class GameFileTreeItem : TreeViewItemViewModel
     {
         private void UpdateContextMenu()
         {
-            _contextMenu.Clear();
+            ContextMenu.Clear();
 
             MenuItem menuItem = null;
 
@@ -23,27 +23,27 @@ namespace PersonaEditor.ViewModels
                 menuItem = new MenuItem();
                 menuItem.Header = "View/Edit";
                 menuItem.Command = new RelayCommand(ContextMenu_Edit);
-                _contextMenu.Add(menuItem);
+                ContextMenu.Add(menuItem);
             }
 
             menuItem = new MenuItem();
             menuItem.Header = "Replace";
             menuItem.Command = new RelayCommand(ContextMenu_Replace);
-            _contextMenu.Add(menuItem);
+            ContextMenu.Add(menuItem);
 
-            _contextMenu.Add(new Separator());
+            ContextMenu.Add(new Separator());
 
             menuItem = new MenuItem();
             menuItem.Header = "Save As...";
             menuItem.Command = new RelayCommand(ContextMenu_SaveAs);
-            _contextMenu.Add(menuItem);
+            ContextMenu.Add(menuItem);
 
             if (PersonaFileHelper.HaveSubFiles(PersonaFile))
             {
                 menuItem = new MenuItem();
                 menuItem.Header = "Export All";
                 menuItem.Command = new RelayCommand(ContextMenu_SaveAll);
-                _contextMenu.Add(menuItem);
+                ContextMenu.Add(menuItem);
             }
         }
 
@@ -97,7 +97,7 @@ namespace PersonaEditor.ViewModels
                 }
 
                 Update(_personaFile);
-                if (_isSelected)
+                if (IsSelected)
                     ItemAction?.Invoke(this, UserTreeViewItemEventEnum.Selected);
             }
         }

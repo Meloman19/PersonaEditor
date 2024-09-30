@@ -30,14 +30,14 @@ namespace PersonaEditor.Common.Behaviors
 
         private void AssociatedObject_DragOver(object sender, DragEventArgs e)
         {
-            var itemDrop = e.Data.GetData(typeof(TreeViewItemVM)) as TreeViewItemVM;
+            var itemDrop = e.Data.GetData(typeof(GameFileTreeItem)) as GameFileTreeItem;
             if (itemDrop == null)
                 e.Effects = DragDropEffects.None;
         }
 
         private void AssociatedObject_Drop(object sender, DragEventArgs e)
         {
-            var itemDrop = e.Data.GetData(typeof(TreeViewItemVM)) as TreeViewItemVM;
+            var itemDrop = e.Data.GetData(typeof(GameFileTreeItem)) as GameFileTreeItem;
             if (itemDrop == null)
                 return;
 

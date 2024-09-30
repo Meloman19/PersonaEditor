@@ -16,7 +16,7 @@ namespace PersonaEditor
 
         public App()
         {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance); // Add shift-jis encoding, .NET 6 mandatory
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             InitializeComponent();
         }
 

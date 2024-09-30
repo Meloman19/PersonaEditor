@@ -1,19 +1,17 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
-using PersonaEditorLib;
-using AuxiliaryLibraries.WPF;
 using PersonaEditor.Common;
 using PersonaEditor.Common.Delegates;
+using PersonaEditorLib;
 
 namespace PersonaEditor.ViewModels
 {
-    class TreeViewPEVM : BindingObject
+    public sealed class TreeViewPEVM : BindingObject
     {
-        private ObservableCollection<TreeViewItemVM> tree = new ObservableCollection<TreeViewItemVM>();
+        private ObservableCollection<GameFileTreeItem> tree = new ObservableCollection<GameFileTreeItem>();
 
         public event TreeViewItemEventHandler ItemAction;
 
-        public ReadOnlyObservableCollection<TreeViewItemVM> Tree { get; }
+        public ReadOnlyObservableCollection<GameFileTreeItem> Tree { get; }
 
         private object _sel = 10;
         public object Sel => _sel;
@@ -26,7 +24,7 @@ namespace PersonaEditor.ViewModels
 
             tree.Clear();
 
-            TreeViewItemVM item = new TreeViewItemVM(personaFile);
+            GameFileTreeItem item = new GameFileTreeItem(personaFile);
             item.ItemAction += Item_Action;
             tree.Add(item);
 
@@ -34,7 +32,7 @@ namespace PersonaEditor.ViewModels
                 ItemAction(item, UserTreeViewItemEventEnum.Open);
         }
 
-        private void Item_Action(TreeViewItemVM sender, UserTreeViewItemEventEnum action) => ItemAction?.Invoke(sender, action);
+        private void Item_Action(GameFileTreeItem sender, UserTreeViewItemEventEnum action) => ItemAction?.Invoke(sender, action);
 
         public GameFile GetRoot()
         {
@@ -46,7 +44,7 @@ namespace PersonaEditor.ViewModels
 
         public TreeViewPEVM()
         {
-            Tree = new ReadOnlyObservableCollection<TreeViewItemVM>(tree);
+            Tree = new ReadOnlyObservableCollection<GameFileTreeItem>(tree);
         }
     }
 }

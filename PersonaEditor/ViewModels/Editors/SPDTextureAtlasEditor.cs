@@ -1,15 +1,20 @@
-﻿using PersonaEditorLib.SpriteContainer;
+﻿using System;
 using System.Linq;
+using PersonaEditorLib;
+using PersonaEditorLib.SpriteContainer;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class SPDTextureAtlasEditor : TextureAtlasEditorBase<SPDTextureAtlas, SPDTextureObject>
+    public sealed class SPDTextureAtlasEditor : TextureAtlasEditorBase<SPDTextureAtlas, SPDTextureObject>
     {
-        public SPDTextureAtlasEditor(SPD spd)
-        {
-            if (spd == null)
-                throw new System.ArgumentNullException(nameof(spd));
+        private readonly GameFile _spdGameFile;
 
+        public SPDTextureAtlasEditor(GameFile spdGameFile)
+        {
+            ArgumentNullException.ThrowIfNull(spdGameFile);
+            _spdGameFile = spdGameFile;
+
+            var spd = _spdGameFile.GameData as SPD;
             foreach (var subFile in spd.SubFiles)
             {
                 var textureIndex = (int)subFile.Tag;

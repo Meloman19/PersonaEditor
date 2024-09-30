@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,7 +11,6 @@ namespace PersonaEditor.Controls
         public event ColorChangeEventHandler ColorChanged;
 
         private event ColorChangeEventHandler ColorPropertyChanged;
-
 
         #region ColorProp
         public static readonly DependencyProperty ColorProperty = DependencyProperty.Register("Color", typeof(Color), typeof(NumericRGBA),
@@ -29,16 +29,14 @@ namespace PersonaEditor.Controls
         }
         #endregion ColorProp
 
-
-
         public NumericRGBA()
         {
             InitializeComponent();
             ColorPropertyChanged += NumericColorRGBA_ColorPropertyChanged;
-            ColorA.ValueChanged += ColorSet_Changed;
-            ColorR.ValueChanged += ColorSet_Changed;
-            ColorG.ValueChanged += ColorSet_Changed;
-            ColorB.ValueChanged += ColorSet_Changed;
+            ColorA.ValueChanged += Color_ValueChanged;
+            ColorR.ValueChanged += Color_ValueChanged;
+            ColorG.ValueChanged += Color_ValueChanged;
+            ColorB.ValueChanged += Color_ValueChanged;
         }
 
         private void NumericColorRGBA_ColorPropertyChanged(Color color)
@@ -49,14 +47,14 @@ namespace PersonaEditor.Controls
             ColorB.Value = color.B;
         }
 
-        private void ColorSet_Changed(double num)
+        private void Color_ValueChanged(object sender, RoutedEventArgs e)
         {
             Color color = new Color()
             {
-                A = (byte)ColorA.Value,
-                R = (byte)ColorR.Value,
-                G = (byte)ColorG.Value,
-                B = (byte)ColorB.Value
+                A = Convert.ToByte(ColorA.Value),
+                R = Convert.ToByte(ColorR.Value),
+                G = Convert.ToByte(ColorG.Value),
+                B = Convert.ToByte(ColorB.Value)
             };
             Color = color;
             ColorChanged?.Invoke(color);

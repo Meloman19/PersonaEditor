@@ -40,7 +40,7 @@ namespace PersonaEditor.ViewModels
 
         private void SingleFileEdit_Drop(object arg)
         {
-            if (arg is TreeViewItemVM treeItem)
+            if (arg is GameFileTreeItem treeItem)
                 Open(treeItem);
         }
 
@@ -55,7 +55,7 @@ namespace PersonaEditor.ViewModels
             return returned;
         }
 
-        public bool Open(TreeViewItemVM sender)
+        public bool Open(GameFileTreeItem sender)
         {
             if (!sender.CanEdit())
             {
@@ -69,10 +69,10 @@ namespace PersonaEditor.ViewModels
             switch (sender.PersonaFile.GameData.Type)
             {
                 case FormatEnum.SPR:
-                    DataContext = new SPRTextureAtlasEditor(sender.PersonaFile.GameData as SPR);
+                    DataContext = new SPRTextureAtlasEditor(sender.PersonaFile);
                     break;
                 case FormatEnum.SPD:
-                    DataContext = new SPDTextureAtlasEditor(sender.PersonaFile.GameData as SPD);
+                    DataContext = new SPDTextureAtlasEditor(sender.PersonaFile);
                     break;
                 case FormatEnum.PTP:
                     DataContext = new PTPEditorVM(sender.PersonaFile.GameData as PTP);

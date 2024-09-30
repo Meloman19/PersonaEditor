@@ -7,7 +7,7 @@ namespace PersonaEditorLib
         static Static()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            ShiftJIS = Encoding.GetEncoding(932);
+            ShiftJIS = Encoding.GetEncoding("shift-jis");
         }
 
         public static Encoding ShiftJIS { get; }

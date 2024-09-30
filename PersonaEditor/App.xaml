@@ -1,11 +1,13 @@
 ﻿<Application x:Class="PersonaEditor.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:converters="clr-namespace:PersonaEditor.Common.Converters"
              xmlns:controls="clr-namespace:PersonaEditor.Controls"
              xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
              xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options" 
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
              mc:Ignorable="PresentationOptions"
              Startup="Application_Startup"
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
@@ -54,6 +56,14 @@
         <SolidColorBrush x:Key="SPDEditorLine"
                          Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=OneWay}"/>
 
+        <StreamGeometry x:Key="ArrowUp">
+            M 0 4 L 4 0 L 8 4 L 7 5 L 4 2 L 1 5 Z
+        </StreamGeometry>
+
+        <StreamGeometry x:Key="ArrowDown">
+            M 0 1 L 4 5 L 8 1 L 7 0 L 4 3 L 1 0 Z
+        </StreamGeometry>
+
         <Style TargetType="{x:Type controls:AtlasItemsContol}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -74,7 +84,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <Style TargetType="controls:TextureAtlasEditControl">
             <Setter Property="Template">
                 <Setter.Value>
@@ -153,12 +163,17 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <Style TargetType="controls:DragBorderControl">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="controls:DragBorderControl">
                         <Grid>
+                            <Thumb x:Name="ThumbAll"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   Cursor="SizeAll"
+                                   Style="{StaticResource DragBorderThumb}" />
                             <Thumb x:Name="ThumbL"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Stretch"
@@ -203,7 +218,6 @@
                                    Cursor="SizeNESW"
                                    Panel.ZIndex="1"
                                    Style="{StaticResource DragBorderThumb}" />
-                            
                             <Thumb x:Name="ThumbC"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
@@ -216,5 +230,78 @@
             </Setter>
         </Style>
 
+        <Style x:Key="TreeView.Default"
+               TargetType="TreeView">
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=SubItems}">
+                        <TextBlock Text="{Binding Header}"
+                                   MinWidth="100">
+                            <i:Interaction.Behaviors>
+                                <beh:DragTreeItemBehavior />
+                            </i:Interaction.Behaviors>
+
+                            <TextBlock.ContextMenu>
+                                <ContextMenu ItemsSource="{Binding Path=ContextMenu}"/>
+                            </TextBlock.ContextMenu>
+                        </TextBlock>
+                    </HierarchicalDataTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsEnabled" Value="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="controls:NumericUpDown">
+            <Setter Property="MaxHeight" Value="30" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="controls:NumericUpDown">
+                        <DockPanel>
+                            <Grid DockPanel.Dock="Right">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <RepeatButton x:Name="NumericUp"
+                                              Grid.Row="0"
+                                              Delay="500"
+                                              VerticalContentAlignment="Center"
+                                              HorizontalContentAlignment="Center">
+                                    <RepeatButton.Content>
+                                        <Path Data="{StaticResource ArrowUp}"
+                                              Fill="Black" />
+                                    </RepeatButton.Content>
+                                </RepeatButton>
+                                <RepeatButton x:Name="NumericDown"
+                                              Grid.Row="1"
+                                              Delay="500"
+                                              VerticalContentAlignment="Center"
+                                              HorizontalContentAlignment="Center">
+                                    <RepeatButton.Content>
+                                        <Path Data="{StaticResource ArrowDown}"
+                                              Fill="Black" />
+                                    </RepeatButton.Content>
+                                </RepeatButton>
+                            </Grid>
+
+                            <TextBox x:Name="NumericTextBox"
+                                     VerticalContentAlignment="Center"
+                                     MaxLines="1"
+                                     TextWrapping="NoWrap" />
+                        </DockPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

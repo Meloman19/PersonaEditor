@@ -25,7 +25,7 @@ namespace PersonaEditor.Controls
 
         public static readonly DependencyProperty TextureBitmapProperty =
             DependencyProperty.Register(nameof(TextureBitmap), typeof(BitmapSource), typeof(TextureAtlasEditControl),
-                new FrameworkPropertyMetadata(null));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         public static readonly DependencyProperty ObjectListProperty =
             DependencyProperty.Register(nameof(ObjectList), typeof(IList), typeof(TextureAtlasEditControl),

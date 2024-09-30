@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:controls="clr-namespace:PersonaEditor.Views"
+             xmlns:views="clr-namespace:PersonaEditor.Views"
              xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
@@ -15,7 +15,7 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-
+        
         <Grid Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Name="FirstCol" Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWLeftWidth, Mode=TwoWay}"/>
@@ -33,9 +33,12 @@
                         <beh:DropFileBehavior OpenFile="{Binding DropFileCommand}" />
                     </i:Interaction.Behaviors>
 
-                    <controls:TreeViewPE Grid.Row="0" DataContext="{Binding Tree}" />
+                    <TreeView Grid.Row="0"
+                              Style="{StaticResource TreeView.Default}"
+                              DataContext="{Binding Tree}"
+                              ItemsSource="{Binding Tree}" />
                 </Grid>
-                
+
                 <StatusBar Grid.Row="1">
                     <StatusBarItem>
                         <TextBlock Text="{Binding StatusBar}"/>
@@ -46,6 +49,6 @@
             <GridSplitter ResizeBehavior="PreviousAndCurrent" ShowsPreview="True" Grid.Column="1" Width="4"/>
         </Grid>
 
-        <controls:PreviewEditorTabControl Grid.Column="1" DataContext="{Binding Tab}"/>
+        <views:PreviewEditorTabControl Grid.Column="1" DataContext="{Binding Tab}"/>
     </Grid>
 </UserControl>
