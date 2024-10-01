@@ -47,6 +47,10 @@ namespace PersonaEditor.ViewModels.Editors
             Notify(nameof(TextureObjectRect));
         }
 
+        public IntPropertyViewModel XOffsetProp { get; } = new IntPropertyViewModel();
+
+        public IntPropertyViewModel YOffsetProp { get; } = new IntPropertyViewModel();
+
         public ColorPropertyViewModel ColorProp { get; } = new ColorPropertyViewModel();
 
         public bool IsSelected
@@ -61,6 +65,8 @@ namespace PersonaEditor.ViewModels.Editors
                 || YProp.PropertyValueChanged
                 || WidthProp.PropertyValueChanged
                 || HeightProp.PropertyValueChanged
+                || XOffsetProp.PropertyValueChanged
+                || YOffsetProp.PropertyValueChanged
                 || ColorProp.PropertyValueChanged;
         }
 
@@ -70,6 +76,8 @@ namespace PersonaEditor.ViewModels.Editors
             YProp.SaveChanges();
             WidthProp.SaveChanges();
             HeightProp.SaveChanges();
+            XOffsetProp.SaveChanges();
+            YOffsetProp.SaveChanges();
             ColorProp.SaveChanges();
         }
     }

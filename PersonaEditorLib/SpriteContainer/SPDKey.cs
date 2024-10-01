@@ -9,14 +9,14 @@ namespace PersonaEditorLib.SpriteContainer
         public int ListIndex { get; private set; }
         public int TextureIndex { get; private set; }
         private int[] Unk0x08 { get; set; } // x 6
-        public int X0 { get; set; }
-        public int Y0 { get; set; }
-        public int Xdel { get; set; }
-        public int Ydel { get; set; }
-        private int X1 { get; set; }
-        private int Y1 { get; set; }
-        private int X1Del { get; set; }
-        private int Y1Del { get; set; }
+        public int SpriteX { get; set; }
+        public int SpriteY { get; set; }
+        public int SpriteWidth { get; set; }
+        public int SpriteHeight { get; set; }
+        public int ScreenXOffset { get; set; }
+        public int ScreenYOffset { get; set; }
+        private int ScreenWidth { get; set; }
+        private int ScreenHeight { get; set; }
 
         private int[] Unk0x40 { get; set; } // x 12
         public byte[] Comment { get; private set; }
@@ -33,20 +33,20 @@ namespace PersonaEditorLib.SpriteContainer
             TextureIndex = reader.ReadInt32();
             Unk0x08 = reader.ReadInt32Array(6);
 
-            X0 = reader.ReadInt32();
-            Y0 = reader.ReadInt32();
-            Xdel = reader.ReadInt32();
-            Ydel = reader.ReadInt32();
+            SpriteX = reader.ReadInt32();
+            SpriteY = reader.ReadInt32();
+            SpriteWidth = reader.ReadInt32();
+            SpriteHeight = reader.ReadInt32();
 
-            X1 = reader.ReadInt32();
-            Y1 = reader.ReadInt32();
-            X1Del = reader.ReadInt32();
-            Y1Del = reader.ReadInt32();
+            ScreenXOffset = reader.ReadInt32();
+            ScreenYOffset = reader.ReadInt32();
+            ScreenWidth = reader.ReadInt32();
+            ScreenHeight = reader.ReadInt32();
 
-            if (Xdel != 0 && X1Del != 0)
-                XScale = (double)Xdel / (double)X1Del;
-            if (Ydel != 0 && Y1Del != 0)
-                YScale = (double)Ydel / (double)Y1Del;
+            if (SpriteWidth != 0 && ScreenWidth != 0)
+                XScale = (double)SpriteWidth / (double)ScreenWidth;
+            if (SpriteHeight != 0 && ScreenHeight != 0)
+                YScale = (double)SpriteHeight / (double)ScreenHeight;
 
             Unk0x40 = reader.ReadInt32Array(12);
             Comment = reader.ReadBytes(0x30);
@@ -58,19 +58,19 @@ namespace PersonaEditorLib.SpriteContainer
             writer.Write(TextureIndex);
             writer.WriteInt32Array(Unk0x08);
 
-            writer.Write(X0);
-            writer.Write(Y0);
-            writer.Write(Xdel);
-            writer.Write(Ydel);
+            writer.Write(SpriteX);
+            writer.Write(SpriteY);
+            writer.Write(SpriteWidth);
+            writer.Write(SpriteHeight);
 
-            writer.Write(X1);
-            writer.Write(Y1);
+            writer.Write(ScreenXOffset);
+            writer.Write(ScreenYOffset);
             if (XScale.HasValue)
-                X1Del = Convert.ToInt32(Xdel / XScale.Value);
+                ScreenWidth = Convert.ToInt32(SpriteWidth / XScale.Value);
             if (YScale.HasValue)
-                Y1Del = Convert.ToInt32(Ydel / YScale.Value);
-            writer.Write(X1Del);
-            writer.Write(Y1Del);
+                ScreenHeight = Convert.ToInt32(SpriteHeight / YScale.Value);
+            writer.Write(ScreenWidth);
+            writer.Write(ScreenHeight);
 
             writer.WriteInt32Array(Unk0x40);
             writer.Write(Comment);

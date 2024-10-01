@@ -166,16 +166,20 @@ namespace PersonaEditorLib.SpriteContainer
 
                 XElement index = new XElement("Index", key.ListIndex.ToString());
                 Key.Add(index);
-                XElement texIndex = new XElement("TextureIndex", key.TextureIndex.ToString());
-                Key.Add(texIndex);
-                XElement X0 = new XElement("X", key.X0.ToString());
-                Key.Add(X0);
-                XElement Y0 = new XElement("Y", key.Y0.ToString());
-                Key.Add(Y0);
-                XElement width = new XElement("Width", key.Xdel.ToString());
-                Key.Add(width);
-                XElement height = new XElement("Height", key.Ydel.ToString());
-                Key.Add(height);
+                XElement textureIndex = new XElement("TextureIndex", key.TextureIndex.ToString());
+                Key.Add(textureIndex);
+                XElement spriteX = new XElement("X", key.SpriteX.ToString());
+                Key.Add(spriteX);
+                XElement spriteY = new XElement("Y", key.SpriteY.ToString());
+                Key.Add(spriteY);
+                XElement spriteWidth = new XElement("Width", key.SpriteWidth.ToString());
+                Key.Add(spriteWidth);
+                XElement spriteHeight = new XElement("Height", key.SpriteHeight.ToString());
+                Key.Add(spriteHeight);
+                XElement screenXOffset = new XElement("XOffset", key.ScreenXOffset.ToString());
+                Key.Add(screenXOffset);
+                XElement screenYOffset = new XElement("YOffset", key.ScreenYOffset.ToString());
+                Key.Add(screenYOffset);
 
                 WT.Add(Key);
             }
@@ -187,28 +191,28 @@ namespace PersonaEditorLib.SpriteContainer
         {
             try
             {
-                XElement SI = xDoc.Element("SpriteInfo");
+                XElement spriteInfo = xDoc.Element("SpriteInfo");
 
-                foreach (var key in SI.Elements())
+                foreach (var key in spriteInfo.Elements())
                 {
                     int index = int.Parse(key.Element("Index").Value);
-                    int texIndex = int.Parse(key.Element("TextureIndex").Value);
-                    int X0 = int.Parse(key.Element("X").Value);
-                    int Y0 = int.Parse(key.Element("Y").Value);
-                    int width = int.Parse(key.Element("Width").Value);
-                    int height = int.Parse(key.Element("Height").Value);
+                    int textureIndex = int.Parse(key.Element("TextureIndex").Value);
 
-                    var findKey = KeyList.Find(x => x.ListIndex == index && x.TextureIndex == texIndex);
-                    if (findKey != null)
-                    {
-                        findKey.X0 = X0;
-                        findKey.Y0 = Y0;
-                        findKey.Xdel = width;
-                        findKey.Ydel = height;
-                    }
-                    else
-                    {
+                    var spdKey = KeyList.Find(x => x.ListIndex == index && x.TextureIndex == textureIndex);
+                    if (spdKey == null)
+                        continue;
 
+                    spdKey.SpriteX = int.Parse(key.Element("X").Value);
+                    spdKey.SpriteY = int.Parse(key.Element("Y").Value);
+                    spdKey.SpriteWidth = int.Parse(key.Element("Width").Value);
+                    spdKey.SpriteHeight = int.Parse(key.Element("Height").Value);
+
+                    var screenXOffset = key.Element("XOffset");
+                    var screenYOffset = key.Element("YOffset");
+                    if (screenXOffset != null && screenYOffset != null)
+                    {
+                        spdKey.ScreenXOffset = int.Parse(screenXOffset.Value);
+                        spdKey.ScreenYOffset = int.Parse(screenYOffset.Value);
                     }
                 }
             }

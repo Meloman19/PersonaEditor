@@ -142,6 +142,44 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="XOffset">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="editorVM:TextureObjectBase">
+                                    <TextBlock Text="{Binding XOffsetProp.PropertyReadOnlyTextValue}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate DataType="editorVM:TextureObjectBase">
+                                    <controls:NumericUpDown DataContext="{Binding XOffsetProp}"
+                                                            MinWidth="50"
+                                                            Value="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            MinValue="{Binding PropertyMinValue}"
+                                                            MaxValue="{Binding PropertyMaxValue}"
+                                                            IsIntegerOnly="True" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="YOffset">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="editorVM:TextureObjectBase">
+                                    <TextBlock Text="{Binding YOffsetProp.PropertyReadOnlyTextValue}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate DataType="editorVM:TextureObjectBase">
+                                    <controls:NumericUpDown DataContext="{Binding YOffsetProp}"
+                                                            MinWidth="50"
+                                                            Value="{Binding PropertyValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            MinValue="{Binding PropertyMinValue}"
+                                                            MaxValue="{Binding PropertyMaxValue}"
+                                                            IsIntegerOnly="True" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
 
