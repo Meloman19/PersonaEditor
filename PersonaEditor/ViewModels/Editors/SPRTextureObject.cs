@@ -41,12 +41,12 @@ namespace PersonaEditor.ViewModels.Editors
             HeightProp.PropertyValueChanged = false;
             HeightProp.SaveDelegate = val => _key.Y2 = _key.Y1 + val ?? 0;
 
-            ColorProp.PropertyValue = DecodingHelper.PixelFromFullRgba32PS2(_key.RGBACoords[0]).ToColor();
+            ColorProp.PropertyValue = DecodingHelper.PixelFromFullRgba32PS2(_key.RGBACoords[0], reverseOrder: true).ToColor();
             ColorProp.PropertyValueChanged = false;
             ColorProp.SaveDelegate = val =>
             {
                 var pixel = (val ?? Colors.White).ToPixel();
-                var data = EncodingHelper.ToFullRgba32PS2(pixel);
+                var data = EncodingHelper.ToFullRgba32PS2(pixel, reverseOrder: true);
                 for (var i = 0; i < 4; i++)
                     _key.RGBACoords[i] = data;
             };

@@ -119,7 +119,7 @@ namespace AuxiliaryLibraries.Media
             return ImageHelper.IndexesToData(indexes, 8, width);
         }
 
-        public static byte[] ToFullRgba32PS2(Pixel pixel)
+        public static byte[] ToFullRgba32PS2(Pixel pixel, bool reverseOrder)
         {
             byte[] data =
             [
@@ -128,6 +128,10 @@ namespace AuxiliaryLibraries.Media
                 BitHelper.AlphaPCToPS2[pixel.B],
                 BitHelper.AlphaPCToPS2[pixel.A],
             ];
+
+            if (reverseOrder)
+                Array.Reverse(data);
+
             return data;
         }
     }

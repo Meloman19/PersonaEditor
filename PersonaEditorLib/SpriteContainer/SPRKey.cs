@@ -66,12 +66,12 @@ namespace PersonaEditorLib.SpriteContainer
 
                 RGBACoords = new byte[4][];
 
-                for (int i = 0; i < 4; i++) 
-                {   
+                for (int i = 0; i < 4; i++)
+                {
                     RGBACoords[i] = new byte[4];
-                    for (int j = 0; j < 4; j++) 
+                    for (int j = 0; j < 4; j++)
                     {
-                        RGBACoords[i][3-j] = reader.ReadByte();
+                        RGBACoords[i][j] = reader.ReadByte();
                     }
                 }
 
@@ -115,7 +115,7 @@ namespace PersonaEditorLib.SpriteContainer
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    writer.Write(RGBACoords[i][3-j]);
+                    writer.Write(RGBACoords[i][j]);
                 }
             }
 

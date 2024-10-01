@@ -165,15 +165,22 @@ namespace AuxiliaryLibraries.Media
             return returned;
         }
 
-        public static Pixel PixelFromFullRgba32PS2(byte[] data)
+        public static Pixel PixelFromFullRgba32PS2(byte[] data, bool reverseOrder)
         {
             ArgumentOutOfRangeException.ThrowIfNotEqual(data.Length, 4);
 
-            return Pixel.FromArgb(
-                BitHelper.AlphaPS2ToPC[data[3]],
-                BitHelper.AlphaPS2ToPC[data[0]],
-                BitHelper.AlphaPS2ToPC[data[1]],
-                BitHelper.AlphaPS2ToPC[data[2]]);
+            if (reverseOrder)
+                return Pixel.FromArgb(
+                    BitHelper.AlphaPS2ToPC[data[0]],
+                    BitHelper.AlphaPS2ToPC[data[3]],
+                    BitHelper.AlphaPS2ToPC[data[2]],
+                    BitHelper.AlphaPS2ToPC[data[1]]);
+            else
+                return Pixel.FromArgb(
+                    BitHelper.AlphaPS2ToPC[data[3]],
+                    BitHelper.AlphaPS2ToPC[data[0]],
+                    BitHelper.AlphaPS2ToPC[data[1]],
+                    BitHelper.AlphaPS2ToPC[data[2]]);
         }
     }
 }
