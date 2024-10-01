@@ -29,5 +29,9 @@ namespace AuxiliaryLibraries.WPF.Wrapper
             var pixels = DecodingHelper.FromBgra32(bitmapSource.GetData());
             return new PixelMap(bitmapSource.PixelWidth, bitmapSource.PixelHeight, pixels);
         }
+
+        public static Pixel ToPixel(this Color color) => Pixel.FromArgb(color.A, color.R, color.G, color.B);
+
+        public static Color ToColor(this Pixel pixel) => Color.FromArgb(pixel.A, pixel.R, pixel.G, pixel.B);
     }
 }

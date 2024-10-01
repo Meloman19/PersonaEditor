@@ -36,7 +36,6 @@ namespace AuxiliaryLibraries.WPF.Wrapper
                     data[i]);
             }
 
-
             return returned;
         }
     }

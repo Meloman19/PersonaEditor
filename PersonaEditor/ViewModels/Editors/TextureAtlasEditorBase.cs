@@ -1,5 +1,7 @@
-﻿using PersonaEditor.Common;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Editors
 {
@@ -19,6 +21,20 @@ namespace PersonaEditor.ViewModels.Editors
 
         public bool Close()
         {
+            if (TextureAtlasList.Any(x => x.HasAnyChanges()))
+            {
+                var result = MessageBox.Show("Save changes?", "Saving", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    foreach (var item in TextureAtlasList)
+                        item.SaveChanges();
+                }
+                else if (result == MessageBoxResult.No)
+                    return true;
+                else
+                    return false;
+            }
+
             return true;
         }
     }

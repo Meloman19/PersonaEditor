@@ -1,6 +1,8 @@
-﻿using PersonaEditorLib.SpriteContainer;
-using System;
-using System.Windows;
+﻿using System;
+using System.Windows.Media;
+using AuxiliaryLibraries.Media;
+using AuxiliaryLibraries.WPF.Wrapper;
+using PersonaEditorLib.SpriteContainer;
 
 namespace PersonaEditor.ViewModels.Editors
 {
@@ -12,121 +14,42 @@ namespace PersonaEditor.ViewModels.Editors
         {
             _key = key ?? throw new ArgumentNullException(nameof(key));
             Name = _key.mComment;
-        }
 
-        public override int X
-        {
-            get => _key.X1;
-            set
+            XProp.PropertyValue = _key.X1;
+            XProp.PropertyValueChanged = false;
+            XProp.SaveDelegate = val =>
             {
-                if (value != _key.X1)
-                {
-                    _key.X1 = value;
-                    Notify(nameof(X));
-                    Notify(nameof(Rect));
-                }
-            }
-        }
+                var width = _key.X2 - _key.X1;
+                _key.X1 = val ?? 0;
+                _key.X2 = _key.X1 + width;
+            };
 
-        public override int Y
-        {
-            get => _key.Y1;
-            set
+            YProp.PropertyValue = _key.Y1;
+            YProp.PropertyValueChanged = false;
+            YProp.SaveDelegate = val =>
             {
-                if (value != _key.Y1)
-                {
-                    _key.Y1 = value;
-                    Notify(nameof(Y));
-                    Notify(nameof(Rect));
-                }
-            }
-        }
+                var height = _key.Y2 - _key.Y1;
+                _key.Y1 = val ?? 0;
+                _key.Y2 = _key.Y1 + height;
+            };
 
-        public override int Width
-        {
-            get => _key.X2 - _key.X1;
-            set
-            {
-                if (value != _key.X2 - _key.X1)
-                {
-                    _key.X2 = _key.X1 + value;
-                    Notify(nameof(Width));
-                    Notify(nameof(Rect));
-                }
-            }
-        }
+            WidthProp.PropertyValue = _key.X2 - _key.X1;
+            WidthProp.PropertyValueChanged = false;
+            WidthProp.SaveDelegate = val => _key.X2 = _key.X1 + val ?? 0;
 
-        public override int Height
-        {
-            get => _key.Y2 - _key.Y1;
-            set
-            {
-                if (value != _key.Y2 - _key.Y1)
-                {
-                    _key.Y2 = _key.Y1 + value;
-                    Notify(nameof(Height));
-                    Notify(nameof(Rect));
-                }
-            }
-        }
-        
-        
-        public override int Red
-        {
-            get => _key.Red;
-            set
-            {
-                if (value != _key.Red)
-                {
-                    _key.ColorChanged = true;
-                    _key.Red = (byte)value;
-                    Notify(nameof(Red));
-                }
-            }
-        }
+            HeightProp.PropertyValue = _key.Y2 - _key.Y1;
+            HeightProp.PropertyValueChanged = false;
+            HeightProp.SaveDelegate = val => _key.Y2 = _key.Y1 + val ?? 0;
 
-        public override int Green
-        {
-            get => _key.Green;
-            set
+            ColorProp.PropertyValue = DecodingHelper.PixelFromFullRgba32PS2(_key.RGBACoords[0]).ToColor();
+            ColorProp.PropertyValueChanged = false;
+            ColorProp.SaveDelegate = val =>
             {
-                if (value != _key.Green)
-                {
-                    _key.ColorChanged = true;
-                    _key.Green = (byte)value;
-                    Notify(nameof(Green));
-                }
-            }
+                var pixel = (val ?? Colors.White).ToPixel();
+                var data = EncodingHelper.ToFullRgba32PS2(pixel);
+                for (var i = 0; i < 4; i++)
+                    _key.RGBACoords[i] = data;
+            };
         }
-
-        public override int Blue
-        {
-            get => _key.Blue;
-            set
-            {
-                if (value != _key.Blue)
-                {
-                    _key.ColorChanged = true;
-                    _key.Blue = (byte)value;
-                    Notify(nameof(Blue));
-                }
-            }
-        }
-        
-        public override int Alpha
-        {
-            get => _key.Alpha;
-            set
-            {
-                if (value != _key.Alpha)
-                {
-                    _key.ColorChanged = true;
-                    _key.Alpha = (byte)value;
-                    Notify(nameof(Alpha));
-                }
-            }
-        }
-        
-        public Rect Rect => new Rect(new Point(_key.X1, _key.Y1), new Point(_key.X2, _key.Y2));
     }
 }

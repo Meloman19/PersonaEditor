@@ -118,5 +118,17 @@ namespace AuxiliaryLibraries.Media
             var indexes = ImageHelper.GetIndexes(pixels, palette);
             return ImageHelper.IndexesToData(indexes, 8, width);
         }
+
+        public static byte[] ToFullRgba32PS2(Pixel pixel)
+        {
+            byte[] data =
+            [
+                BitHelper.AlphaPCToPS2[pixel.R],
+                BitHelper.AlphaPCToPS2[pixel.G],
+                BitHelper.AlphaPCToPS2[pixel.B],
+                BitHelper.AlphaPCToPS2[pixel.A],
+            ];
+            return data;
+        }
     }
 }

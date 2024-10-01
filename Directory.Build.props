@@ -3,10 +3,13 @@
 		<Authors>Meloman19</Authors>
 		<NeutralLanguage>en</NeutralLanguage>
 		<Product>PersonaEditor</Product>
+		<Description>Persona game series file editing application.</Description>
+		<RepositoryUrl>https://github.com/Meloman19/PersonaEditor</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 
-		<AssemblyVersion>1.6.2.0</AssemblyVersion>
-		<FileVersion>1.6.2.0</FileVersion>
-		<Version>1.6.2.0</Version>
-		<ApplicationVersion>1.6.2.0</ApplicationVersion>
+		<AssemblyVersion>1.6.3.0</AssemblyVersion>
+		<FileVersion>1.6.3.0</FileVersion>
+		<Version>1.6.3.0</Version>
+		<ApplicationVersion>1.6.3.0</ApplicationVersion>
 	</PropertyGroup>
 </Project>

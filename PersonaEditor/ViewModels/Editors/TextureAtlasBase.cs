@@ -1,7 +1,8 @@
-﻿using PersonaEditor.Common;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels.Editors
 {
@@ -35,5 +36,13 @@ namespace PersonaEditor.ViewModels.Editors
             : new Rect(0, 0, TextureImage.PixelWidth, TextureImage.PixelHeight);
 
         public abstract string Name { get; }
+
+        public bool HasAnyChanges() => Objects.Any(x => x.HasAnyChanges());
+
+        public void SaveChanges()
+        {
+            foreach (var obj in Objects)
+                obj.SaveChanges();
+        }
     }
 }

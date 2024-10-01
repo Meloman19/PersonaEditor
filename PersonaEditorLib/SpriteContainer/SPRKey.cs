@@ -31,11 +31,6 @@ namespace PersonaEditorLib.SpriteContainer
         public int Y1;
         public int X2;
         public int Y2;
-        public byte Red;
-        public byte Green;
-        public byte Blue;
-        public byte Alpha;
-        public bool ColorChanged;
         public byte[][] RGBACoords;
         public int _unk0x74;
         public int _unk0x78;
@@ -80,14 +75,6 @@ namespace PersonaEditorLib.SpriteContainer
                     }
                 }
 
-                // Convert color to 255 color space
-                Red = (byte)Math.Round(RGBACoords[0][3] / 128.0 * 255.0);
-                Green = (byte)Math.Round(RGBACoords[0][2] / 128.0 * 255.0);
-                Blue = (byte)Math.Round(RGBACoords[0][1] / 128.0 * 255.0);
-                Alpha = (byte)Math.Round(RGBACoords[0][0] / 128.0 * 255.0);
-
-                ColorChanged = false;
-
                 _unk0x74 = reader.ReadInt32();
                 _unk0x78 = reader.ReadInt32();
                 _unk0x7C = reader.ReadInt32();
@@ -124,27 +111,11 @@ namespace PersonaEditorLib.SpriteContainer
             writer.Write(X2);
             writer.Write(Y2);
 
-            // Make sure if we didn't change any color, conversion doesn't mess original color
-            if (ColorChanged)
+            for (int i = 0; i < 4; i++)
             {
-                byte[] newColor = { Alpha, Blue, Green, Red };
-
-                for (int i = 0; i < newColor.Length; i++)
-                    newColor[i] = (byte)Math.Round(newColor[i] / 255.0 * 128.0);
-
-                int finalColor = BitConverter.ToInt32(newColor, 0);
-
-                for (int i = 0; i < 4; i++)
-                    writer.Write(finalColor); // Write same color for all 4 coords   
-            }
-            else
-            {
-                for (int i = 0; i < 4; i++)
+                for (int j = 0; j < 4; j++)
                 {
-                    for (int j = 0; j < 4; j++)
-                    {
-                        writer.Write(RGBACoords[i][j]);
-                    }
+                    writer.Write(RGBACoords[i][j]);
                 }
             }
 

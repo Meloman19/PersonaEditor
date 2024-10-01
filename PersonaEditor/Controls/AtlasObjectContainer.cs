@@ -39,10 +39,6 @@ namespace PersonaEditor.Controls
 
         public TextureObjectBase Data => DataContext as TextureObjectBase;
 
-        public Rect ObjectRect => Data == null
-            ? new Rect()
-            : new Rect(Data.X, Data.Y, Data.Width, Data.Height);
-
         private void AtlasObjectContainer_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue is TextureObjectBase oldData)
@@ -67,7 +63,7 @@ namespace PersonaEditor.Controls
 
         private void UpdateData()
         {
-            this.SetLocation(ObjectRect);
+            this.SetLocation(Data?.TextureObjectRect ?? new Rect());
         }
     }
 }

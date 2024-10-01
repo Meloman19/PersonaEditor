@@ -115,7 +115,6 @@ namespace PersonaEditor.Controls
                 return;
 
             var newText = NumericTextBox.Text;
-
             if (string.IsNullOrEmpty(newText))
             {
                 SetCurrentValue(ValueProperty, null);
@@ -152,8 +151,9 @@ namespace PersonaEditor.Controls
             try
             {
                 _supressTextBoxUpdate = true;
+                var newText = val?.ToString() ?? string.Empty;
                 var caret = NumericTextBox.CaretIndex;
-                NumericTextBox.Text = val?.ToString() ?? string.Empty;
+                NumericTextBox.Text = newText;
                 NumericTextBox.CaretIndex = caret;
             }
             finally

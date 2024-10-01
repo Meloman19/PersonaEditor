@@ -181,10 +181,7 @@ namespace PersonaEditor.Controls
         {
             _location = _visualize.Location;
             this.SetLocation(_location);
-            _selectedObject.X = Convert.ToInt32(_location.X);
-            _selectedObject.Y = Convert.ToInt32(_location.Y);
-            _selectedObject.Width = Convert.ToInt32(_location.Width);
-            _selectedObject.Height = Convert.ToInt32(_location.Height);
+            _selectedObject.TextureObjectRect = _location;
             _inDrag = false;
         }
 
@@ -203,7 +200,7 @@ namespace PersonaEditor.Controls
             {
                 Visibility = Visibility.Visible;
                 _visualize.Visibility = Visibility.Visible;
-                _location = new Rect(_selectedObject.X, _selectedObject.Y, _selectedObject.Width, _selectedObject.Height);
+                _location = _selectedObject.TextureObjectRect;
             }
 
             _visualize.SetLocation(_location);
@@ -227,10 +224,7 @@ namespace PersonaEditor.Controls
         {
             switch (e.PropertyName)
             {
-                case nameof(TextureObjectBase.X):
-                case nameof(TextureObjectBase.Y):
-                case nameof(TextureObjectBase.Width):
-                case nameof(TextureObjectBase.Height):
+                case nameof(TextureObjectBase.TextureObjectRect):
                     UpdateLocation();
                     break;
             }

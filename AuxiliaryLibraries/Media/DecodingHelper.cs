@@ -1,4 +1,6 @@
-﻿namespace AuxiliaryLibraries.Media
+﻿using System;
+
+namespace AuxiliaryLibraries.Media
 {
     public static class DecodingHelper
     {
@@ -161,6 +163,17 @@
                 returned[i] = palette[data[i]];
 
             return returned;
+        }
+
+        public static Pixel PixelFromFullRgba32PS2(byte[] data)
+        {
+            ArgumentOutOfRangeException.ThrowIfNotEqual(data.Length, 4);
+
+            return Pixel.FromArgb(
+                BitHelper.AlphaPS2ToPC[data[3]],
+                BitHelper.AlphaPS2ToPC[data[0]],
+                BitHelper.AlphaPS2ToPC[data[1]],
+                BitHelper.AlphaPS2ToPC[data[2]]);
         }
     }
 }
