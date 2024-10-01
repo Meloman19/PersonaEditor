@@ -15,8 +15,9 @@ namespace PersonaEditorLib.FileContainer
             Open(File.ReadAllBytes(path));
         }
 
-        public BIN(byte[] data)
+        public BIN(byte[] data, bool isCpkFormat = false)
         {
+            IsCpk = isCpkFormat;
             Open(data);
         }
 
@@ -56,7 +57,12 @@ namespace PersonaEditorLib.FileContainer
             using (BinaryReader reader = IOTools.OpenReadFile(new MemoryStream(data), IsLittleEndian, false))
                 while (reader.BaseStream.Position < reader.BaseStream.Length - 0x100)
                 {
-                    string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x100 - 4)).TrimEnd('\0');
+                    string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x100 - 4));
+
+                    if (IsCpk) 
+                        Name = Name.Substring(0, 0x10); // CPK only uses 0x10 data for name, rest of it is filled with garbage data
+
+                    Name = Name.TrimEnd('\0');
                     if (string.IsNullOrWhiteSpace(Name) || Name.Contains('\0'))
                         throw new Exception("BIN: entry name is empty or have wrong char");
 
@@ -112,7 +118,7 @@ namespace PersonaEditorLib.FileContainer
 
                 int count = reader.ReadInt32();
                 if (count == 0)
-                    throw new Exception("BIN: incorrect special id");
+                    throw new Exception("BIN: incorrect element count");
 
                 int[] blockPosition = new int[count];
                 int[] blockSize = new int[count];
@@ -169,6 +175,7 @@ namespace PersonaEditorLib.FileContainer
         bool Old = true;
         bool FES_format = false;
         bool IsLittleEndian { get; set; } = true;
+        bool IsCpk = false;
 
         #region IGameFile
 

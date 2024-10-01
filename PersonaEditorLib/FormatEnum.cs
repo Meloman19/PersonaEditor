@@ -4,6 +4,7 @@
     {
         Unknown,
         BIN,
+        CPK,
         SPR,
         TMX,
         BF,

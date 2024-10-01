@@ -18,6 +18,7 @@ namespace PersonaEditorLib
             { ".p01",  FormatEnum.BIN },
             { ".arc",  FormatEnum.BIN },
             { ".dds2", FormatEnum.BIN },
+            { ".cpk", FormatEnum.CPK },
 
             { ".bf",  FormatEnum.BF  },
             { ".pm1", FormatEnum.PM1 },
@@ -58,6 +59,8 @@ namespace PersonaEditorLib
 
                 if (type == FormatEnum.BIN)
                     Obj = new FileContainer.BIN(data);
+                else if (type == FormatEnum.CPK)
+                    Obj = new FileContainer.BIN(data, true);
                 else if (type == FormatEnum.SPR)
                     Obj = new SpriteContainer.SPR(data);
                 else if (type == FormatEnum.TMX)
