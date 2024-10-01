@@ -53,16 +53,26 @@ namespace PersonaEditorLib.SpriteContainer
             }
         }
 
-        private void UpdateOffsets(List<int> list, int start)
+        private void UpdateOffsets(List<int> list, int? start)
         {
-            list[0] = start;
+            if (!start.HasValue)
+                return;
 
-            for (int i = 1; i < SubFiles.Count; i++)
+            var offset = start.Value;
+
+            for (int i = 0; i < SubFiles.Count; i++)
             {
-                start += SubFiles[i - 1].GameData.GetSize();
-                int temp = IOTools.Alignment(start, 16);
-                start += temp == 0 ? 16 : temp;
-                list[i] = start;
+                if (i == 0)
+                {
+                    list[0] = offset;
+                }
+                else
+                {
+                    offset += SubFiles[i - 1].GameData.GetSize();
+                    int temp = IOTools.Alignment(offset, 16);
+                    offset += temp == 0 ? 16 : temp;
+                    list[i] = offset;
+                }
             }
         }
 
@@ -83,13 +93,9 @@ namespace PersonaEditorLib.SpriteContainer
             returned += KeyOffsetList.Count * 8;
             returned += KeyList.Size;
 
-            int temp = IOTools.Alignment(returned, 16);
-            returned += temp == 0 ? 16 : temp;
-
-            returned += (SubFiles[0].GameData as IGameData).GetSize();
-            for (int i = 1; i < SubFiles.Count; i++)
+            for (int i = 0; i < SubFiles.Count; i++)
             {
-                temp = IOTools.Alignment(returned, 16);
+                int temp = IOTools.Alignment(returned, 16);
                 returned += temp == 0 ? 16 : temp;
                 returned += SubFiles[i].GameData.GetSize();
             }
@@ -118,18 +124,17 @@ namespace PersonaEditorLib.SpriteContainer
                 }
                 KeyList.Get(writer);
 
-                int temp = IOTools.Alignment(writer.BaseStream.Position, 16);
-                writer.Write(new byte[temp == 0 ? 16 : temp]);
+                int? startTextureOffset = null;
 
-                UpdateOffsets(TextureOffsetList, (int)writer.BaseStream.Position);
-
-                writer.Write(SubFiles[0].GameData.GetData());
-                for (int i = 1; i < SubFiles.Count; i++)
+                for (int i = 0; i < SubFiles.Count; i++)
                 {
-                    int temp2 = IOTools.Alignment(writer.BaseStream.Length, 16);
-                    writer.Write(new byte[temp2 == 0 ? 16 : temp2]);
+                    int temp = IOTools.Alignment(writer.BaseStream.Position, 16);
+                    writer.Write(new byte[temp == 0 ? 16 : temp]);
+                    startTextureOffset ??= (int)writer.BaseStream.Position;
                     writer.Write(SubFiles[i].GameData.GetData());
                 }
+
+                UpdateOffsets(TextureOffsetList, startTextureOffset);
 
                 writer.BaseStream.Position = Header.Size;
                 foreach (var a in TextureOffsetList)
