@@ -119,8 +119,6 @@ namespace PersonaEditorLib.Sprite
 
         #region IGameFormat
 
-        public FormatEnum Type => FormatEnum.DDS;
-
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => Header.Size + 4 + dataList.Sum(x => x.Length) + LastBlock.Length;

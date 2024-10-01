@@ -1,9 +1,10 @@
-﻿using AuxiliaryLibraries.IO;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
+using AuxiliaryLibraries.IO;
+using PersonaEditorLib.Sprite;
 
 namespace PersonaEditorLib.SpriteContainer
 {
@@ -62,7 +63,10 @@ namespace PersonaEditorLib.SpriteContainer
 
                     long tempPos = streamFile.Stream.Position;
                     streamFile.Stream.Position = texPos;
-                    var text = GameFormatHelper.OpenFile(name + ".dds", reader.ReadBytes(texSize), FormatEnum.DDS);
+                    var textureName = name + ".dds";
+                    var textureData = reader.ReadBytes(texSize);
+                    var text = GameFormatHelper.TryOpenFile<DDS>(textureName, textureData)
+                        ?? GameFormatHelper.TryOpenFile<DDSAtlus>(textureName, textureData);
                     text.Tag = tag;
                     SubFiles.Add(text);
                     streamFile.Stream.Position = tempPos;
@@ -79,8 +83,6 @@ namespace PersonaEditorLib.SpriteContainer
         }
 
         #region IGameFile
-
-        public FormatEnum Type => FormatEnum.SPD;
 
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 

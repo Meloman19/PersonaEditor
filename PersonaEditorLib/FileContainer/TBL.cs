@@ -1,10 +1,10 @@
-﻿using AuxiliaryLibraries.IO;
-using AuxiliaryLibraries.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using AuxiliaryLibraries.IO;
+using AuxiliaryLibraries.Tools;
+using PersonaEditorLib.Other;
 
 namespace PersonaEditorLib.FileContainer
 {
@@ -81,15 +81,14 @@ namespace PersonaEditorLib.FileContainer
                         throw new Exception("TBL error");
 
                     byte[] tempdata = reader.ReadBytes(Size);
-                    FormatEnum fileType = GameFormatHelper.GetFormat(tempdata);
+                    var fileType = GameFormatHelper.TryGetDataType(tempdata) ?? typeof(DAT);
                     string ext = Path.GetExtension(name);
                     string tempName = name.Substring(0, name.Length - ext.Length) + "(" + index++.ToString().PadLeft(2, '0') + ")";
-                    if (fileType == FormatEnum.Unknown)
-                        tempName += ".DAT";
-                    else
-                        tempName += "." + fileType.ToString();
+                    tempName += GameFormatHelper.GetDefaultExtension(fileType);
 
-                    SubFiles.Add(GameFormatHelper.OpenFile(tempName, tempdata, fileType == FormatEnum.Unknown ? FormatEnum.DAT : fileType));
+                    var gameFile = GameFormatHelper.TryOpenFile(tempName, tempdata, fileType) ??
+                        GameFormatHelper.TryOpenFile<DAT>(tempName, tempdata);
+                    SubFiles.Add(gameFile);
                     reader.BaseStream.Position += IOTools.Alignment(reader.BaseStream.Position - streamFile.Position, 16);
                 } while (streamFile.Stream.Position < streamFile.Position + streamFile.Size);
         }
@@ -121,8 +120,6 @@ namespace PersonaEditorLib.FileContainer
         public bool IsLittleEndian { get; set; } = true;
 
         #region IGameFile
-
-        public FormatEnum Type => FormatEnum.TBL;
 
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 

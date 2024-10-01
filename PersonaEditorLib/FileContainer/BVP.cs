@@ -1,9 +1,8 @@
-﻿using AuxiliaryLibraries.Extensions;
-using AuxiliaryLibraries.Tools;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using AuxiliaryLibraries.Extensions;
+using AuxiliaryLibraries.Tools;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditorLib.FileContainer
 {
@@ -39,7 +38,8 @@ namespace PersonaEditorLib.FileContainer
                     FlagList.Add(Entry[i][0]);
                     reader.BaseStream.Position = Entry[i][1];
                     string name = Path.GetFileNameWithoutExtension(Name) + "(" + i.ToString().PadLeft(3, '0') + ").BMD";
-                    SubFiles.Add(GameFormatHelper.OpenFile(name, reader.ReadBytes(Entry[i][2]), FormatEnum.BMD));
+                    var bmdGM = GameFormatHelper.TryOpenFile<BMD>(name, reader.ReadBytes(Entry[i][2]));
+                    SubFiles.Add(bmdGM);
                 }
             }
         }
@@ -54,8 +54,6 @@ namespace PersonaEditorLib.FileContainer
         public string Name { get; private set; } = "";
 
         #region IGameFile
-
-        public FormatEnum Type => FormatEnum.BVP;
 
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 

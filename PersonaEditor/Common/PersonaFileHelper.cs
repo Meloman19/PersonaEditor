@@ -1,33 +1,40 @@
-﻿using PersonaEditorLib;
-using System.Collections.Generic;
+﻿using System;
+using System.Linq;
+using PersonaEditorLib;
+using PersonaEditorLib.Other;
+using PersonaEditorLib.SpriteContainer;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditor.Common
 {
     public static class PersonaFileHelper
     {
-        private static List<FormatEnum> contextMenuItemsEdited = new List<FormatEnum>()
+        private static readonly Type[] _editableTypes = new[]
         {
-            FormatEnum.BMD,
-            FormatEnum.PTP,
-            FormatEnum.SPD,
-            FormatEnum.SPR,
-            FormatEnum.FTD,
-            FormatEnum.DAT,
-            FormatEnum.FNT,
-            FormatEnum.FNT0
+            typeof(BMD),
+            typeof(PTP),
+            typeof(SPD),
+            typeof(SPR),
+            typeof(FTD),
+            typeof(DAT),
+            typeof(FNT),
+            typeof(FNT0),
         };
 
-        public static bool IsEdited(FormatEnum fileType)
+        public static bool IsEditable(Type type)
         {
-            return contextMenuItemsEdited.Contains(fileType);
+            return _editableTypes.Contains(type);
         }
 
-        public static bool IsEdited(GameFile gameFile)
+        public static bool IsEditable<T>() =>
+            IsEditable(typeof(T));
+
+        public static bool IsEditable(GameFile gameFile)
         {
             if (gameFile == null)
                 throw new System.ArgumentNullException(nameof(gameFile));
 
-            return contextMenuItemsEdited.Contains(gameFile.GameData.Type);
+            return IsEditable(gameFile.GameData.GetType());
         }
 
         public static bool HaveSubFiles(GameFile objectFile)

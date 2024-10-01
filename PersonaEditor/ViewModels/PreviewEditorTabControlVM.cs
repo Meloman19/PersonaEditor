@@ -1,17 +1,17 @@
-﻿using PersonaEditorLib;
-using PersonaEditorLib.Other;
-using PersonaEditorLib.SpriteContainer;
-using PersonaEditorLib.Text;
-using AuxiliaryLibraries.WPF;
-using PersonaEditor.Common;
-using PersonaEditor.ViewModels.Editors;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using PersonaEditor.Common;
+using PersonaEditor.ViewModels.Editors;
+using PersonaEditorLib;
+using PersonaEditorLib.Other;
+using PersonaEditorLib.SpriteContainer;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels
 {
@@ -55,6 +55,18 @@ namespace PersonaEditor.ViewModels
             return returned;
         }
 
+        private static readonly Dictionary<Type, Func<GameFile, object>> _editorFactory = new Dictionary<Type, Func<GameFile, object>>
+        {
+            { typeof(SPR),  gm => new SPRTextureAtlasEditor(gm) },
+            { typeof(SPD),  gm => new SPDTextureAtlasEditor(gm) },
+            { typeof(PTP),  gm => new PTPEditorVM(gm.GameData as PTP) },
+            { typeof(BMD),  gm => new BMDEditorVM(gm) },
+            { typeof(FTD),  gm => new FTDEditorVM(gm.GameData as FTD) },
+            { typeof(FNT),  gm => new FNTEditorVM(gm.GameData as FNT) },
+            { typeof(FNT0), gm => new FNT0EditorVM(gm.GameData as FNT0) },
+            { typeof(DAT),  gm => new HEXEditorVM(gm.GameData as DAT) },
+        };
+
         public bool Open(GameFileTreeItem sender)
         {
             if (!sender.CanEdit())
@@ -63,41 +75,15 @@ namespace PersonaEditor.ViewModels
                 return false;
             }
 
-            object DataContext;
             string Title = sender.PersonaFile.Name;
 
-            switch (sender.PersonaFile.GameData.Type)
-            {
-                case FormatEnum.SPR:
-                    DataContext = new SPRTextureAtlasEditor(sender.PersonaFile);
-                    break;
-                case FormatEnum.SPD:
-                    DataContext = new SPDTextureAtlasEditor(sender.PersonaFile);
-                    break;
-                case FormatEnum.PTP:
-                    DataContext = new PTPEditorVM(sender.PersonaFile.GameData as PTP);
-                    break;
-                case FormatEnum.BMD:
-                    DataContext = new BMDEditorVM(sender.PersonaFile);
-                    break;
-                case FormatEnum.FTD:
-                    DataContext = new FTDEditorVM(sender.PersonaFile.GameData as FTD);
-                    break;
-                case FormatEnum.FNT:
-                    DataContext = new FNTEditorVM(sender.PersonaFile.GameData as FNT);
-                    break;
-                case FormatEnum.FNT0:
-                    DataContext = new FNT0EditorVM(sender.PersonaFile.GameData as FNT0);
-                    break;
-                case FormatEnum.DAT:
-                    DataContext = new HEXEditorVM(sender.PersonaFile.GameData as DAT);
-                    break;
-                default:
-                    return false;
-            }
+            if (!_editorFactory.TryGetValue(sender.PersonaFile.GameData.GetType(), out var factory))
+                return false;
+
+            var dataContext = factory(sender.PersonaFile);
 
             ClosableTabItemVM closableTabItemVM = new ClosableTabItemVM();
-            closableTabItemVM.DataContext = DataContext;
+            closableTabItemVM.DataContext = dataContext;
             closableTabItemVM.TabTitle = Title;
             closableTabItemVM.PropertyChanged += ClosableTabItemVM_PropertyChanged;
             closableTabItemVM.PersonaFile = sender;

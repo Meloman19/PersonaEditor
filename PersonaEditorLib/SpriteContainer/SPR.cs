@@ -80,8 +80,6 @@ namespace PersonaEditorLib.SpriteContainer
 
         #region IGameFile
 
-        public FormatEnum Type => FormatEnum.SPR;
-
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()

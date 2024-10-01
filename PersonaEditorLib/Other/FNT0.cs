@@ -95,8 +95,6 @@ namespace PersonaEditorLib.Other
 
         #region IGameFile
 
-        public FormatEnum Type => FormatEnum.FNT0;
-
         public List<GameFile> SubFiles => new List<GameFile>();
 
         public int GetSize()

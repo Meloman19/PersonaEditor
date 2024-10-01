@@ -2,6 +2,7 @@
 using PersonaEditor.Common;
 using PersonaEditor.Common.Delegates;
 using PersonaEditorLib;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels
 {
@@ -28,7 +29,7 @@ namespace PersonaEditor.ViewModels
             item.ItemAction += Item_Action;
             tree.Add(item);
 
-            if (personaFile.GameData.Type == FormatEnum.PTP)
+            if (personaFile.GameData is PTP)
                 ItemAction(item, UserTreeViewItemEventEnum.Open);
         }
 

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 using AuxiliaryLibraries.Tools;
+using PersonaEditorLib.Other;
 
 namespace PersonaEditorLib.FileContainer
 {
@@ -12,16 +13,15 @@ namespace PersonaEditorLib.FileContainer
 
         public BIN(string path)
         {
-            Open(File.ReadAllBytes(path));
+            Open(File.ReadAllBytes(path), false);
         }
 
-        public BIN(byte[] data, bool isCpkFormat = false)
+        public BIN(byte[] data, bool isCpk = false)
         {
-            IsCpk = isCpkFormat;
-            Open(data);
+            Open(data, isCpk);
         }
 
-        private void Open(byte[] data)
+        private void Open(byte[] data, bool isCpk)
         {
             FES_format = false;
             Old = false;
@@ -37,19 +37,20 @@ namespace PersonaEditorLib.FileContainer
                 IsLittleEndian = true;
                 OpenSpecialFES(data);
             }
-            else if (data[3] == 0 && data[4] != 0  && data[4] != 3)
+            else if (data[3] == 0 && data[4] != 0 && data[4] != 3)
             {
                 IsLittleEndian = true;
                 OpenNew(data);
             }
-            else {
+            else
+            {
                 Old = true;
-                OpenOld(data);
+                OpenOld(data, isCpk);
             }
-                
+
         }
 
-        private void OpenOld(byte[] data)
+        private void OpenOld(byte[] data, bool isCpk)
         {
             IsLittleEndian = true;
             if (data.Length < 0x100)
@@ -57,13 +58,13 @@ namespace PersonaEditorLib.FileContainer
             using (BinaryReader reader = IOTools.OpenReadFile(new MemoryStream(data), IsLittleEndian, false))
                 while (reader.BaseStream.Position < reader.BaseStream.Length - 0x100)
                 {
-                    string Name = Encoding.ASCII.GetString(reader.ReadBytes(0x100 - 4));
+                    string name = Encoding.ASCII.GetString(reader.ReadBytes(0x100 - 4));
 
-                    if (IsCpk) 
-                        Name = Name.Substring(0, 0x10); // CPK only uses 0x10 data for name, rest of it is filled with garbage data
+                    if (isCpk)
+                        name = name.Substring(0, 0x10); // CPK only uses 0x10 data for name, rest of it is filled with garbage data
 
-                    Name = Name.TrimEnd('\0');
-                    if (string.IsNullOrWhiteSpace(Name) || Name.Contains('\0'))
+                    name = name.TrimEnd('\0');
+                    if (string.IsNullOrWhiteSpace(name) || name.Contains('\0'))
                         throw new Exception("BIN: entry name is empty or have wrong char");
 
                     int Size = reader.ReadInt32();
@@ -73,9 +74,9 @@ namespace PersonaEditorLib.FileContainer
 
                     reader.BaseStream.Position += IOTools.Alignment(reader.BaseStream.Position, 0x40);
 
-                    GameFile objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
+                    GameFile objectFile = GameFormatHelper.OpenUnknownFile(name, Data);
                     if (objectFile == null)
-                        objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
+                        objectFile = GameFormatHelper.TryOpenFile<DAT>(name, Data);
                     SubFiles.Add(objectFile);
                 }
         }
@@ -98,10 +99,10 @@ namespace PersonaEditorLib.FileContainer
                     byte[] Data = reader.ReadBytes(Size);
                     if (Data.Length != Size)
                         throw new Exception("BIN: readed size less than entry size");
-                    
-                    GameFile objectFile = GameFormatHelper.OpenFile(Name, Data, GameFormatHelper.GetFormat(Name));
+
+                    GameFile objectFile = GameFormatHelper.OpenUnknownFile(Name, Data);
                     if (objectFile == null)
-                        objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
+                        objectFile = GameFormatHelper.TryOpenFile<DAT>(Name, Data);
                     SubFiles.Add(objectFile);
                 }
 
@@ -134,27 +135,21 @@ namespace PersonaEditorLib.FileContainer
                     reader.BaseStream.Seek(blockPosition[i], SeekOrigin.Begin);
 
                     int Size = blockSize[i];
-                    byte[] Data = reader.ReadBytes(Size);
-                    
-                    if (Data.Length != Size)
+                    byte[] subData = reader.ReadBytes(Size);
+
+                    if (subData.Length != Size)
                         throw new Exception("BIN: readed size less than entry size");
 
-                    FormatEnum format = GameFormatHelper.GetFormat(Data);
-                    String Name = "Unnamed_FES_" + i + "." + format.ToString();
+                    var dataType = GameFormatHelper.TryGetDataType(subData) ?? typeof(DAT);
+                    var fileName = "Unnamed_FES_" + i + GameFormatHelper.GetDefaultExtension(dataType);
 
-                    GameFile objectFile;
-
-                    try {
-                        objectFile = GameFormatHelper.OpenFile(Name, Data, format);
-                    }
-                    catch {
-                        objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
-                    }
+                    var objectFile = GameFormatHelper.TryOpenFile(fileName, subData, dataType);
                     if (objectFile == null)
-                        objectFile = GameFormatHelper.OpenFile(Name, Data, FormatEnum.DAT);
+                        objectFile = GameFormatHelper.TryOpenFile<DAT>(fileName, subData);
+
                     SubFiles.Add(objectFile);
                 }
-                
+
                 if (reader.BaseStream.Position != reader.BaseStream.Length)
                     throw new System.Exception("BIN: read error");
             }
@@ -174,12 +169,10 @@ namespace PersonaEditorLib.FileContainer
 
         bool Old = true;
         bool FES_format = false;
+
         bool IsLittleEndian { get; set; } = true;
-        bool IsCpk = false;
 
         #region IGameFile
-
-        public FormatEnum Type => FormatEnum.BIN;
 
         public List<GameFile> GetSubFiles()
         {
@@ -289,7 +282,7 @@ namespace PersonaEditorLib.FileContainer
 
                 int fileAddress = 8 + (SubFiles.Count * 8);
                 int align = 0;
-                
+
                 foreach (var a in SubFiles)
                 {
                     int fileSize = a.GameData.GetSize();

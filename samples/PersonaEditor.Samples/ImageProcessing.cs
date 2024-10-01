@@ -1,8 +1,9 @@
-﻿using AuxiliaryLibraries.WPF.Wrapper;
-using PersonaEditorLib;
-using PersonaEditorLib.Sprite;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
+using AuxiliaryLibraries.WPF.Wrapper;
+using PersonaEditorLib;
+using PersonaEditorLib.Other;
+using PersonaEditorLib.Sprite;
 
 namespace PersonaEditor.Samples
 {
@@ -11,13 +12,12 @@ namespace PersonaEditor.Samples
         public static void ExportImages(string filePath, string outputDir)
         {
             // Try open file as known format;
-            var gf = GameFormatHelper.OpenFile(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
-            if (gf == null)
-                // Unknown format -> next;
-                return;
+            var gf = GameFormatHelper.OpenUnknownFile(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
 
-            // Collect all DDS (or TMX)
-            var ddsGFs = gf.GetAllObjectFiles(FormatEnum.DDS).ToArray();
+            // Collect all DDS
+            var ddsGFs = gf.GetAllObjectOfType<DDS>()
+                .Concat(gf.GetAllObjectOfType<DDSAtlus>())
+                .ToArray();
             if (!ddsGFs.Any())
                 return;
 

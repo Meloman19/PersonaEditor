@@ -1,110 +1,122 @@
-﻿using AuxiliaryLibraries.Extensions;
-using PersonaEditorLib.Other;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using AuxiliaryLibraries.Extensions;
+using PersonaEditorLib.FileContainer;
+using PersonaEditorLib.Other;
+using PersonaEditorLib.Sprite;
+using PersonaEditorLib.SpriteContainer;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditorLib
 {
     public static class GameFormatHelper
     {
-        public static Dictionary<string, FormatEnum> FileTypeDic = new Dictionary<string, FormatEnum>()
+        private static readonly Dictionary<Type, string> _defaultExtension = new Dictionary<Type, string>
         {
-            //Containers
-            { ".bin", FormatEnum.BIN },
-            { ".pak",  FormatEnum.BIN },
-            { ".pac",  FormatEnum.BIN },
-            { ".p00",  FormatEnum.BIN },
-            { ".p01",  FormatEnum.BIN },
-            { ".arc",  FormatEnum.BIN },
-            { ".dds2", FormatEnum.BIN },
-            { ".cpk", FormatEnum.CPK },
-
-            { ".bf",  FormatEnum.BF  },
-            { ".pm1", FormatEnum.PM1 },
-            { ".bvp", FormatEnum.BVP },
-            { ".tbl", FormatEnum.TBL },
-
-            { ".ctd", FormatEnum.FTD },
-            { ".ftd", FormatEnum.FTD },
-            { ".ttd", FormatEnum.FTD },
-
-            //Graphic containers
-            { ".spr", FormatEnum.SPR },
-            { ".spd", FormatEnum.SPD },
-
-            //Graphic
-            { ".fnt", FormatEnum.FNT },
-            { ".tmx", FormatEnum.TMX },
-            { ".dds", FormatEnum.DDS },
-
-            //Text
-            { ".bmd", FormatEnum.BMD },
-            { ".msg", FormatEnum.BMD },
-            { ".ptp", FormatEnum.PTP }
+            { typeof(BF) ,      ".bf"   },
+            { typeof(BIN),      ".bin"  },
+            { typeof(BVP),      ".bvp"  },
+            { typeof(PM1),      ".pm1"  },
+            { typeof(TBL),      ".tbl"  },
+            { typeof(DAT),      ".dat"  },
+            { typeof(FNT),      ".fnt"  },
+            { typeof(FNT0),     ".fnt0" },
+            { typeof(FTD),      ".ftd"  },
+            { typeof(DDS),      ".dds"  },
+            { typeof(DDSAtlus), ".dds"  },
+            { typeof(TMX),      ".tmx"  },
+            { typeof(SPD),      ".spd"  },
+            { typeof(SPR),      ".spr"  },
+            { typeof(BMD),      ".msg"  },
+            { typeof(PTP),      ".ptp"  },
         };
 
+        private static readonly Dictionary<string, Type> _extensionToType = new Dictionary<string, Type>()
+        {
+            //Containers
+            { ".bin",  typeof(BIN) },
+            { ".pak",  typeof(BIN) },
+            { ".pac",  typeof(BIN) },
+            { ".p00",  typeof(BIN) },
+            { ".p01",  typeof(BIN) },
+            { ".arc",  typeof(BIN) },
+            { ".dds2", typeof(BIN) },
+            { ".cpk",  typeof(BIN) },
+
+            { ".bf",  typeof(BF)  },
+            { ".pm1", typeof(PM1) },
+            { ".bvp", typeof(BVP) },
+            { ".tbl", typeof(TBL) },
+
+            { ".ctd", typeof(FTD) },
+            { ".ftd", typeof(FTD) },
+            { ".ttd", typeof(FTD) },
+
+            //Graphic containers
+            { ".spr", typeof(SPR) },
+            { ".spd", typeof(SPD) },
+
+            //Graphic
+            { ".fnt", typeof(FNT) },
+            { ".tmx", typeof(TMX) },
+            { ".dds", typeof(DDS) },
+
+            //Text
+            { ".bmd", typeof(BMD) },
+            { ".msg", typeof(BMD) },
+            { ".ptp", typeof(PTP) }
+        };
+
+        private static readonly Dictionary<Type, Type> _alternateType = new Dictionary<Type, Type>
+        {
+            { typeof(TBL), typeof(BIN)      },
+            { typeof(DDS), typeof(DDSAtlus) },
+        };
+
+        private static readonly Dictionary<Type, Func<string, byte[], IGameData>> _factories = new Dictionary<Type, Func<string, byte[], IGameData>>
+        {
+            { typeof(BIN),      (name, data) => name.ToLower().EndsWith(".cpk") ? new BIN(data, true) : new BIN(data, false) },
+            { typeof(SPR),      (name, data) => new SPR(data) },
+            { typeof(TMX),      (name, data) => new TMX(data) },
+            { typeof(BF),       (name, data) => new BF(data, name) },
+            { typeof(PM1),      (name, data) => new PM1(data) },
+            { typeof(BMD),      (name, data) => new BMD(data) },
+            { typeof(PTP),      (name, data) => new PTP(data) },
+            { typeof(FNT),      (name, data) => new FNT(data) },
+            { typeof(FNT0),     (name, data) => new FNT0(data) },
+            { typeof(BVP),      (name, data) => new BVP(name, data) },
+            { typeof(TBL),      (name, data) => new TBL(data, name) },
+            { typeof(FTD),      (name, data) => new FTD(data) },
+            { typeof(DDS),      (name, data) => new DDS(data) },
+            { typeof(DDSAtlus), (name, data) => new DDSAtlus(data) },
+            { typeof(SPD),      (name, data) => new SPD(data) },
+            { typeof(DAT),      (name, data) => new DAT(data) },
+        };
+
+        public static string GetDefaultExtension(Type type)
+        {
+            if (_defaultExtension.TryGetValue(type, out var extension))
+                return extension;
+
+            return string.Empty;
+        }
+
+        public static string GetDefaultExtension<T>() =>
+            GetDefaultExtension(typeof(T));
+
         /// <summary>
-        /// Tries to open a file with the specified data type.
+        /// Tries to open in the specified format
         /// </summary>
-        /// <param name="name">Name of file</param>
-        /// <param name="data">Data of file</param>
-        /// <param name="type">Type of file</param>
-        /// <returns>Return ObjectContainer for this file or null if an error occurred.</returns>
-        public static GameFile OpenFile(string name, byte[] data, FormatEnum type)
+        public static GameFile TryOpenFile(string name, byte[] data, Type type)
         {
             try
             {
-                IGameData Obj;
+                if (!_factories.TryGetValue(type, out var factory))
+                    return null;
 
-                if (type == FormatEnum.BIN)
-                    Obj = new FileContainer.BIN(data);
-                else if (type == FormatEnum.CPK)
-                    Obj = new FileContainer.BIN(data, true);
-                else if (type == FormatEnum.SPR)
-                    Obj = new SpriteContainer.SPR(data);
-                else if (type == FormatEnum.TMX)
-                    Obj = new Sprite.TMX(data);
-                else if (type == FormatEnum.BF)
-                    Obj = new FileContainer.BF(data, name);
-                else if (type == FormatEnum.PM1)
-                    Obj = new FileContainer.PM1(data);
-                else if (type == FormatEnum.BMD)
-                    Obj = new Text.BMD(data);
-                else if (type == FormatEnum.PTP)
-                    Obj = new Text.PTP(data);
-                else if (type == FormatEnum.FNT)
-                    Obj = new FNT(data);
-                else if (type == FormatEnum.FNT0)
-                    Obj = new FNT0(data);
-                else if (type == FormatEnum.BVP)
-                    Obj = new FileContainer.BVP(name, data);
-                else if (type == FormatEnum.TBL)
-                    try
-                    {
-                        Obj = new FileContainer.TBL(data, name);
-                    }
-                    catch
-                    {
-                        Obj = new FileContainer.BIN(data);
-                    }
-                else if (type == FormatEnum.FTD)
-                    Obj = new FTD(data);
-                else if (type == FormatEnum.DDS)
-                    try
-                    {
-                        Obj = new Sprite.DDS(data);
-                    }
-                    catch
-                    {
-                        Obj = new Sprite.DDSAtlus(data);
-                    }
-                else if (type == FormatEnum.SPD)
-                    Obj = new SpriteContainer.SPD(data);
-                else
-                    Obj = new DAT(data);
-
-                return new GameFile(name, Obj);
+                var obj = factory(name, data);
+                return new GameFile(name, obj);
             }
             catch
             {
@@ -112,45 +124,62 @@ namespace PersonaEditorLib
             }
         }
 
-        public static GameFile OpenFile(string name, byte[] data)
-        {
-            var format = GetFormat(data);
-            if (format == FormatEnum.Unknown)
-                format = GetFormat(name);
+        /// <summary>
+        /// Tries to open in the specified format
+        /// </summary>
+        public static GameFile TryOpenFile<T>(string name, byte[] data) =>
+            TryOpenFile(name, data, typeof(T));
 
-            return OpenFile(name, data, format);
+        /// <summary>
+        /// Tries to determine the format and open it. On failure, it returns by default in DAT format.
+        /// </summary>
+        public static GameFile OpenUnknownFile(string name, byte[] data)
+        {
+            var type = TryGetDataType(data)
+                ?? TryGetDataType(name)
+                ?? typeof(DAT);
+
+            var gf = TryOpenFile(name, data, type);
+            if (gf != null)
+                return gf;
+
+            if (_alternateType.TryGetValue(type, out var alternateType))
+                return TryOpenFile(name, data, alternateType);
+
+            return TryOpenFile<DAT>(name, data);
         }
 
-        public static FormatEnum GetFormat(string name)
+        public static Type TryGetDataType(string name)
         {
             string ext = Path.GetExtension(name).ToLower().TrimEnd(' ');
-            if (FileTypeDic.ContainsKey(ext))
-                return FileTypeDic[ext];
-            else
-                return FormatEnum.DAT;
+            if (_extensionToType.TryGetValue(ext, out var type))
+                return type;
+
+            return null;
         }
 
-        public static FormatEnum GetFormat(byte[] data)
+        public static Type TryGetDataType(byte[] data)
         {
-            if (data.Length >= 0xc)
+            if (data.Length >= 0xC)
             {
                 byte[] buffer = data.SubArray(0, 4);
                 if (buffer.ArrayEquals(new byte[] { 0x46, 0x4E, 0x54, 0x30 }))
-                    return FormatEnum.FNT0;
+                    return typeof(FNT0);
 
                 buffer = data.SubArray(8, 4);
                 if (buffer.ArrayEquals(new byte[] { 0x31, 0x47, 0x53, 0x4D }) | buffer.ArrayEquals(new byte[] { 0x4D, 0x53, 0x47, 0x31 }))
-                    return FormatEnum.BMD;
+                    return typeof(BMD);
                 else if (buffer.ArrayEquals(new byte[] { 0x54, 0x4D, 0x58, 0x30 }))
-                    return FormatEnum.TMX;
+                    return typeof(TMX);
                 else if (buffer.ArrayEquals(new byte[] { 0x53, 0x50, 0x52, 0x30 }))
-                    return FormatEnum.SPR;
+                    return typeof(SPR);
                 else if (buffer.ArrayEquals(new byte[] { 0x46, 0x4C, 0x57, 0x30 }))
-                    return FormatEnum.BF;
+                    return typeof(BF);
                 else if (buffer.ArrayEquals(new byte[] { 0x50, 0x4D, 0x44, 0x31 }))
-                    return FormatEnum.PM1;
+                    return typeof(PM1);
             }
-            return FormatEnum.Unknown;
+
+            return null;
         }
     }
 }

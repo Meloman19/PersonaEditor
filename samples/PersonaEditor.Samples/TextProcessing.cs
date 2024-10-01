@@ -99,13 +99,10 @@ namespace PersonaEditor.Samples
             foreach (var file in Directory.EnumerateFiles(inputDir, "*", SearchOption.AllDirectories))
             {
                 // Try open file as known format;
-                var gf = GameFormatHelper.OpenFile(Path.GetFileName(file), File.ReadAllBytes(file));
-                if (gf == null)
-                    // Unknown format -> next;
-                    continue;
+                var gf = GameFormatHelper.OpenUnknownFile(Path.GetFileName(file), File.ReadAllBytes(file));
 
                 // Collect all BMD
-                var bmdGFs = gf.GetAllObjectFiles(FormatEnum.BMD).ToArray();
+                var bmdGFs = gf.GetAllObjectOfType<BMD>().ToArray();
                 if (!bmdGFs.Any())
                     continue;
 

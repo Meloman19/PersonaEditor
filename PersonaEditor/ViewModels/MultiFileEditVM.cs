@@ -41,13 +41,9 @@ namespace PersonaEditor.ViewModels
                 if (fileInfo.Length > 1000000000)
                     return;
 
-                var file = GameFormatHelper.OpenFile(Path.GetFileName(path), File.ReadAllBytes(path));
-
-                if (file != null)
-                {
-                    Tree.SetRoot(file);
-                    Static.OpenedFile = Path.GetFullPath(path);
-                }
+                var file = GameFormatHelper.OpenUnknownFile(Path.GetFileName(path), File.ReadAllBytes(path));
+                Tree.SetRoot(file);
+                Static.OpenedFile = Path.GetFullPath(path);
             }
         }
 

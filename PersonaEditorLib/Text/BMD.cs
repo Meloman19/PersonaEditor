@@ -132,8 +132,6 @@ namespace PersonaEditorLib.Text
 
         #region IGameFile
 
-        public FormatEnum Type => FormatEnum.BMD;
-
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()

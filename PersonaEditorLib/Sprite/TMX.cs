@@ -108,8 +108,6 @@ namespace PersonaEditorLib.Sprite
 
         #region IGameFile
 
-        public FormatEnum Type => FormatEnum.TMX;
-
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize()

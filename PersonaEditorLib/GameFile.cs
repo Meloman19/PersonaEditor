@@ -60,13 +60,16 @@ namespace PersonaEditorLib
 
         #endregion
 
-        public IEnumerable<GameFile> GetAllObjectFiles(FormatEnum fileType)
+        public IEnumerable<GameFile> GetAllObjectOfType(Type type)
         {
-            if (GameData.Type == fileType)
+            if (GameData.GetType() == type)
                 yield return this;
             foreach (var sub in GameData.SubFiles)
-                foreach (var gameFile in sub.GetAllObjectFiles(fileType))
+                foreach (var gameFile in sub.GetAllObjectOfType(type))
                     yield return gameFile;
         }
+
+        public IEnumerable<GameFile> GetAllObjectOfType<T>() =>
+            GetAllObjectOfType(typeof(T));
     }
 }

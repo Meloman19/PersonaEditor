@@ -1,17 +1,19 @@
-﻿using AuxiliaryLibraries.Extensions;
-using AuxiliaryLibraries.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using AuxiliaryLibraries.Extensions;
+using AuxiliaryLibraries.Tools;
+using PersonaEditorLib.Other;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditorLib.FileContainer
 {
     public class BF : IGameData
     {
-        private static Dictionary<int, FormatEnum> MAP = new Dictionary<int, FormatEnum>()
+        private static Dictionary<int, Type> MAP = new Dictionary<int, Type>()
         {
-            { 0x3, FormatEnum.BMD }
+            { 0x3, typeof(BMD) }
         };
 
         int[][] Table;
@@ -46,9 +48,9 @@ namespace PersonaEditorLib.FileContainer
         {
             foreach (var a in SubFiles)
             {
-                FormatEnum fileType = a.GameData.Type;
+                var fileType = a.GameData.GetType();
                 string ext = Path.GetExtension(name);
-                if (fileType == FormatEnum.DAT)
+                if (fileType == typeof(DAT))
                     a.Name = name.Substring(0, name.Length - ext.Length) + "(" + ((int)a.Tag).ToString().PadLeft(2, '0') + ").DAT";
                 else
                     a.Name = name.Substring(0, name.Length - ext.Length) + "." + fileType.ToString();
@@ -85,20 +87,20 @@ namespace PersonaEditorLib.FileContainer
 
                     string tempN;
 
-                    FormatEnum type = FormatEnum.DAT;
+                    Type type = typeof(DAT);
                     if (MAP.ContainsKey(element[0]))
                         type = MAP[element[0]];
 
-                    tempN = "." + type.ToString();
+                    tempN = GameFormatHelper.GetDefaultExtension(type);
 
                     if (fileSize == element[3] + element[1] * element[2])
                         endIndex = element[0];
 
                     byte[] data = reader.ReadBytes(element[1] * element[2]);
 
-                    var item = GameFormatHelper.OpenFile(tempN, data, type);
+                    var item = GameFormatHelper.TryOpenFile(tempN, data, type);
                     if (item == null)
-                        item = GameFormatHelper.OpenFile(tempN, data, FormatEnum.DAT);
+                        item = GameFormatHelper.TryOpenFile<DAT>(tempN, data);
 
                     item.Tag = element[0];
 
@@ -136,8 +138,6 @@ namespace PersonaEditorLib.FileContainer
         }
 
         #region IGameFile
-
-        public FormatEnum Type => FormatEnum.BF;
 
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 

@@ -19,8 +19,6 @@ namespace PersonaEditorLib.Other
 
         #region IGameFile
 
-        public FormatEnum Type => FormatEnum.DAT;
-
         public int GetSize() => Data.Length;
 
         public byte[] GetData() => Data;

@@ -1,12 +1,12 @@
-﻿using Microsoft.Win32;
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Windows.Controls;
+using Microsoft.Win32;
 using PersonaEditor.Common;
 using PersonaEditor.Controls.ToolBox;
 using PersonaEditorLib;
 using PersonaEditorLib.Text;
-using System;
-using System.IO;
-using System.Text;
-using System.Windows.Controls;
 
 namespace PersonaEditor.ViewModels
 {
@@ -18,7 +18,7 @@ namespace PersonaEditor.ViewModels
 
             MenuItem menuItem = null;
 
-            if (PersonaFileHelper.IsEdited(PersonaFile))
+            if (PersonaFileHelper.IsEditable(PersonaFile))
             {
                 menuItem = new MenuItem();
                 menuItem.Header = "View/Edit";
@@ -54,8 +54,6 @@ namespace PersonaEditor.ViewModels
 
         private void ContextMenu_Replace()
         {
-            FormatEnum fileType = PersonaFile.GameData.Type;
-
             OpenFileDialog OFD = new OpenFileDialog();
             string name = PersonaFile.Name.Replace('/', '+');
             OFD.Filter = $"RAW(*{Path.GetExtension(name)})|*{Path.GetExtension(name)}";
@@ -74,7 +72,8 @@ namespace PersonaEditor.ViewModels
             {
                 if (OFD.FilterIndex == 1)
                 {
-                    var item = GameFormatHelper.OpenFile(PersonaFile.Name, File.ReadAllBytes(OFD.FileName), fileType);
+                    var fileType = PersonaFile.GameData.GetType();
+                    var item = GameFormatHelper.TryOpenFile(PersonaFile.Name, File.ReadAllBytes(OFD.FileName), fileType);
 
                     if (item != null)
                         PersonaFile.GameData = item.GameData;

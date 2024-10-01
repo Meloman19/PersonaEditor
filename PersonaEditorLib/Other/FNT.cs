@@ -70,8 +70,6 @@ namespace PersonaEditorLib.Other
 
         #region IGameFile
 
-        public FormatEnum Type => FormatEnum.FNT;
-
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => Header.HeaderSize + Palette.Size + WidthTable.Size() + Unknown.Size() + Reserved.Size + Compressed.Size();

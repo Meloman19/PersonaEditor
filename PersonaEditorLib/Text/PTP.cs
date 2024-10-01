@@ -441,8 +441,6 @@ namespace PersonaEditorLib.Text
 
         #region IGameFormat
 
-        public FormatEnum Type => FormatEnum.PTP;
-
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
         public int GetSize() => GetData().Length;

@@ -1,11 +1,12 @@
-﻿using AuxiliaryLibraries.Extensions;
-using PersonaEditorLib.Other;
-using AuxiliaryLibraries.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using AuxiliaryLibraries.Extensions;
+using AuxiliaryLibraries.Tools;
+using PersonaEditorLib.Other;
+using PersonaEditorLib.Sprite;
 
 namespace PersonaEditorLib.FileContainer
 {
@@ -147,10 +148,9 @@ namespace PersonaEditorLib.FileContainer
                     throw new Exception($"PM1 Read: {typeMap.ToString()}'s count more than 1");
 
                 string name = fileNameList[fileNameIndex++];
-                var singleFile = GameFormatHelper.OpenFile(name, data[(int)typeMap][0], GameFormatHelper.GetFormat(name));
-
+                var singleFile = GameFormatHelper.OpenUnknownFile(name, data[(int)typeMap][0]);
                 if (singleFile == null)
-                    singleFile = GameFormatHelper.OpenFile(name, data[(int)typeMap][0], FormatEnum.DAT);
+                    singleFile = GameFormatHelper.TryOpenFile<DAT>(name, data[(int)typeMap][0]);
 
                 singleFile.Tag = new object[] { (int)typeMap };
                 SubFiles.Add(singleFile);
@@ -190,7 +190,7 @@ namespace PersonaEditorLib.FileContainer
                         for (int i = 0; i < rmdHeaders.Length; i++)
                         {
                             RMDreader.BaseStream.Position = rmdHeaders[i][4] - rmdHeaders[0][4];
-                            var rmd = GameFormatHelper.OpenFile(fileNameList[fileNameIndex++], RMDreader.ReadBytes(rmdHeaders[i][5]), FormatEnum.DAT);
+                            var rmd = GameFormatHelper.TryOpenFile<DAT>(fileNameList[fileNameIndex++], RMDreader.ReadBytes(rmdHeaders[i][5]));
                             rmd.Tag = new object[] { (int)TypeMap.RMD, rmdHeaders[i] };
                             SubFiles.Add(rmd);
                         }
@@ -224,7 +224,7 @@ namespace PersonaEditorLib.FileContainer
 
                     for (int i = 0; i < eplList.Length; i++)
                     {
-                        var epl = GameFormatHelper.OpenFile(fileNameList[fileNameIndex++], eplList[i], FormatEnum.DAT);
+                        var epl = GameFormatHelper.TryOpenFile<DAT>(fileNameList[fileNameIndex++], eplList[i]);
                         epl.Tag = new object[] { (int)TypeMap.EPL, eplHeaders[i] };
                         SubFiles.Add(epl);
                     }
@@ -254,7 +254,7 @@ namespace PersonaEditorLib.FileContainer
                     for (int i = 0; i < tmxList.Length; i++)
                     {
                         var name = fileNameList[fileNameIndex++];
-                        var tmx = GameFormatHelper.OpenFile(name, tmxList[i], GameFormatHelper.GetFormat(name));
+                        var tmx = GameFormatHelper.TryOpenFile<TMX>(name, tmxList[i]);
                         tmx.Tag = new object[] { (int)TypeMap.TMX, tmxHeaders[i] };
                         SubFiles.Add(tmx);
                     }
@@ -286,7 +286,7 @@ namespace PersonaEditorLib.FileContainer
                             name = $"Noname({index.ToString().PadLeft(2, '0')}).DAT";
                         }
 
-                        var temp = GameFormatHelper.OpenFile(name, a, FormatEnum.DAT);
+                        var temp = GameFormatHelper.TryOpenFile<DAT>(name, a);
                         temp.Tag = new object[] { el.Key };
                         SubFiles.Add(temp);
                     }
@@ -628,8 +628,6 @@ namespace PersonaEditorLib.FileContainer
         }
 
         #region IGameFile
-
-        public FormatEnum Type => FormatEnum.PM1;
 
         public List<GameFile> SubFiles { get; } = new List<GameFile>();
 
