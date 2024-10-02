@@ -151,6 +151,7 @@ namespace PersonaEditorLib.Sprite
             _header.Width = (ushort)bitmap.Width;
             _header.Height = (ushort)bitmap.Height;
             _header.FileSize = GetSize();
+            _pixelMap = bitmap;
         }
 
         #endregion IImage
