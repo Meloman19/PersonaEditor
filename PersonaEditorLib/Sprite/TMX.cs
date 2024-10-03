@@ -163,6 +163,9 @@ namespace PersonaEditorLib.Sprite
 
         public void SetBitmap(PixelMap bitmap)
         {
+            _header.PaletteCount = 1;
+            Pallete = new byte[1][];
+            CurrentPallete = 0;
             TMXEncoding.Encode(this, bitmap);
             _header.Width = (ushort)bitmap.Width;
             _header.Height = (ushort)bitmap.Height;
