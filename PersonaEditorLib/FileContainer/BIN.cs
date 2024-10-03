@@ -183,7 +183,17 @@ namespace PersonaEditorLib.FileContainer
         {
             int returned = 0;
 
-            if (Old)
+            if (FES_format)
+            {
+                returned += 8 + (0x8 * SubFiles.Count);
+                foreach (var a in SubFiles)
+                {
+                    int size = a.GameData.GetSize();
+                    int align = IOTools.Alignment(size, 0x4);
+                    returned += size + align;
+                }
+            }
+            else if (Old)
             {
                 foreach (var a in SubFiles)
                 {

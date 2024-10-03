@@ -9,7 +9,7 @@ namespace PersonaEditorLib.Sprite
         {
             if (tmx.Pallete != null)
             {
-                var palleteData = tmx.Pallete;
+                var palleteData = tmx.Pallete[tmx.CurrentPallete];
                 if (tmx.Header.PixelFormat == TMXPixelFormatEnum.PSMT8)
                     palleteData = TMXHelper.TilePalette(palleteData);
 

@@ -4,6 +4,7 @@ using AuxiliaryLibraries.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -28,8 +29,9 @@ namespace PersonaEditorLib.Sprite
         public bool IsLittleEndian { get; set; } = true;
 
         public TMXHeader Header => _header;
-        public byte[] Pallete { get; set; }
+        public byte[][] Pallete { get; set; }
         public byte[] ImageData { get; set; }
+        public int CurrentPallete { get; set; }
 
         public string Comment => Encoding.ASCII.GetString(_header.Comment).TrimEnd('\0');
 
@@ -63,10 +65,14 @@ namespace PersonaEditorLib.Sprite
                     throw new Exception("TMX: unsupported format");
 
                 tempsize += Marshal.SizeOf<TMXHeader>();
-                if (_header.PaletteCount == 1)
+
+                Pallete = new byte[_header.PaletteCount][];
+                CurrentPallete = 0;
+
+                for (int i = 0; i < _header.PaletteCount; i++)
                 {
-                    Pallete = TMXHelper.ReadPallete(reader, _header.PixelFormat);
-                    tempsize += Pallete.Length;
+                    Pallete[i] = TMXHelper.ReadPallete(reader, _header.PixelFormat);
+                    tempsize += Pallete[i].Length;
                 }
 
                 int datasize = _header.Height * TMXHelper.GetStride(_header.PixelFormat, _header.Width);
@@ -85,7 +91,6 @@ namespace PersonaEditorLib.Sprite
             if (Header.ID != ID) throw new Exception("TMX: (0x00) wrong ID");
             if (Header.MagicNumber != MagicNumber) throw new Exception("TMX: (0x08) wrong MagicNumber");
             if (Header.Padding != 0) throw new Exception("TMX: (0x0C) wrong padding");
-            if (Header.PaletteCount > 1) throw new Exception("TMX: (0x10) number of palette more than 1");
             if (Header.MipMapCount != 0) throw new Exception("TMX: (0x17) mipMapCount more than 0");
             if (Header.MipMapK != 0) throw new Exception("TMX: (0x18) mipMapK more than 0");
             if (Header.MipMapL != 0) throw new Exception("TMX: (0x19) mipMapL more than 0");
@@ -114,7 +119,13 @@ namespace PersonaEditorLib.Sprite
         {
             int returned = 0;
             returned += 0x40;
-            returned += Pallete?.Length ?? 0;
+            
+            if (Pallete != null)
+            {
+                for (int i = 0; i < _header.PaletteCount; i++)
+                    returned += Pallete[i].Length;
+            }
+
             returned += ImageData.Length;
             return returned;
         }
@@ -127,7 +138,12 @@ namespace PersonaEditorLib.Sprite
 
                 writer.WriteStruct(_header);
                 if (Pallete != null)
-                    writer.Write(Pallete);
+                {
+                    for (int i = 0; i < _header.PaletteCount; i++)
+                    {
+                        writer.Write(Pallete[i]);
+                    }
+                }
                 writer.Write(ImageData);
                 return MS.ToArray();
             }
