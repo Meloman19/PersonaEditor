@@ -120,7 +120,7 @@ namespace PersonaEditorLib.Sprite
             int returned = 0;
             returned += 0x40;
             
-            if (Pallete != null)
+            if (Pallete.Length != 0)
             {
                 for (int i = 0; i < _header.PaletteCount; i++)
                     returned += Pallete[i].Length;
@@ -137,7 +137,7 @@ namespace PersonaEditorLib.Sprite
                 BinaryWriter writer = IOTools.OpenWriteFile(MS, IsLittleEndian);
 
                 writer.WriteStruct(_header);
-                if (Pallete != null)
+                if (Pallete.Length != 0)
                 {
                     for (int i = 0; i < _header.PaletteCount; i++)
                     {
