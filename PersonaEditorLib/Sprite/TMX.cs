@@ -66,8 +66,8 @@ namespace PersonaEditorLib.Sprite
 
                 tempsize += Marshal.SizeOf<TMXHeader>();
 
-                Pallete = new byte[_header.PaletteCount][];
                 CurrentPallete = 0;
+                Pallete = (_header.PaletteCount != 0) ? new byte[_header.PaletteCount][] : null;
 
                 for (int i = 0; i < _header.PaletteCount; i++)
                 {
@@ -120,7 +120,7 @@ namespace PersonaEditorLib.Sprite
             int returned = 0;
             returned += 0x40;
             
-            if (Pallete.Length != 0)
+            if (Pallete != null)
             {
                 for (int i = 0; i < _header.PaletteCount; i++)
                     returned += Pallete[i].Length;
@@ -137,7 +137,7 @@ namespace PersonaEditorLib.Sprite
                 BinaryWriter writer = IOTools.OpenWriteFile(MS, IsLittleEndian);
 
                 writer.WriteStruct(_header);
-                if (Pallete.Length != 0)
+                if (Pallete != null)
                 {
                     for (int i = 0; i < _header.PaletteCount; i++)
                     {

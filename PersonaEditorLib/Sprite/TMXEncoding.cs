@@ -43,7 +43,11 @@ namespace PersonaEditorLib.Sprite
                     throw new Exception();
             }
 
-            tmx.Pallete[tmx.CurrentPallete] = pallete;
+            if (pallete != null)
+                tmx.Pallete[tmx.CurrentPallete] = pallete;
+            else
+                tmx.Pallete = null;
+
             tmx.ImageData = imageData;
         }
     }
