@@ -4,7 +4,6 @@ using AuxiliaryLibraries.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -20,6 +19,7 @@ namespace PersonaEditorLib.Sprite
         #region Private Fields
 
         private PixelMap _pixelMap;
+        private int _pixelMapPallete;
         private TMXHeader _header;
 
         #endregion Private Fields
@@ -67,7 +67,7 @@ namespace PersonaEditorLib.Sprite
                 tempsize += Marshal.SizeOf<TMXHeader>();
 
                 CurrentPallete = 0;
-                Pallete = (_header.PaletteCount != 0) ? new byte[_header.PaletteCount][] : null;
+                Pallete = new byte[_header.PaletteCount][];
 
                 for (int i = 0; i < _header.PaletteCount; i++)
                 {
@@ -119,12 +119,9 @@ namespace PersonaEditorLib.Sprite
         {
             int returned = 0;
             returned += 0x40;
-            
-            if (Pallete != null)
-            {
-                for (int i = 0; i < _header.PaletteCount; i++)
-                    returned += Pallete[i].Length;
-            }
+
+            for (int i = 0; i < Pallete.Length; i++)
+                returned += Pallete[i].Length;
 
             returned += ImageData.Length;
             return returned;
@@ -137,12 +134,9 @@ namespace PersonaEditorLib.Sprite
                 BinaryWriter writer = IOTools.OpenWriteFile(MS, IsLittleEndian);
 
                 writer.WriteStruct(_header);
-                if (Pallete != null)
+                for (int i = 0; i < Pallete.Length; i++)
                 {
-                    for (int i = 0; i < _header.PaletteCount; i++)
-                    {
-                        writer.Write(Pallete[i]);
-                    }
+                    writer.Write(Pallete[i]);
                 }
                 writer.Write(ImageData);
                 return MS.ToArray();
@@ -155,22 +149,32 @@ namespace PersonaEditorLib.Sprite
 
         public PixelMap GetBitmap()
         {
+            if (_pixelMap != null &&
+                Pallete.Length > 0 &&
+                _pixelMapPallete != CurrentPallete)
+            {
+                _pixelMap = null;
+            }
+
             if (_pixelMap == null)
+            {
                 _pixelMap = TMXDecoding.Decode(this);
+                _pixelMapPallete = CurrentPallete;
+            }
 
             return _pixelMap;
         }
 
         public void SetBitmap(PixelMap bitmap)
         {
-            _header.PaletteCount = 1;
-            Pallete = new byte[1][];
             CurrentPallete = 0;
             TMXEncoding.Encode(this, bitmap);
+            _header.PaletteCount = (byte)Pallete.Length;
             _header.Width = (ushort)bitmap.Width;
             _header.Height = (ushort)bitmap.Height;
             _header.FileSize = GetSize();
             _pixelMap = bitmap;
+            _pixelMapPallete = 0;
         }
 
         #endregion IImage

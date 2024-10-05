@@ -7,7 +7,7 @@ namespace PersonaEditorLib.Sprite
     {
         public static PixelMap Decode(TMX tmx)
         {
-            if (tmx.Pallete != null)
+            if (tmx.Pallete.Length > 0)
             {
                 var palleteData = tmx.Pallete[tmx.CurrentPallete];
                 if (tmx.Header.PixelFormat == TMXPixelFormatEnum.PSMT8)

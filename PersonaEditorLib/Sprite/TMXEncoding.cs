@@ -44,9 +44,9 @@ namespace PersonaEditorLib.Sprite
             }
 
             if (pallete != null)
-                tmx.Pallete[tmx.CurrentPallete] = pallete;
+                tmx.Pallete = new byte[][] { pallete };
             else
-                tmx.Pallete = null;
+                tmx.Pallete = Array.Empty<byte[]>();
 
             tmx.ImageData = imageData;
         }
