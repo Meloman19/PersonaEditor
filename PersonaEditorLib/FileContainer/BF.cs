@@ -53,7 +53,7 @@ namespace PersonaEditorLib.FileContainer
                 if (fileType == typeof(DAT))
                     a.Name = name.Substring(0, name.Length - ext.Length) + "(" + ((int)a.Tag).ToString().PadLeft(2, '0') + ").DAT";
                 else
-                    a.Name = name.Substring(0, name.Length - ext.Length) + "." + fileType.ToString();
+                    a.Name = name.Substring(0, name.Length - ext.Length) + GameFormatHelper.GetDefaultExtension(fileType);
             }
         }
 

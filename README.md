@@ -6,4 +6,4 @@
 
 * Container: BIN (BIN, PAK, PAC, CPK (FES cut-ins format), P00, ARC); PM1; BF; BVP; TBL; FTD (FTD, CTD, TTD)
 * Graphic: FNT; SPR; TMX; SPD; DDS
-* Text: BMD (BMD, MSG); PTP
+* Text: BMD (BMD, MSG);
