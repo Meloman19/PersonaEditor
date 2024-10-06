@@ -6,20 +6,19 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
         xmlns:controls="clr-namespace:PersonaEditor.Views"
-        xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
+        xmlns:root="clr-namespace:PersonaEditor"
         mc:Ignorable="d"
         Title="Persona Editor GUI" 
-        Left="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosX, Mode=TwoWay}"
-        Top="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWPosY, Mode=TwoWay}"
-        WindowState="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWState, Mode=TwoWay}"
-        Height="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWHeight, Mode=TwoWay}"
-        Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWWidth, Mode=TwoWay}"
+        Left="{Binding Source={x:Static root:Static.SettingsProvider}, Path=UISettings.MainWindowPosX, Mode=TwoWay}"
+        Top="{Binding Source={x:Static root:Static.SettingsProvider}, Path=UISettings.MainWindowPosY, Mode=TwoWay}"
+        Height="{Binding Source={x:Static root:Static.SettingsProvider}, Path=UISettings.MainWidnowHeight, Mode=TwoWay}"
+        Width="{Binding Source={x:Static root:Static.SettingsProvider}, Path=UISettings.MainWindowWidth, Mode=TwoWay}"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <i:Interaction.Behaviors>
-        <beh:ClosingWindowBehavior Closing="{Binding WindowClosing}" />
-    </i:Interaction.Behaviors>    
-    
+        <beh:ClosingWindowBehavior Closing="{Binding WindowClosingCommand}" />
+    </i:Interaction.Behaviors>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,16 +28,16 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="Open" Command="{Binding Path=clickOpenFile}"/>
-                <MenuItem Header="Save As..." Command="{Binding Path=clickSaveAsFile}"/>
+                <MenuItem Header="Open" Command="{Binding Path=OpenFileCommand}"/>
+                <MenuItem Header="Save As..." Command="{Binding Path=SaveFileAsCommand}"/>
             </MenuItem>
             <MenuItem Header="Tools">
-                <MenuItem Header="Visualizer" Command="{Binding Path=clickVisualizerOpen}"/>
-                <MenuItem Header="Char Set" Command="{Binding Path=clickSetCharOpen}"/>
+                <MenuItem Header="Visualizer" Command="{Binding Path=OpenVisualizerCommand}"/>
+                <MenuItem Header="Char Set" Command="{Binding Path=OpenSetCharCommand}"/>
                 <Separator/>
-                <MenuItem Header="Settings" Command="{Binding Path=clickSettingOpen}"/>
+                <MenuItem Header="Settings" Command="{Binding Path=OpenSettingsCommand}"/>
             </MenuItem>
-            <MenuItem Header="About" Command="{Binding Path=clickAboutOpen}"/>
+            <MenuItem Header="About" Command="{Binding Path=OpenAboutCommand}"/>
         </Menu>
         <Separator Grid.Row="1"/>
 

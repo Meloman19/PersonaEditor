@@ -22,7 +22,7 @@
         <TabControl.ItemTemplate>
             <DataTemplate>
                 <controls:ClosableTabItem Title="{Binding TabTitle}"
-                                          Command="{Binding FileClose}"
+                                          Command="{Binding FileCloseCommand}"
                                           IsClosable="{Binding IsClosable}" />                
             </DataTemplate>
         </TabControl.ItemTemplate>

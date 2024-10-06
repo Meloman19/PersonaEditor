@@ -1,8 +1,8 @@
-﻿using System.Windows;
+﻿using System.Text;
 using System.Threading;
-using System.Text;
-using PersonaEditor.Views;
+using System.Windows;
 using PersonaEditor.Common;
+using PersonaEditor.Views;
 
 namespace PersonaEditor
 {
@@ -10,9 +10,9 @@ namespace PersonaEditor
     {
         private const string CURRENT_NAMED_PIPE = "PersonaEditor";
 
-        Mutex Mutex;
-        NamedPipeManager NamedPipeManager;
-        MainWindowVM MainWindowVM;
+        private Mutex Mutex;
+        private NamedPipeManager NamedPipeManager;
+        private MainWindowVM MainWindowVM;
 
         public App()
         {
@@ -22,7 +22,13 @@ namespace PersonaEditor
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (ApplicationSettings.AppSetting.Default.SingleInstanceApplication)
+            try
+            {
+                Static.SettingsProvider.Load();
+            }
+            catch { }
+
+            if (Static.SettingsProvider.AppSettings.SingleInstanceApplication)
             {
                 Mutex = new Mutex(true, CURRENT_NAMED_PIPE, out bool Is);
                 if (!Is)

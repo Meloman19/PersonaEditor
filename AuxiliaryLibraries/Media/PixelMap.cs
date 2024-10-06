@@ -30,5 +30,7 @@ namespace AuxiliaryLibraries.Media
         public int Height => _height;
 
         public Pixel[] Pixels => _pixels;
+
+        public bool IsEmpty => _pixels.Length == 0;
     }
 }

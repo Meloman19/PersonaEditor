@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -22,6 +23,14 @@ namespace PersonaEditor.Controls
         public static readonly DependencyProperty ObjectBorderThicknessProperty =
             DependencyProperty.Register(nameof(ObjectBorderThickness), typeof(Thickness), typeof(TextureAtlasEditControl),
                 new FrameworkPropertyMetadata(new Thickness(1)));
+
+        public static readonly DependencyProperty ObjectBorderBrushProperty =
+           DependencyProperty.Register(nameof(ObjectBorderBrush), typeof(Brush), typeof(TextureAtlasEditControl),
+               new FrameworkPropertyMetadata(null));
+
+        public static readonly DependencyProperty ObjectSelectionBrushProperty =
+           DependencyProperty.Register(nameof(ObjectSelectionBrush), typeof(Brush), typeof(TextureAtlasEditControl),
+               new FrameworkPropertyMetadata(null));
 
         public static readonly DependencyProperty TextureBitmapProperty =
             DependencyProperty.Register(nameof(TextureBitmap), typeof(BitmapSource), typeof(TextureAtlasEditControl),
@@ -71,6 +80,18 @@ namespace PersonaEditor.Controls
         {
             get { return (Thickness)GetValue(ObjectBorderThicknessProperty); }
             set { SetValue(ObjectBorderThicknessProperty, value); }
+        }
+
+        public Brush ObjectBorderBrush
+        {
+            get { return (Brush)GetValue(ObjectBorderBrushProperty); }
+            set { SetValue(ObjectBorderBrushProperty, value); }
+        }
+
+        public Brush ObjectSelectionBrush
+        {
+            get { return (Brush)GetValue(ObjectSelectionBrushProperty); }
+            set { SetValue(ObjectSelectionBrushProperty, value); }
         }
 
         public BitmapSource TextureBitmap

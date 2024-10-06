@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:views="clr-namespace:PersonaEditor.Views"
-             xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:root="clr-namespace:PersonaEditor"
              xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="900">
@@ -18,7 +18,7 @@
         
         <Grid Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Name="FirstCol" Width="{Binding Source={x:Static settings:WindowSetting.Default}, Path=MWLeftWidth, Mode=TwoWay}"/>
+                <ColumnDefinition Name="FirstCol" Width="{Binding Source={x:Static root:Static.SettingsProvider}, Path=UISettings.MainWindowTreeWidth, Mode=TwoWay}"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 

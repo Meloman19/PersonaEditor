@@ -1,15 +1,17 @@
-﻿using PersonaEditorLib;
-using AuxiliaryLibraries.WPF;
-using PersonaEditor.Common;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using PersonaEditor.Common;
+using PersonaEditorLib;
 
 namespace PersonaEditor.ViewModels
 {
-    class MultiFileEditVM : BindingObject
+    public sealed class MultiFileEditVM : BindingObject
     {
+        private string _mainWindowType = "";
+        private string _statusBar = "";
+
         public MultiFileEditVM()
         {
             DropFileCommand = new RelayCommand(DropFile);
@@ -17,9 +19,9 @@ namespace PersonaEditor.ViewModels
         }
 
         public TreeViewPEVM Tree { get; } = new TreeViewPEVM();
+
         public PreviewEditorTabControlVM Tab { get; } = new PreviewEditorTabControlVM();
 
-        private string _mainWindowType = "";
         public string MainWindowType
         {
             get => _mainWindowType;
@@ -28,10 +30,9 @@ namespace PersonaEditor.ViewModels
 
         public string OpenFileName => Static.OpenedFile;
 
-        private string statusBar = "";
-        public string StatusBar => statusBar;
+        public string StatusBar => _statusBar;
 
-        #region Methods
+        public ICommand DropFileCommand { get; }
 
         public void OpenFile(string path)
         {
@@ -79,12 +80,6 @@ namespace PersonaEditor.ViewModels
             return false;
         }
 
-        #endregion Methods
-
-        #region Events
-
-        public ICommand DropFileCommand { get; }
-
         private void DropFile(object arg)
         {
             if (arg is string filePath)
@@ -95,9 +90,9 @@ namespace PersonaEditor.ViewModels
         {
             Tab.SetPreview(sender.BitmapSource);
 
-            statusBar = "";
+            _statusBar = "";
             int size = sender.PersonaFile.GameData.GetSize();
-            statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
+            _statusBar = "Size: " + String.Format("0x{0:X8}", size) + " (" + size + ")";
             Notify("StatusBar");
         }
 
@@ -110,8 +105,6 @@ namespace PersonaEditor.ViewModels
         private void Tree_ItemSaveAs(GameFileTreeItem sender)
         {
         }
-
-        #endregion Events
 
         private void Tree_ItemAction(GameFileTreeItem sender, UserTreeViewItemEventEnum action)
         {

@@ -1,15 +1,23 @@
 ﻿using System.Collections.ObjectModel;
-using PersonaEditorLib.Text;
 using System.Linq;
 using PersonaEditor.Common;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class BMDMsgVM : BindingObject
+    public sealed class BMDMsgVM : BindingObject
     {
-        BMDMSG msg;
+        private readonly BMDMSG _msg;
 
-        public string Name => msg.Name;
+        public BMDMsgVM(BMDMSG msg, int sourceFont)
+        {
+            _msg = msg;
+
+            foreach (var a in msg.MsgStrings)
+                StringList.Add(new BMDMsgStrVM(a, sourceFont));
+        }
+
+        public string Name => _msg.Name;
 
         public ObservableCollection<BMDMsgStrVM> StringList { get; } = new ObservableCollection<BMDMsgStrVM>();
 
@@ -19,21 +27,13 @@ namespace PersonaEditor.ViewModels.Editors
                 a.Changes(save, destFont);
 
             if (save)
-                msg.MsgStrings = StringList.Select(x => x.data).ToArray();
+                _msg.MsgStrings = StringList.Select(x => x.Data).ToArray();
         }
 
         public void Update(int sourceFont)
         {
             foreach (var a in StringList)
                 a.Update(sourceFont);
-        }
-
-        public BMDMsgVM(BMDMSG msg, int sourceFont)
-        {
-            this.msg = msg;
-
-            foreach (var a in msg.MsgStrings)
-                StringList.Add(new BMDMsgStrVM(a, sourceFont));
         }
     }
 }

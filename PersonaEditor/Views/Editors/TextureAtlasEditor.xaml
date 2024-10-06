@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
              xmlns:editorVM="clr-namespace:PersonaEditor.ViewModels.Editors"
              xmlns:controls="clr-namespace:PersonaEditor.Controls"
              xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
@@ -52,7 +51,7 @@
                           VerticalScrollBarVisibility="Visible">
                     <DataGrid.Columns>
                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}" />
-                        
+
                         <DataGridTemplateColumn Header="X">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="editorVM:TextureObjectBase">
@@ -71,7 +70,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
-                        
+
                         <DataGridTemplateColumn Header="Y">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="editorVM:TextureObjectBase">
@@ -195,6 +194,15 @@
             <GridSplitter Grid.Column="1" Width="6" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
 
             <Grid Grid.Column="2">
+                <Grid.Resources>
+                    <SolidColorBrush x:Key="EditorBackgroundBrush"
+                                     Color="{Binding EditorBackground, Mode=OneWay}" />
+                    <SolidColorBrush x:Key="ObjectBorderBrush"
+                                     Color="{Binding ObjectBorderColor, Mode=OneWay}" />
+                    <SolidColorBrush x:Key="ObjectSelectionBrush"
+                                     Color="{Binding ObjectSelectionColor, Mode=OneWay}" />
+                </Grid.Resources>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
@@ -208,18 +216,17 @@
 
                     <Menu Grid.Column="0" VerticalAlignment="Center">
                         <MenuItem Header="Color">
-                            <MenuItem Header="Background" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=TwoWay}" Command="{Binding}"/>
-                            <MenuItem Header="Border" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=TwoWay}"/>
-                            <MenuItem Header="Selected Item" Click="MenuItem_Click" Tag="{Binding Source={x:Static settings:SPREditor.Default}, Path=SelectColor, Mode=TwoWay}"/>
+                            <MenuItem Header="Background" Command="{Binding SelectColorCommand}" CommandParameter="Background" />
+                            <MenuItem Header="Border" Command="{Binding SelectColorCommand}" CommandParameter="Border" />
+                            <MenuItem Header="Selected Item" Command="{Binding SelectColorCommand}" CommandParameter="Selected" />
                         </MenuItem>
                     </Menu>
                     <Grid Grid.Column="1">
-                        <controls:NumericUpDown x:Name="NUM"
-                                                MinValue="0"
+                        <controls:NumericUpDown MinValue="0"
                                                 MaxValue="5"
                                                 Width="40"
                                                 Margin="0,2"
-                                                Value="{Binding Source={x:Static settings:SPREditor.Default}, Path=BorderThickness, Mode=TwoWay}"
+                                                Value="{Binding ObjectBorderThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                 HorizontalAlignment="Left" />
                     </Grid>
                 </Grid>
@@ -237,7 +244,10 @@
                                                           TextureBitmap="{Binding SelectedTextureAtlas.TextureImage}"
                                                           ObjectList="{Binding SelectedTextureAtlas.Objects}"
                                                           SelectedObject="{Binding SelectedTextureAtlas.SelectedObject}"
-                                                          ObjectBorderThickness="{Binding ElementName=NUM, Path=Value}" />
+                                                          Background="{StaticResource EditorBackgroundBrush}"
+                                                          ObjectBorderThickness="{Binding ObjectBorderThickness}"
+                                                          ObjectBorderBrush="{StaticResource ObjectBorderBrush}"
+                                                          ObjectSelectionBrush="{StaticResource ObjectSelectionBrush}" />
                     </controls:ZoomPresenter>
                 </controls:ZoomScrollViewer>
             </Grid>

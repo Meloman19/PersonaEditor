@@ -1,36 +1,45 @@
-﻿using AuxiliaryLibraries.WPF;
-using PersonaEditor.Common;
-using PersonaEditor.Views.Tools;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using System.Windows.Media;
+using PersonaEditor.Common;
+using PersonaEditor.Common.Settings;
+using PersonaEditor.Views.Tools;
 
 namespace PersonaEditor.ViewModels
 {
-    public class ImagePreviewVM : BindingObject
+    public sealed class ImagePreviewVM : BindingObject
     {
+        private readonly SettingsProvider _settingsProvider;
+
         private ImageSource imageSource = null;
+        private Color _background;
+
+        public ImagePreviewVM()
+        {
+            _settingsProvider = Static.SettingsProvider;
+            _background = _settingsProvider.AppSettings.PreviewSelectedColor;
+            SelectBackgroundCommand = new RelayCommand(SelectBackground);
+        }
+
         public ImageSource SourceIMG
         {
             get => imageSource;
             set => SetProperty(ref imageSource, value);
         }
 
-        private Color background;
         public Color Background
         {
-            get { return background; }
+            get { return _background; }
             set
             {
-                if (background != value)
+                if (SetProperty(ref _background, value))
                 {
-                    background = value;
-                    ApplicationSettings.AppSetting.Default.PreviewSelectedColor = value;
-                    Notify("Background");
+                    _settingsProvider.AppSettings.PreviewSelectedColor = value;
                 }
             }
         }
 
-        public ICommand SelectBack { get; }
+        public ICommand SelectBackgroundCommand { get; }
+
         private void SelectBackground()
         {
             ColorPickerTool colorPickerTool = new ColorPickerTool()
@@ -40,11 +49,5 @@ namespace PersonaEditor.ViewModels
             if (colorPickerTool.ShowDialog() == true)
                 Background = colorPickerTool.SelectedColor;
         }
-
-        public ImagePreviewVM()
-        {
-            background = ApplicationSettings.AppSetting.Default.PreviewSelectedColor;
-            SelectBack = new RelayCommand(SelectBackground);
-        }        
     }
 }

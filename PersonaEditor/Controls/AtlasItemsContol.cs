@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace PersonaEditor.Controls
 {
@@ -10,13 +11,21 @@ namespace PersonaEditor.Controls
     {
         private const string DragBorderCanvasName = "DragBorderCanvas";
 
-        public static readonly DependencyProperty ObjectBorderThicknessProperty =
-            DependencyProperty.Register(nameof(ObjectBorderThickness), typeof(Thickness), typeof(AtlasItemsContol),
+        public static readonly DependencyProperty ItemBorderThicknessProperty =
+            DependencyProperty.Register(nameof(ItemBorderThickness), typeof(Thickness), typeof(AtlasItemsContol),
                 new FrameworkPropertyMetadata(new Thickness(1)));
 
-        public static readonly DependencyProperty SelectedObjectProperty =
-            DependencyProperty.Register(nameof(SelectedObject), typeof(object), typeof(AtlasItemsContol),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedObjectPropertyChanged));
+        public static readonly DependencyProperty ItemBorderBrushProperty =
+           DependencyProperty.Register(nameof(ItemBorderBrush), typeof(Brush), typeof(AtlasItemsContol),
+               new FrameworkPropertyMetadata(null));
+
+        public static readonly DependencyProperty ItemSelectionBrushProperty =
+           DependencyProperty.Register(nameof(ItemSelectionBrush), typeof(Brush), typeof(AtlasItemsContol),
+               new FrameworkPropertyMetadata(null));
+
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register(nameof(SelectedItem), typeof(object), typeof(AtlasItemsContol),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedItemPropertyChanged));
 
         internal static readonly DependencyPropertyKey CursorPositionPropertyKey =
             DependencyProperty.RegisterReadOnly(nameof(CursorPosition), typeof(Point?), typeof(AtlasItemsContol),
@@ -43,10 +52,22 @@ namespace PersonaEditor.Controls
             remove { RemoveHandler(CursorPositionChangedEvent, value); }
         }
 
-        public Thickness ObjectBorderThickness
+        public Thickness ItemBorderThickness
         {
-            get { return (Thickness)GetValue(ObjectBorderThicknessProperty); }
-            set { SetValue(ObjectBorderThicknessProperty, value); }
+            get { return (Thickness)GetValue(ItemBorderThicknessProperty); }
+            set { SetValue(ItemBorderThicknessProperty, value); }
+        }
+
+        public Brush ItemBorderBrush
+        {
+            get { return (Brush)GetValue(ItemBorderBrushProperty); }
+            set { SetValue(ItemBorderBrushProperty, value); }
+        }
+
+        public Brush ItemSelectionBrush
+        {
+            get { return (Brush)GetValue(ItemSelectionBrushProperty); }
+            set { SetValue(ItemSelectionBrushProperty, value); }
         }
 
         public Point? CursorPosition
@@ -55,10 +76,10 @@ namespace PersonaEditor.Controls
             private set => SetValue(CursorPositionPropertyKey, value);
         }
 
-        public object SelectedObject
+        public object SelectedItem
         {
-            get { return GetValue(SelectedObjectProperty); }
-            set { SetValue(SelectedObjectProperty, value); }
+            get { return GetValue(SelectedItemProperty); }
+            set { SetValue(SelectedItemProperty, value); }
         }
 
         public override void OnApplyTemplate()
@@ -71,7 +92,7 @@ namespace PersonaEditor.Controls
             _dragBorderCanvas.Children.Add(dragBorderVisualize);
 
             _dragBorderControl = new DragBorderControl(dragBorderVisualize);
-            _dragBorderControl.SetSelectedObject(SelectedObject);
+            _dragBorderControl.SetSelectedObject(SelectedItem);
             _dragBorderCanvas.Children.Add(_dragBorderControl);
         }
 
@@ -89,13 +110,32 @@ namespace PersonaEditor.Controls
         {
             var container = element as AtlasObjectContainer;
             container.DataContext = item;
-            container.IsSelected = item == SelectedObject;
+            container.IsSelected = item == SelectedItem;
             container.SelectingRequested += Container_SelectingRequested;
 
-            var borderBinding = new Binding();
-            borderBinding.Source = this;
-            borderBinding.Path = new PropertyPath(nameof(ObjectBorderThickness));
-            container.SetBinding(Control.BorderThicknessProperty, borderBinding);
+            var borderThicknessBinding = new Binding
+            {
+                Source = this,
+                Path = new PropertyPath(nameof(ItemBorderThickness)),
+                Mode = BindingMode.OneWay,
+            };
+            container.SetBinding(Control.BorderThicknessProperty, borderThicknessBinding);
+
+            var borderBrushBinding = new Binding
+            {
+                Source = this,
+                Path = new PropertyPath(nameof(ItemBorderBrush)),
+                Mode = BindingMode.OneWay,
+            };
+            container.SetBinding(Control.BorderBrushProperty, borderBrushBinding);
+
+            var foregroundBinding = new Binding
+            {
+                Source = this,
+                Path = new PropertyPath(nameof(ItemSelectionBrush)),
+                Mode = BindingMode.OneWay,
+            };
+            container.SetBinding(Control.ForegroundProperty, foregroundBinding);
         }
 
         protected override void ClearContainerForItemOverride(DependencyObject element, object item)
@@ -106,6 +146,8 @@ namespace PersonaEditor.Controls
             container.SelectingRequested -= Container_SelectingRequested;
 
             BindingOperations.ClearBinding(container, Control.BorderThicknessProperty);
+            BindingOperations.ClearBinding(container, Control.BorderBrushProperty);
+            BindingOperations.ClearBinding(container, Control.ForegroundProperty);
         }
 
         protected override void OnPreviewMouseMove(MouseEventArgs e)
@@ -116,7 +158,7 @@ namespace PersonaEditor.Controls
 
         private void Container_SelectingRequested(object sender, RoutedEventArgs e)
         {
-            SelectedObject = (sender as AtlasObjectContainer).Data;
+            SelectedItem = (sender as AtlasObjectContainer).Data;
         }
 
         private static void OnCursorPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -126,7 +168,7 @@ namespace PersonaEditor.Controls
             control.RaiseEvent(eventArgs);
         }
 
-        private static void OnSelectedObjectPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnSelectedItemPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = d as AtlasItemsContol;
             var oldSelected = control.ItemContainerGenerator.ContainerFromItem(e.OldValue);

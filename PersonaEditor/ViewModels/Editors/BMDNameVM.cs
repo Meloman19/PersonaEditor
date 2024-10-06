@@ -1,41 +1,44 @@
 ﻿using PersonaEditor.Common;
-using AuxiliaryLibraries.WPF;
 using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class BMDNameVM : BindingObject
+    public sealed class BMDNameVM : BindingObject
     {
-        BMDName name;
-        int sourceFont;
+        private readonly BMDName _bmdName;
 
-        public int Index => name.Index;
+        private int _sourceFont;
+        private string _name;
 
-        public string Name { get; set; }
+        public BMDNameVM(BMDName name, int sourceFont)
+        {
+            _bmdName = name;
+            _sourceFont = sourceFont;
+            Name = name.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
+        }
+
+        public int Index => _bmdName.Index;
+
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
+        }
 
         public void Changes(bool save, int destFont)
         {
             if (save)
-                name.NameBytes = Static.EncodingManager.GetPersonaEncoding(destFont).GetBytes(Name);
+                _bmdName.NameBytes = Static.EncodingManager.GetPersonaEncoding(destFont).GetBytes(Name);
             else
             {
-                Name = name.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
-                Notify("Name");
+                Name = _bmdName.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(_sourceFont));
             }
         }
 
         public void Update(int sourceFont)
         {
-            this.sourceFont = sourceFont;
-            Name = name.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
-            Notify("Name");
-        }
-
-        public BMDNameVM(BMDName name, int sourceFont)
-        {
-            this.name = name;
-            this.sourceFont = sourceFont;
-            Name = name.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
+            _sourceFont = sourceFont;
+            Name = _bmdName.NameBytes.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
         }
     }
 }

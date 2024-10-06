@@ -22,12 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Resource Include="ApplicationResource\Background.png" />
-		<Resource Include="ApplicationResource\PersonaEditor.ico" />
-		<Resource Include="ApplicationResource\icons\icons8-папка-96.png" />
-		<Resource Include="ApplicationResource\icons\icons8-файл-80.png" />
-		<Resource Include="ApplicationResource\icons\icons8-картина-80.png" />
-		<Resource Include="ApplicationResource\icons\icons8-документ-80.png" />
+		<Resource Include="ApplicationResource\**\*" />
 	</ItemGroup>
 
 	<ItemGroup>

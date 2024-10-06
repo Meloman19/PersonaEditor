@@ -21,7 +21,7 @@
 
         
         <ScrollViewer Grid.Row="1" Background="White" CanContentScroll="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-            <ItemsControl ItemsSource="{Binding Entrie}">
+            <ItemsControl ItemsSource="{Binding Entries}">
                 <ItemsControl.Resources>
                     <DataTemplate DataType="{x:Type editorsVM:FTDSingleVM}">
                         <StackPanel Orientation="Horizontal">

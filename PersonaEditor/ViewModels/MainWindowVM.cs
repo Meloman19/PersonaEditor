@@ -1,21 +1,32 @@
-﻿using Microsoft.Win32;
+﻿using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;
-using System.ComponentModel;
-using AuxiliaryLibraries.WPF;
-using PersonaEditor.ViewModels;
-using PersonaEditor.View.Settings;
-using PersonaEditor.ViewModels.Settings;
+using Microsoft.Win32;
 using PersonaEditor.Common;
+using PersonaEditor.View.Settings;
+using PersonaEditor.ViewModels;
+using PersonaEditor.ViewModels.Settings;
 
 namespace PersonaEditor.Views
 {
-    class MainWindowVM : BindingObject
+    public sealed class MainWindowVM : BindingObject
     {
         private object _mainControlDC = null;
 
-        Views.Tools.Visualizer visualizer;
-        Views.Tools.SetChar setchar;
+        private Views.Tools.Visualizer _visualizerTool;
+        private Views.Tools.SetChar _setcharTool;
+
+        public MainWindowVM()
+        {
+            WindowClosingCommand = new RelayCommand(WindowClosing);
+            OpenFileCommand = new RelayCommand(OpenFile);
+            SaveFileAsCommand = new RelayCommand(SaveFileAs);
+            OpenSettingsCommand = new RelayCommand(OpenSettings);
+            OpenVisualizerCommand = new RelayCommand(OpenVisualizer);
+            OpenSetCharCommand = new RelayCommand(OpenSetChar);
+
+            OpenAboutCommand = new RelayCommand(OpenAbout);
+        }
 
         public MultiFileEditVM MultiFile { get; } = new MultiFileEditVM();
 
@@ -25,28 +36,35 @@ namespace PersonaEditor.Views
             set => SetProperty(ref _mainControlDC, value);
         }
 
-        #region Events
+        public ICommand WindowClosingCommand { get; }
 
-        public ICommand WindowClosing { get; }
-        private void Window_Closing(object arg)
+        public ICommand OpenFileCommand { get; }
+
+        public ICommand SaveFileAsCommand { get; }
+
+        public ICommand OpenVisualizerCommand { get; }
+
+        public ICommand OpenSetCharCommand { get; }
+
+        public ICommand OpenSettingsCommand { get; }
+
+        public ICommand OpenAboutCommand { get; }
+
+        private void WindowClosing(object arg)
         {
             if (MultiFile.CloseFile())
             {
-                if (visualizer != null)
-                    visualizer.Close();
-                if (setchar != null)
-                    setchar.Close();
+                if (_visualizerTool != null)
+                    _visualizerTool.Close();
+                if (_setcharTool != null)
+                    _setcharTool.Close();
 
-                ApplicationSettings.AppSetting.Default.Save();
-                ApplicationSettings.BackgroundDefault.Default.Save();
-                ApplicationSettings.SPREditor.Default.Save();
-                ApplicationSettings.WindowSetting.Default.Save();
+                Static.SettingsProvider.Save();
             }
             else
                 (arg as CancelEventArgs).Cancel = true;
         }
 
-        public ICommand clickOpenFile { get; }
         private void OpenFile()
         {
             OpenFileDialog OFD = new OpenFileDialog();
@@ -54,8 +72,7 @@ namespace PersonaEditor.Views
                 MultiFile.OpenFile(OFD.FileName);
         }
 
-        public ICommand clickSaveAsFile { get; }
-        private void SaveAsFile()
+        private void SaveFileAs()
         {
             if (MultiFile.OpenFileName != "")
             {
@@ -74,80 +91,58 @@ namespace PersonaEditor.Views
                 if (SFD.ShowDialog() == true)
                     MultiFile.SaveFile(SFD.FileName);
             }
-
         }
 
-        public ICommand clickVisualizerOpen { get; }
-        private void ToolVisualizerOpen()
+        private void OpenVisualizer()
         {
-            if (visualizer != null)
-                if (visualizer.IsLoaded)
+            if (_visualizerTool != null)
+                if (_visualizerTool.IsLoaded)
                 {
-                    visualizer.Activate();
+                    _visualizerTool.Activate();
                     return;
                 }
 
-            visualizer = new Views.Tools.Visualizer() { DataContext = new ViewModels.Tools.VisualizerVM() };
-            visualizer.Show();
+            _visualizerTool = new Views.Tools.Visualizer() { DataContext = new ViewModels.Tools.VisualizerVM() };
+            _visualizerTool.Show();
         }
 
-        public ICommand clickSetCharOpen { get; }
-        private void ToolSetCharOpen()
+        private void OpenSetChar()
         {
-            if (setchar != null)
-                if (setchar.IsLoaded)
+            if (_setcharTool != null)
+                if (_setcharTool.IsLoaded)
                 {
-                    setchar.Activate();
+                    _setcharTool.Activate();
                     return;
                 }
 
-            setchar = new Views.Tools.SetChar() { DataContext = new ViewModels.Tools.SetCharVM() };
-            setchar.Show();
+            _setcharTool = new Views.Tools.SetChar() { DataContext = new ViewModels.Tools.SetCharVM() };
+            _setcharTool.Show();
         }
 
-        public ICommand clickSettingOpen { get; }
-        private void SettingOpen()
+        private void OpenSettings()
         {
-            ApplicationSettings.AppSetting.Default.Save();
-            ApplicationSettings.BackgroundDefault.Default.Save();
-            ApplicationSettings.SPREditor.Default.Save();
-            ApplicationSettings.WindowSetting.Default.Save();
+            Static.SettingsProvider.Save();
             SetSettings setSettings = new SetSettings() { DataContext = new SetSettingsVM() };
             setSettings.ShowDialog();
-            Static.BackManager.EmptyUpdate();
         }
 
-        public ICommand clickAboutOpen { get; }
-        private void AboutOpen()
+        private void OpenAbout()
         {
+#if DEBUG
+            TestClick();
+#endif
+
             (new About()).ShowDialog();
         }
 
-        #endregion Events
-
-        public ICommand clickTest { get; }
         private void TestClick()
-        {          
+        {
         }
 
         public void OpenFile(string path)
         {
             if (File.Exists(path))
                 MultiFile.OpenFile(path);
-        }
-
-        public MainWindowVM()
-        {
-            WindowClosing = new RelayCommand(Window_Closing);
-            clickOpenFile = new RelayCommand(OpenFile);
-            clickSaveAsFile = new RelayCommand(SaveAsFile);
-            clickSettingOpen = new RelayCommand(SettingOpen);
-            clickVisualizerOpen = new RelayCommand(ToolVisualizerOpen);
-            clickSetCharOpen = new RelayCommand(ToolSetCharOpen);
-
-            clickAboutOpen = new RelayCommand(AboutOpen);
-
-            clickTest = new RelayCommand(TestClick);
         }
     }
 }

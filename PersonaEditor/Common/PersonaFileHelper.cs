@@ -12,7 +12,6 @@ namespace PersonaEditor.Common
         private static readonly Type[] _editableTypes = new[]
         {
             typeof(BMD),
-            typeof(PTP),
             typeof(SPD),
             typeof(SPR),
             typeof(FTD),

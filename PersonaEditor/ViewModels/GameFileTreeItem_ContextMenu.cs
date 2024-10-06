@@ -1,12 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using PersonaEditor.Common;
-using PersonaEditor.Controls.ToolBox;
 using PersonaEditorLib;
-using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels
 {
@@ -65,8 +62,6 @@ namespace PersonaEditor.ViewModels
                 OFD.Filter += $"|PNG (*.png)|*.png";
             if (PersonaFile.GameData is ITable)
                 OFD.Filter += $"|XML data table (*.xml)|*.xml";
-            if (PersonaFile.GameData is BMD)
-                OFD.Filter += $"|Persona Text Project (*.ptp)|*.ptp";
 
             if (OFD.ShowDialog() == true)
             {
@@ -85,12 +80,6 @@ namespace PersonaEditor.ViewModels
                         PersonaEditorTools.OpenImageFile(PersonaFile, OFD.FileName);
                     else if (ext.Equals(".xml", StringComparison.CurrentCultureIgnoreCase))
                         PersonaEditorTools.OpenTableFile(PersonaFile, OFD.FileName);
-                    else if (ext.Equals(".ptp", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        var result = ToolBox.Show(ToolBoxType.OpenPTP);
-                        if (result == ToolBoxResult.Ok)
-                            PersonaEditorTools.OpenPTPFile(PersonaFile, OFD.FileName, Static.EncodingManager.GetPersonaEncoding(ApplicationSettings.AppSetting.Default.OpenPTP_Font));
-                    }
                     else
                         throw new Exception("OpenPersonaFileDialog");
                 }
@@ -113,10 +102,6 @@ namespace PersonaEditor.ViewModels
                 SFD.Filter += $"|PNG (*.png)|*.png";
             if (PersonaFile.GameData is ITable)
                 SFD.Filter += $"|XML data table (*.xml)|*.xml";
-            if (PersonaFile.GameData is BMD)
-                SFD.Filter += $"|Persona Text Project (*.ptp)|*.ptp";
-            if (PersonaFile.GameData is PTP)
-                SFD.Filter += $"|BMD Text File (*.bmd)|*.bmd";
 
             SFD.InitialDirectory = Path.GetDirectoryName(Static.OpenedFile);
             if (SFD.ShowDialog() == true)
@@ -127,24 +112,10 @@ namespace PersonaEditor.ViewModels
                     string ext = Path.GetExtension(SFD.FileName);
                     if (ext.Equals(".png", StringComparison.CurrentCultureIgnoreCase))
                         PersonaEditorTools.SaveImageFile(PersonaFile, SFD.FileName);
-                    else if (ext.Equals(".ptp", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        var result = ToolBox.Show(ToolBoxType.SaveAsPTP);
-                        if (result == ToolBoxResult.Ok)
-                        {
-                            PersonaEncoding temp = ApplicationSettings.AppSetting.Default.SaveAsPTP_CO2N ? Static.EncodingManager.GetPersonaEncoding(ApplicationSettings.AppSetting.Default.SaveAsPTP_Font) : null;
-                            PersonaEditorTools.SavePTPFile(PersonaFile, SFD.FileName, temp);
-                        }
-                    }
-                    else if (ext.Equals(".bmd", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        Encoding encoding = Static.EncodingManager.GetPersonaEncoding(ApplicationSettings.AppSetting.Default.PTPNewDefault);
-                        BMD bmd = new BMD(PersonaFile.GameData as PTP, encoding);
-                        File.WriteAllBytes(SFD.FileName, bmd.GetData());
-                    }
                     else if (ext.Equals(".xml", StringComparison.CurrentCultureIgnoreCase))
                         PersonaEditorTools.SaveTableFile(PersonaFile, SFD.FileName);
-                    else throw new Exception("SavePersonaFileDialog");
+                    else
+                        throw new Exception("SavePersonaFileDialog");
                 }
         }
 

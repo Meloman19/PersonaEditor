@@ -25,9 +25,6 @@ namespace PersonaEditor.Common
                 case BMDEditorVM:
                     controlType = typeof(BMDEditor);
                     break;
-                case PTPEditorVM:
-                    controlType = typeof(PTPEditor);
-                    break;
                 case HEXEditorVM:
                     controlType = typeof(HEXEditor);
                     break;

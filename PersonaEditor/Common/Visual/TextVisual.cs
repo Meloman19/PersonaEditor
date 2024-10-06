@@ -1,152 +1,37 @@
-﻿using AuxiliaryLibraries.WPF.Wrapper;
-using PersonaEditorLib;
-using PersonaEditorLib.Text;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using AuxiliaryLibraries.Extensions;
+using AuxiliaryLibraries.Media;
+using AuxiliaryLibraries.WPF.Wrapper;
+using PersonaEditorLib;
+using PersonaEditorLib.Text;
 
 namespace PersonaEditor.Common.Visual
 {
-    public delegate void VisualChangedEventHandler(ImageSource imageSource, Rect rect);
-
-    class TextVisual : BindingObject
+    public sealed class TextVisual
     {
-        public event VisualChangedEventHandler VisualChanged;
+        private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        private PersonaEncoding _encoding;
+        private PersonaFont _font;
+        private string _text;
+        private BitmapSource _textBitmap;
 
-        CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        public BitmapSource Image => _textBitmap;
 
-        Func<ImageData> GetData;
-
-        PersonaFont font;
-
-        #region PrivateField
-
-        private bool isEnable = true;
-        private object Text;
-
-        private ImageSource _Image;
-        private Rect _Rect;
-        private Point _Start;
-        private Color _Color;
-        private double _GlyphScale;
-        private int _LineSpacing;
-        private ImageData _Data;
-        private ImageData Data
+        public void UpdateText(string text)
         {
-            get { return _Data; }
-            set
-            {
-                _Data = value;
-                _Image = _Data.GetImageSource()?.GetBitmapSource();
-                TextDrawing.ImageSource = _Image;
-                _Rect = GetSize(Start, _Data.PixelWidth, _Data.PixelHeight);
-                TextDrawing.Rect = _Rect;
-                VisualChanged?.Invoke(_Image, _Rect);
-            }
-        }
-
-        #endregion PrivateField
-
-        public string Tag { get; set; }
-
-        public Point Start
-        {
-            get { return _Start; }
-            set
-            {
-                if (_Start != value)
-                {
-                    _Start = value;
-                    _Rect = GetSize(Start, _Data.PixelWidth, _Data.PixelHeight);
-                    VisualChanged?.Invoke(_Image, _Rect);
-                }
-            }
-        }
-        public Color Color
-        {
-            get { return _Color; }
-            set
-            {
-                if (_Color != value)
-                {
-                    _Color = value;
-                    _Image = _Data.GetImageSource()?.GetBitmapSource();
-                    VisualChanged?.Invoke(_Image, _Rect);
-                }
-            }
-        }
-        public double GlyphScale
-        {
-            get { return _GlyphScale; }
-            set
-            {
-                if (_GlyphScale != value)
-                {
-                    _GlyphScale = value;
-                    _Rect = GetSize(Start, _Data.PixelWidth, _Data.PixelHeight);
-                    VisualChanged?.Invoke(_Image, _Rect);
-                }
-            }
-        }
-        public int LineSpacing
-        {
-            get { return _LineSpacing; }
-            set
-            {
-                if (_LineSpacing != value)
-                {
-                    _LineSpacing = value;
-                    UpdateText();
-                }
-            }
-        }
-
-        public Rect Rect => _Rect;
-        public ImageSource Image => _Image;
-
-        public ImageDrawing TextDrawing { get; } = new ImageDrawing();
-
-        public bool IsEnable
-        {
-            get { return isEnable; }
-            set
-            {
-                isEnable = value;
-                if (value)
-                    UpdateText();
-            }
-        }
-
-        ImageData CreateData()
-        {
-            if (Text is IEnumerable<TextBaseElement> list)
-                return ImageData.DrawText(list, font, LineSpacing);
-            else if (Text is byte[] array)
-                return ImageData.DrawText(array.GetTextBases(), font, LineSpacing);
-            else return new ImageData();
-        }
-
-        Rect GetSize(Point start, double pixelWidth, double pixelHeight)
-        {
-            double Height = pixelHeight * GlyphScale;
-            double Width = pixelWidth * GlyphScale * 0.9375;
-            return new Rect(start, new Size(Width, Height));
-        }
-
-        public void UpdateText(IEnumerable<TextBaseElement> textBases, PersonaFont font = null)
-        {
-            Text = textBases;
-            if (font != null)
-                this.font = font;
+            _text = text;
             UpdateText();
         }
 
-        public void UpdateText(byte[] array)
+        public void UpdateFont(PersonaEncoding encoding, PersonaFont font)
         {
-            Text = array;
+            _encoding = encoding;
+            _font = font;
             UpdateText();
         }
 
@@ -158,33 +43,154 @@ namespace PersonaEditor.Common.Visual
             CancellationTokenSource.Dispose();
             CancellationTokenSource = new CancellationTokenSource();
 
-            if (IsEnable)
-                try
+            try
+            {
+                var text = _text ?? string.Empty;
+                var encoding = _encoding;
+                var font = _font;
+
+                _textBitmap = await Task.Run(() =>
                 {
-                    Data = await Task.Run(GetData, CancellationTokenSource.Token);
+                    var textBases = text.GetTextBases(encoding);
+                    var imageData = DrawText(textBases, font);
+                    if (imageData.IsEmpty)
+                        return null;
+                    var img = imageData.GetBitmapSource();
+                    img.Freeze();
+                    return img;
+                }, CancellationTokenSource.Token);
+                ImageChanged?.Invoke();
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        public static PixelMap DrawText(IEnumerable<TextBaseElement> text, PersonaFont personaFont)
+        {
+            if (text != null && personaFont != null)
+            {
+                PixelMap returned = new PixelMap();
+                PixelMap line = new PixelMap();
+                foreach (var a in text)
+                {
+                    if (a.IsText)
+                    {
+                        for (int i = 0; i < a.Data.Length; i++)
+                        {
+                            int index = 0;
+
+                            if (0x20 <= a.Data[i] & a.Data[i] < 0x80)
+                                index = a.Data[i];
+                            else if (0x80 <= a.Data[i] & a.Data[i] < 0xF0)
+                            {
+                                index = (a.Data[i] - 0x81) * 0x80 + a.Data[i + 1] + 0x20;
+                                i++;
+                            }
+
+                            var Glyph = personaFont.GetGlyph(index);
+
+                            if (Glyph.Item1 != null)
+                            {
+                                PixelMap glyph = new PixelMap(personaFont.Width, personaFont.Height, Glyph.Item1);
+                                byte Left = Glyph.Item2.Left;
+                                byte Right = Glyph.Item2.Right;
+                                glyph = Crop(glyph, new Rectangle(Left, 0, Right - Left, glyph.Height));
+                                line = MergeLeftRight(line, glyph, 1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (a.Data.ArrayEquals(new byte[] { 0x0A }))
+                        {
+                            returned = MergeUpDown(returned, line);
+                            line = new PixelMap();
+                        }
+                    }
                 }
-                catch (OperationCanceledException ex)
+                returned = MergeUpDown(returned, line);
+                return returned;
+            }
+            return new PixelMap();
+        }
+
+        public static PixelMap MergeLeftRight(PixelMap left, PixelMap right, int horizontalshift)
+        {
+            if (left.IsEmpty)
+                return right;
+            if (right.IsEmpty)
+                return left;
+
+            var leftRect = new Rectangle(0, 0, left.Width, left.Height);
+            var rightRect = new Rectangle(left.Width + horizontalshift, 0, right.Width, right.Height);
+
+            var union = Rectangle.Union(leftRect, rightRect);
+            var newPixels = new Pixel[union.Width * union.Height];
+            Array.Fill(newPixels, Pixel.FromArgb(255, 0, 0, 0));
+            CopyPixels(newPixels, union, left, leftRect);
+            CopyPixels(newPixels, union, right, rightRect);
+
+            return new PixelMap(union.Width, union.Height, newPixels);
+        }
+
+        public static PixelMap MergeUpDown(PixelMap up, PixelMap down)
+        {
+            if (up.IsEmpty)
+                return down;
+            if (down.IsEmpty)
+                return up;
+
+            var upRect = new Rectangle(0, 0, up.Width, up.Height);
+            var downRect = new Rectangle(0, up.Height, down.Width, down.Height);
+
+            var union = Rectangle.Union(upRect, downRect);
+            var newPixels = new Pixel[union.Width * union.Height];
+            Array.Fill(newPixels, Pixel.FromArgb(255, 0, 0, 0));
+            CopyPixels(newPixels, union, up, upRect);
+            CopyPixels(newPixels, union, down, downRect);
+
+            return new PixelMap(union.Width, union.Height, newPixels);
+        }
+
+        private static void CopyPixels(Pixel[] newPixels, Rectangle newRect, PixelMap pixelMap, Rectangle rect)
+        {
+            for (int y = rect.Top; y < rect.Bottom; y++)
+                for (int x = rect.Left; x < rect.Right; x++)
                 {
-                }
-                catch (Exception e)
-                {
+                    var newIndex = y * newRect.Width + x;
+                    var oldIndex = (y - rect.Top) * rect.Width + (x - rect.Left);
+
+                    newPixels[newIndex] = pixelMap.Pixels[oldIndex];
                 }
         }
 
-        public void UpdateFont(PersonaFont Font)
+        private static PixelMap Crop(PixelMap image, Rectangle rect)
         {
-            this.font = Font;
-            UpdateText();
+            if (image.IsEmpty)
+                return image;
+
+            var intersect = Rectangle.Intersect(new Rectangle(0, 0, image.Width, image.Height), rect);
+            if (intersect.IsEmpty)
+                return new PixelMap();
+
+            var newPixels = new Pixel[intersect.Width * intersect.Height];
+            Array.Fill(newPixels, Pixel.FromArgb(255, 0, 0, 0));
+            for (int y = intersect.Y; y < intersect.Bottom; y++)
+                for (int x = intersect.X; x < intersect.Right; x++)
+                {
+                    var newIndex = (y - intersect.Y) * intersect.Width + (x - intersect.X);
+                    var oldIndex = y * image.Width + x;
+
+                    newPixels[newIndex] = image.Pixels[oldIndex];
+                }
+
+            return new PixelMap(intersect.Width, intersect.Height, newPixels);
         }
 
-        public TextVisual()
-        {
-            GetData = CreateData;
-        }
-
-        public TextVisual(PersonaFont font) : this()
-        {
-            this.font = font;
-        }
+        public event Action ImageChanged;
     }
 }

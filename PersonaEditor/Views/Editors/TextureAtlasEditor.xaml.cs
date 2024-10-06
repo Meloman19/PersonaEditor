@@ -1,8 +1,6 @@
-﻿using PersonaEditor.Controls;
-using PersonaEditor.Views.Tools;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using PersonaEditor.Controls;
 
 namespace PersonaEditor.Views.Editors
 {
@@ -11,20 +9,6 @@ namespace PersonaEditor.Views.Editors
         public TextureAtlasEditor()
         {
             InitializeComponent();
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem item)
-                if (item.Tag is Color color)
-                {
-                    ColorPickerTool tool = new ColorPickerTool()
-                    {
-                        SelectedColor = color
-                    };
-                    if (tool.ShowDialog() == true)
-                        item.Tag = tool.SelectedColor;
-                }
         }
 
         private void TextureAtlasEditControl_CursorPositionChanged(object sender, RoutedEventArgs e)

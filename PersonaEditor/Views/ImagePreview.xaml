@@ -14,7 +14,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <StatusBar Grid.Row="0">
-            <Button Content="Background" Command="{Binding SelectBack}"/>
+            <Button Content="Background" Command="{Binding SelectBackgroundCommand}"/>
             <CheckBox IsChecked="True"
                       Checked="CheckBox_Checked"
                       Unchecked="CheckBox_Unchecked"
@@ -37,7 +37,7 @@
                             x:FieldModifier="private"
                             BorderBrush="Black"
                             BorderThickness="1"
-                            Background="{StaticResource ImageBackground}">
+                            Background="{StaticResource DefaultImageTiledBackground}">
                         <Rectangle>
                             <Rectangle.Fill>
                                 <SolidColorBrush Color="{Binding Path=Background}"/>

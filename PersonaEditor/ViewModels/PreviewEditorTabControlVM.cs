@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -15,17 +14,17 @@ using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels
 {
-    class PreviewEditorTabControlVM : BindingObject
+    public sealed class PreviewEditorTabControlVM : BindingObject
     {
-        private ObservableCollection<ClosableTabItemVM> tabCollection = new ObservableCollection<ClosableTabItemVM>();
+        private readonly ObservableCollection<ClosableTabItemVM> _tabCollection = new ObservableCollection<ClosableTabItemVM>();
         private int _selectedTabIndex = 0;
         private ImagePreviewVM previewVM = new ImagePreviewVM();
 
         public PreviewEditorTabControlVM()
         {
             DropItemCommand = new RelayCommand(SingleFileEdit_Drop);
-            tabCollection.Add(new ClosableTabItemVM() { TabTitle = "Preview", IsClosable = false, DataContext = previewVM });
-            TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(tabCollection);
+            _tabCollection.Add(new ClosableTabItemVM(null, previewVM, "Preview") { IsClosable = false });
+            TabCollection = new ReadOnlyObservableCollection<ClosableTabItemVM>(_tabCollection);
         }
 
         public ReadOnlyObservableCollection<ClosableTabItemVM> TabCollection { get; }
@@ -48,18 +47,17 @@ namespace PersonaEditor.ViewModels
         {
             bool returned = true;
 
-            var list = tabCollection.ToList();
+            var list = _tabCollection.ToList();
             foreach (var a in list)
                 returned = returned & a.Close();
 
             return returned;
         }
 
-        private static readonly Dictionary<Type, Func<GameFile, object>> _editorFactory = new Dictionary<Type, Func<GameFile, object>>
+        private static readonly Dictionary<Type, Func<GameFile, BindingObject>> _editorFactory = new Dictionary<Type, Func<GameFile, BindingObject>>
         {
             { typeof(SPR),  gm => new SPRTextureAtlasEditor(gm) },
             { typeof(SPD),  gm => new SPDTextureAtlasEditor(gm) },
-            { typeof(PTP),  gm => new PTPEditorVM(gm.GameData as PTP) },
             { typeof(BMD),  gm => new BMDEditorVM(gm) },
             { typeof(FTD),  gm => new FTDEditorVM(gm.GameData as FTD) },
             { typeof(FNT),  gm => new FNTEditorVM(gm.GameData as FNT) },
@@ -75,21 +73,18 @@ namespace PersonaEditor.ViewModels
                 return false;
             }
 
-            string Title = sender.PersonaFile.Name;
+            string tabTitle = sender.PersonaFile.Name;
 
             if (!_editorFactory.TryGetValue(sender.PersonaFile.GameData.GetType(), out var factory))
                 return false;
 
             var dataContext = factory(sender.PersonaFile);
 
-            ClosableTabItemVM closableTabItemVM = new ClosableTabItemVM();
-            closableTabItemVM.DataContext = dataContext;
-            closableTabItemVM.TabTitle = Title;
-            closableTabItemVM.PropertyChanged += ClosableTabItemVM_PropertyChanged;
-            closableTabItemVM.PersonaFile = sender;
+            ClosableTabItemVM closableTabItemVM = new ClosableTabItemVM(sender, dataContext, tabTitle);
+            closableTabItemVM.ItemClosed += ClosableTabItemVM_ItemClosed;
 
-            tabCollection.Add(closableTabItemVM);
-            SelectedTabIndex = tabCollection.IndexOf(closableTabItemVM);
+            _tabCollection.Add(closableTabItemVM);
+            SelectedTabIndex = _tabCollection.IndexOf(closableTabItemVM);
 
             sender.UnEnable();
             return true;
@@ -100,9 +95,11 @@ namespace PersonaEditor.ViewModels
             previewVM.SourceIMG = Preview;
         }
 
-        private void ClosableTabItemVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void ClosableTabItemVM_ItemClosed(ClosableTabItemVM sender)
         {
-            tabCollection.Remove(sender as ClosableTabItemVM);
+            sender.ItemClosed -= ClosableTabItemVM_ItemClosed;
+            _tabCollection.Remove(sender);
+            sender.Release();
         }
     }
 }

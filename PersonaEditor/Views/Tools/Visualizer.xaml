@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:classes="clr-namespace:PersonaEditor.Common"
         mc:Ignorable="d"
         Title="Visualizer" MinHeight="250" Height="350" MinWidth="400" Width="500">
 
@@ -19,26 +18,19 @@
         </Grid.RowDefinitions>
 
         <StatusBar Grid.Row="0">
-            <ComboBox Width="150" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
+            <ComboBox Width="150" ItemsSource="{Binding AvailableFontList}" SelectedIndex="{Binding SelectedFontIndex}"/>
         </StatusBar>
 
         <Image Grid.Row="1"
-               Source="{Binding TextImage}"
+               Source="{Binding TextVisualize, Mode=OneWay}"
                Stretch="Uniform" />
 
         <StackPanel Grid.Row="2">
-            <Grid Margin="4">
-                <TextBox
-                    Width="200"                    
-                    HorizontalAlignment="Left"
-                    MaxLines="1"
-                    Text="{Binding NameTB, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <CheckBox Content="Two byte ASCII"
-                          HorizontalAlignment="Right"
-                          VerticalAlignment="Center"
-                          IsChecked="{Binding TwoBytesASCII, Mode=TwoWay}" />
-            </Grid>
+            <CheckBox Content="Two byte ASCII"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Margin="4"
+                      IsChecked="{Binding TwoBytesASCII, Mode=TwoWay}" />
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -59,14 +51,14 @@
                     Margin="4"
                     AcceptsReturn="True"
                     TextWrapping="NoWrap"
-                    Text="{Binding TextTB, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    Text="{Binding InputOutputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBox
                     Grid.Column="1"
                     Grid.Row="1"
                     Margin="4"
                     IsReadOnly="True"
                     TextWrapping="Wrap"
-                    Text="{Binding HexTB, Mode=OneWay}"/>
+                    Text="{Binding InputOutputHex, Mode=OneWay}"/>
             </Grid>
         </StackPanel>
     </Grid>

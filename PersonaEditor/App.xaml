@@ -4,7 +4,6 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:converters="clr-namespace:PersonaEditor.Common.Converters"
              xmlns:controls="clr-namespace:PersonaEditor.Controls"
-             xmlns:settings="clr-namespace:PersonaEditor.ApplicationSettings"
              xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options" 
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:beh="clr-namespace:PersonaEditor.Common.Behaviors"
@@ -20,11 +19,11 @@
 
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-            <DrawingBrush x:Key="ImageBackground"
-                      Viewport="0,0,50,50"
-                      ViewportUnits="Absolute"
-                      TileMode="Tile"
-                      PresentationOptions:Freeze="True">
+            <DrawingBrush x:Key="DefaultImageTiledBackground"
+                          Viewport="0,0,50,50"
+                          ViewportUnits="Absolute"
+                          TileMode="Tile"
+                          PresentationOptions:Freeze="True">
                 <DrawingBrush.Drawing>
                     <DrawingGroup>
                         <GeometryDrawing Brush="White">
@@ -53,13 +52,6 @@
                     </DrawingGroup>
                 </DrawingBrush.Drawing>
             </DrawingBrush>
-
-            <SolidColorBrush x:Key="SPDEditorBackgroud"
-                             Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=BackgroundColor, Mode=OneWay}"/>
-            <SolidColorBrush x:Key="SPDEditorSelect"
-                             Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=SelectColor, Mode=OneWay}"/>
-            <SolidColorBrush x:Key="SPDEditorLine"
-                            Color="{Binding Source={x:Static settings:SPREditor.Default}, Path=LineColor, Mode=OneWay}"/>
 
             <StreamGeometry x:Key="ArrowUp">
                 M 0 4 L 4 0 L 8 4 L 7 5 L 4 2 L 1 5 Z
@@ -98,18 +90,19 @@
                                   DataContext="{x:Null}"
                                   Background="Transparent">
                                 <Grid IsHitTestVisible="False">
-                                    <Rectangle Fill="{StaticResource ImageBackground}"
+                                    <Rectangle Fill="{StaticResource DefaultImageTiledBackground}"
                                                Stroke="Black"
                                                StrokeThickness="2" />
-                                    <Rectangle Fill="{StaticResource SPDEditorBackgroud}" />
+                                    <Rectangle Fill="{TemplateBinding Background}" />
                                     <Image Source="{TemplateBinding TextureBitmap}" />
                                 </Grid>
 
-                                <controls:AtlasItemsContol
-                                    x:Name="ItemsControl"
-                                    SelectedObject="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SelectedObject, Mode=TwoWay}"
-                                    ObjectBorderThickness="{TemplateBinding ObjectBorderThickness}"
-                                    ItemsSource="{TemplateBinding ObjectList}" />
+                                <controls:AtlasItemsContol x:Name="ItemsControl"
+                                                           SelectedItem="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SelectedObject, Mode=TwoWay}"
+                                                           ItemBorderThickness="{TemplateBinding ObjectBorderThickness}"
+                                                           ItemBorderBrush="{TemplateBinding ObjectBorderBrush}"
+                                                           ItemSelectionBrush="{TemplateBinding ObjectSelectionBrush}"
+                                                           ItemsSource="{TemplateBinding ObjectList}" />
                             </Grid>
                         </ControlTemplate>
                     </Setter.Value>
@@ -120,10 +113,10 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type controls:AtlasObjectContainer}">
-                            <Border BorderBrush="{StaticResource SPDEditorLine}"
+                            <Border BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     Background="Transparent">
-                                <Rectangle Fill="{StaticResource SPDEditorSelect}"
+                                <Rectangle Fill="{TemplateBinding Foreground}"
                                            Opacity="0.4"
                                            Visibility="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IsSelected, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             </Border>

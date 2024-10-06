@@ -3,18 +3,12 @@ using System.Runtime.CompilerServices;
 
 namespace PersonaEditor.Common
 {
-    public abstract class BindingObject : IEventWrapper
+    public abstract class BindingObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-
-        }
-
         protected virtual void OnPropertyChanged(string propertyName)
         {
-
         }
 
         protected void Notify([CallerMemberName] string propertyName = null)
@@ -31,6 +25,11 @@ namespace PersonaEditor.Common
             storage = value;
             Notify(propertyName);
             return true;
+        }
+
+        public virtual void Release()
+        {
+
         }
     }
 }

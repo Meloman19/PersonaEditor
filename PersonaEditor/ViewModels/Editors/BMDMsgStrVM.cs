@@ -1,47 +1,43 @@
 ﻿using PersonaEditor.Common;
-using AuxiliaryLibraries.WPF;
 using PersonaEditorLib.Text;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class BMDMsgStrVM : BindingObject
+    public sealed class BMDMsgStrVM : BindingObject
     {
-        int sourceFont;
+        private int sourceFont;
+        private string _text;
 
-        public byte[] data { get; private set; }
+        public byte[] Data { get; private set; }
 
-        public string Text { get; set; }
-
-        // public FlowDocument Document { get; } = new FlowDocument();
+        public string Text
+        {
+            get => _text;
+            set => SetProperty(ref _text, value);
+        }
 
         public void Changes(bool save, int destFont)
         {
             if (save)
-                data = Text.GetTextBases(Static.EncodingManager.GetPersonaEncoding(sourceFont)).GetByteArray();
+                Data = Text.GetTextBases(Static.EncodingManager.GetPersonaEncoding(sourceFont)).GetByteArray();
             else
             {
-                Text = data.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
-                Notify("Text");
+                Text = Data.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
             }
         }
 
         public void Update(int sourceFont)
         {
             this.sourceFont = sourceFont;
-            Text = data.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
-            Notify("Text");
+            Text = Data.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
         }
 
         public BMDMsgStrVM(byte[] array, int sourceFont)
         {
-            data = array;
+            Data = array;
             this.sourceFont = sourceFont;
 
-            Text = data.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
-            //  Style style = new Style(typeof(Paragraph));
-            //  style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
-            //  Document.Resources.Add(typeof(Paragraph), style);
-            //  Document.Blocks.Add(data.GetTextBaseList().GetDocument(TestClass.personaEncoding, false));
+            Text = Data.GetTextBases().GetString(Static.EncodingManager.GetPersonaEncoding(sourceFont));
         }
     }
 }

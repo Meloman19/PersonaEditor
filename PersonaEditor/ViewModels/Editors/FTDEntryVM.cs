@@ -1,11 +1,10 @@
-﻿using PersonaEditorLib.Other;
-using AuxiliaryLibraries.WPF;
-using System.Text;
+﻿using System.Text;
 using PersonaEditor.Common;
+using PersonaEditorLib.Other;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    abstract class FTDEntryVM : BindingObject
+    public abstract class FTDEntryVM : BindingObject
     {
         protected FTD ftd;
         protected int index;

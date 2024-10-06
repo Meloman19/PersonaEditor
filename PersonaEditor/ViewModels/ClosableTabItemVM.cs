@@ -1,41 +1,33 @@
-﻿using AuxiliaryLibraries.WPF;
-using PersonaEditor.Common;
+﻿using System;
 using System.Windows.Input;
+using PersonaEditor.Common;
 
 namespace PersonaEditor.ViewModels
 {
-    class ClosableTabItemVM : BindingObject
+    public sealed class ClosableTabItemVM : BindingObject
     {
-        private object _dataContext = null;
-
-        public ClosableTabItemVM()
+        public ClosableTabItemVM(GameFileTreeItem gameFile, BindingObject gameFileViewModel, string tabTitle)
         {
-            MouseUp = new RelayCommand(MouseButtonUp);
-            FileClose = new RelayCommand(CloseFile);
+            PersonaFile = gameFile;
+            DataContext = gameFileViewModel;
+            TabTitle = tabTitle;
+            FileCloseCommand = new RelayCommand(FileClose);
         }
 
-        public ICommand FileClose { get; }
-        private void CloseFile()
+        public ICommand FileCloseCommand { get; }
+
+        public string TabTitle { get; set; }
+
+        public GameFileTreeItem PersonaFile { get; } = null;
+
+        public BindingObject DataContext { get; } = null;
+
+        public bool IsClosable { get; set; } = true;
+
+        private void FileClose()
         {
             Close();
         }
-
-        public ICommand MouseUp { get; }
-
-        private void MouseButtonUp(object arg)
-        {
-            if ((MouseButton)arg == MouseButton.Middle)
-                Close();
-        }
-
-        public string TabTitle { get; set; }
-        public object DataContext
-        {
-            get => _dataContext;
-            set => SetProperty(ref _dataContext, value);
-        }
-        public bool IsClosable { get; set; } = true;
-        public GameFileTreeItem PersonaFile { get; set; } = null;
 
         public bool Close()
         {
@@ -44,16 +36,20 @@ namespace PersonaEditor.ViewModels
                 if (DataContext is IEditor vm)
                     if (!vm.Close())
                         return false;
-
-                Notify("Close");
             }
 
-            //dataContextType = TabItemType.Null;
-            //DataContext = null;
-
             PersonaFile?.Enable();
+            ItemClosed?.Invoke(this);
             return true;
         }
 
+        public override void Release()
+        {
+            base.Release();
+
+            DataContext?.Release();
+        }
+
+        public event Action<ClosableTabItemVM> ItemClosed;
     }
 }

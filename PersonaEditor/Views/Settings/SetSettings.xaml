@@ -23,15 +23,6 @@
                     <local:Main DataContext="{Binding MainVM}"/>
                 </TabItem.Content>
             </TabItem>
-
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="Default Background"/>
-                </TabItem.Header>
-                <TabItem.Content>
-                    <local:DefaultBackground DataContext="{Binding DefaultBackgroundVM}"/>
-                </TabItem.Content>
-            </TabItem>
         </TabControl>
 
         <Grid Grid.Row="1">

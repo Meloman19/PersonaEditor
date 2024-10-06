@@ -1,30 +1,36 @@
-﻿using AuxiliaryLibraries.WPF;
-using PersonaEditor.ApplicationSettings;
-using PersonaEditor.Common;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
+using PersonaEditor.Common;
+using PersonaEditor.Common.Settings;
 
 namespace PersonaEditor.ViewModels.Settings
 {
-    class MainVM : BindingObject
+    public sealed class MainVM : BindingObject
     {
-        AppSetting AppSetting_Temp = new AppSetting();
+        private readonly AppSettings _appSettings;
+
+        public MainVM()
+        {
+            _appSettings = Static.SettingsProvider.AppSettings.Clone();
+            LoadLangList();
+        }
 
         public ObservableCollection<string> LangList { get; } = new ObservableCollection<string>() { "Default" };
+
         public int SelectedLangIndex
         {
             get
             {
-                if (LangList.Contains(AppSetting_Temp.DefaultLocalization))
-                    return LangList.IndexOf(AppSetting_Temp.DefaultLocalization);
+                if (LangList.Contains(_appSettings.DefaultLocalization))
+                    return LangList.IndexOf(_appSettings.DefaultLocalization);
                 else
                     return 0;
             }
             set
             {
                 if (LangList.Count > value)
-                    AppSetting_Temp.DefaultLocalization = LangList[value];
-                Notify("SelectedLangIndex");
+                    _appSettings.DefaultLocalization = LangList[value];
+                Notify(nameof(SelectedLangIndex));
             }
         }
 
@@ -32,11 +38,11 @@ namespace PersonaEditor.ViewModels.Settings
 
         public bool CopyOld2New
         {
-            get { return AppSetting_Temp.SaveAsPTP_CO2N; }
+            get { return _appSettings.SaveAsPTP_CO2N; }
             set
             {
-                AppSetting_Temp.SaveAsPTP_CO2N = value;
-                Notify("CopyOld2New");
+                _appSettings.SaveAsPTP_CO2N = value;
+                Notify(nameof(CopyOld2New));
             }
         }
 
@@ -44,7 +50,7 @@ namespace PersonaEditor.ViewModels.Settings
         {
             get
             {
-                int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(AppSetting_Temp.SaveAsPTP_Font);
+                int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(_appSettings.SaveAsPTP_Font);
                 if (sourceInd >= 0)
                     return sourceInd;
                 else
@@ -52,8 +58,8 @@ namespace PersonaEditor.ViewModels.Settings
             }
             set
             {
-                AppSetting_Temp.SaveAsPTP_Font = Static.EncodingManager.GetPersonaEncodingName(value);
-                Notify("SelectedFontSave");
+                _appSettings.SaveAsPTP_Font = Static.EncodingManager.GetPersonaEncodingName(value);
+                Notify(nameof(SelectedFontSave));
             }
         }
 
@@ -61,7 +67,7 @@ namespace PersonaEditor.ViewModels.Settings
         {
             get
             {
-                int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(AppSetting_Temp.OpenPTP_Font);
+                int sourceInd = Static.EncodingManager.GetPersonaEncodingIndex(_appSettings.OpenPTP_Font);
                 if (sourceInd >= 0)
                     return sourceInd;
                 else
@@ -69,30 +75,24 @@ namespace PersonaEditor.ViewModels.Settings
             }
             set
             {
-                AppSetting_Temp.OpenPTP_Font = Static.EncodingManager.GetPersonaEncodingName(value);
-                Notify("SelectedFontOpen");
+                _appSettings.OpenPTP_Font = Static.EncodingManager.GetPersonaEncodingName(value);
+                Notify(nameof(SelectedFontOpen));
             }
         }
 
         public bool SingleInstanceApplication
         {
-            get { return AppSetting_Temp.SingleInstanceApplication; }
+            get { return _appSettings.SingleInstanceApplication; }
             set
             {
-                AppSetting_Temp.SingleInstanceApplication = value;
-                Notify("SingleInstanceApplication");
+                _appSettings.SingleInstanceApplication = value;
+                Notify(nameof(SingleInstanceApplication));
             }
-        }
-
-        public MainVM()
-        {
-            LoadLangList();
         }
 
         public void Save()
         {
-            AppSetting_Temp.Save();
-            AppSetting.Default.Reload();
+            Static.SettingsProvider.AppSettings = _appSettings;
         }
 
         private void LoadLangList()

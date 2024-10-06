@@ -1,56 +1,59 @@
-﻿using PersonaEditorLib.Other;
-using AuxiliaryLibraries.WPF;
-using PersonaEditor.Common;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Media;
+using PersonaEditor.Common;
+using PersonaEditor.Common.Settings;
+using PersonaEditorLib.Other;
 
 namespace PersonaEditor.ViewModels.Editors
 {
-    class FTDEditorVM : BindingObject, IEditor
+    public sealed class FTDEditorVM : BindingObject, IEditor
     {
-        FTD ftd;
+        private readonly SettingsProvider _settingsProvider;
 
-        public ObservableCollection<FTDEntryVM> Entrie { get; } = new ObservableCollection<FTDEntryVM>();
+        private FTD _ftd;
+        private int _selectEncodingIndex = 0;
+
+        public FTDEditorVM(FTD ftd)
+        {
+            _settingsProvider = Static.SettingsProvider;
+            EncodingList = Static.EncodingManager.EncodingList;
+            _selectEncodingIndex = Static.EncodingManager.GetPersonaEncodingIndex(_settingsProvider.AppSettings.FTDEncoding);
+            _ftd = ftd;
+            Init();
+        }
+
+        public ObservableCollection<FTDEntryVM> Entries { get; } = new ObservableCollection<FTDEntryVM>();
 
         public ReadOnlyObservableCollection<string> EncodingList { get; }
 
-        private int selectEncodingIndex = 0;
         public int SelectEncodingIndex
         {
-            get { return selectEncodingIndex; }
+            get { return _selectEncodingIndex; }
             set
             {
-                selectEncodingIndex = value;
-                ApplicationSettings.AppSetting.Default.FTDEncoding = Static.EncodingManager.GetPersonaEncodingName(value);
+                _selectEncodingIndex = value;
+                _settingsProvider.AppSettings.FTDEncoding = Static.EncodingManager.GetPersonaEncodingName(value);
                 UpdateEncoding();
             }
         }
 
         public FontFamily FontFamily { get; } = new FontFamily(System.Drawing.FontFamily.GenericMonospace.Name);
 
-        public FTDEditorVM(FTD ftd)
-        {
-            EncodingList = Static.EncodingManager.EncodingList;
-            selectEncodingIndex = Static.EncodingManager.GetPersonaEncodingIndex(ApplicationSettings.AppSetting.Default.FTDEncoding);
-            this.ftd = ftd;
-            Init();
-        }
-
         private void Init()
         {
-            Entrie.Clear();
-            for (int i = 0; i < ftd.Entries.Count; i++)
+            Entries.Clear();
+            for (int i = 0; i < _ftd.Entries.Count; i++)
             {
-                if (ftd.Entries[i].Length == 1)
-                    Entrie.Add(new FTDSingleVM(ftd, i, 0, Static.EncodingManager.GetPersonaEncoding(selectEncodingIndex)));
+                if (_ftd.Entries[i].Length == 1)
+                    Entries.Add(new FTDSingleVM(_ftd, i, 0, Static.EncodingManager.GetPersonaEncoding(_selectEncodingIndex)));
                 else
-                    Entrie.Add(new FTDMultiVM(ftd, i, Static.EncodingManager.GetPersonaEncoding(selectEncodingIndex)));
+                    Entries.Add(new FTDMultiVM(_ftd, i, Static.EncodingManager.GetPersonaEncoding(_selectEncodingIndex)));
             }
         }
 
         private void UpdateEncoding()
         {
-            foreach (var a in Entrie)
+            foreach (var a in Entries)
                 a.SetEncoding(Static.EncodingManager.GetPersonaEncoding(SelectEncodingIndex));
         }
 
@@ -58,7 +61,5 @@ namespace PersonaEditor.ViewModels.Editors
         {
             return true;
         }
-
-
     }
 }
