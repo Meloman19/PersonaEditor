@@ -198,10 +198,11 @@ namespace PersonaEditorLib.SpriteContainer
                     int index = int.Parse(key.Element("Index").Value);
                     int textureIndex = int.Parse(key.Element("TextureIndex").Value);
 
-                    var spdKey = KeyList.Find(x => x.ListIndex == index && x.TextureIndex == textureIndex);
+                    var spdKey = KeyList.Find(x => x.ListIndex == index);
                     if (spdKey == null)
                         continue;
 
+                    spdKey.TextureIndex = textureIndex;
                     spdKey.SpriteX = int.Parse(key.Element("X").Value);
                     spdKey.SpriteY = int.Parse(key.Element("Y").Value);
                     spdKey.SpriteWidth = int.Parse(key.Element("Width").Value);

@@ -7,7 +7,7 @@ namespace PersonaEditorLib.SpriteContainer
     public class SPDKey
     {
         public int ListIndex { get; private set; }
-        public int TextureIndex { get; private set; }
+        public int TextureIndex { get; set; }
         private int[] Unk0x08 { get; set; } // x 6
         public int SpriteX { get; set; }
         public int SpriteY { get; set; }
